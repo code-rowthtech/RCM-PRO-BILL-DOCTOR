@@ -51,11 +51,23 @@ const MENU_ITEMS = [
         url: '/apps/patients/list',
     },
  
+    // {
+    //     key: 'transaction',
+    //     label: 'Transaction',
+    //     icon: 'uil-money-withdrawal',
+    //     url: '/apps/transaction/transaction-list',
+    // },
     {
-        key: 'transaction',
-        label: 'Transaction',
-        icon: 'uil-money-withdrawal',
-        url: '/apps/transaction/transaction-list',
+        key: 'schedule',
+        label: 'Schedule',
+        icon: 'uil uil-medical',
+        url: '/apps/schedule/tabs',
+    },
+    {
+        key: 'prescription',
+        label: 'Prescription',
+        icon: 'uil uil-medical',
+        url: '/apps/prescription/index',
     },
     {
         key: 'Diagnosis',

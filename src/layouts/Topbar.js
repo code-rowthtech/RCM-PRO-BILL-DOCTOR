@@ -120,6 +120,11 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/diagnosis/list': 'Diagnosis',
         '/apps/profile/profile-details': 'Profile',
         '/apps/setting/setting-page': 'Settings',
+        '/apps/schedule/tabs': 'Schedule',
+        '/apps/schedule/addHoliday': 'Add Holiday',
+        '/apps/schedule/addBreak': 'Add Break',
+        '/apps/prescription/index': 'Prescription',
+        '/apps/prescription/newPrescription': 'New Prescription',
        
 
     };

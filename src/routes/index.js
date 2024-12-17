@@ -17,6 +17,11 @@ import Setting from '../pages/setting/Setting';
 import Index from '../pages/profile/Index';
 import NewAppointment from '../pages/apps/Appointments/NewAppointment';
 import AppointmentCalendar from '../pages/apps/Appointments/AppointmentCalendar';
+import schedule from '../pages/Schedule/schedule';
+import AddHoliday from '../pages/Schedule/addHoliday';
+import addBreak from '../pages/Schedule/addBreak';
+import Prescription from '../pages/Prescription/index';
+import NewPrescription from '../pages/Prescription/newPrescription';
 
 // lazy load all the views
 
@@ -253,6 +258,44 @@ const AllRoutes = () => {
                               
                             ],
                         },
+
+                        {
+                            path: 'schedule',
+                            children: [
+                                {
+                                    path: 'tabs',
+                                    element: <LoadComponent component={schedule} />,
+                                },
+                                {
+                                    path: 'addHoliday',
+                                    element: <LoadComponent component={AddHoliday} />,
+                                },
+                                {
+                                    path: 'addBreak',
+                                    element: <LoadComponent component={addBreak} />,
+                                },
+                              
+                            ],
+                        },
+                        {
+                            path: 'prescription',
+                            children: [
+                                {
+                                    path: 'index',
+                                    element: <LoadComponent component={Prescription} />,
+                                },
+                                {
+                                    path: 'newPrescription',
+                                    element: <LoadComponent component={NewPrescription} />,
+                                },
+                                // {
+                                //     path: 'addBreak',
+                                //     element: <LoadComponent component={addBreak} />,
+                                // },
+                              
+                            ],
+                        },
+                       
                        
                         {
                             path: 'transaction',
