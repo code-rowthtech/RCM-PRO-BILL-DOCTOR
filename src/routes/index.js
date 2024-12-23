@@ -22,6 +22,9 @@ import AddHoliday from '../pages/Schedule/addHoliday';
 import addBreak from '../pages/Schedule/addBreak';
 import Prescription from '../pages/Prescription/index';
 import NewPrescription from '../pages/Prescription/newPrescription';
+import NewDiagnosisTest from '../pages/diagnosis/NewDiagnosisTest';
+import Report from '../pages/Report/Report';
+import NewInvestigation from '../pages/Report/NewInvestigation';
 
 // lazy load all the views
 
@@ -344,11 +347,29 @@ const AllRoutes = () => {
                             ],
                         },
                         {
+                            path: 'report',
+                            children: [
+                                {
+                                    path: 'list',
+                                    element: <LoadComponent component={Report} />,
+                                },
+                                {
+                                    path: 'newInvestigation',
+                                    element: <LoadComponent component={NewInvestigation} />,
+                                },
+                              
+                            ],
+                        },
+                        {
                             path: 'diagnosis',
                             children: [
                                 {
                                     path: 'list',
                                     element: <LoadComponent component={Diagnosis} />,
+                                },
+                                {
+                                    path: 'newDiagnosisTest',
+                                    element: <LoadComponent component={NewDiagnosisTest} />,
                                 },
                               
                             ],

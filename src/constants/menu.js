@@ -60,13 +60,19 @@ const MENU_ITEMS = [
     {
         key: 'schedule',
         label: 'Schedule',
-        icon: 'uil uil-medical',
+        icon: 'uil-book-medical',
         url: '/apps/schedule/tabs',
+    },
+    {
+        key: 'report',
+        label: 'Report',
+        icon: 'uil-clipboard-alt',
+        url: '/apps/report/list',
     },
     {
         key: 'prescription',
         label: 'Prescription',
-        icon: 'uil uil-medical',
+        icon: 'uil-file-medical-alt',
         url: '/apps/prescription/index',
     },
     {
