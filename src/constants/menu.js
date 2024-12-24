@@ -87,12 +87,12 @@ const MENU_ITEMS = [
         icon: 'uil-user-square',
         url: '/apps/profile/profile-details',
     },
-    {
-        key: 'setting',
-        label: 'Setting',
-        icon: 'uil-lock-open-alt',
-        url: '/apps/setting/setting-page',
-    },
+    // {
+    //     key: 'setting',
+    //     label: 'Setting',
+    //     icon: 'uil-lock-open-alt',
+    //     url: '/apps/setting/setting-page',
+    // },
     {
         key: 'logout',
         label: 'Logout',

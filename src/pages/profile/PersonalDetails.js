@@ -39,7 +39,7 @@ const PersonalDetails = () => {
 
     return (
         <div className="container-fluid px-0">
-            <div className="col-12 mt-3" style={{ borderBottom: '1px solid #444141' }}>
+            <div className="col-12 mt-1" style={{ borderBottom: '1px solid #444141' }}>
                 <div className="row">
                     <div className="col-6">
                         <Form>
