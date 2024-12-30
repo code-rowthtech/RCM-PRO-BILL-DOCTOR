@@ -51,11 +51,29 @@ const MENU_ITEMS = [
         url: '/apps/patients/list',
     },
  
+    // {
+    //     key: 'transaction',
+    //     label: 'Transaction',
+    //     icon: 'uil-money-withdrawal',
+    //     url: '/apps/transaction/transaction-list',
+    // },
     {
-        key: 'transaction',
-        label: 'Transaction',
-        icon: 'uil-money-withdrawal',
-        url: '/apps/transaction/transaction-list',
+        key: 'schedule',
+        label: 'Schedule',
+        icon: 'uil-book-medical',
+        url: '/apps/schedule/tabs',
+    },
+    {
+        key: 'report',
+        label: 'Report',
+        icon: 'uil-clipboard-alt',
+        url: '/apps/report/list',
+    },
+    {
+        key: 'prescription',
+        label: 'Prescription',
+        icon: 'uil-file-medical-alt',
+        url: '/apps/prescription/index',
     },
     {
         key: 'Diagnosis',
@@ -69,12 +87,12 @@ const MENU_ITEMS = [
         icon: 'uil-user-square',
         url: '/apps/profile/profile-details',
     },
-    {
-        key: 'setting',
-        label: 'Setting',
-        icon: 'uil-lock-open-alt',
-        url: '/apps/setting/setting-page',
-    },
+    // {
+    //     key: 'setting',
+    //     label: 'Setting',
+    //     icon: 'uil-lock-open-alt',
+    //     url: '/apps/setting/setting-page',
+    // },
     {
         key: 'logout',
         label: 'Logout',

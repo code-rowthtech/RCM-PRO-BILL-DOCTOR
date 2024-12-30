@@ -34,10 +34,10 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
                 <tr>
                     <th className='text-white'>Sr.No.</th>
                     <th className='text-white'>Patients Name</th>
-                    <th className='text-white'>Doctor</th>
-                    <th className='text-white'>Doctor Department</th>
-                    <th className='text-white'>Date</th>
-                    <th className='text-white'>Status</th>
+                    {/* <th className='text-white'>Doctor</th> */}
+                    {/* <th className='text-white'>Doctor Department</th> */}
+                    <th className='text-white text-end' style={{paddingRight:'70px'}}>Date</th>
+                    <th className='text-white text-end pe-3 '>Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -45,10 +45,10 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
                     <tr key={index}>
                         <td>{index + 1}</td>
                         <td>Patient Name</td>
-                        <td>Doctor Demo</td>
-                        <td>Allergists</td>
-                        <td>DD/MM/YYYY</td>
-                        <td><span className='px-1 text-white bg-secondary rounded-2'>Confirm</span></td>
+                        {/* <td>Doctor Demo</td> */}
+                        {/* <td>Allergists</td> */}
+                        <td className='text-end'>DD/MM/YYYY</td>
+                        <td className='text-end'><span className='px-1 text-white bg-secondary rounded-2'>Confirm</span></td>
                     </tr>
                 ))}
             </tbody>
@@ -64,8 +64,8 @@ const AppointmentsTransactionList = ({ patientsData }: OrderListProps): React$El
                 <tr>
                     <th className='text-white'>Sr.No.</th>
                     <th className='text-white'>Patient Name</th>
-                    <th className='text-white'>Doctor</th>
-                    <th className='text-white'>Doctor Department</th>
+                    {/* <th className='text-white'>Doctor</th> */}
+                    {/* <th className='text-white'>Doctor Department</th> */}
                     <th className='text-white'>Appointment Date</th>                                                                          
                     <th className='text-white'>Payment Status</th>
                     <th className='text-white'>Payment Mode</th>
@@ -78,8 +78,8 @@ const AppointmentsTransactionList = ({ patientsData }: OrderListProps): React$El
                     <tr key={index}>
                         <td>{index + 1}</td>
                         <td>John Doe</td>
-                        <td>Doctor Demo</td>
-                        <td>Nephrologists</td>
+                        {/* <td>Doctor Demo</td> */}
+                        {/* <td>Nephrologists</td> */}
                         <td>26th sep, 2024</td>
                         <td><span className='px-1 text-white bg-success rounded-2'>Confirm</span></td>
                         <td>Paystack</td>

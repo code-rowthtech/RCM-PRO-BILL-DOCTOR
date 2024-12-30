@@ -7,3 +7,4 @@ export * from './dashboard/actions';
 export * from './doctors/actions';
 export * from './patients/actions';
 export * from './subscriptions/actions';
+export * from './schedule/actions';
