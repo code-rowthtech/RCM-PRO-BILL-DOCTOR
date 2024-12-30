@@ -11,7 +11,8 @@ const AddHoliday = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const doctorLists = store?.getDoctorsListReducer?.data?.result;
-    // const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'));
+    console.log(clinic_id,'clinic_id')
 
     const {
         register,
@@ -42,7 +43,7 @@ const AddHoliday = () => {
 
     return (
         <div className="background_Color pt-1 pb-2">
-            <div className="container-fluid mt-4">
+            <div className="container-fluid mt-2">
                 <Card className="px-3 py-2" style={{ height: "85vh" }}>
                     <div className="d-flex justify-content-between">
                         <p style={{ fontWeight: 600 }}>ADD HOLIDAY</p>
