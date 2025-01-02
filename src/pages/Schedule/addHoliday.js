@@ -3,16 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { Button, Card, Form } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-// import { createScheduleAction, getDoctorsListAction } from "../../../redux/schedule/action";
-// import { encryptMessage } from "../../../cryptoUtils";
+import { createHolidayScheduleAction } from "../../redux/schedule/actions";
+import { encryptMessage } from "../../cryptoUtils";
+import Spinner from "../../constants/Spinner";
 
 const AddHoliday = () => {
+    
     const store = useSelector((state) => state);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const doctorLists = store?.getDoctorsListReducer?.data?.result;
-    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'));
-    console.log(clinic_id,'clinic_id')
+    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const user = JSON.parse(sessionStorage.getItem('hyper_user'));
+    const doctorName = `${user?.firstName || ''} ${user?.lastName || ''}`.trim();
 
     const {
         register,
@@ -21,25 +23,25 @@ const AddHoliday = () => {
         formState: { errors },
     } = useForm();
 
-   const onSubmit = (data) => {
-    const doctorInfo = JSON.parse(data.doctorInfo);
+    const onSubmit = (data) => {
 
-    const payload = {
-        doctorId: doctorInfo.id,
-        type : 'Holiday',
-        name: doctorInfo.name,
-        reason: data.reason,
-        fromDate:data.fromDate,
-        tillDate: data.tillDate,
+        const payload = {
+            clinicId: clinic_id,
+            type: 'Holiday',
+            name: doctorName,
+            reason: data.reason,
+            fromDate: data.fromDate,
+            tillDate: data.tillDate,
+        };
+        console.log(payload,'payloadddddddd')
+        dispatch(createHolidayScheduleAction({ key: encryptMessage(payload) }));
     };
-
-    // dispatch(createScheduleAction({ key: encryptMessage(payload) }));
-    reset();
-};
-
-    // useEffect(() => {
-    //     dispatch(getDoctorsListAction());
-    // }, [dispatch]);
+    const createResponse = store?.createHolidayScheduleReducer?.data?.status;
+    useEffect(() => {
+        if (createResponse === 200) {
+            reset()
+        }
+    }, [createResponse]);
 
     return (
         <div className="background_Color pt-1 pb-2">
@@ -48,7 +50,7 @@ const AddHoliday = () => {
                     <div className="d-flex justify-content-between">
                         <p style={{ fontWeight: 600 }}>ADD HOLIDAY</p>
                         <div>
-                            <Button onClick={() => navigate(-1)}>Back</Button>
+                            <Button variant="secondary" onClick={() => navigate(-1)}>Back</Button>
                         </div>
                     </div>
 
@@ -60,29 +62,17 @@ const AddHoliday = () => {
                                         <Form.Label className="mb-1">
                                             Doctor Name<span className="text-danger">*</span>
                                         </Form.Label>
-                                        <Form.Select
+                                        <Form.Control
+                                            type="text"
+                                            value={doctorName} // Display the doctor name dynamically
+                                            readOnly // Prevent manual editing
                                             {...register("doctorInfo", {
-                                                required: "Doctor selection is required",
+                                                // required: "Doctor selection is required",
                                             })}
-                                        >
-                                            <option value="">Select doctor</option>
-                                            {doctorLists &&
-                                                doctorLists.map((doctor, index) => (
-                                                    <option
-                                                        key={index}
-                                                        value={JSON.stringify({
-                                                            id: doctor?.userId?._id,
-                                                            name: `${doctor?.userId?.firstName} ${doctor?.userId?.lastName}`,
-                                                        })}
-                                                    >
-                                                        {`${doctor?.userId?.firstName} ${doctor?.userId?.lastName}`}
-                                                    </option>
-                                                ))}
-                                        </Form.Select>
-                                        {errors.doctorName && (
-                                            <span className="text-danger">{errors.doctorName.message}</span>
-                                        )}
+                                        />
+
                                     </Form.Group>
+
 
                                     <Form.Group className="mb-3">
                                         <Form.Label className="mb-1">
@@ -138,8 +128,13 @@ const AddHoliday = () => {
                                 <Button variant="secondary" type="button">
                                     Cancel
                                 </Button>
-                                <Button variant="primary" type="submit">
-                                    Save
+                                <Button variant="primary" disabled={store?.createHolidayScheduleReducer?.loading} type="submit">
+                                    {
+                                        store?.createHolidayScheduleReducer?.loading ?
+                                            <Spinner color="white" className="spinner-border-sm" />
+                                            :
+                                            'Save'
+                                    }
                                 </Button>
                             </div>
                         </Form>

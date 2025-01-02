@@ -8,6 +8,10 @@ export const createHolidayScheduleAction = (data): AuthAction => ({
     type: ScheduleActionTypes.CREATE_HOLIDAY_SCHEDULE,
     data
 });
+export const getHolidayScheduleAction = (data): AuthAction => ({
+    type: ScheduleActionTypes.GET_HOLIDAY_SCHEDULE,
+    data
+});
 
 export const stateEmptydAction = (): LayoutAction => ({
     type: ScheduleActionTypes.STATE_EMPTY_INTIAL_STATE,

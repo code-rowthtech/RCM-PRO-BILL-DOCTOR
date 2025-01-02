@@ -57,6 +57,12 @@ const PersonalDetails = () => {
             : '';
 
         setValue('dateOfBirth', formattedDateOfBirth);
+        if (doctorDetails?.result?.userId?.profileImage) {
+            setLogoName(doctorDetails?.result?.userId?.profileImage?.fileName)
+        }
+        if (doctorDetails?.result?.userId?.degreeDoc) {
+            setDegreeName(doctorDetails?.result?.userId?.degreeDoc?.fileName)
+        }
 
     }, [doctorDetails]);
 
@@ -81,6 +87,7 @@ const PersonalDetails = () => {
             // console.error('Error during file upload:', error);
         }
     };
+    
 
     return (
         <div className="container-fluid px-0">
@@ -157,9 +164,8 @@ const PersonalDetails = () => {
                                 <Form.Control
                                     type="file"
                                     className="d-none "
-                                    // {...register('profileImage', {
-                                    //     required: 'Profile image is required',
-                                    // })}
+                                    {...register('profileImage', {
+                                    })}
                                     accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
                                     ref={logoFileInputRef}
                                     onChange={handleFileChange}
@@ -175,7 +181,13 @@ const PersonalDetails = () => {
 
                             <Form.Group className="mb-1" controlId="degree">
                                 <Form.Label className='mb-0'>Degree Name</Form.Label>
-                                <Form.Control type="text" placeholder="Enter Degree Name" />
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Enter Degree Name"
+                                    {...register('degreeName',
+                                        // { required: 'Degree Name is required' }
+                                    )}
+                                />
                             </Form.Group>
                         </Form>
                     </div>
@@ -223,10 +235,10 @@ const PersonalDetails = () => {
                                 <Form.Control
                                     as="select"
                                     {...register("gender", { required: "Gender is required" })}
-                                    // onChange={(e) => {
-                                    //     clearErrors("gender");
-                                    //     setFormData((prev) => ({ ...prev, gender: e.target.value }));
-                                    // }}
+                                // onChange={(e) => {
+                                //     clearErrors("gender");
+                                //     setFormData((prev) => ({ ...prev, gender: e.target.value }));
+                                // }}
                                 // className="mt-1"
                                 >
                                     <option value="">Select Gender</option>
