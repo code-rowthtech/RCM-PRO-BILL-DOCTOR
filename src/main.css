@@ -86,3 +86,7 @@ table {
 .box-shadow-none {
     box-shadow: none !important;
 }
+
+.select__input{
+    border: none !important;
+}
