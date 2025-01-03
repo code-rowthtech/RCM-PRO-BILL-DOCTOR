@@ -7,18 +7,30 @@ import ClinicalNotes from './clinicalNotes';
 import TreatmentPlans from './treatmentPlans';
 import CompleatedProcedures from './compleatedProcedures';
 import Files from './files';
+import NewPrescription from './newPrescription';
+import NewClinicalNotes from './newClinicalNotes';
 
 const Prescription = () => {
-    const [detailsModal, setDetailsModal] = useState(false);
     const [selectedPatient, setSelectedPatient] = useState('Select Patient');
     const [activeTab, setActiveTab] = useState('prescription');
+    const [ShowNewPrescription, setShowNewPrescription] = useState(false);
+    const [ShowNewClinicalNotes, setShowNewClinicalNotes] = useState(false);
+
 
     const renderTabContent = () => {
         switch (activeTab) {
             case 'prescription':
-                return <PrescriptionTable />;
+                if (ShowNewPrescription) {
+                    return <NewPrescription />;
+                } else {
+                    return <PrescriptionTable />;
+                }
             case 'clinicalNotes':
-                return <ClinicalNotes />;
+                if (ShowNewClinicalNotes) {
+                    return <NewClinicalNotes />;
+                } else {
+                    return <ClinicalNotes />;
+                }
             case 'treatmentPlans':
                 return <TreatmentPlans />;
             case 'completedProcedures':
@@ -101,13 +113,23 @@ const Prescription = () => {
                                                 placeholder="Search..."
                                                 className="w-auto"
                                             />
-                                            <Button
-                                                className="custom-buttons"
-                                                // as={Link}
-                                                // to="/apps/prescription/newPrescription"
-                                            >
-                                                Create Notes
-                                            </Button>
+                                            {activeTab === 'prescription' && (
+                                                <Button
+                                                    className={` ${ShowNewPrescription ? 'bg-danger' : 'custom-buttons'}`}
+                                                    onClick={() => setShowNewPrescription(!ShowNewPrescription)}
+                                                >
+                                                    {!ShowNewPrescription ? 'New Prescription' : 'Back'}
+                                                </Button>
+                                            )}
+                                            {activeTab === 'clinicalNotes' && (
+                                                <Button
+                                                    className={` ${ShowNewClinicalNotes ? 'bg-danger' : 'custom-buttons'}`}
+                                                    onClick={() => setShowNewClinicalNotes(!ShowNewClinicalNotes)}
+                                                >
+                                                    {!ShowNewClinicalNotes ? 'Create Notes' : 'Back'}
+                                                </Button>
+                                            )}
+
                                         </Col>
                                     </Row>
                                 </Col>
@@ -119,31 +141,6 @@ const Prescription = () => {
                     </Card>
                 </Col>
             </Row>
-
-            {/* Patient Details Modal */}
-            <Modal show={detailsModal} onHide={() => setDetailsModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Patient Details</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {/* {selectedDetails ? (
-                        <>
-                            <h5>Name:</h5>
-                            <p>{selectedDetails.firstName} {selectedDetails.lastName}</p>
-                            <h5>Age:</h5>
-                            <p>{selectedDetails.age}</p>
-                            <h5>Gender:</h5>
-                            <p>{selectedDetails.gender}</p>
-                            <h5>Appointment Date:</h5>
-                            <p>{selectedDetails.appointmentDate}</p>
-                            <h5>Insurance Provider:</h5>
-                            <p>{selectedDetails.insuranceProvider}</p>
-                        </>
-                    ) : (
-                        <p>No patient details available.</p>
-                    )} */}
-                </Modal.Body>
-            </Modal>
         </>
     );
 };

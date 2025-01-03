@@ -89,4 +89,8 @@ table {
 
 .select__input{
     border: none !important;
+
+}
+.buttons-head div{
+    width: 50% !important;
 }

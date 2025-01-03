@@ -7,6 +7,7 @@ import { MdOutlineMailOutline } from "react-icons/md";
 import { MdSkipPrevious } from "react-icons/md";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaEye } from "react-icons/fa";
+import { RiDeleteBin7Line } from "react-icons/ri";
 
 const PrescriptionTable = () => {
     const prescriptionData = [
@@ -139,7 +140,8 @@ const PrescriptionTable = () => {
                                                 <TfiSave className='fs-4' />&nbsp; Save as Template
                                             </Dropdown.Item>
                                             <hr className='m-0' />
-                                            <Dropdown.Item href="#/edit"><RiEditLine className='fs-4' />&nbsp;Edit</Dropdown.Item>
+                                            <Dropdown.Item href="#/edit"><RiEditLine className='fs-4' />&nbsp;Edit</Dropdown.Item> 
+                                            <Dropdown.Item href="#/delete"><RiDeleteBin7Line className='fs-4' />&nbsp;Delete</Dropdown.Item>
                                             <hr className='m-0' />
                                             {/* <Dropdown.Item href="#/delete"><TfiSave className='fs-4'/>&nbsp;Delete</Dropdown.Item> */}
                                             <Dropdown.Item href="#/email"><MdOutlineMailOutline className='fs-4' />&nbsp;Email</Dropdown.Item>
