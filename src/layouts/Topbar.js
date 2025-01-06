@@ -118,8 +118,15 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/patients/list': 'Patient-History',
         '/apps/transaction/transaction-list': 'Transaction',
         '/apps/diagnosis/list': 'Diagnosis',
+        '/apps/diagnosis/newDiagnosisTest': 'New Patient Diagnosis Test',
         '/apps/profile/profile-details': 'Profile',
+        '/apps/report/list': 'Reports',
         '/apps/setting/setting-page': 'Settings',
+        '/apps/schedule/tabs': 'Schedule',
+        '/apps/schedule/addHoliday': 'Add Holiday',
+        '/apps/schedule/addBreak': 'Add Break',
+        '/apps/prescription/index': 'Prescription',
+        '/apps/prescription/newPrescription': 'New Prescription',
        
 
     };

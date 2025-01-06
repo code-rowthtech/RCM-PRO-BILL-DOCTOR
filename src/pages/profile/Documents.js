@@ -6,12 +6,12 @@ const Documents = () => {
     return (
         <>
             <div className="container-fluid px-0">
-                <div className="row mt-3" style={{ borderBottom: '1px solid #444141' }}>
+                <div className="row mt-1" style={{ borderBottom: '1px solid #444141' }}>
                     <p className="fw-bold">Licensing Information<span className='text-danger'>*</span></p>
                     <div className="col-6">
                         <form>
-                            <div className="mb-3">
-                                <label htmlFor="firstName" className="form-label">
+                            <div className="mb-1">
+                                <label htmlFor="firstName" className="form-label mb-0">
                                     State License #
                                 </label>
                                 <input
@@ -23,8 +23,8 @@ const Documents = () => {
 
                             <div className="row">
                                 <div className="col-6">
-                                    <div className="mb-3">
-                                        <label htmlFor="stateLicense" className="form-label">
+                                    <div className="mb-1">
+                                        <label htmlFor="stateLicense" className="form-label mb-0">
                                             State License Obtained (state)<span className='text-danger'>*</span>
                                         </label>
                                         <select
@@ -51,8 +51,8 @@ const Documents = () => {
                                     </div>
                                 </div>
                                 <div className="col-6">
-                                    <div className="mb-3" style={{ position: "relative" }}>
-                                        <label htmlFor="Phone" className="form-label">
+                                    <div className="mb-1" style={{ position: "relative" }}>
+                                        <label htmlFor="Phone" className="form-label mb-0">
                                             Upload Document
                                         </label>
                                         <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
@@ -87,8 +87,8 @@ const Documents = () => {
                     </div>
                     <div className="col-6">
                         <form>
-                            <div className="mb-3">
-                                <label htmlFor="firstName" className="form-label">
+                            <div className="mb-1">
+                                <label htmlFor="firstName" className="form-label mb-0">
                                     State License Provider (licensing authority name)
                                 </label>
                                 <input
@@ -100,8 +100,8 @@ const Documents = () => {
 
                             <div className="row">
                                 <div className="col-6">
-                                    <div className="mb-3">
-                                        <label htmlFor="firstName" className="form-label">
+                                    <div className="mb-1">
+                                        <label htmlFor="firstName" className="form-label mb-0">
                                             State License Issue Date<span className='text-danger'>*</span>
                                         </label>
                                         <input
@@ -112,8 +112,8 @@ const Documents = () => {
                                     </div>
                                 </div>
                                 <div className="col-6">
-                                    <div className="mb-3">
-                                        <label htmlFor="firstName" className="form-label">
+                                    <div className="mb-2">
+                                        <label htmlFor="firstName" className="form-label mb-0">
                                             License Expiration Date<span className='text-danger'>*</span>
                                         </label>
                                         <input
@@ -127,12 +127,12 @@ const Documents = () => {
                         </form>
                     </div>
                 </div>
-                <div className="row mt-3" >
+                <div className="row mt-1" >
                     <p className="fw-bold">Licensing Information<span className='text-danger'>*</span></p>
                     <div className="col-6">
                         <form>
-                            <div className="mb-3">
-                                <label htmlFor="firstName" className="form-label">
+                            <div className="mb-1">
+                                <label htmlFor="firstName" className="form-label mb-0">
                                     State License #
                                 </label>
                                 <input
@@ -144,8 +144,8 @@ const Documents = () => {
 
                             <div className="row">
                                 <div className="col-6">
-                                    <div className="mb-3">
-                                        <label htmlFor="stateLicense" className="form-label">
+                                    <div className="mb-1">
+                                        <label htmlFor="stateLicense" className="form-label mb-0">
                                             State License Obtained (state)<span className='text-danger'>*</span>
                                         </label>
                                         <select
@@ -172,8 +172,8 @@ const Documents = () => {
                                     </div>
                                 </div>
                                 <div className="col-6">
-                                    <div className="mb-3" style={{ position: "relative" }}>
-                                        <label htmlFor="Phone" className="form-label">
+                                    <div className="mb-1" style={{ position: "relative" }}>
+                                        <label htmlFor="Phone" className="form-label mb-0">
                                             Upload Document
                                         </label>
                                         <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
@@ -208,8 +208,8 @@ const Documents = () => {
                     </div>
                     <div className="col-6">
                         <form>
-                            <div className="mb-3">
-                                <label htmlFor="firstName" className="form-label">
+                            <div className="mb-1">
+                                <label htmlFor="firstName" className="form-label mb-0">
                                     State License Provider (licensing authority name)
                                 </label>
                                 <input
@@ -221,8 +221,8 @@ const Documents = () => {
 
                             <div className="row">
                                 <div className="col-6">
-                                    <div className="mb-3">
-                                        <label htmlFor="firstName" className="form-label">
+                                    <div className="mb-1">
+                                        <label htmlFor="firstName" className="form-label mb-0">
                                             State License Issue Date<span className='text-danger'>*</span>
                                         </label>
                                         <input
@@ -233,8 +233,8 @@ const Documents = () => {
                                     </div>
                                 </div>
                                 <div className="col-6">
-                                    <div className="mb-3">
-                                        <label htmlFor="firstName" className="form-label">
+                                    <div className="mb-1">
+                                        <label htmlFor="firstName" className="form-label mb-0">
                                             License Expiration Date<span className='text-danger'>*</span>
                                         </label>
                                         <input
@@ -248,7 +248,7 @@ const Documents = () => {
                         </form>
                     </div>
                 </div>
-                <div className="d-flex justify-content-end gap-2 mt-2">
+                <div className="d-flex justify-content-end gap-2 mt-2 mb-1">
                     <Button className="">
                         Cancel
                     </Button>

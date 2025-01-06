@@ -34,7 +34,7 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
     };
 
     const user = JSON.parse(sessionStorage.getItem('hyper_user'));
-    const userName = user?.name || 'John Doe';
+    const userName = user?.firstName || 'John Doe';
     const changedLogo=sessionStorage.getItem('logo');
     // console.log({changedLogo});
     const logo=JSON.parse(sessionStorage.getItem('hyper_user'))?.logo;
@@ -75,7 +75,7 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
                     {/* <div className="dropdown-header noti-title">
                         <h6 className="text-overflow m-0">Welcome !</h6>
                     </div> */}
-                    <p className='mb-0 ps-3 text-start fw-bold'>Clinic</p>
+                    <p className='mb-0 ps-3 text-start fw-bold'>Doctor</p>
                     <hr className='my-0' />
                     {props.menuItems.map((item, i) => {
                         return (

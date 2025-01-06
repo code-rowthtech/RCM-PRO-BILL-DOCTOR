@@ -14,7 +14,8 @@ axios.interceptors.response.use(
         return response;
     },
     (error) => {
-        console.log(error, 'api error')
+        console.log(error, 'error')
+
         // Any status codes that falls outside the range of 2xx cause this function to trigger
         let message;
 

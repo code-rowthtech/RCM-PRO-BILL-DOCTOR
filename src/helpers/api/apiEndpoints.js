@@ -15,10 +15,13 @@ export const getClinic = '/api/v1/clinics';
 export const getClinicById = '/api/v1/clinic/byId';
 
 // DOCTORS
-export const getDoctor = '/api/v1/admin/getAllDoctors';
+export const getDoctor = '/api/v1/doctor/getDoctorDetails';
 // PATIENTS
 export const getPatients = '/api/v1/admin/getAllPatients';
 // DASHBOARD
 export const getAnalytics = '/api/v1/admin/analytics';
 // SUBSCRIPTIONS
 export const getSubscriptions = '/api/v1/admin/subscription/all'
+// SCHEDULE
+export const createHoliday = '/api/v1/doctor/addOrUpdateSchedule';
+export const getHoliday = '/api/v1/doctor/getSchedule';
