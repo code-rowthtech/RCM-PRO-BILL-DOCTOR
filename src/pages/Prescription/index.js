@@ -129,6 +129,13 @@ const Prescription = () => {
                                                     {!ShowNewClinicalNotes ? 'Create Notes' : 'Back'}
                                                 </Button>
                                             )}
+                                            {activeTab === 'treatmentPlans' && (
+                                                <Button
+                                                   className='custom-buttons'
+                                                >
+                                                    Add Treatment Plan
+                                                </Button>
+                                            )}
 
                                         </Col>
                                     </Row>

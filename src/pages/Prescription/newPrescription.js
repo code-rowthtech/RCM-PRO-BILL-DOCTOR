@@ -5,6 +5,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { IoIosSearch } from 'react-icons/io';
 import TabButtons from './tabButtons';
+import { IoPrintSharp } from 'react-icons/io5';
 
 const mockTemplate = [
     { id: '1', name: 'Template 1' },
@@ -144,9 +145,11 @@ const NewPrescription = () => {
                                 </Dropdown>
                                 <Button
                                     className="custom-buttons"
+                                    onClick={() => setShow(true)}
                                 >
                                     Vital Signs
                                 </Button>
+
                                 <Button
                                     variant='secondary'
                                 // className="custom-buttons"
@@ -212,7 +215,7 @@ const NewPrescription = () => {
                         />
                         {isDropdownOpen && (
                             <div className=" bg-white shadow-lg position-absolute w-100" style={{ zIndex: 11111 }} >
-                                <div className="d-flex justify-content-center buttons-head px-2  pt-2 pb-0">
+                                <div className="d-flex justify-content-center buttons-head  pt-2 pb-0">
                                     <TabButtons
                                         active={activeTab === 'template'}
                                         onClick={() => setActiveTab('template')}
@@ -273,10 +276,10 @@ const NewPrescription = () => {
                                         {activeTab === 'drugs' && (
                                             <Button
                                                 className="w-100 custom-buttons rounded-pill"
-                                                // onClick={() => {
-                                                //     setShow(true);
-                                                //     setIsDropdownOpen(false); 
-                                                // }}
+                                            // onClick={() => {
+                                            //     setShow(true);
+                                            //     setIsDropdownOpen(false); 
+                                            // }}
                                             >
                                                 Add Drug
                                             </Button>
@@ -460,7 +463,7 @@ const NewPrescription = () => {
                                 </Form.Group>
                             </Col>
                             <Col sm={1} className='mt-2 d-flex justify-content-end'>
-                                <div style={{marginTop:'3px'}}>
+                                <div style={{ marginTop: '3px' }}>
                                     <Button className='mt-1'>Add</Button>
                                 </div>
                             </Col>
@@ -503,7 +506,7 @@ const NewPrescription = () => {
                                     </Col>
                                     <Col sm={5}>
                                         <div className="d-flex align-items-center mt-3 pt-1">
-                                            <p className="me-2 mb-0 fw-bold">Instruction:</p>
+                                            <p className="me-2 mb-0 fw-bold text-black">Instruction:</p>
 
                                             <Form.Check
                                                 type="radio"
@@ -635,39 +638,74 @@ const NewPrescription = () => {
 
             <Modal show={show} onHide={() => setShow(false)} centered size='lg'>
                 <Modal.Header closeButton>
-                    <Modal.Title>Add Patient Hobbies </Modal.Title>
+                    <Modal.Title>Vital Signs </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <Row>
+                            <div className='d-flex justify-content-between mb-2'>
+                                <div className='d-flex gap-2'>
+                                    <Button>Charts</Button>
+                                    <Button>Details</Button>
+                                </div>
+                                <div>
+                                    <Button variant='success'>Add</Button>
+                                </div>
+                            </div>
                             <Col sm={6}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Name</Form.Label>
-                                    <Form.Control type="text" placeholder="Enter Name" />
+                                <Form.Group className="mb-1">
+                                    <Form.Label className='mb-0'>Time</Form.Label>
+                                    <Form.Control type="time" />
                                 </Form.Group>
                             </Col>
                             <Col sm={6}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Date</Form.Label>
-                                    <Form.Control type="date" />
+                                <Form.Group className="mb-1">
+                                    <Form.Label className='mb-0'>Temp F</Form.Label>
+                                    <Form.Control type="text" placeholder="Enter Temp F" />
                                 </Form.Group>
                             </Col>
-                            <Col>
-                                <Form.Group className="mb-3">
-                                    <Form.Control as="textarea" rows={3} placeholder="Type Something" />
+                            <Col sm={6}>
+                                <Form.Group className="mb-1">
+                                    <Form.Label className='mb-0'>Pulse opm</Form.Label>
+                                    <Form.Control type="text" placeholder="Enter Pulse opm" />
                                 </Form.Group>
                             </Col>
+                            <Col sm={6}>
+                                <Form.Group className="mb-1">
+                                    <Form.Label className='mb-0'>RR Breaths/ min</Form.Label>
+                                    <Form.Control type="text" placeholder="Enter RR Breaths/ min" />
+                                </Form.Group>
+                            </Col>
+                            <Col sm={6}>
+                                <Form.Group className="mb-1">
+                                    <Form.Label className='mb-0'>SYS/DIA mm/hg</Form.Label>
+                                    <Form.Control type="text" placeholder="Enter SYS/DIA mm/hg" />
+                                </Form.Group>
+                            </Col>
+                            <Col sm={6}>
+                                <Form.Group className="mb-1">
+                                    <Form.Label className='mb-0'>Weight kg</Form.Label>
+                                    <Form.Control type="text" placeholder="Enter Weight kg" />
+                                </Form.Group>
+                            </Col>
+                            <div className='d-flex justify-content-between mt-3'>
+                                <div>
+                                    <p>Recorded by <span className='text-black'>Dr. Vasanth</span></p>
+                                </div>
+                                <div>
+                                    <Button variant="primary" className='custom-button' >
+                                        <IoPrintSharp className="fs-4" />
+                                        &nbsp;Print
+                                    </Button>
+                                </div>
+                            </div>
+
+
                         </Row>
+
                     </Form>
                 </Modal.Body>
-                <Modal.Footer>
-                    {/* <Button variant="secondary" onClick={() => setShow(false)}>
-                        Cancel
-                    </Button> */}
-                    <Button variant="primary" onClick={() => setShow(false)}>
-                        Save
-                    </Button>
-                </Modal.Footer>
+
             </Modal>
         </div>
     )
