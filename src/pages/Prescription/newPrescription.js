@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Col, Dropdown, Form, Modal, Row } from 'react-bootstrap';
+import { Button, Col, Dropdown, DropdownButton, Form, Modal, Row } from 'react-bootstrap';
 import Select from 'react-select';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -29,6 +29,7 @@ const NewPrescription = () => {
     const [selectedDrugs, setSelectedDrugs] = useState([]);
     const [activeTab, setActiveTab] = useState('template');
     const dropdownRef = useRef(null);
+    const [selectedItem, setSelectedItem] = useState(null);
 
     const template = mockTemplate.filter(item =>
         item.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -67,6 +68,10 @@ const NewPrescription = () => {
         { value: 'template3', label: 'Template 3' },
     ];
 
+    const handleSelect = (eventKey) => {
+        setSelectedItem(eventKey);
+        console.log(`Selected: ${eventKey}`);
+    };
 
     return (
         <div>
@@ -214,8 +219,8 @@ const NewPrescription = () => {
                             value={searchTerm}
                         />
                         {isDropdownOpen && (
-                            <div className=" bg-white shadow-lg position-absolute w-100" style={{ zIndex: 11111 }} >
-                                <div className="d-flex justify-content-center buttons-head  pt-2 pb-0">
+                            <div className=" bg-white shadow-lg position-absolute w-100 rounded" style={{ zIndex: 11111 }} >
+                                <div className="d-flex justify-content-center buttons-head  pt-1 pb-0">
                                     <TabButtons
                                         active={activeTab === 'template'}
                                         onClick={() => setActiveTab('template')}
@@ -693,10 +698,24 @@ const NewPrescription = () => {
                                     <p>Recorded by <span className='text-black'>Dr. Vasanth</span></p>
                                 </div>
                                 <div>
-                                    <Button variant="primary" className='custom-button' >
-                                        <IoPrintSharp className="fs-4" />
-                                        &nbsp;Print
-                                    </Button>
+                                    <DropdownButton
+                                        title={
+                                            <>
+                                                <IoPrintSharp className="fs-4" />
+                                                &nbsp;Print
+                                            </>
+                                        }
+                                        className="text-nowrap custom-buttons"
+                                        onSelect={handleSelect}
+                                    >
+                                        <Dropdown.Item eventKey="1">1</Dropdown.Item>
+                                        <Dropdown.Item eventKey="2">2</Dropdown.Item>
+                                    </DropdownButton>
+                                    {selectedItem && (
+                                        <div className="mt-3">
+                                            <strong>Selected Item: </strong> {selectedItem}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 

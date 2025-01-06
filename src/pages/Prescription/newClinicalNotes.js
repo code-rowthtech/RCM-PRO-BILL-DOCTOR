@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
+import { Button, Col, Dropdown, DropdownButton, Form, Modal, Row } from 'react-bootstrap';
 import Select from 'react-select';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -30,6 +30,7 @@ const NewClinicalNotes = () => {
     const [selectedHobbies, setSelectedHobbies] = useState([]);
     const [activeTab, setActiveTab] = useState('medicalHistory');
     const dropdownRef = useRef(null);
+    const [selectedItem, setSelectedItem] = useState(null);
 
     const filteredMedicalHistory = mockMedicalHistory.filter(item =>
         item.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -68,6 +69,10 @@ const NewClinicalNotes = () => {
         { value: 'template3', label: 'Template 3' },
     ];
 
+    const handleSelect = (eventKey) => {
+        setSelectedItem(eventKey);
+        console.log(`Selected: ${eventKey}`);
+    };
 
     return (
         <div>
@@ -148,8 +153,8 @@ const NewClinicalNotes = () => {
                             value={searchTerm}
                         />
                         {isDropdownOpen && (
-                            <div className=" bg-white shadow-lg position-absolute w-100" style={{ zIndex: 11111 }} >
-                                <div className="d-flex justify-content-center buttons-head pt-2 pb-0">
+                            <div className=" bg-white shadow-lg position-absolute w-100 rounded" style={{ zIndex: 11111 }} >
+                                <div className="d-flex justify-content-center buttons-head pt-1 pb-0">
                                     <TabButtons
                                         active={activeTab === 'medicalHistory'}
                                         onClick={() => setActiveTab('medicalHistory')}
@@ -374,24 +379,35 @@ const NewClinicalNotes = () => {
                             </Col>
                             <div className='d-flex justify-content-between mt-3'>
                                 <div>
-                                    <p>Recorded by <span className='text-black'>Dr. Vasanth</span></p>
+                                    <p className='mb-0 mt-2 '>Recorded by <span className='text-black'>Dr. Vasanth</span></p>
                                 </div>
                                 <div>
-                                    <Button variant="primary" className='custom-button' >
-                                        <IoPrintSharp className="fs-4" />
-                                        &nbsp;Print
-                                    </Button>
+                                    <DropdownButton
+                                        title={
+                                            <>
+                                                <IoPrintSharp className="fs-4" />
+                                                &nbsp;Print
+                                            </>
+                                        }
+                                        className="text-nowrap custom-buttons"
+                                        onSelect={handleSelect}
+                                    >
+                                        <Dropdown.Item eventKey="1">1</Dropdown.Item>
+                                        <Dropdown.Item eventKey="2">2</Dropdown.Item>
+                                    </DropdownButton>
+                                    {selectedItem && (
+                                        <div className="mt-3">
+                                            <strong>Selected Item: </strong> {selectedItem}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-
-
                         </Row>
-
                     </Form>
                 </Modal.Body>
 
             </Modal>
-        </div>
+        </div >
     )
 }
 
