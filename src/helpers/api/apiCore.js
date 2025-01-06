@@ -14,12 +14,11 @@ axios.interceptors.response.use(
         return response;
     },
     (error) => {
+        console.log(error, 'api error')
         // Any status codes that falls outside the range of 2xx cause this function to trigger
         let message;
 
-        if (error && error.response && error.response.status === 404) {
-            // window.location.href = '/not-found';
-        } else if (error && error.response && error.response.status === 403) {
+        if (error && error.response && error.response.status === 403) {
             // window.location.href = '/access-denied';
         } else {
             switch (error.response.status) {
