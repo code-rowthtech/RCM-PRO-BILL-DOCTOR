@@ -52,7 +52,7 @@ const Schedule = () => {
         <div>
             <Row className="mt-2">
                 <Col xs={12}>
-                    <Card>
+                    <Card style={{height:'87vh'}}>
                         <Card.Body>
                             <Row className="mb-2">
                                 {/* Navigation Tabs */}

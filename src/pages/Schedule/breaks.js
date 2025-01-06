@@ -2,14 +2,16 @@ import React, { useEffect } from 'react';
 import { Spinner, Table } from 'react-bootstrap';
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { useDispatch, useSelector } from 'react-redux';
+import { getHolidayScheduleAction } from '../../redux/schedule/actions';
 // import { deleteScheduleAction, getScheduleAction } from '../../../redux/schedule/action';
 const Breaks = () => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
 
-    const scheduleResponse = store?.getScheduleReducer?.data?.result || [];
-    console.log(scheduleResponse, 'break')
+    const scheduleResponse = store?.getHolidayScheduleReducer?.data?.result || [];
+    // console.log(scheduleResponse, 'iddd')
     const isLoading = store?.getScheduleReducer?.loading;
+    const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
 
     useEffect(() => {
         const payload = {
@@ -18,19 +20,19 @@ const Breaks = () => {
             type: "Break",
             search: ''
         };
-        // dispatch(getScheduleAction(payload));
+        dispatch(getHolidayScheduleAction({ breakTo: '', breakFrom: '', type: 'Break', search: '', doctorId: doctorId }));
     }, [dispatch]);
 
     const deleteHandle = (id) => {
         // dispatch(deleteScheduleAction(id))
         const payload = {
-          startDate: '',
-          endDate: '',
-          type: "Break",
-          search : ''
+            breakTo: '',
+            breakFrom: '',
+            type: "Break",
+            search: ''
         };
         // dispatch(getScheduleAction(payload));
-      }
+    }
 
     return (
         <div>
@@ -69,7 +71,7 @@ const Breaks = () => {
                                     {breakItem.breakDay}
                                 </td>
                                 <td>
-                                <RiDeleteBin5Line onClick={()=>deleteHandle(breakItem?._id)} className="fs-4 text-danger ms-2 cursor-pointer" />
+                                    <RiDeleteBin5Line onClick={() => deleteHandle(breakItem?._id)} className="fs-4 text-danger ms-2 cursor-pointer" />
                                 </td>
                             </tr>
                         ))

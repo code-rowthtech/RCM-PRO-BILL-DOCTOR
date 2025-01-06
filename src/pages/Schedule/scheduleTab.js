@@ -182,8 +182,8 @@ const ScheduleTab = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
             <h4>Edit Schedule</h4>
 
-            <div className="mb-3 w-50">
-                <label htmlFor="doctorName" style={{ fontWeight: "bold" }}>
+            <div className="mb-1 w-50">
+                <label htmlFor="doctorName" style={{ fontWeight: "bold", marginBottom:'0px!important' }}>
                     Doctor Name<span className="text-danger">*</span>
                 </label>
                 <select
@@ -195,7 +195,7 @@ const ScheduleTab = () => {
                         borderRadius: "4px",
                         border: "1px solid #ccc",
                         width: "100%",
-                        marginTop: "10px",
+                        // marginTop: "10px",
                     }}
                 >
                     <option value="">Select a doctor</option>
@@ -213,7 +213,7 @@ const ScheduleTab = () => {
                 </select>
             </div>
 
-            <div className="mb-3 w-50">
+            <div className="mb-1 w-50">
                 <label htmlFor="perPatientTime" style={{ fontWeight: "bold" }}>
                     Per Patient Time<span className="text-danger">*</span>
                 </label>

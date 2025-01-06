@@ -10,7 +10,7 @@ import { getDoctorsReducer } from './doctors/reducers';
 import { getAnalyticsReducer } from './dashboard/reducers';
 import { getPatientsReducer } from './patients/reducers';
 import { getSubscriptionsReducer } from './subscriptions/reducers';
-import { createHolidayScheduleReducer } from './schedule/reducers';
+import { createHolidayScheduleReducer, getHolidayScheduleReducer } from './schedule/reducers';
 export default (combineReducers({
     Auth,
     Layout,
@@ -21,5 +21,5 @@ export default (combineReducers({
     getDoctorsReducer,
     getPatientsReducer,
     getSubscriptionsReducer,
-    createHolidayScheduleReducer,
+    createHolidayScheduleReducer,getHolidayScheduleReducer,
 }): any);

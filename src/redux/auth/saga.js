@@ -34,7 +34,8 @@ function* login({ payload }) {
             token: user?.accessToken,
             role: user?.role,
             userId: user?.userId,
-            doctorId: user?.doctorId
+            doctorId: user?.doctorId,
+            clinicId: user?.clinicId
         }
         // NOTE - You can change this according to response format from your api
         api.setLoggedInUser(userData);

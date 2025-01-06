@@ -1,11 +1,67 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Form } from 'react-bootstrap'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import { getDoctorsAction } from '../../redux/doctors/actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { useForm } from 'react-hook-form';
 
 const ProfessionalInformation = () => {
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+  } = useForm();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showCAQHPassword, setShowCAQHPassword] = useState(false);
+  const store = useSelector((state) => state);
+  const dispatch = useDispatch();
+  const doctorDetails = store?.getDoctorsReducer?.data
+  console.log(doctorDetails, '123456789');
+
+  useEffect(() => {
+    dispatch(
+      getDoctorsAction()
+    );
+
+  }, [dispatch]);
+
+  useEffect(() => {
+
+    setValue('TIN_SSN', doctorDetails?.result?.TIN_SSN)
+    setValue('NPI', doctorDetails?.result?.NPI)
+    setValue('NPIUsername', doctorDetails?.result?.NPIUsername)
+    setValue('CAQH_ID', doctorDetails?.result?.CAQH_ID)
+    setValue('CAQHUsername', doctorDetails?.result?.CAQHUsername)
+    setValue('medicarePTAN', doctorDetails?.result?.medicarePTAN)
+    setValue('medicaidID', doctorDetails?.result?.medicaidID)
+    setValue('department', doctorDetails?.result?.departmentId?._id)
+    setValue('Medicare_SPOT_Logins', doctorDetails?.result?.Medicare_SPOT_Logins)
+    setValue('Medicare_PECOS_Logins', doctorDetails?.result?.Medicare_PECOS_Logins)
+    setValue('stateLicense', doctorDetails?.result?.LicensingInformation?.[0]?.stateLicense)
+    setValue('stateLicenseProvider', doctorDetails?.result?.LicensingInformation?.[0]?.stateLicenseProvider)
+    setValue('stateLicenseObtained', doctorDetails?.result?.LicensingInformation?.[0]?.stateLicenseObtained)
+    setValue('DEA', doctorDetails?.result?.DEA)
+    setValue('CLIA', doctorDetails?.result?.CLIA)
+
+    const formattedDEAIssueDate = doctorDetails?.result?.DEA_IssueDate
+      ? new Date(doctorDetails?.result?.DEA_IssueDate).toISOString().split('T')[0]
+      : '';
+    const formattedStateLicenseIssueDate = doctorDetails?.result?.LicensingInformation?.[0]?.stateLicenseIssueDate
+      ? new Date(doctorDetails?.result?.LicensingInformation?.[0]?.stateLicenseIssueDate).toISOString().split('T')[0]
+      : '';
+    const formattedLicenseExpirationDate = doctorDetails?.result?.LicensingInformation?.[0]?.licenseExpirationDate
+      ? new Date(doctorDetails?.result?.LicensingInformation?.[0]?.licenseExpirationDate).toISOString().split('T')[0]
+      : '';
+
+    setValue('DEA_IssueDate', formattedDEAIssueDate);
+    setValue('stateLicenseIssueDate', formattedStateLicenseIssueDate);
+    setValue('licenseExpirationDate', formattedLicenseExpirationDate);
+
+  }, [doctorDetails, setValue])
 
   return (
     <div className='container-fluid px-0'>
@@ -19,6 +75,7 @@ const ProfessionalInformation = () => {
               TIN/SSN
             </Form.Label>
             <Form.Control
+              {...register('TIN_SSN',)}
               type="text"
               placeholder="Enter TIN/SSN"
             />
@@ -29,6 +86,7 @@ const ProfessionalInformation = () => {
               NPI Username
             </Form.Label>
             <Form.Control
+              {...register('NPIUsername',)}
               type="text"
               placeholder="Enter NPI Username"
             />
@@ -39,6 +97,7 @@ const ProfessionalInformation = () => {
               CAQH ID
             </Form.Label>
             <Form.Control
+              {...register('CAQH_ID',)}
               type="text"
               placeholder="Enter CAQH ID"
             />
@@ -52,6 +111,7 @@ const ProfessionalInformation = () => {
               NPI (National Provider Identifier)
             </Form.Label>
             <Form.Control
+              {...register('NPI',)}
               type="text"
               placeholder="Enter NPI"
             />
@@ -80,6 +140,7 @@ const ProfessionalInformation = () => {
                   CAQH Username
                 </Form.Label>
                 <Form.Control
+                  {...register('CAQHUsername',)}
                   type="text"
                   placeholder="Enter CAQH Username"
                 />
@@ -118,6 +179,7 @@ const ProfessionalInformation = () => {
               Medicare PTAN
             </Form.Label>
             <Form.Control
+              {...register('medicarePTAN',)}
               type="text"
               placeholder="Enter Medicare PTAN"
             />
@@ -128,6 +190,7 @@ const ProfessionalInformation = () => {
               Medicare SPOT Logins
             </Form.Label>
             <Form.Control
+              {...register('Medicare_SPOT_Logins',)}
               type="text"
               placeholder="Enter Medicare SPOT Logins"
             />
@@ -142,6 +205,7 @@ const ProfessionalInformation = () => {
                   Medicaid ID
                 </Form.Label>
                 <Form.Control
+                  {...register('medicaidID',)}
                   type="text"
                   placeholder="Enter Medicaid ID"
                 />
@@ -153,12 +217,11 @@ const ProfessionalInformation = () => {
                 <Form.Label className='mb-0'>
                   Department
                 </Form.Label>
-                <Form.Select
-                >
-                  <option value="" disabled selected>
-                    Select Department
-                  </option>
-                </Form.Select>
+                <Form.Control
+                  // {...register('department',)}
+                  type="text"
+                placeholder="Department"
+                />
               </Form.Group>
             </div>
           </div>
@@ -168,6 +231,7 @@ const ProfessionalInformation = () => {
               Medicare PECOS Login
             </Form.Label>
             <Form.Control
+              {...register('Medicare_PECOS_Logins',)}
               type="text"
               placeholder="Enter Medicare PECOS Logins"
             />
@@ -185,6 +249,7 @@ const ProfessionalInformation = () => {
               State License
             </Form.Label>
             <Form.Control
+              {...register('stateLicense',)}
               type="text"
               placeholder="Enter State License"
             />
@@ -195,6 +260,7 @@ const ProfessionalInformation = () => {
               State License Obtained (state)
             </Form.Label>
             <Form.Control
+              {...register('stateLicenseObtained',)}
               type="text"
               placeholder="Enter State of License"
             />
@@ -207,6 +273,7 @@ const ProfessionalInformation = () => {
               State License Provider (licensing authority name)
             </Form.Label>
             <Form.Control
+              {...register('stateLicenseProvider',)}
               type="text"
               placeholder="Enter Licensing Authority Name"
             />
@@ -219,6 +286,7 @@ const ProfessionalInformation = () => {
                   State License Issue Date
                 </Form.Label>
                 <Form.Control
+                  {...register('stateLicenseIssueDate',)}
                   type="date"
                   placeholder="Enter Issue Date"
                 />
@@ -231,6 +299,7 @@ const ProfessionalInformation = () => {
                   License Expiration Date
                 </Form.Label>
                 <Form.Control
+                  {...register('licenseExpirationDate',)}
                   type="date"
                   placeholder="Enter Expiration Date"
                 />
@@ -248,6 +317,7 @@ const ProfessionalInformation = () => {
                 DEA # (Drug Enforcement Administration number)
               </Form.Label>
               <Form.Control
+                {...register('DEA',)}
                 type="text"
                 id="DEA"
                 className="w-100 input ps-2 py-1"
@@ -264,6 +334,7 @@ const ProfessionalInformation = () => {
                   DEA Issue Date
                 </Form.Label>
                 <Form.Control
+                  {...register('DEA_IssueDate',)}
                   type="date"
                   id="DEA_IssueDate"
                   className="w-100 input ps-2 py-1"
@@ -277,6 +348,7 @@ const ProfessionalInformation = () => {
             CLIA # (Clinical Laboratory Improvement Amendments)
           </Form.Label>
           <Form.Control
+            {...register('CLIA',)}
             type="text"
             id="CLIA"
             className="w-100 input ps-2 py-1"
@@ -294,7 +366,7 @@ const ProfessionalInformation = () => {
         </Button>
       </div>
 
-    </div>
+    </div >
   )
 }
 

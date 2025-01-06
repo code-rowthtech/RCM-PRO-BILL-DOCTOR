@@ -1,56 +1,111 @@
 import React, { useState } from 'react';
-import { Button, Card, Col, Modal, Row, Table, Form } from 'react-bootstrap';
-import { FiFileText, FiFilter } from "react-icons/fi";
-import { LuFileText, LuFileEdit } from "react-icons/lu";
+import { Button, Card, Col, Modal, Row, Form, DropdownButton, Dropdown } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import classNames from 'classnames';
+import PrescriptionTable from './prescription';
+import ClinicalNotes from './clinicalNotes';
+import TreatmentPlans from './treatmentPlans';
+import CompleatedProcedures from './compleatedProcedures';
+import Files from './files';
+import NewPrescription from './newPrescription';
+import NewClinicalNotes from './newClinicalNotes';
 
 const Prescription = () => {
-    const [detailsModal, setDetailsModal] = useState(false);
-    const [selectedDetails, setSelectedDetails] = useState(null);
+    const [selectedPatient, setSelectedPatient] = useState('Select Patient');
+    const [activeTab, setActiveTab] = useState('prescription');
+    const [ShowNewPrescription, setShowNewPrescription] = useState(false);
+    const [ShowNewClinicalNotes, setShowNewClinicalNotes] = useState(false);
 
-    const patientsData = [
-        {
-            id: 1,
-            firstName: 'John',
-            lastName: 'Doe',
-            age: 35,
-            gender: 'Male',
-            amount: '$200',
-            appointmentDate: '2023-11-10',
-            status: true, // true for active, false for inactive
-            insuranceProvider: 'HealthCare Inc.',
-        },
-        {
-            id: 2,
-            firstName: 'Jane',
-            lastName: 'Smith',
-            age: 29,
-            gender: 'Female',
-            amount: '$150',
-            appointmentDate: '2023-11-12',
-            status: false,
-            insuranceProvider: 'MediSure',
-        },
-    ];
 
-    const handleStatusChange = (id) => {
-        // Toggle the status of the patient with the given ID
-        patientsData.forEach((patient) => {
-            if (patient.id === id) {
-                patient.status = !patient.status;
-            }
-        });
+    const renderTabContent = () => {
+        switch (activeTab) {
+            case 'prescription':
+                if (ShowNewPrescription) {
+                    return <NewPrescription />;
+                } else {
+                    return <PrescriptionTable />;
+                }
+            case 'clinicalNotes':
+                if (ShowNewClinicalNotes) {
+                    return <NewClinicalNotes />;
+                } else {
+                    return <ClinicalNotes />;
+                }
+            case 'treatmentPlans':
+                return <TreatmentPlans />;
+            case 'completedProcedures':
+                return <CompleatedProcedures />;
+            case 'files':
+                return <Files />;
+            default:
+                return null;
+        }
+    };
+
+    const handleSelect = (patient) => {
+        setSelectedPatient(patient);
+        console.log(`Selected Patient: ${patient}`);
+        // Add additional logic if needed
     };
 
     return (
         <>
             <Row className="mt-2">
                 <Col xs={12}>
-                    <Card>
+                    <Card style={{ height: '87vh' }}>
                         <Card.Body>
+                            <Row>
+                                <Col >
+                                    <div className="d-flex justify-content-end gap-2">
+                                        <Card style={{
+                                            background: '#E6EBFF',
+                                            width: '75vw',
+                                            // height: '3.8vh',
+                                            border: '1px solid #a4c5d5'
+                                        }}>
+                                            <Card.Body className="p-1">
+                                                <p className="mb-0 ms-2 fw-bold text-secondary" style={{marginTop:'3px'}}>All Patients</p>
+                                            </Card.Body>
+                                        </Card>
+                                        <DropdownButton
+                                            title={selectedPatient}
+                                            id="dropdown-patient-button"
+                                            className="text-nowrap"
+                                            onSelect={handleSelect} // Bind the onSelect handler
+                                        >
+                                            <Dropdown.Item eventKey="John Doe">John Doe</Dropdown.Item>
+                                            <Dropdown.Item eventKey="Jane Smith">Jane Smith</Dropdown.Item>
+                                            <Dropdown.Item eventKey="Michael Brown">Michael Brown</Dropdown.Item>
+                                        </DropdownButton>
+                                    </div>
+                                </Col>
+                            </Row>
                             <Row className="mb-2">
-                                <Col sm={6}></Col>
-                                <Col sm={6} className="text-end">
+                                <Col sm={8}>
+                                    <ul className="nav nav-underline">
+                                        {['prescription', 'clinicalNotes', 'treatmentPlans', 'completedProcedures', 'files'].map((tab, index) => (
+                                            <li className="nav-item" key={index}>
+                                                <a
+                                                    className={classNames('nav-link fw-bold text-black', {
+                                                        active: activeTab === tab,
+                                                    })}
+                                                    href="#"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        setActiveTab(tab);
+                                                    }}
+                                                >
+                                                    {tab === 'prescription' && 'Prescription'}
+                                                    {tab === 'clinicalNotes' && 'Clinical Notes'}
+                                                    {tab === 'treatmentPlans' && 'Treatment Plans'}
+                                                    {tab === 'completedProcedures' && 'Completed Procedures'}
+                                                    {tab === 'files' && 'Files'}
+                                                </a>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </Col>
+                                <Col sm={4} className="text-end">
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
                                         <Col xs="auto" className="d-flex gap-2">
                                             <Form.Control
@@ -58,81 +113,41 @@ const Prescription = () => {
                                                 placeholder="Search..."
                                                 className="w-auto"
                                             />
-                                            <Button className="custom-buttons" 
-                                            as={Link} to="/apps/prescription/newPrescription"
-                                            >
-                                                New Prescription
-                                            </Button>
+                                            {activeTab === 'prescription' && (
+                                                <Button
+                                                    className={` ${ShowNewPrescription ? 'bg-danger' : 'custom-buttons'}`}
+                                                    onClick={() => setShowNewPrescription(!ShowNewPrescription)}
+                                                >
+                                                    {!ShowNewPrescription ? 'New Prescription' : 'Back'}
+                                                </Button>
+                                            )}
+                                            {activeTab === 'clinicalNotes' && (
+                                                <Button
+                                                    className={` ${ShowNewClinicalNotes ? 'bg-danger' : 'custom-buttons'}`}
+                                                    onClick={() => setShowNewClinicalNotes(!ShowNewClinicalNotes)}
+                                                >
+                                                    {!ShowNewClinicalNotes ? 'Create Notes' : 'Back'}
+                                                </Button>
+                                            )}
+                                            {activeTab === 'treatmentPlans' && (
+                                                <Button
+                                                   className='custom-buttons'
+                                                >
+                                                    Add Treatment Plan
+                                                </Button>
+                                            )}
+
                                         </Col>
                                     </Row>
                                 </Col>
                             </Row>
                             <Row>
-                                <Col>
-                                    <Table responsive className="table-centered table-nowrap mb-0">
-                                        <thead className="text-white">
-                                            <tr>
-                                                <th className="text-white">Sr. No.</th>
-                                                <th className="text-white">Patients Name</th>
-                                                <th className="text-white">Doctor</th>
-                                                <th className="text-white">Added at</th>
-                                                <th className="text-white">Status</th>
-                                                <th className="text-white">Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {patientsData.length === 0 ? (
-                                                <tr>
-                                                    <td colSpan={7} className="text-center">
-                                                        <h3 className="my-5">No Data Found</h3>
-                                                    </td>
-                                                </tr>
-                                            ) : (
-                                                patientsData.map((data, index) => (
-                                                    <tr key={index}>
-                                                        <td>{index + 1}</td>
-                                                        <td className="text-capitalize">
-                                                            {data.firstName + ' ' + data.lastName}
-                                                        </td>
-                                                        <td>Doctor Demo</td>
-                                                        <td>{data.appointmentDate}</td>
-                                                        <td>
-                                                            <Form.Check
-                                                                type="switch"
-                                                                id={`status-${data.id}`}
-                                                                checked={data.status}
-                                                                onChange={() => handleStatusChange(data.id)}
-                                                            />
-                                                        </td>
-                                                        <td>
-                                                            <LuFileEdit className="fs-4" />
-                                                            &nbsp;
-                                                            <LuFileText className="fs-4" />
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            )}
-                                        </tbody>
-                                    </Table>
-                                </Col>
+                                <div className="mt-1">{renderTabContent()}</div>
                             </Row>
                         </Card.Body>
                     </Card>
                 </Col>
             </Row>
-
-            <Modal show={detailsModal} onHide={() => setDetailsModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Patient Details</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <h5>Name:</h5>
-                    <p>
-                        {selectedDetails?.firstName} {selectedDetails?.lastName}
-                    </p>
-                    {/* Add more patient details here */}
-                </Modal.Body>
-            </Modal>
         </>
     );
 };
