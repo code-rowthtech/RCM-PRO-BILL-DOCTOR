@@ -27,3 +27,5 @@ export const getSubscriptions = '/api/v1/admin/subscription/all'
 // SCHEDULE
 export const createHoliday = '/api/v1/doctor/addOrUpdateSchedule';
 export const getHoliday = '/api/v1/doctor/getSchedule';
+// TEMPLATE
+export const getTemplate = 'api/v1/doctor/getTemplates';

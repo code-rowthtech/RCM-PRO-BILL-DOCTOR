@@ -113,6 +113,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/dashboard': 'Dashboard',
         '/dashboard/project': 'Dashboard', // Example of multiple paths mapping to the same title
         '/apps/appointments/list': 'Appointments',
+        '/apps/template/template': 'Template', 
         '/apps/appointments/newAppointment': 'New Appointment',
         '/apps/appointments/appointmentCalendar': 'Appointment Calendar',
         '/apps/patients/list': 'Patient-History',

@@ -9,6 +9,8 @@ const MENU_ITEMS = [
         icon: 'uil-home-alt',
         url: '/dashboard/project',
     },
+   
+   
     // {
     //     key: 'apps-crm',
     //     label: 'Clinics',
@@ -49,6 +51,12 @@ const MENU_ITEMS = [
         label: 'Patient History',
         icon: 'uil-thermometer',
         url: '/apps/patients/list',
+    },
+    {
+        key: 'template',
+        label: 'Template',
+        icon: 'uil-schedule',
+        url: '/apps/template/template',
     },
  
     // {

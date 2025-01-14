@@ -47,6 +47,8 @@ const LockScreen2 = React.lazy(() => import('../pages/account2/LockScreen2'));
 
 // dashboard
 const ProjectDashboard = React.lazy(() => import('../pages/dashboard/Project'));
+const Template = React.lazy(() => import('../pages/apps/template/index'));
+
 // const AllClinics = React.lazy(() => import('../pages/apps/Clinic/AllClinics'));
 // const AddClinics = React.lazy(() => import('../pages/apps/Clinic/AddClinic/index'));
 // const UpdateClinic = React.lazy(() => import('../pages/apps/Clinic/AllClinics/updateClinic'));
@@ -222,6 +224,7 @@ const AllRoutes = () => {
                         },
                     ],
                 },
+           
                 {
                     path: 'apps',
                     children: [
@@ -278,6 +281,16 @@ const AllRoutes = () => {
                                     element: <LoadComponent component={addBreak} />,
                                 },
                               
+                            ],
+                        },
+                        {
+                  
+                            path: 'template',
+                            children: [
+                                {
+                                    path: 'template',
+                                    element: <LoadComponent component={Template} />,
+                                },
                             ],
                         },
                         {

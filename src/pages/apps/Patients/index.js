@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom';
 import { FormInput } from '../../../components';
 import { FiFileText, FiFilter } from "react-icons/fi";
 import { PiFilePdf } from "react-icons/pi";
-import { LuFileText } from "react-icons/lu";
-import { LuFileEdit } from "react-icons/lu";
+// import { LuFileText } from "react-icons/lu";
+// import { LuFileEdit } from "react-icons/lu";
 
 const Patients = () => {
     const [detailsModal, setDetailsModal] = useState(false);
@@ -143,7 +143,9 @@ const Patients = () => {
                                                         <td>{data.amount}</td>
                                                         <td>{data.appointmentDate}</td>
                                                         <td>{data.status}</td>
-                                                        <td><LuFileEdit className='fs-4' />&nbsp;<LuFileText className='fs-4' /></td>
+                                                        <td>
+                                                            {/* <LuFileEdit className='fs-4' />&nbsp;<LuFileText className='fs-4' /> */}
+                                                        </td>
 
                                                         {/* <td>
                                                             

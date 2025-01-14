@@ -1,6 +1,6 @@
 import React from 'react'
 import { Table } from 'react-bootstrap';
-import { LuFileEdit, LuFileText } from 'react-icons/lu';
+// import { LuFileEdit, LuFileText } from 'react-icons/lu';
 
 const DiagnosisCategories = () => {
 
@@ -66,7 +66,9 @@ const DiagnosisCategories = () => {
                         patientsData.map((data, index) => (
                             <tr key={index}>
                                 <td className='ps-4'>{data?.firstName}</td>
-                                <td className=' text-end pe-5'><LuFileEdit className='fs-4' /></td>
+                                <td className=' text-end pe-5'>
+                                    {/* <LuFileEdit className='fs-4' /> */}
+                                </td>
                             </tr>
                         ))
                     )}

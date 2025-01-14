@@ -1,6 +1,6 @@
 import React from 'react';
 import { Badge, Table } from 'react-bootstrap';
-import { LuFileEdit } from 'react-icons/lu';
+// import { LuFileEdit } from 'react-icons/lu';
 
 const Investigation = () => {
     const patientsData = [
@@ -65,7 +65,7 @@ const Investigation = () => {
                                     )}
                                 </td>
                                 <td className='ps-3'>
-                                    <LuFileEdit className="fs-4" />
+                                    {/* <LuFileEdit className="fs-4" /> */}
                                 </td>
                             </tr>
                         ))
