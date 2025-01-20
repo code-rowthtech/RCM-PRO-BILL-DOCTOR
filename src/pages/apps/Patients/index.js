@@ -84,7 +84,7 @@ const Patients = () => {
         <>
             <Row className='mt-2'>
                 <Col xs={12}>
-                
+
                     <Card>
                         <Card.Body>
                             <Row className="mb-2">

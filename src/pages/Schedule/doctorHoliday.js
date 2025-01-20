@@ -8,11 +8,9 @@ const DoctorHoliday = () => {
   const dispatch = useDispatch();
   const store = useSelector((state) => state);
   const scheduleResponse = store?.getHolidayScheduleReducer?.data?.result || [];
-  // console.log(scheduleResponse, 'iddd')
+  console.log(store?.getHolidayScheduleReducer, 'iddd')
   const isLoading = store?.getScheduleReducer?.loading;
   const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
-
-
   useEffect(() => {
     const payload = {
       startDate: '',
@@ -23,7 +21,6 @@ const DoctorHoliday = () => {
     };
     dispatch(getHolidayScheduleAction({ startDate: '', endDate: '', type: 'Holiday', search: '', doctorId: doctorId }));
   }, [dispatch]);
-
 
   const deleteHandle = (id) => {
     // dispatch(deleteScheduleAction(id))
@@ -52,7 +49,7 @@ const DoctorHoliday = () => {
             <td
               className='text-center'
               colSpan={5}
-            style={{ height: '65vh' }}
+              style={{ height: '65vh' }}
             >
               <Spinner />
             </td>

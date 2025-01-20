@@ -17,7 +17,6 @@ const ScheduleTab = () => {
     const [time, setTime] = useState("");
     const [name, setName] = useState("");
     const doctorLists = store?.getDoctorsListReducer?.data?.result;
-    console.log({ doctorLists })
     const scheduleList = store?.getScheduleReducer?.data?.result || [];
     const isLoading = store?.getScheduleReducer?.loading;
 
@@ -183,7 +182,7 @@ const ScheduleTab = () => {
             <h4>Edit Schedule</h4>
 
             <div className="mb-1 w-50">
-                <label htmlFor="doctorName" style={{ fontWeight: "bold", marginBottom:'0px!important' }}>
+                <label htmlFor="doctorName" style={{ fontWeight: "bold", marginBottom: '0px!important' }}>
                     Doctor Name<span className="text-danger">*</span>
                 </label>
                 <select

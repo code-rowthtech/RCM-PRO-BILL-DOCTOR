@@ -85,16 +85,9 @@ const Login = (): React$Element<any> => {
                     </p>
                 </div>
 
-                {/* {error && (
-                    <Alert variant="danger" className="my-2">
-                        {error ? 'Please try again' : ''}
-                    </Alert>
-                )} */}
-
                 <VerticalForm
                     onSubmit={onSubmit}
                     resolver={schemaResolver}
-                // defaultValues={{ username: 'test', password: 'test' }}
                 >
                     <FormInput
                         label={t('Username')}
@@ -102,12 +95,14 @@ const Login = (): React$Element<any> => {
                         name="username"
                         placeholder={t('Enter your Username')}
                         containerClass={'mb-3'}
+                        defaultValue=''
                     />
                     <FormInput
                         label={t('Password')}
                         type="password"
                         name="password"
                         placeholder={t('Enter your password')}
+                        defaultValue=''
                         containerClass={'mb-3'}>
                         <Link to="/account/forget-password" className="text-muted float-end">
                             <small>{t('Forgot your password?')}</small>

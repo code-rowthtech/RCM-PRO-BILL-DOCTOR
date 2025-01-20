@@ -44,9 +44,7 @@ function* getHolidayScheduleFunction(data) {
         });
         const response = yield call(getHolidayScheduleApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        console.log(decryptedData,'decryptedData')
         if (response.status === 200) {
-            ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: ScheduleActionTypes.GET_HOLIDAY_SCHEDULE_SUCCESS,
                 payload: { ...decryptedData },
