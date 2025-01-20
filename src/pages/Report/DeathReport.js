@@ -1,6 +1,7 @@
 import React from 'react'
 import { Badge, Table } from 'react-bootstrap'
 import { LuFileEdit } from 'react-icons/lu'
+import { Link } from 'react-router-dom';
 
 const DeathReport = () => {
 
@@ -53,8 +54,9 @@ const DeathReport = () => {
                                 <td>{data.doctor}</td>
                                 <td><Badge className='p-1'>{data.createdOn}</Badge></td>
                                 <td className='ps-3'>
-                                    <LuFileEdit className="fs-4" />&nbsp;
-                                    {/* <LuFileText className="fs-4" /> */}
+                                    <Link to='#' className="action-icon">
+                                        <i className="mdi mdi-square-edit-outline cursor-pointer fs-4"></i>
+                                    </Link>
                                 </td>
                             </tr>
                         ))

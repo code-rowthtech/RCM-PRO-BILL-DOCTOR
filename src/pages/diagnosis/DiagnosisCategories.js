@@ -1,6 +1,7 @@
 import React from 'react'
 import { Table } from 'react-bootstrap';
-import { LuFileEdit, LuFileText } from 'react-icons/lu';
+import { LuFileText } from 'react-icons/lu';
+import { Link } from 'react-router-dom';
 
 const DiagnosisCategories = () => {
 
@@ -66,7 +67,11 @@ const DiagnosisCategories = () => {
                         patientsData.map((data, index) => (
                             <tr key={index}>
                                 <td className='ps-4'>{data?.firstName}</td>
-                                <td className=' text-end pe-5'><LuFileEdit className='fs-4' /></td>
+                                <td className=' text-end pe-5'>
+                                    <Link to='#' className="action-icon">
+                                        <i className="mdi mdi-square-edit-outline cursor-pointer fs-4"></i>
+                                    </Link>
+                                </td>
                             </tr>
                         ))
                     )}

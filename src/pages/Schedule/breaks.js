@@ -9,7 +9,6 @@ const Breaks = () => {
     const store = useSelector((state) => state);
 
     const scheduleResponse = store?.getHolidayScheduleReducer?.data?.result || [];
-    // console.log(scheduleResponse, 'iddd')
     const isLoading = store?.getScheduleReducer?.loading;
     const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
 
