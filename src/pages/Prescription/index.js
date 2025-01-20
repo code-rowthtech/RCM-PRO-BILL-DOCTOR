@@ -64,7 +64,7 @@ const Prescription = () => {
                                             border: '1px solid #a4c5d5'
                                         }}>
                                             <Card.Body className="p-1">
-                                                <p className="mb-0 ms-2 fw-bold text-secondary">All Patients</p>
+                                                <p className="mb-0 ms-2 fw-bold text-secondary" style={{marginTop:'3px'}}>All Patients</p>
                                             </Card.Body>
                                         </Card>
                                         <DropdownButton
@@ -127,6 +127,13 @@ const Prescription = () => {
                                                     onClick={() => setShowNewClinicalNotes(!ShowNewClinicalNotes)}
                                                 >
                                                     {!ShowNewClinicalNotes ? 'Create Notes' : 'Back'}
+                                                </Button>
+                                            )}
+                                            {activeTab === 'treatmentPlans' && (
+                                                <Button
+                                                   className='custom-buttons'
+                                                >
+                                                    Add Treatment Plan
                                                 </Button>
                                             )}
 

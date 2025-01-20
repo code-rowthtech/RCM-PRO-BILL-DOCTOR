@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
+import { Button, Col, Dropdown, DropdownButton, Form, Modal, Row } from 'react-bootstrap';
 import Select from 'react-select';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { IoIosSearch } from 'react-icons/io';
 import TabButtons from './tabButtons';
+import { IoPrintSharp } from 'react-icons/io5';
 
 const mockMedicalHistory = [
     { id: '1', name: 'Diabetes', description: 'Type 2 diabetes' },
@@ -22,12 +23,14 @@ const NewClinicalNotes = () => {
     const [value, setValue] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [show, setShow] = useState(false);
+    const [showVitalMOdal, setShowVitalMOdal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [selectedMedicalHistory, setSelectedMedicalHistory] = useState([]);
     const [selectedHobbies, setSelectedHobbies] = useState([]);
     const [activeTab, setActiveTab] = useState('medicalHistory');
     const dropdownRef = useRef(null);
+    const [selectedItem, setSelectedItem] = useState(null);
 
     const filteredMedicalHistory = mockMedicalHistory.filter(item =>
         item.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -66,6 +69,10 @@ const NewClinicalNotes = () => {
         { value: 'template3', label: 'Template 3' },
     ];
 
+    const handleSelect = (eventKey) => {
+        setSelectedItem(eventKey);
+        console.log(`Selected: ${eventKey}`);
+    };
 
     return (
         <div>
@@ -77,6 +84,7 @@ const NewClinicalNotes = () => {
                     <div className='d-flex gap-2'>
                         <Button
                             className="custom-buttons"
+                            onClick={() => setShowVitalMOdal(true)}
                         >
                             Vital Signs
                         </Button>
@@ -145,8 +153,8 @@ const NewClinicalNotes = () => {
                             value={searchTerm}
                         />
                         {isDropdownOpen && (
-                            <div className=" bg-white shadow-lg position-absolute w-100" style={{ zIndex: 11111 }} >
-                                <div className="d-flex justify-content-center  pt-2 pb-0">
+                            <div className=" bg-white shadow-lg position-absolute w-100 rounded" style={{ zIndex: 11111 }} >
+                                <div className="d-flex justify-content-center buttons-head pt-1 pb-0">
                                     <TabButtons
                                         active={activeTab === 'medicalHistory'}
                                         onClick={() => setActiveTab('medicalHistory')}
@@ -315,7 +323,91 @@ const NewClinicalNotes = () => {
                     </Button>
                 </Modal.Footer>
             </Modal>
-        </div>
+
+            {/* vital notes modal */}
+            <Modal show={showVitalMOdal} onHide={() => setShowVitalMOdal(false)} centered size='lg'>
+                <Modal.Header closeButton>
+                    <Modal.Title>Vital Signs </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Row>
+                            <div className='d-flex justify-content-between mb-2'>
+                                <div className='d-flex gap-2'>
+                                    <Button>Charts</Button>
+                                    <Button>Details</Button>
+                                </div>
+                                <div>
+                                    <Button variant='success'>Add</Button>
+                                </div>
+                            </div>
+                            <Col sm={6}>
+                                <Form.Group className="mb-1">
+                                    <Form.Label className='mb-0'>Time</Form.Label>
+                                    <Form.Control type="time" />
+                                </Form.Group>
+                            </Col>
+                            <Col sm={6}>
+                                <Form.Group className="mb-1">
+                                    <Form.Label className='mb-0'>Temp F</Form.Label>
+                                    <Form.Control type="text" placeholder="Enter Temp F" />
+                                </Form.Group>
+                            </Col>
+                            <Col sm={6}>
+                                <Form.Group className="mb-1">
+                                    <Form.Label className='mb-0'>Pulse opm</Form.Label>
+                                    <Form.Control type="text" placeholder="Enter Pulse opm" />
+                                </Form.Group>
+                            </Col>
+                            <Col sm={6}>
+                                <Form.Group className="mb-1">
+                                    <Form.Label className='mb-0'>RR Breaths/ min</Form.Label>
+                                    <Form.Control type="text" placeholder="Enter RR Breaths/ min" />
+                                </Form.Group>
+                            </Col>
+                            <Col sm={6}>
+                                <Form.Group className="mb-1">
+                                    <Form.Label className='mb-0'>SYS/DIA mm/hg</Form.Label>
+                                    <Form.Control type="text" placeholder="Enter SYS/DIA mm/hg" />
+                                </Form.Group>
+                            </Col>
+                            <Col sm={6}>
+                                <Form.Group className="mb-1">
+                                    <Form.Label className='mb-0'>Weight kg</Form.Label>
+                                    <Form.Control type="text" placeholder="Enter Weight kg" />
+                                </Form.Group>
+                            </Col>
+                            <div className='d-flex justify-content-between mt-3'>
+                                <div>
+                                    <p className='mb-0 mt-2 '>Recorded by <span className='text-black'>Dr. Vasanth</span></p>
+                                </div>
+                                <div>
+                                    <DropdownButton
+                                        title={
+                                            <>
+                                                <IoPrintSharp className="fs-4" />
+                                                &nbsp;Print
+                                            </>
+                                        }
+                                        className="text-nowrap custom-buttons"
+                                        onSelect={handleSelect}
+                                    >
+                                        <Dropdown.Item eventKey="1">1</Dropdown.Item>
+                                        <Dropdown.Item eventKey="2">2</Dropdown.Item>
+                                    </DropdownButton>
+                                    {selectedItem && (
+                                        <div className="mt-3">
+                                            <strong>Selected Item: </strong> {selectedItem}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </Row>
+                    </Form>
+                </Modal.Body>
+
+            </Modal>
+        </div >
     )
 }
 

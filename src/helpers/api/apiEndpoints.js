@@ -16,6 +16,8 @@ export const getClinicById = '/api/v1/clinic/byId';
 
 // DOCTORS
 export const getDoctor = '/api/v1/doctor/getDoctorDetails';
+export const getCityByState = '/api/v1/clinic/cities/';
+
 // PATIENTS
 export const getPatients = '/api/v1/admin/getAllPatients';
 // DASHBOARD

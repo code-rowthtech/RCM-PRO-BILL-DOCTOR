@@ -25,7 +25,7 @@ const Index = () => {
                                 {[
                                     { id: 'personalDetails', label: 'Personal Details' },
                                     { id: 'professionalInformation', label: 'Professional Information' },
-                                    { id: 'documents', label: 'Documents' },
+                                    // { id: 'documents', label: 'Documents' },
                                 ].map((tab) => (
                                     <li className="nav-item" key={tab.id}>
                                         <button
@@ -42,7 +42,7 @@ const Index = () => {
                         <div>
                             {activeTab === 'personalDetails' && <PersonalDetails />}
                             {activeTab === 'professionalInformation' && <ProfessionalInformation />}
-                            {activeTab === 'documents' && <Documents />}
+                            {/* {activeTab === 'documents' && <Documents />} */}
                         </div>
                     </div>
                 </Card>

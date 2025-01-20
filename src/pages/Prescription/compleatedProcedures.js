@@ -2,7 +2,7 @@ import React from 'react'
 
 const CompleatedProcedures = () => {
   return (
-    <div>CompleatedProcedures</div>
+    <div>Inprogress...</div>
   )
 }
 
