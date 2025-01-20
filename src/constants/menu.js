@@ -46,7 +46,7 @@ const MENU_ITEMS = [
     },
     {
         key: 'patients',
-        label: 'Patient History',
+        label: 'Patient',
         icon: 'uil-thermometer',
         url: '/apps/patients/list',
     },
