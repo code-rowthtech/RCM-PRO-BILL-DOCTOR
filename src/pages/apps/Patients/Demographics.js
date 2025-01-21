@@ -397,9 +397,27 @@ const Demographics = () => {
                     </Form.Group>
                 </Col>
                 <Col className='d-flex justify-content-end align-items-center mb-2 gap-2'>
-                    <Button variant='danger' className='fs-6' style={{ height: '30px' }}>Delete</Button>
-                    <Button variant='secondary' className='fs-6' style={{ height: '30px' }}>Clear</Button>
-                    <Button variant='success' className='fs-6' style={{ height: '30px' }}>Next</Button>
+                    <Button
+                        variant='danger'
+                        className='fs-6 d-flex align-items-center justify-content-center'
+                        style={{ height: '30px', padding: '0 15px' }}
+                    >
+                        Delete
+                    </Button>
+                    <Button
+                        variant='secondary'
+                        className='fs-6 d-flex align-items-center justify-content-center'
+                        style={{ height: '30px', padding: '0 15px' }}
+                    >
+                        Clear
+                    </Button>
+                    <Button
+                        variant='success'
+                        className='fs-6 d-flex align-items-center justify-content-center'
+                        style={{ height: '30px', padding: '0 15px' }}
+                    >
+                        Next
+                    </Button>
                 </Col>
 
             </Row>

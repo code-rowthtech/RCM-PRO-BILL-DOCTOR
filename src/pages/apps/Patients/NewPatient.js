@@ -8,6 +8,8 @@ import PatientDetails from './PatientDetails';
 import Demographics from './Demographics';
 import { TbHeartRateMonitor } from "react-icons/tb";
 import { LiaReceiptSolid } from "react-icons/lia";
+import Insurances from './Insurances';
+import VitalStatus from './VitalStatus';
 
 const NewPatient = () => {
     const navigate = useNavigate();
@@ -40,43 +42,48 @@ const NewPatient = () => {
                                                 style={{ width: '136px', height: '139px', objectFit: 'cover' }}
                                             />
                                         </div>
-                                        <div className='mt-1 d-flex gap-2 ps-2 '>
+                                        <div className='mt-1 d-flex gap-2 ps-3 '>
                                             <IoPrintSharp className='fs-3' />
                                             <LiaReceiptSolid className='fs-3 text-black' />
-                                            <TbHeartRateMonitor className='fs-3' />
+                                            {/* <TbHeartRateMonitor className='fs-3' /> */}
                                         </div>
                                     </Col>
 
                                     <Col sm={8}>
                                         <Row className='pt-1'>
                                             <div className='d-flex gap-2 ps-1'>
-                                                <p style={{ borderRight: '1px solid black' }} className='pe-2 text-nowrap fs-6'><span className='text-success fw-bold'>Jane Cooper</span> <span className='fs-6'>Male</span></p>
-                                                <p style={{ borderRight: '1px solid black' }} className='pe-2 text-nowrap fs-6'><span>55 years old</span></p>
-                                                <p className='text-nowrap fs-6'><span>Sep 10,1971</span></p>
+                                                <p style={{ borderRight: '1px solid black' }} className='pe-2 text-nowrap fs-6'><span className='fw-bold' style={{ color: 'rgb(249, 139, 55)' }}>Jane Cooper</span> <span className='fs-6'>Male</span></p>
+                                                <p style={{ borderRight: '1px solid black' }} className='pe-2 text-nowrap fs-6'><span>Sep 10,1971</span></p>
+                                                <p className='text-nowrap fs-6'><span>55 years old</span></p>
                                             </div>
                                             <Col sm={6} className='p-0'>
                                                 <div>
-                                                    <p className='fs-6 m-1'>Patients Chart ID:<span className='ps-2 text-primary'>2322BDEW</span></p>
-                                                    <p className='fs-6 m-1'>Phone:<span className='ps-2'>9887363532</span></p>
-                                                    <p className='fs-6 m-1'>Email:<span className='ps-2'>alma.lawson@example.com</span></p>
-                                                    <p className='fs-6 m-1'>Address:<span className='ps-2'>2972 Westheimer Rd. Santa Ana, Illinois 85486 </span></p>
+                                                    <p className='fs-6 m-1'><span className='fw-bold'>Patients Chart ID:</span><span className='ps-2 text-primary'>2322BDEW</span></p>
+                                                    <p className='fs-6 m-1'><span className='fw-bold'>Phone:</span><span className='ps-2'>9887363532</span></p>
+                                                    <p className='fs-6 m-1'><span className='fw-bold'>Email:</span><span className='ps-2'>alma.lawson@example.com</span></p>
+                                                    <p className='fs-6 m-1'><span className='fw-bold'>Address:</span><span className='ps-2'>2972 Westheimer Rd. Santa Ana, Illinois 85486 </span></p>
                                                 </div>
                                             </Col>
                                             <Col sm={6}>
                                                 <div>
-                                                    <p className='fs-6 m-1'>Primary Provider:<span className='ps-2'>Nishchay Sharma</span></p>
-                                                    <p className='fs-6 m-1'>Date Added:<span className='ps-2'>01/11/2024</span></p>
-                                                    <p className='fs-6 m-1'>Last Scheduled appt:<span className='ps-2 text-primary'>01/01/2025</span></p>
-                                                    <p className='fs-6 m-1'>Next Scheduled appt:<span className='ps-2'>None</span></p>
+                                                    <p className='fs-6 m-1'><span className='fw-bold'>Primary Provider:</span><span className='ps-2'>Nishchay Sharma</span></p>
+                                                    <p className='fs-6 m-1'><span className='fw-bold'>Date Added:</span><span className='ps-2'>01/11/2024</span></p>
+                                                    <p className='fs-6 m-1'><span className='fw-bold'>Last Scheduled appt:</span><span className='ps-2 text-primary'>01/01/2025</span></p>
+                                                    <p className='fs-6 m-1'><span className='fw-bold'>Next Scheduled appt:</span><span className='ps-2'>None</span></p>
                                                 </div>
                                             </Col>
                                         </Row>
                                     </Col>
 
-                                    <Col sm={2} className='d-flex justify-content-center'>
+                                    <Col sm={2} className='d-flex justify-content-end pe-3'>
                                         <div className='text-center'>
-                                            <Button className='text-black text-nowrap bg-white' style={{ width: '90%', fontSize: '12px', height: '30px' }}>New Appointment</Button>
-                                            <Button className='text-black text-nowrap bg-white mt-2' style={{ width: '90%', fontSize: '12px', height: '30px' }}>New Referral</Button>
+                                            <Button
+                                                className='text-black text-nowrap bg-white fs-6 d-flex align-items-center justify-content-center w-100'
+                                                style={{ height: '30px' }}
+                                            >
+                                                New Appointment
+                                            </Button>
+                                            <Button className='text-black text-nowrap bg-white mt-1 fs-6 d-flex align-items-center justify-content-center w-100' style={{ height: '30px' }}>New Referral</Button>
                                         </div>
                                     </Col>
                                 </Row>
@@ -94,7 +101,7 @@ const NewPatient = () => {
                                             'Authorizations',
                                             'Vital Status',
                                             'Balance',
-                                            'Drchrono Payment'
+                                            'Payment'
                                         ].map((tab) => (
                                             <li className="nav-item" key={tab}>
                                                 <a
@@ -112,12 +119,12 @@ const NewPatient = () => {
                                 <div className="mt-2">
                                     {activeTab === 'Patient Details' && <PatientDetails />}
                                     {activeTab === 'Demographics' && <Demographics />}
-                                    {activeTab === 'Insurances' && <p>Insurances Content</p>}
-                                    {activeTab === 'Eligibility' && <p>Eligibility Content</p>}
-                                    {activeTab === 'Authorizations' && <p>Authorizations Content</p>}
-                                    {activeTab === 'Vital Status' && <p>Vital Status Content</p>}
-                                    {activeTab === 'Balance' && <p>Balance Content</p>}
-                                    {activeTab === 'Drchrono Payment' && <p>Drchrono Payment Content</p>}
+                                    {activeTab === 'Insurances' && <Insurances />}
+                                    {activeTab === 'Eligibility' && <p>In Progress...</p>}
+                                    {activeTab === 'Authorizations' && <p>In Progress...</p>}
+                                    {activeTab === 'Vital Status' && <VitalStatus />}
+                                    {activeTab === 'Balance' && <p>In Progress...</p>}
+                                    {activeTab === 'Drchrono Payment' && <p>In Progress...</p>}
                                 </div>
 
                                 {/* <div className='d-flex gap-1 justify-content-end mb-2'>
@@ -132,7 +139,7 @@ const NewPatient = () => {
                         <FormInput type="text" placeholder="Search..." />
                         {/* </div> */}
                         <div className='d-flex justify-content-center mt-2'>
-                            <Button className="custom-buttons text-nowrap w-100" style={{ height: '30px' }}>
+                            <Button className="custom-buttons text-nowrap w-100  d-flex align-items-center justify-content-center" style={{ height: '30px' }}>
                                 Add New Patient
                             </Button>
                         </div>
