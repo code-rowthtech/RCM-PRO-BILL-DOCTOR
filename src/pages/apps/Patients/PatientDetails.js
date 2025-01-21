@@ -210,7 +210,13 @@ const PatientDetails = () => {
                     </Form.Group>
                 </Col>
                 <Col className='d-flex justify-content-end mb-2'>
-                    <Button variant='success' className='fs-6' style={{ height: '30px' }}>Save</Button>
+                    <Button
+                        variant='success'
+                        className='fs-6 d-flex align-items-center justify-content-center'
+                        style={{ height: '30px', padding: '0 15px' }}
+                    >
+                        Save
+                    </Button>
                 </Col>
             </Row>
         </div>
