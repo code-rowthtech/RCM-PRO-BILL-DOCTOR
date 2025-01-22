@@ -151,7 +151,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
 
     return (
         <>
-            <div className={classNames('navbar-custom', navbarCssClasses)}>
+            <div className={classNames('navbar-custom', navbarCssClasses)} style={{backgroundColor:"#D9D9D9"}}>
                 <div className={containerCssClasses}>
                     {!hideLogo && (
                         <Link to="/" className="topnav-logo">
@@ -186,6 +186,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                             <h4 className=''>{pageTitle}</h4>
                         </div>
                     )}
+                    
 
                     {/* toggle for horizontal layout */}
                     {layoutType === layoutConstants.LAYOUT_HORIZONTAL && (

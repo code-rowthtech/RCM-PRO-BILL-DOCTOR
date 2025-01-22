@@ -59,3 +59,15 @@
     padding: 0px; /* Optional for spacing */
     font-size: 14px; /* Optional for consistency */
 }
+.add_hover_appoinment:hover {
+    background-color: rgba(68, 65, 65, 0.33);
+    color: #444141!important;
+}
+.add_small_size{
+    font-size: 10px;
+    color: #444141;
+}
+/* .diff_color{
+    font-size: 10px;
+    color: #949292;
+} */
