@@ -1,7 +1,6 @@
 // @flow
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import SimpleBar from 'simplebar-react';
 import classNames from 'classnames';
 import profilepic from "../assets/images/profilepic.png";
 import { getMenuItems } from '../helpers/menu';
@@ -15,6 +14,8 @@ import logoDark from '../assets/images/logo-dark.png';
 import logoDarkSm from '../assets/images/logo_sm_dark.png';
 import logo from '../assets/images/logo.png';
 import helpBoxImage from '../assets/images/help-icon.svg';
+import SimpleBar from 'simplebar-react';
+
 import profileImg from '../assets/images/users/avatar-1.jpg';
 
 type SideBarContentProps = {
@@ -35,26 +36,7 @@ const SideBarContent = ({ hideUserProfile }: SideBarContentProps) => {
             )}
             <AppMenu menuItems={getMenuItems()} />
 
-            {/* <div
-                className={classNames('help-box', 'text-center', {
-                    'text-white': hideUserProfile,
-                })}>
-                <Link to="/" className="float-end close-btn text-white">
-                    <i className="mdi mdi-close" />
-                </Link>
-
-                <img src={helpBoxImage} height="90" alt="Helper Icon" />
-                <h5 className="mt-3">Unlimited Access</h5>
-                <p className="mb-3">Upgrade to plan to get access to unlimited reports</p>
-                <button
-                    className={classNames(
-                        'btn',
-                        'btn-sm',
-                        hideUserProfile ? 'btn-outline-light' : 'btn-outline-primary'
-                    )}>
-                    Upgrade
-                </button>
-            </div> */}
+       
             <div className="clearfix" />
         </>
     );
@@ -114,7 +96,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                     </>
                 )}
 
-                {/* {!isCondensed && (
+                {!isCondensed && (
                     <SimpleBar style={{ maxHeight: '100%' }} timeout={500} scrollbarMaxSize={320}>
                         <SideBarContent
                             menuClickHandler={() => { }}
@@ -123,8 +105,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                         />
                     </SimpleBar>
                 )}
-                {isCondensed && <SideBarContent isLight={isLight} hideUserProfile={hideUserProfile} />} */}
-                {/* <!-- Search Section --> */}
+                {isCondensed && <SideBarContent isLight={isLight} hideUserProfile={hideUserProfile} />}
                 <div class="row">
                     <div class="col-12">
                         <div class="search-bar p-1">
@@ -145,7 +126,6 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                     </div>
                 </div>
 
-                {/* <!-- Today Appointment Section --> */}
                 <div class="row mx-auto">
                     <div class="col-12 my-1 ">
                         <p className='p-0 m-0' style={{ color: "#444141",fontSize:"10px" }}>Today Appointment</p>

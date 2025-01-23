@@ -17,7 +17,7 @@ import avatar2 from '../assets/images/users/avatar-4.jpg';
 import logoSmDark from '../assets/images/logo_sm_dark.png';
 import logoSmLight from '../assets/images/logo_sm.png';
 import logo from '../assets/images/logo-light.png';
-
+import CloseIcon from "../assets/images/Iconclose.png"
 //constants
 import * as layoutConstants from '../constants/layout';
 
@@ -180,8 +180,9 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                     {/* toggle for vertical layout */}
                     {(layoutType === layoutConstants.LAYOUT_VERTICAL || layoutType === layoutConstants.LAYOUT_FULL) && (
                         <div className='d-flex align-items-center'>
-                            <button className="button-menu-mobile open-left" onClick={handleLeftMenuCallBack}>
-                                <i className="mdi mdi-menu" />
+                            <button className="button-menu-mobile open-left ps-3" onClick={handleLeftMenuCallBack} style={{paddingTop:"3.2rem"}}>
+                                {/* <i className="mdi mdi-menu" /> */}
+                                <img src={CloseIcon} alt='' style={{width:"100%",height:"100%",objectFit:"contain"}}/>
                             </button>
                             <h4 className=''>{pageTitle}</h4>
                         </div>

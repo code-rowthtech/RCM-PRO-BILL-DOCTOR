@@ -62,7 +62,6 @@ const Statistics = (data): React$Element<React$FragmentType> => {
                                             <i className="dripicons-graph-line text-muted font-24"></i>
                                             <h3>
                                                 <span>{statisticsData?.totalclaims}</span>
-                                                {/* <i className="mdi mdi-arrow-up text-success"></i> */}
                                             </h3>
                                             <p className="text-muted font-15 mb-0">Claims</p>
                                         </Card.Body>

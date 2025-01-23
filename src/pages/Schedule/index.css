@@ -59,8 +59,8 @@
     padding: 0px; /* Optional for spacing */
     font-size: 14px; /* Optional for consistency */
 }
-.add_hover_appoinment:hover {
-    background-color: rgba(68, 65, 65, 0.33);
+.patient-menu-item:hover {
+    background-color: rgba(68, 65, 65, 0.33)!important;
     color: #444141!important;
 }
 .add_small_size{
