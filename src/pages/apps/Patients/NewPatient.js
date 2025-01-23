@@ -106,36 +106,107 @@ const NewPatient = () => {
                                                 </p>
                                             </div>
                                             <Col sm={6} className='p-0'>
-                                                <div>
-                                                    <p className='fs-6 m-1'>
+                                                <div className='row'>
+                                                    <div className='col-12 mx-1 mt-1'>
+                                                        <div className='row'>
+                                                            <div className='col-3'>
+                                                            <span className='fw-bold fs-6'>Patients ID:</span>
+                                                            </div>
+                                                            <div className='col-9'>
+                                                            <span className='ps-2 text-primary fs-6'>2322BDEW</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className='col-12 mx-1 mt-1'>
+                                                        <div className='row'>
+                                                            <div className='col-3'>
+                                                            <span className='fw-bold fs-6'>Phone:</span>
+                                                            </div>
+                                                            <div className='col-9'>
+                                                            <span className='ps-2 fs-6'>9887363532</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className='col-12 mx-1 mt-1'>
+                                                        <div className='row'>
+                                                            <div className='col-3'>
+                                                            <span className='fw-bold fs-6'>Email:</span>
+                                                            </div>
+                                                            <div className='col-9'>
+                                                            <span className='ps-2 fs-6'>alma.lawson@example.com</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className='col-12 mx-1 mt-1'>
+                                                        <div className='row'>
+                                                            <div className='col-3'>
+                                                            <span className='fw-bold fs-6'>Address:</span>
+                                                            </div>
+                                                            <div className='col-9'>
+                                                            <span className='ps-2 fs-6'>2972 Westheimer Rd. Santa Ana, Illinois 85486</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                  
+                                                    {/* <p className='fs-6 m-1'>
                                                         <span className='fw-bold'>Patients Chart ID:</span><span className='ps-2 text-primary'>2322BDEW</span>
-                                                    </p>
-                                                    <p className='fs-6 m-1'>
-                                                        <span className='fw-bold'>Phone:</span><span className='ps-2'>9887363532</span>
+                                                    </p> */}
+                                                    {/* <p className='fs-6 m-1'>
+                                                        <span className='fw-bold'>Phone:</span>
+                                                        <span className='ps-2'>9887363532</span>
                                                     </p>
                                                     <p className='fs-6 m-1'>
                                                         <span className='fw-bold'>Email:</span><span className='ps-2'>alma.lawson@example.com</span>
                                                     </p>
                                                     <p className='fs-6 m-1'>
                                                         <span className='fw-bold'>Address:</span><span className='ps-2'>2972 Westheimer Rd. Santa Ana, Illinois 85486</span>
-                                                    </p>
+                                                    </p> */}
                                                 </div>
                                             </Col>
                                             <Col sm={6}>
-                                                <div>
-                                                    <p className='fs-6 m-1'>
-                                                        <span className='fw-bold'>Primary Provider:</span><span className='ps-2'>Nishchay Sharma</span>
-                                                    </p>
-                                                    <p className='fs-6 m-1'>
-                                                        <span className='fw-bold'>Date Added:</span><span className='ps-2'>01/11/2024</span>
-                                                    </p>
-                                                    <p className='fs-6 m-1'>
-                                                        <span className='fw-bold'>Last Scheduled appt:</span><span className='ps-2 text-primary'>01/01/2025</span>
-                                                    </p>
-                                                    <p className='fs-6 m-1'>
-                                                        <span className='fw-bold'>Next Scheduled appt:</span><span className='ps-2'>None</span>
-                                                    </p>
+                                            <div className='row'>
+                                                    <div className='col-12 mx-1 mt-1'>
+                                                        <div className='row'>
+                                                            <div className='col-5'>
+                                                            <span className='fw-bold fs-6'>Primary Provider:</span>
+                                                            </div>
+                                                            <div className='col-7'>
+                                                            <span className='ps-2 text-primary fs-6'>Nishchay Sharma</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className='col-12 mx-1 mt-1'>
+                                                        <div className='row'>
+                                                            <div className='col-5'>
+                                                            <span className='fw-bold fs-6'>Date Added:</span>
+                                                            </div>
+                                                            <div className='col-7'>
+                                                            <span className='ps-2 fs-6'>01/11/2024</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className='col-12 mx-1 mt-1'>
+                                                        <div className='row'>
+                                                            <div className='col-5'>
+                                                            <span className='fw-bold fs-6'>Last Scheduled appt:</span>
+                                                            </div>
+                                                            <div className='col-7'>
+                                                            <span className='ps-2 fs-6'>01/01/2025</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className='col-12 mx-1 mt-1'>
+                                                        <div className='row'>
+                                                            <div className='col-5'>
+                                                            <span className='fw-bold fs-6'>Next Scheduled appt:</span>
+                                                            </div>
+                                                            <div className='col-7'>
+                                                            <span className='ps-2 fs-6'>None</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
+                                                
                                             </Col>
                                         </Row>
                                     </Col>

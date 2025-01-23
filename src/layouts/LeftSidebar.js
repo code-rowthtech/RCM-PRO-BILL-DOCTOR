@@ -96,7 +96,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                     </>
                 )}
 
-                {!isCondensed && (
+                {/* {!isCondensed && (
                     <SimpleBar style={{ maxHeight: '100%' }} timeout={500} scrollbarMaxSize={320}>
                         <SideBarContent
                             menuClickHandler={() => { }}
@@ -105,7 +105,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                         />
                     </SimpleBar>
                 )}
-                {isCondensed && <SideBarContent isLight={isLight} hideUserProfile={hideUserProfile} />}
+                {isCondensed && <SideBarContent isLight={isLight} hideUserProfile={hideUserProfile} />} */}
                 <div class="row">
                     <div class="col-12">
                         <div class="search-bar p-1">
