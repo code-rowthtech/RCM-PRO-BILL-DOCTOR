@@ -1,6 +1,6 @@
 // @flow
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import classNames from 'classnames';
 
@@ -20,6 +20,7 @@ import logo from '../assets/images/logo-light.png';
 import CloseIcon from "../assets/images/Iconclose.png"
 //constants
 import * as layoutConstants from '../constants/layout';
+import MENU_ITEMS from '../constants/menu';
 
 // get the notifications
 
@@ -61,7 +62,9 @@ type TopbarProps = {
 
 const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: TopbarProps): React$Element<any> => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
+    console.log(MENU_ITEMS, 'MENU_ITEMSMENU_ITEMS')
     const [isopen, setIsopen] = useState(false);
     const navbarCssClasses = navCssClasses || '';
     const containerCssClasses = !hideLogo ? 'container-fluid' : '';
@@ -105,7 +108,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
     // const handleRightSideBar = () => {
     //     dispatch(showRightSidebar());
     // };
-  
+
     const location = useLocation(); // Get the current location object
     const { pathname, search } = location;
     // Define a mapping of paths to titles
@@ -128,7 +131,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/schedule/addBreak': 'Add Break',
         '/apps/prescription/index': 'Prescription',
         '/apps/prescription/newPrescription': 'New Prescription',
-       
+
 
     };
     const getPageTitle = (pathToTitleMap, pathname, search) => {
@@ -148,11 +151,11 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
     };
     const pageTitle = getPageTitle(pathToTitleMap, pathname, search);
 
-
+console.log(location.pathname)
     return (
         <>
-            <div className={classNames('navbar-custom', navbarCssClasses)} style={{backgroundColor:"#D9D9D9"}}>
-                <div className={containerCssClasses}>
+            <div className={classNames('navbar-custom ', navbarCssClasses)} style={{ backgroundColor: "#ffffff" }}>
+                <div className={`${containerCssClasses} d-flex align-items-center justify-content-between`}>
                     {!hideLogo && (
                         <Link to="/" className="topnav-logo">
                             <span className="topnav-logo-lg">
@@ -164,6 +167,23 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                         </Link>
                     )}
 
+
+
+                    {/* toggle for vertical layout */}
+                    {(layoutType === layoutConstants.LAYOUT_VERTICAL || layoutType === layoutConstants.LAYOUT_FULL) && (
+                        // <div className='d-flex align-items-center'>
+                        //     <button className="button-menu-mobile open-left ps-3" onClick={handleLeftMenuCallBack} style={{paddingTop:"3.2rem"}}>
+                        //         {/* <i className="mdi mdi-menu" /> */}
+                        //         <img src={CloseIcon} alt='' style={{width:"100%",height:"100%",objectFit:"contain"}}/>
+                        //     </button>
+                        //     <h4 className=''>{pageTitle}</h4>
+                        // </div>
+                        <div className='d-flex gap-3 align-items-center '>
+                            {MENU_ITEMS?.map((data) => (
+                                <p onClick={() => navigate(data?.url)} className='fs-5 mb-0 fw-bold cursor-pointer' style={{color:location.pathname===data?.url?'black':'rgba(116, 114, 114, 0.51)'}}>{data?.label}</p>
+                            ))}
+                        </div>
+                    )}
                     <ul className="list-unstyled topbar-menu float-end mb-0">
                         <li className="dropdown notification-list">
                         </li>
@@ -176,18 +196,6 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                             />
                         </li>
                     </ul>
-
-                    {/* toggle for vertical layout */}
-                    {(layoutType === layoutConstants.LAYOUT_VERTICAL || layoutType === layoutConstants.LAYOUT_FULL) && (
-                        <div className='d-flex align-items-center'>
-                            <button className="button-menu-mobile open-left ps-3" onClick={handleLeftMenuCallBack} style={{paddingTop:"3.2rem"}}>
-                                {/* <i className="mdi mdi-menu" /> */}
-                                <img src={CloseIcon} alt='' style={{width:"100%",height:"100%",objectFit:"contain"}}/>
-                            </button>
-                            <h4 className=''>{pageTitle}</h4>
-                        </div>
-                    )}
-                    
 
                     {/* toggle for horizontal layout */}
                     {layoutType === layoutConstants.LAYOUT_HORIZONTAL && (

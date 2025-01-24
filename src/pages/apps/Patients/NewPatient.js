@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Row } from 'react-bootstrap';
-import { IoPrintSharp } from 'react-icons/io5';
+import { HiOutlinePrinter } from "react-icons/hi2";
 import { LiaReceiptSolid } from 'react-icons/lia';
 import { TbHeartRateMonitor } from 'react-icons/tb';
 import PatientDetails from './PatientDetails';
@@ -10,11 +10,18 @@ import Insurances from './Insurances';
 import VitalStatus from './VitalStatus';
 import profileDummy from '../../../assets/images/profileDummy.png'
 import CloseIcon from "../../../assets/images/Icon.png"
+import { MdPhone } from "react-icons/md";
+import { MdOutlineMarkEmailUnread } from "react-icons/md";
+import { BiSolidLocationPlus } from "react-icons/bi";
+
+
 const NewPatient = () => {
     const navigate = useNavigate();
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [activeTab, setActiveTab] = useState('Patient Details');
     const [isClinicalReviewExpanded, setIsClinicalReviewExpanded] = useState(false);
+    const [timeLeft, setTimeLeft] = useState(null);
+    const [isRunning, setIsRunning] = useState(false);
 
     const handleSidebarToggle = () => {
         setSidebarCollapsed(!isSidebarCollapsed);
@@ -33,121 +40,145 @@ const NewPatient = () => {
         setIsClinicalReviewExpandedData(!isClinicalReviewExpandedData);
     };
     const patientMenuItems = [
-        'Demographic',
-        'Appointments',
-        'Clinical Dashboard',
-        'Documents',
+        { label: "Demographic", icon: "bi bi-person" },
+        { label: "Appointments", icon: "bi bi-person" },
+        { label: "Clinical Dashboard", icon: "bi bi-person" },
+        { label: "Documents", icon: "bi bi-person" },
         {
             label: 'Clinical Review',
+            icon: "bi bi-person",
             subItems: [
-                'Problem List',
-                'Allergy List',
-                'Drug Medication',
-                'Medication List',
-                'Drug Interactions',
-                'Care Quality Indicators (CQIs)',
+                { label: 'Problem List', icon: 'bi bi-person' },
+                { label: 'Allergy List', icon: 'bi bi-person' },
+                { label: 'Drug Medication', icon: 'bi bi-person' },
+                { label: 'Medication List', icon: 'bi bi-person' },
+                { label: 'Drug Interactions', icon: 'bi bi-person' },
+                { label: 'Care Quality Indicators (CQIs)', icon: 'bi bi-person' },
             ],
         },
-        'Intake Data',
-        'Lab Orders',
-        'Immunizations',
-        'Patient Cost Estimator',
-        'Growth Charts',
-        'Onpatient Access',
-        'Education Resources',
-        'Communication',
-        'Family History',
-        'Imaging Orders',
-        'Implantable Devices',
+        { label: 'Intake Data', icon: 'bi bi-person' },
+        { label: 'Lab Orders', icon: 'bi bi-person' },
+        { label: 'Immunizations', icon: 'bi bi-person' },
+        { label: 'Patient Cost Estimator', icon: 'bi bi-person' },
+        { label: 'Growth Charts', icon: 'bi bi-person' },
+        { label: 'Onpatient Access', icon: 'bi bi-person' },
+        { label: 'Education Resources', icon: 'bi bi-person' },
+        { label: 'Communication', icon: 'bi bi-person' },
+        { label: 'Family History', icon: 'bi bi-person' },
+        { label: 'Imaging Orders', icon: 'bi bi-person' },
+        { label: 'Implantable Devices', icon: 'bi bi-person' },
     ];
 
+    const startTimer = () => {
+        setIsRunning(true);
+        setTimeLeft(30 * 60); // 30 minutes in seconds
+    };
+
+    useEffect(() => {
+        let timer;
+        if (isRunning && timeLeft > 0) {
+            timer = setInterval(() => {
+                setTimeLeft((prevTime) => prevTime - 1);
+            }, 1000);
+        } else if (timeLeft === 0) {
+            clearInterval(timer);
+            setIsRunning(false);
+        }
+        return () => clearInterval(timer);
+    }, [isRunning, timeLeft]);
+
+    // Function to format seconds into MM:SS
+    const formatTime = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+    };
+
     return (
-        <div className="background_Color pt-1 pb-2">
-            <div className="container-fluid px-0 mt-2">
+        <div className="background_Color  pb-2">
+            <div className="container-fluid px-0 mt-0 pt-0">
                 <div className="row">
                     {/* Main Content */}
                     <div className={isSidebarCollapsed ? 'col-11' : 'col-10'}>
-                        <Card
+                        <div
                             className='mb-1'
                             style={{
-                                background: '#E6EBFF',
+                                background: 'transparent',
                                 width: 'auto',
-                                border: '1px solid #a4c5d5'
+                                // border: '1px solid #a4c5d5',
+                                bordertop: '0px!important',
+                                boxShadow: 0
                             }}>
-                            <Card.Body className="p-1">
+                            <div className="p-1">
                                 <Row>
-                                    <Col sm={2} className='ps-3 pt-2'>
+                                    <Col sm={2} className='ps-3 pt-1'>
                                         <div>
                                             <img
                                                 src={profileDummy}
                                                 alt="Patient Profile"
                                                 className="img-fluid rounded"
-                                                style={{ width: '136px', height: '139px', objectFit: 'cover' }}
+                                                style={{ width: '126px', height: '129px', objectFit: 'cover' }}
                                             />
                                         </div>
-                                        <div className='mt-1 d-flex gap-2 ps-3'>
-                                            <IoPrintSharp className='fs-3' />
-                                            <LiaReceiptSolid className='fs-3 text-black' />
-                                            <TbHeartRateMonitor className='fs-3' />
-                                        </div>
+
                                     </Col>
 
                                     <Col sm={8}>
                                         <Row className='pt-1'>
                                             <div className='d-flex gap-2 ps-1'>
                                                 <p style={{ borderRight: '1px solid black' }} className='pe-2 text-nowrap fs-6'>
-                                                    <span className='fw-bold' style={{ color: 'rgb(249, 139, 55)' }}>Jane Cooper</span> <span className='fs-6'>Male</span>
+                                                    <span className='fw-bold' style={{ color: 'rgb(249, 139, 55)' }}>Jane Cooper</span> <span className='fs-6 fw-bold'>Male</span>
                                                 </p>
-                                                <p style={{ borderRight: '1px solid black' }} className='pe-2 text-nowrap fs-6'>
+                                                <p style={{ borderRight: '1px solid black' }} className='pe-2 text-nowrap fw-bold fs-6'>
                                                     <span>Sep 10,1971</span>
                                                 </p>
-                                                <p className='text-nowrap fs-6'>
+                                                <p className='text-nowrap fs-6 fw-bold'>
                                                     <span>55 years old</span>
                                                 </p>
                                             </div>
                                             <Col sm={6} className='p-0'>
                                                 <div className='row'>
-                                                    <div className='col-12 mx-1 mt-1'>
+                                                    <div className='col-12 mx-1 '>
                                                         <div className='row'>
                                                             <div className='col-3'>
-                                                            <span className='fw-bold fs-6'>Patients ID:</span>
+                                                                <span className='fw-bold fs-6'>Patients ID:</span>
                                                             </div>
                                                             <div className='col-9'>
-                                                            <span className='ps-2 text-primary fs-6'>2322BDEW</span>
+                                                                <span className='ps-2 text-primary fs-6' style={{ fontWeight: 600 }}>2322BDEW</span>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className='col-12 mx-1 mt-1'>
+                                                    <div className='col-12 mx-1 '>
                                                         <div className='row'>
                                                             <div className='col-3'>
-                                                            <span className='fw-bold fs-6'>Phone:</span>
+                                                                <span><MdPhone className='fs-5' /></span>
                                                             </div>
                                                             <div className='col-9'>
-                                                            <span className='ps-2 fs-6'>9887363532</span>
+                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>9887363532</span>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className='col-12 mx-1 mt-1'>
+                                                    <div className='col-12 mx-1 '>
                                                         <div className='row'>
                                                             <div className='col-3'>
-                                                            <span className='fw-bold fs-6'>Email:</span>
+                                                                <span ><MdOutlineMarkEmailUnread className='fs-5' /></span>
                                                             </div>
                                                             <div className='col-9'>
-                                                            <span className='ps-2 fs-6'>alma.lawson@example.com</span>
+                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>alma.lawson@example.com</span>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className='col-12 mx-1 mt-1'>
+                                                    <div className='col-12 mx-1 '>
                                                         <div className='row'>
                                                             <div className='col-3'>
-                                                            <span className='fw-bold fs-6'>Address:</span>
+                                                                <span ><BiSolidLocationPlus className='fs-5' /></span>
                                                             </div>
                                                             <div className='col-9'>
-                                                            <span className='ps-2 fs-6'>2972 Westheimer Rd. Santa Ana, Illinois 85486</span>
+                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>2972 Westheimer Rd. Santa Ana, Illinois 85486</span>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                  
+
                                                     {/* <p className='fs-6 m-1'>
                                                         <span className='fw-bold'>Patients Chart ID:</span><span className='ps-2 text-primary'>2322BDEW</span>
                                                     </p> */}
@@ -164,76 +195,88 @@ const NewPatient = () => {
                                                 </div>
                                             </Col>
                                             <Col sm={6}>
-                                            <div className='row'>
-                                                    <div className='col-12 mx-1 mt-1'>
+                                                <div className='row'>
+                                                    <div className='col-12 mx-1 '>
                                                         <div className='row'>
                                                             <div className='col-5'>
-                                                            <span className='fw-bold fs-6'>Primary Provider:</span>
+                                                                <span className='fw-bold fs-6'>Primary Provider:</span>
                                                             </div>
                                                             <div className='col-7'>
-                                                            <span className='ps-2 text-primary fs-6'>Nishchay Sharma</span>
+                                                                <span className='ps-2 text-primary fs-6' style={{ fontWeight: 600 }}>Nishchay Sharma</span>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className='col-12 mx-1 mt-1'>
+                                                    <div className='col-12 mx-1 '>
                                                         <div className='row'>
                                                             <div className='col-5'>
-                                                            <span className='fw-bold fs-6'>Date Added:</span>
+                                                                <span className='fw-bold fs-6'>Date Added:</span>
                                                             </div>
                                                             <div className='col-7'>
-                                                            <span className='ps-2 fs-6'>01/11/2024</span>
+                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>01/11/2024</span>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className='col-12 mx-1 mt-1'>
+                                                    <div className='col-12 mx-1 '>
                                                         <div className='row'>
                                                             <div className='col-5'>
-                                                            <span className='fw-bold fs-6'>Last Scheduled appt:</span>
+                                                                <span className='fw-bold fs-6'>Last Appointment Date:</span>
                                                             </div>
                                                             <div className='col-7'>
-                                                            <span className='ps-2 fs-6'>01/01/2025</span>
+                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>01/01/2025</span>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className='col-12 mx-1 mt-1'>
+                                                    <div className='col-12 mx-1 '>
                                                         <div className='row'>
                                                             <div className='col-5'>
-                                                            <span className='fw-bold fs-6'>Next Scheduled appt:</span>
+                                                                <span className='fw-bold fs-6'>Next Appointment Date:</span>
                                                             </div>
                                                             <div className='col-7'>
-                                                            <span className='ps-2 fs-6'>None</span>
+                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>None</span>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                
+
                                             </Col>
                                         </Row>
                                     </Col>
 
                                     <Col sm={2} className='d-flex justify-content-end pe-3'>
                                         <div className='text-center'>
+
+                                            {/* <Button className='text-black text-nowrap bg-white mt-1 fs-6 d-flex align-items-center justify-content-center w-100' style={{ height: '30px' }}>
+                                                New Referral
+                                            </Button> */}
                                             <Button
                                                 className='text-black text-nowrap bg-white fs-6 d-flex align-items-center justify-content-center w-100'
                                                 style={{ height: '30px' }}
+                                                onClick={startTimer}
+                                                disabled={isRunning}  // Prevent multiple clicks
                                             >
-                                                New Appointment
+                                                {isRunning ? formatTime(timeLeft) : 'Start Session'}
                                             </Button>
-                                            <Button className='text-black text-nowrap bg-white mt-1 fs-6 d-flex align-items-center justify-content-center w-100' style={{ height: '30px' }}>
-                                                New Referral
+                                            <Button
+                                                className='text-black text-nowrap bg-white mt-1 fs-6 d-flex align-items-center justify-content-center w-100'
+                                                style={{ height: '30px' }}
+                                            >
+                                                Add Appointment
                                             </Button>
-                                            <Button className='text-black text-nowrap bg-white mt-1 fs-6 d-flex align-items-center justify-content-center w-100' style={{ height: '30px' }}>
-                                                Start Session
-                                            </Button>
+                                            <div className='mt-2 d-flex gap-2  justify-content-center'>
+                                                <HiOutlinePrinter className='fs-3 text-black' />
+                                                <LiaReceiptSolid className='fs-3 text-black' />
+                                                {/* <TbHeartRateMonitor className='fs-3' /> */}
+                                            </div>
                                         </div>
+
                                     </Col>
                                 </Row>
-                            </Card.Body>
-                        </Card>
+                            </div>
+                        </div>
 
-                        <div className=' mt-2'>
+                        <div className=' mt-2 '>
                             <Card className='px-2'>
-                                <div>
+                                <div style={{ borderBottom: '2px solid grey' }}>
                                     <ul className="nav nav-underline">
                                         {[
                                             'Patient Details',
@@ -245,11 +288,11 @@ const NewPatient = () => {
                                             'Balance',
                                             'Payment'
                                         ].map((tab) => (
-                                            <li className="nav-item" key={tab}>
+                                            <li className="nav-item " key={tab}>
                                                 <a
-                                                    className={`nav-link fw-medium  text-black ${activeTab === tab ? 'active' : ''}`}
+                                                    className={`nav-link ms-3 pb-0 tab-font-family ${activeTab === tab ? 'active text-primary' : 'text-black'}`}
                                                     onClick={() => handleTabClick(tab)}
-                                                    style={{ cursor: 'pointer' }}
+                                                    style={{ cursor: 'pointer',fontWeight:600 }}
                                                 >
                                                     {tab}
                                                 </a>
@@ -258,7 +301,7 @@ const NewPatient = () => {
                                     </ul>
                                 </div>
 
-                                <div className="mt-2">
+                                <div className="mt-2 px-2 scroll-container" style={{ height: '65vh', overflow: 'auto' }}>
                                     {activeTab === 'Patient Details' && <PatientDetails />}
                                     {activeTab === 'Demographics' && <Demographics />}
                                     {activeTab === 'Insurances' && <Insurances />}
@@ -273,7 +316,7 @@ const NewPatient = () => {
                     </div>
 
                     {/* Sidebar */}
-                    <div className={isSidebarCollapsed ? 'col-1' : 'col-2'}>
+                    <div className={isSidebarCollapsed ? 'col-1 ' : 'col-2'}>
                         <div
                             className="patient-menu-container bg-white mt-0"
                             style={{
@@ -283,11 +326,11 @@ const NewPatient = () => {
                         >
                             <div
                                 className="card m-0 overflow-hidden"
-                                style={{ borderRadius: '10px' }}
+                                style={{ borderRadius: '5px' }}
                             >
                                 <div
                                     className="card-header d-flex justify-content-between align-items-center text-white px-2 py-1"
-                                    style={{ backgroundColor: '#444141' }}
+                                    style={{ backgroundColor: '#313A46' }}
                                 >
                                     <button
                                         className="btn p-0 shadow-none outline-none"
@@ -295,12 +338,12 @@ const NewPatient = () => {
                                     >
                                         <i
                                             className="bi bi-list text-white"
-                                            style={{ fontSize: '25px' }}
+                                            style={{ fontSize: '18px' }}
                                         ></i>
                                         {/* <img src={CloseIcon} alt='' style={{ width: "30%", height: "30%", objectFit: "contain" }} /> */}
 
                                     </button>
-                                    {!isSidebarCollapsed && <h4 className="m-0">Patient Chart</h4>}
+                                    {!isSidebarCollapsed && <h5 className="m-0">Patient Chart</h5>}
                                     <button
                                         className="btn p-0 shadow-none outline-none"
                                         data-bs-toggle="collapse"
@@ -312,45 +355,36 @@ const NewPatient = () => {
                                         <i
                                             className={`bi ${isClinicalReviewExpandedData ? 'bi-chevron-up' : 'bi-chevron-down'
                                                 }`}
-                                            style={{ fontSize: '20px', color: "white" }}
+                                            style={{ fontSize: '14px', color: "white" }}
                                         ></i>
                                     </button>
                                 </div>
                                 <div id="patientChartData" className="collapse">
-                                    <div className="card-body p-0">
+                                    <div className="card-body p-0 scroll-container" style={{ height: '83vh', overflow: 'auto' }}>
                                         {patientMenuItems.map((item, index) => (
-                                            typeof item === 'string' ? (
-                                                <p
-                                                    key={index}
-                                                    className="patient-menu-item text-black mb-0 ps-2 py-1"
-                                                    onClick={() => handleTabClick(item)}
-                                                    style={{
-                                                        cursor: 'pointer',
-                                                        backgroundColor:
-                                                            activeTab === item ? '#f8f9fa' : 'transparent',
-                                                        fontWeight: activeTab === item ? 'bold' : 'normal',
-                                                    }}
-                                                >
-                                                    {item}
-                                                </p>
-                                            ) : (
-                                                <div key={index}>
+                                            item.subItems ? (
+                                                <div key={index} className='ms-0'>
                                                     <p
-                                                        className="patient-menu-item text-black mb-0 px-2 border-bottom py-1 d-flex justify-content-between align-items-center"
+                                                        className={`patient-menu-item text-black mb-0 ps-2 pe-2 border-bottom py-1 ${isSidebarCollapsed ? 'text-center fw-bold' : 'd-flex justify-content-between align-items-center'}`}
                                                         onClick={handleClinicalReviewToggle}
                                                         style={{
                                                             cursor: 'pointer',
-                                                            backgroundColor:
-                                                                isClinicalReviewExpanded ? '#f8f9fa' : 'transparent',
-                                                            fontWeight: isClinicalReviewExpanded ? 'normal' : 'normal',
+                                                            backgroundColor: isClinicalReviewExpanded ? '#f8f9fa' : 'transparent',
                                                         }}
                                                     >
-                                                        {item.label}
+                                                        <span className='text-center'>
+                                                            <i className={`${item.icon}`}></i>
+                                                            <span className={`${isSidebarCollapsed ? 'd-none' : ''}`}>
+                                                                {" " + item.label}
+                                                            </span>
+                                                        </span>
                                                         <i
                                                             className={`bi ${isClinicalReviewExpanded
                                                                 ? 'bi-chevron-up'
                                                                 : 'bi-chevron-down'
-                                                                }`}
+                                                                }
+                                                           ${isSidebarCollapsed ? 'd-none' : ''}     
+                                                                `}
                                                         ></i>
                                                     </p>
                                                     {isClinicalReviewExpanded && (
@@ -358,25 +392,39 @@ const NewPatient = () => {
                                                             {item.subItems.map((subItem, subIndex) => (
                                                                 <p
                                                                     key={subIndex}
-                                                                    className="text-black  mb-0 ps-4 border-bottom py-1"
-                                                                    onClick={() => handleTabClick(subItem)}
+                                                                    className="text-black mb-0 ps-4 border-bottom py-1"
+                                                                    onClick={() => handleTabClick(subItem.label)}
                                                                     style={{
                                                                         cursor: 'pointer',
                                                                         backgroundColor:
-                                                                            activeTab === subItem ? '#e9ecef' : 'transparent',
-                                                                        fontWeight: activeTab === subItem ? 'bold' : 'normal',
+                                                                            activeTab === subItem.label ? '#e9ecef' : 'transparent',
+                                                                        fontWeight: activeTab === subItem.label ? 'bold' : 'normal',
                                                                     }}
                                                                 >
-                                                                    {subItem}
+                                                                    {subItem.label}
                                                                 </p>
                                                             ))}
                                                         </div>
                                                     )}
                                                 </div>
+                                            ) : (
+                                                <p
+                                                    key={index}
+                                                    className={`patient-menu-item text-black mb-0 ps-2 py-1 ${isSidebarCollapsed ? 'text-center fw-bold' : ''}`}
+                                                    onClick={() => handleTabClick(item.label)}
+                                                    style={{
+                                                        cursor: 'pointer',
+                                                        backgroundColor: activeTab === item.label ? '#f8f9fa' : 'transparent',
+                                                        fontWeight: activeTab === item.label ? 'bold' : 'normal',
+                                                    }}
+                                                >
+                                                    <i className={`${item.icon}`}></i> <span className={`${isSidebarCollapsed ? 'd-none' : ''}`}>{item.label}</span>
+                                                </p>
                                             )
                                         ))}
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>

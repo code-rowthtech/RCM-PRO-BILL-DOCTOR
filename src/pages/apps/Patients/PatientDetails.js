@@ -5,7 +5,7 @@ const PatientDetails = () => {
     return (
         <div>
             <Row>
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="templateSelect">
                         <Form.Label className="mb-0">Primary Provider</Form.Label>
                         <Form.Select>
@@ -15,7 +15,7 @@ const PatientDetails = () => {
                         </Form.Select>
                     </Form.Group>
                 </Col>
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="templateSelect">
                         <Form.Label className="mb-0">First Name</Form.Label>
                         <Form.Control
@@ -24,7 +24,7 @@ const PatientDetails = () => {
                         />
                     </Form.Group>
                 </Col>
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="templateSelect">
                         <Form.Label className="mb-0">Status</Form.Label>
                         <Form.Select>
@@ -34,7 +34,7 @@ const PatientDetails = () => {
                         </Form.Select>
                     </Form.Group>
                 </Col>
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="templateSelect">
                         <Form.Label className="mb-0">Middle Name</Form.Label>
                         <Form.Control
@@ -43,7 +43,7 @@ const PatientDetails = () => {
                         />
                     </Form.Group>
                 </Col>
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="templateSelect">
                         <Form.Label className="mb-0">Title</Form.Label>
                         <Form.Control
@@ -52,7 +52,7 @@ const PatientDetails = () => {
                         />
                     </Form.Group>
                 </Col>
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="templateSelect">
                         <Form.Label className="mb-0">Last Name</Form.Label>
                         <Form.Control
@@ -61,7 +61,7 @@ const PatientDetails = () => {
                         />
                     </Form.Group>
                 </Col>
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="templateSelect">
                         <Form.Label className="mb-0">Previous Birth Name</Form.Label>
                         <Form.Control
@@ -70,7 +70,7 @@ const PatientDetails = () => {
                         />
                     </Form.Group>
                 </Col>
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="templateSelect">
                         <Form.Label className="mb-0">Suffix</Form.Label>
                         <Form.Control
@@ -79,7 +79,7 @@ const PatientDetails = () => {
                         />
                     </Form.Group>
                 </Col>
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="templateSelect">
                         <Form.Label className="mb-0">Patient Chart Photo</Form.Label>
                         <Form.Control
@@ -88,7 +88,7 @@ const PatientDetails = () => {
                         />
                     </Form.Group>
                 </Col>
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="templateSelect">
                         <Form.Label className="mb-0">Home Phone</Form.Label>
                         <Form.Control
@@ -97,7 +97,7 @@ const PatientDetails = () => {
                         />
                     </Form.Group>
                 </Col>
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="templateSelect">
                         <Form.Label className="mb-0">Cell Phone</Form.Label>
                         <Form.Select>
@@ -107,7 +107,7 @@ const PatientDetails = () => {
                         </Form.Select>
                     </Form.Group>
                 </Col>
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="templateSelect">
                         <Form.Label className="mb-0">Preferred Communication</Form.Label>
                         <Form.Select>
@@ -117,7 +117,7 @@ const PatientDetails = () => {
                         </Form.Select>
                     </Form.Group>
                 </Col>
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="templateSelect">
                         <Form.Label className="mb-0">Office Phone</Form.Label>
                         <Form.Select>
@@ -127,7 +127,7 @@ const PatientDetails = () => {
                         </Form.Select>
                     </Form.Group>
                 </Col>
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="templateSelect">
                         <Form.Label className="mb-0">Reminder Language</Form.Label>
                         <Form.Select>
@@ -137,7 +137,7 @@ const PatientDetails = () => {
                         </Form.Select>
                     </Form.Group>
                 </Col>
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="templateSelect">
                         <Form.Label className="mb-0">Email</Form.Label>
                         <Form.Control
@@ -146,7 +146,7 @@ const PatientDetails = () => {
                         />
                     </Form.Group>
                 </Col>
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="templateSelect">
                         <Form.Label className="mb-0">Medication History Consent</Form.Label>
                         <Form.Control
@@ -155,7 +155,7 @@ const PatientDetails = () => {
                         />
                     </Form.Group>
                 </Col>
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="templateSelect">
                         <Form.Label className="mb-0">Alternate Email</Form.Label>
                         <Form.Control
@@ -164,7 +164,7 @@ const PatientDetails = () => {
                         />
                     </Form.Group>
                 </Col>
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="templateSelect">
                         <Form.Label className="mb-0">Payment Profile</Form.Label>
                         <Form.Control
@@ -173,7 +173,7 @@ const PatientDetails = () => {
                         />
                     </Form.Group>
                 </Col>
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="templateSelect">
                         <Form.Label className="mb-0">Patient Chart Photo</Form.Label>
                         <Form.Control
@@ -182,7 +182,7 @@ const PatientDetails = () => {
                         />
                     </Form.Group>
                 </Col>
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="templateSelect">
                         <Form.Label className="mb-0">Patient’s Copay $</Form.Label>
                         <Form.Control
@@ -191,8 +191,8 @@ const PatientDetails = () => {
                         />
                     </Form.Group>
                 </Col>
-                <Col sm={6}>
-                    <Form.Group className="mb-2" controlId="templateSelect">
+                <Col sm={3}>
+                    <Form.Group className="" controlId="templateSelect">
                         <Form.Label className="mb-0">Follow -up date</Form.Label>
                         <Form.Control
                             type='text'
@@ -200,8 +200,8 @@ const PatientDetails = () => {
                         />
                     </Form.Group>
                 </Col>
-                <Col sm={6}>
-                    <Form.Group className="mb-2" controlId="templateSelect">
+                <Col sm={3}>
+                    <Form.Group className="" controlId="templateSelect">
                         <Form.Label className="mb-0">Follow-Up Reason</Form.Label>
                         <Form.Control
                             type='text'
@@ -209,10 +209,10 @@ const PatientDetails = () => {
                         />
                     </Form.Group>
                 </Col>
-                <Col className='d-flex justify-content-end mb-2'>
+                <Col sm={12} className='d-flex justify-content-end mb-2'>
                     <Button
-                        variant='success'
-                        className='fs-6 d-flex align-items-center justify-content-center'
+                        // variant='success'
+                        className='custom-buttons fs-6 d-flex align-items-center justify-content-center'
                         style={{ height: '30px', padding: '0 15px' }}
                     >
                         Save
