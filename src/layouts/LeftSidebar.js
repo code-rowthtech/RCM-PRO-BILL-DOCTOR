@@ -1,10 +1,11 @@
-// @flow
-import React, { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import SimpleBar from 'simplebar-react';
 import classNames from 'classnames';
+import profileDummy from '../assets/images/profileDummy.png'
 
 import { getMenuItems } from '../helpers/menu';
+import { MdAdd } from "react-icons/md";
 
 // components
 import AppMenu from './Menu';
@@ -16,6 +17,12 @@ import logoDarkSm from '../assets/images/logo_sm_dark.png';
 import logo from '../assets/images/logo.png';
 import helpBoxImage from '../assets/images/help-icon.svg';
 import profileImg from '../assets/images/users/avatar-1.jpg';
+import { useDispatch, useSelector } from 'react-redux';
+import { getPatientsAction } from '../redux/actions';
+import { encryptMessage } from '../cryptoUtils';
+import { FormInput } from '../components';
+import Spinner from '../constants/Spinner';
+import { Button } from 'react-bootstrap';
 
 type SideBarContentProps = {
     hideUserProfile: boolean,
@@ -35,26 +42,7 @@ const SideBarContent = ({ hideUserProfile }: SideBarContentProps) => {
             )}
             <AppMenu menuItems={getMenuItems()} />
 
-            {/* <div
-                className={classNames('help-box', 'text-center', {
-                    'text-white': hideUserProfile,
-                })}>
-                <Link to="/" className="float-end close-btn text-white">
-                    <i className="mdi mdi-close" />
-                </Link>
 
-                <img src={helpBoxImage} height="90" alt="Helper Icon" />
-                <h5 className="mt-3">Unlimited Access</h5>
-                <p className="mb-3">Upgrade to plan to get access to unlimited reports</p>
-                <button
-                    className={classNames(
-                        'btn',
-                        'btn-sm',
-                        hideUserProfile ? 'btn-outline-light' : 'btn-outline-primary'
-                    )}>
-                    Upgrade
-                </button>
-            </div> */}
             <div className="clearfix" />
         </>
     );
@@ -69,6 +57,9 @@ type LeftSidebarProps = {
 
 const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSidebarProps): React$Element<any> => {
     const menuNodeRef: any = useRef(null);
+    const [search, setSearch] = useState('')
+    const store = useSelector((state) => state)
+    const navigate = useNavigate();
 
     /**
      * Handle the click anywhere in doc
@@ -91,21 +82,22 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
 
     return (
         <>
-            <div className="leftside-menu" ref={menuNodeRef}>
+            <div className="leftside-menu" ref={menuNodeRef} style={{ backgroundColor: "#313A46" }}>
+
                 {!hideLogo && (
                     <>
                         <Link to="/" className="logo text-center logo-light">
                             <span className="logo-lg">
-                                <img src={isLight ? logoDark : logo} alt="logo" height="16" />
+                                <img src={logo} alt="logo" height="16" />
                             </span>
                             <span className="logo-sm">
-                                <img src={isLight ? logoSm : logoDarkSm} alt="logo" height="16" />
+                                <img src={isLight ? logoSm : logo} alt="logo" height="12" />
                             </span>
                         </Link>
 
                         <Link to="/" className="logo text-center logo-dark">
                             <span className="logo-lg">
-                                <img src={isLight ? logoDark : logo} alt="logo" height="16" />
+                                <img src={logo} alt="logo" height="16" />
                             </span>
                             <span className="logo-sm">
                                 <img src={isLight ? logoSm : logoDarkSm} alt="logo" height="16" />
@@ -114,7 +106,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                     </>
                 )}
 
-                {!isCondensed && (
+                {/* {!isCondensed && (
                     <SimpleBar style={{ maxHeight: '100%' }} timeout={500} scrollbarMaxSize={320}>
                         <SideBarContent
                             menuClickHandler={() => { }}
@@ -123,7 +115,113 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                         />
                     </SimpleBar>
                 )}
-                {isCondensed && <SideBarContent isLight={isLight} hideUserProfile={hideUserProfile} />}
+                {isCondensed && <SideBarContent isLight={isLight} hideUserProfile={hideUserProfile} />} */}
+                {/* <div class="row">
+                    <div class="col-12">
+                        <div class="search-bar p-1">
+                            <div class="input-group bg-white" style={{ border: "1px solid #D9D9D9", borderRadius: "8px", overflow: "hidden" }}>
+                                <span class="input-group-text bg-white border-0 pe-0">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text" class="form-control border-0" placeholder="Search" aria-label="Search" />
+                            </div>
+                        </div>
+                    </div>
+                </div> */}
+                <ul style={{ listStyle: 'none' }} className='px-0 mt-1'>
+                    <li className='px-1 mb-1'>
+                        <FormInput type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." />
+                    </li>
+                    <li className={`px-1 mb-1`}>
+                        <Link to='/apps/patients/new-patient'>
+                            <Button
+                                className='border-0 w-100 d-flex align-items-center justify-content-center text-black'
+                                style={{
+                                    height: '30px',
+                                    backgroundColor: '#ffffff',
+                                    boxShadow: 'none',
+                                }}
+                            >
+                               <MdAdd /> &nbsp; New Patient
+                            </Button>
+                        </Link>
+                    </li>
+                    <li className='px-1 mb-1 mt-2 text-white'>
+                        Today's appointments
+                    </li>
+                    {store?.getPatientsReducer?.loading ?
+                        <div className='text-center my-5'>
+                            <Spinner color='white' />
+                        </div>
+                        :
+                        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((data, index) => (
+                            <li
+                                key={index}
+                                className={`py-1 cursor-pointer patient-item px-1 d-flex justify-content-between`}
+                                style={{ borderBottom: '1px solid rgba(242, 231, 231, 0.67)' }}
+                                onClick={() => navigate(`/apps/patients/update-patient`)}
+                            >
+                                <div className="d-flex gap-2 align-items-center">
+                                    <img
+                                        height='40'
+                                        width='40'
+                                        src={profileDummy}
+                                        // style={{ height: '5vh' }}
+                                        className="rounded-circle border border-black"
+                                        alt="profile image"
+                                    />
+                                    <div>
+                                        <p className="mb-0 text-capitalize" style={{ fontSize: '12px' }}>
+                                            Glayn
+                                        </p>
+                                        <p className="mb-0 " style={{ fontSize: '10px' }}>Fever & Cold</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div>
+                                        <p className='mb-0' style={{ fontSize: '10px' }}><span>07/11</span><span className='ps-1 '>08:00AM</span></p>
+                                    </div>
+                                    <div>
+                                        <p className='mb-0 text-end pt-1' style={{ fontSize: '10px' }}>First Time</p>
+                                    </div>
+
+                                </div>
+                            </li>
+                        ))
+                    }
+                </ul>
+                {/*               
+
+                <div class="row mx-auto">
+                    <div class="col-12 my-1 ">
+                        <p className='p-0 m-0 mt-1 text-white' >Today's Appointment</p>
+                    </div>
+
+                    <div className='all_appoinment px-0'>
+                        <div class="col-12 px-2 py-1 border-top border-bottom add_hover_appoinment">
+                            <div class="appointment-card row">
+                                <div class="col-6">
+                                    <div className='row'>
+                                        <div className='col-6'>
+                                            <img src={''} alt="Gladys" className='' style={{ height: "40px", width: "40px" }} />
+
+                                        </div>
+                                        <div className='col-6 px-0 d-flex align-items-start justify-content-around flex-column'>
+                                            <h6 className='p-0 mb-0 mt-0' style={{ color: "#444141", fontWeight: "500" }}>Gladys</h6>
+                                            <small className='p-0 m-0 add_small_size'>Back Pain</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 d-flex align-items-end justify-content-around flex-column">
+                                    <small class="mb-0 add_small_size diff_color" >07/11 08:00 AM</small>
+                                    <small className='add_small_size'> First Time</small>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div> */}
             </div>
         </>
     );
