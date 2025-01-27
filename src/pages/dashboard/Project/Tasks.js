@@ -9,9 +9,9 @@ import CardTitle from '../../../components/CardTitle';
 const Tasks = (): React$Element<any> => {
     return (
         <Card>
-            <Card.Body>
+            <Card.Body className='p-2'>
                 <CardTitle
-                    containerClass="d-flex align-items-center justify-content-between mb-2"
+                    containerClass="d-flex align-items-center justify-content-between mb-0"
                     title="Transactions"
                     menuItems={[
                         { label: 'Weekly Report' },
@@ -21,7 +21,7 @@ const Tasks = (): React$Element<any> => {
                     ]}
                 />
 
-                <p>
+                <p className='mb-0'>
                     <b>107</b> Tasks completed out of 195
                 </p>
 

@@ -250,7 +250,7 @@ const NewPatient = () => {
                                             </Button> */}
                                             <Button
                                                 className='text-black text-nowrap bg-white fs-6 d-flex align-items-center justify-content-center w-100'
-                                                style={{ height: '30px' }}
+                                                style={{ height: '30px',borderRadius:"10px" }}
                                                 onClick={startTimer}
                                                 disabled={isRunning}  // Prevent multiple clicks
                                             >
@@ -258,11 +258,11 @@ const NewPatient = () => {
                                             </Button>
                                             <Button
                                                 className='text-black text-nowrap bg-white mt-1 fs-6 d-flex align-items-center justify-content-center w-100'
-                                                style={{ height: '30px' }}
+                                                style={{ height: '30px',borderRadius:"10px" }}
                                             >
                                                 Add Appointment
                                             </Button>
-                                            <div className='mt-2 d-flex gap-2  justify-content-center'>
+                                            <div className='mt-2 d-flex gap-2  justify-content-end'>
                                                 <HiOutlinePrinter className='fs-3 text-black' />
                                                 <LiaReceiptSolid className='fs-3 text-black' />
                                                 {/* <TbHeartRateMonitor className='fs-3' /> */}

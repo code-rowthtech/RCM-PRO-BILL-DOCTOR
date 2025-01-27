@@ -650,9 +650,11 @@ const PersonalDetails = () => {
                             <Row>
                                 <Col sm={6}>
                                     <Form.Group className="mb-1">
-                                        <label htmlFor="state-select" className='fw-bold mb-0' style={{ display: "block", marginBottom: "6px" }}>
+                                        {/* <label htmlFor="state-select" className='fw-bold mb-0' style={{ display: "block", marginBottom: "6px" }}>
                                             State
-                                        </label>
+                                        </label> */}
+                                        <Form.Label className='mb-0'>State</Form.Label>
+
                                         <select
                                             id="state-select"
                                             {...register("state1")}

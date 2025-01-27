@@ -130,7 +130,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                 </div> */}
                 <ul style={{ listStyle: 'none' }} className='px-0 mt-1'>
                     <li className='px-1 mb-1'>
-                        <FormInput type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." />
+                        <FormInput type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..."  className='bg-white'/>
                     </li>
                     <li className={`px-1 mb-1`}>
                         <Link to='/apps/patients/new-patient'>
@@ -158,8 +158,8 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                             <li
                                 key={index}
                                 className={`py-1 cursor-pointer patient-item px-1 d-flex justify-content-between`}
-                                style={{ borderBottom: '1px solid rgba(242, 231, 231, 0.67)' }}
-                                onClick={() => navigate(`/apps/patients/update-patient`)}
+                                style={{ borderBottom: '1px solid rgb(127 123 123 / 67%)' }}
+                                onClick={() => navigate(`/apps/patients/new-patient`)}
                             >
                                 <div className="d-flex gap-2 align-items-center">
                                     <img
@@ -190,38 +190,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                         ))
                     }
                 </ul>
-                {/*               
-
-                <div class="row mx-auto">
-                    <div class="col-12 my-1 ">
-                        <p className='p-0 m-0 mt-1 text-white' >Today's Appointment</p>
-                    </div>
-
-                    <div className='all_appoinment px-0'>
-                        <div class="col-12 px-2 py-1 border-top border-bottom add_hover_appoinment">
-                            <div class="appointment-card row">
-                                <div class="col-6">
-                                    <div className='row'>
-                                        <div className='col-6'>
-                                            <img src={''} alt="Gladys" className='' style={{ height: "40px", width: "40px" }} />
-
-                                        </div>
-                                        <div className='col-6 px-0 d-flex align-items-start justify-content-around flex-column'>
-                                            <h6 className='p-0 mb-0 mt-0' style={{ color: "#444141", fontWeight: "500" }}>Gladys</h6>
-                                            <small className='p-0 m-0 add_small_size'>Back Pain</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-6 d-flex align-items-end justify-content-around flex-column">
-                                    <small class="mb-0 add_small_size diff_color" >07/11 08:00 AM</small>
-                                    <small className='add_small_size'> First Time</small>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-
-                </div> */}
+            
             </div>
         </>
     );
