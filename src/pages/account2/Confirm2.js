@@ -36,7 +36,7 @@ const Confirm2 = (): React$Element<React$FragmentType> => {
                     </p>
                     <form>
                         <div className="mb-0 d-grid text-center">
-                            <Link to="/account/login2" className="btn btn-primary">
+                            <Link to="/account/login2" className="custom-buttons px-2 btn btn-primary">
                                 <i className="mdi mdi-home me-1"></i> {t('Back to Home')}{' '}
                             </Link>
                         </div>

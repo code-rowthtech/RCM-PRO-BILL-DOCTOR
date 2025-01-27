@@ -155,7 +155,7 @@ console.log(location.pathname)
     return (
         <>
             <div className={classNames('navbar-custom ', navbarCssClasses)} style={{ backgroundColor: "#ffffff" }}>
-                <div className={`${containerCssClasses} d-flex align-items-center justify-content-between`}>
+                <div className={`${containerCssClasses} d-flex align-items-center`}>
                     {!hideLogo && (
                         <Link to="/" className="topnav-logo">
                             <span className="topnav-logo-lg">
@@ -171,18 +171,20 @@ console.log(location.pathname)
 
                     {/* toggle for vertical layout */}
                     {(layoutType === layoutConstants.LAYOUT_VERTICAL || layoutType === layoutConstants.LAYOUT_FULL) && (
-                        // <div className='d-flex align-items-center'>
-                        //     <button className="button-menu-mobile open-left ps-3" onClick={handleLeftMenuCallBack} style={{paddingTop:"3.2rem"}}>
-                        //         {/* <i className="mdi mdi-menu" /> */}
-                        //         <img src={CloseIcon} alt='' style={{width:"100%",height:"100%",objectFit:"contain"}}/>
-                        //     </button>
-                        //     <h4 className=''>{pageTitle}</h4>
-                        // </div>
-                        <div className='d-flex gap-3 align-items-center '>
+                        <>
+                        <div className='d-flex align-items-center col-auto'>
+                            <button className="button-menu-mobile open-left ps-3" onClick={handleLeftMenuCallBack} style={{paddingTop:"3.2rem"}}>
+                                {/* <i className="mdi mdi-menu" /> */}
+                                <img src={CloseIcon} alt='' style={{width:"100%",height:"100%",objectFit:"contain"}}/>
+                            </button>
+                            {/* <h4 className=''>{pageTitle}</h4> */}
+                        </div>
+                        <div className='d-flex gap-3 align-items-center col-11' style={{marginLeft:"-32px"}}>
                             {MENU_ITEMS?.map((data) => (
                                 <p onClick={() => navigate(data?.url)} className='fs-5 mb-0 fw-bold cursor-pointer' style={{color:location.pathname===data?.url?'black':'rgba(116, 114, 114, 0.51)'}}>{data?.label}</p>
                             ))}
                         </div>
+                        </>
                     )}
                     <ul className="list-unstyled topbar-menu float-end mb-0">
                         <li className="dropdown notification-list">

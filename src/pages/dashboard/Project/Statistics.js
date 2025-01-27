@@ -22,7 +22,7 @@ const Statistics = (data): React$Element<React$FragmentType> => {
                             <Row className="g-0">
                                 <Col sm={6} lg={3}>
                                     <Card className="shadow-none box-shadow-none m-0">
-                                        <Card.Body className="text-center">
+                                        <Card.Body className="text-center py-2">
                                             <i className="dripicons-briefcase text-muted font-24"></i>
                                             <h3>
                                                 <span>{statisticsData?.registeredClinics}</span>
@@ -34,7 +34,7 @@ const Statistics = (data): React$Element<React$FragmentType> => {
 
                                 <Col sm={6} lg={3}>
                                     <Card className="shadow-none box-shadow-none m-0 border-start">
-                                        <Card.Body className="text-center">
+                                        <Card.Body className="text-center py-2">
                                             <i className="dripicons-checklist text-muted font-24"></i>
                                             <h3>
                                                 <span>{statisticsData?.registeredDoctors}</span>
@@ -46,7 +46,7 @@ const Statistics = (data): React$Element<React$FragmentType> => {
 
                                 <Col sm={6} lg={3}>
                                     <Card className="shadow-none box-shadow-none m-0 border-start">
-                                        <Card.Body className="text-center">
+                                        <Card.Body className="text-center py-2">
                                             <i className="dripicons-user-group text-muted font-24"></i>
                                             <h3>
                                                 <span>{statisticsData?.registeredPatients}</span>
@@ -58,7 +58,7 @@ const Statistics = (data): React$Element<React$FragmentType> => {
 
                                 <Col sm={6} lg={3}>
                                     <Card className="shadow-none box-shadow-none m-0 border-start">
-                                        <Card.Body className="text-center">
+                                        <Card.Body className="text-center py-2">
                                             <i className="dripicons-graph-line text-muted font-24"></i>
                                             <h3>
                                                 <span>{statisticsData?.totalclaims}</span>

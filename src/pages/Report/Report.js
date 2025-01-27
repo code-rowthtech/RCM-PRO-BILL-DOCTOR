@@ -97,7 +97,7 @@ const Report = () => {
                                                             width: '100%',
                                                         }}
                                                     />
-                                                    <FiSearch
+                                                    {/* <FiSearch
                                                         style={{
                                                             position: 'absolute',
                                                             left: '10px',
@@ -105,7 +105,7 @@ const Report = () => {
                                                             transform: 'translateY(-50%)',
                                                             color: '#aaa',
                                                         }}
-                                                    />
+                                                    /> */}
                                                 </div>
                                             </div>
 

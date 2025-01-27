@@ -98,7 +98,7 @@ const Schedule = () => {
                                                             onChange={(e) => setSearchQuery(e.target.value)} // Update state on input change
                                                             // onKeyUp={searchHandle}
                                                         />
-                                                        <FiSearch
+                                                        {/* <FiSearch
                                                             style={{
                                                                 position: 'absolute',
                                                                 left: '10px',
@@ -106,7 +106,7 @@ const Schedule = () => {
                                                                 transform: 'translateY(-50%)',
                                                                 color: '#aaa',
                                                             }}
-                                                        />
+                                                        /> */}
                                                     </div>
                                                 </div>
                                             )}

@@ -345,42 +345,42 @@ const Demographics = () => {
 
             <Row className='mt-2'>
                 <h4> Employer</h4>
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="employer">
                         <Form.Label className="mb-0">Employer</Form.Label>
                         <Form.Control type="text" placeholder="Enter Employer Name" />
                     </Form.Group>
                 </Col>
 
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="employerPhone">
                         <Form.Label className="mb-0">Employer Phone</Form.Label>
                         <Form.Control type="text" placeholder="Enter Employer Phone" />
                     </Form.Group>
                 </Col>
 
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="employerAddress">
                         <Form.Label className="mb-0">Employer Address</Form.Label>
                         <Form.Control type="text" placeholder="Enter Employer Address" />
                     </Form.Group>
                 </Col>
 
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-1" controlId="employerZip">
                         <Form.Label className="mb-0">Employer Zip Code</Form.Label>
                         <Form.Control type="text" placeholder="Enter Zip Code" />
                     </Form.Group>
                 </Col>
 
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-2" controlId="employerCity">
                         <Form.Label className="mb-0">Employer City</Form.Label>
                         <Form.Control type="text" placeholder="Enter City" />
                     </Form.Group>
                 </Col>
 
-                <Col sm={6}>
+                <Col sm={3}>
                     <Form.Group className="mb-2" controlId="employerState">
                         <Form.Label className="mb-0">Employer State</Form.Label>
                         <Form.Control as="select">
@@ -398,22 +398,22 @@ const Demographics = () => {
                 </Col>
                 <Col className='d-flex justify-content-end align-items-center mb-2 gap-2'>
                     <Button
-                        variant='danger'
-                        className='fs-6 d-flex align-items-center justify-content-center'
+                        variant='primary'
+                        className='fs-6 d-flex align-items-center justify-content-center custom-buttons'
                         style={{ height: '30px', padding: '0 15px' }}
                     >
                         Delete
                     </Button>
                     <Button
-                        variant='secondary'
-                        className='fs-6 d-flex align-items-center justify-content-center'
+                        variant='primary'
+                        className='fs-6 d-flex align-items-center justify-content-center custom-buttons'
                         style={{ height: '30px', padding: '0 15px' }}
                     >
                         Clear
                     </Button>
                     <Button
-                        variant='success'
-                        className='fs-6 d-flex align-items-center justify-content-center'
+                        variant='primary'
+                        className='fs-6 d-flex align-items-center justify-content-center custom-buttons'
                         style={{ height: '30px', padding: '0 15px' }}
                     >
                         Next

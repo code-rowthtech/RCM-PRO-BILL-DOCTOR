@@ -14,7 +14,7 @@ const Index = () => {
 
     return (
         <div className='pt-1 pb-2'>
-            <div className="container-fluid mt-2">
+            <div className=" mt-2">
                 <Card className='px-3 py-1' style={{height:'87vh'}}>
                     <div className="row">
                         {/* <div>
