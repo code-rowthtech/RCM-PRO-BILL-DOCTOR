@@ -143,17 +143,17 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                             {/* Additional controls shown only in the "Appointments" tab */}
                                             {activeTab === 'appointments' && (
                                                 <>
-                                                    <Button className="custom-buttons">
-                                                        <FiFilter className="fs-4" />
+                                                    <Button className="custom-buttons px-2">
+                                                        <FiFilter className="fs-5" />
                                                     </Button>
                                                     <FormInput
                                                         type="Date"
                                                         placeholder="Search..."
                                                     />
-                                                    <Button className="custom-buttons">
+                                                    <Button className="custom-buttons px-2">
                                                         <FiFileText className="fs-4" onClick={goto} />
                                                     </Button>
-                                                    <Button as={Link} to="/apps/appointments/newAppointment">New Appointment</Button>
+                                                    <Button as={Link} to="/apps/appointments/newAppointment" className="custom-buttons px-2">New Appointment</Button>
                                                 </>
                                             )}
                                         </Col>

@@ -71,7 +71,7 @@ const Diagnosis = () => {
                             }}
                             onChange={(e) => setSearchQuery(e.target.value)}
                           />
-                          <FiSearch
+                          {/* <FiSearch
                             style={{
                               position: 'absolute',
                               left: '10px',
@@ -79,7 +79,7 @@ const Diagnosis = () => {
                               transform: 'translateY(-50%)',
                               color: '#aaa',
                             }}
-                          />
+                          /> */}
                         </div>
                       </div>
 

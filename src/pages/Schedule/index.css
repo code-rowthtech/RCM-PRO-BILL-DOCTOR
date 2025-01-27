@@ -6,11 +6,12 @@
 
 .input-container {
     border: 1px solid #827f7f;
-    padding: 6.5px;
+    /* padding: 6.5px; */
     cursor: pointer;
     text-align: center;
     background-color: white;
     border-radius: 5px;
+    height: 30px;
 }
 
 .input-container input {
@@ -18,6 +19,7 @@
     width: 100%;
     text-align: center;
     cursor: pointer;
+    height: 30px;
 }
 .input-container input::before{
     border: 1px solid white !important;
@@ -74,4 +76,7 @@
 .table > :not(caption) > * > *{
     padding: 0.35rem 0.55rem!important;
     font-size: 14px!important;
+}
+::placeholder{
+    color: 'red',
 }

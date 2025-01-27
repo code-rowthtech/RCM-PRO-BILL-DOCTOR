@@ -111,7 +111,7 @@ const NewPatient = () => {
                             }}>
                             <div className="p-1">
                                 <Row>
-                                    <Col sm={2} className='ps-3 pt-1'>
+                                    <Col sm={2} className='ps-2 pt-1'>
                                         <div>
                                             <img
                                                 src={profileDummy}
@@ -151,7 +151,7 @@ const NewPatient = () => {
                                                     <div className='col-12 mx-1 '>
                                                         <div className='row'>
                                                             <div className='col-3'>
-                                                                <span><MdPhone className='fs-5' /></span>
+                                                                <span><MdPhone className='fs-5 text-primary' /></span>
                                                             </div>
                                                             <div className='col-9'>
                                                                 <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>9887363532</span>
@@ -161,7 +161,7 @@ const NewPatient = () => {
                                                     <div className='col-12 mx-1 '>
                                                         <div className='row'>
                                                             <div className='col-3'>
-                                                                <span ><MdOutlineMarkEmailUnread className='fs-5' /></span>
+                                                                <span ><MdOutlineMarkEmailUnread className='fs-5 text-primary' /></span>
                                                             </div>
                                                             <div className='col-9'>
                                                                 <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>alma.lawson@example.com</span>
@@ -171,27 +171,13 @@ const NewPatient = () => {
                                                     <div className='col-12 mx-1 '>
                                                         <div className='row'>
                                                             <div className='col-3'>
-                                                                <span ><BiSolidLocationPlus className='fs-5' /></span>
+                                                                <span ><BiSolidLocationPlus className='fs-5 text-primary' /></span>
                                                             </div>
                                                             <div className='col-9'>
                                                                 <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>2972 Westheimer Rd. Santa Ana, Illinois 85486</span>
                                                             </div>
                                                         </div>
                                                     </div>
-
-                                                    {/* <p className='fs-6 m-1'>
-                                                        <span className='fw-bold'>Patients Chart ID:</span><span className='ps-2 text-primary'>2322BDEW</span>
-                                                    </p> */}
-                                                    {/* <p className='fs-6 m-1'>
-                                                        <span className='fw-bold'>Phone:</span>
-                                                        <span className='ps-2'>9887363532</span>
-                                                    </p>
-                                                    <p className='fs-6 m-1'>
-                                                        <span className='fw-bold'>Email:</span><span className='ps-2'>alma.lawson@example.com</span>
-                                                    </p>
-                                                    <p className='fs-6 m-1'>
-                                                        <span className='fw-bold'>Address:</span><span className='ps-2'>2972 Westheimer Rd. Santa Ana, Illinois 85486</span>
-                                                    </p> */}
                                                 </div>
                                             </Col>
                                             <Col sm={6}>

@@ -130,7 +130,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                 </div> */}
                 <ul style={{ listStyle: 'none' }} className='px-0 mt-1'>
                     <li className='px-1 mb-1'>
-                        <FormInput type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..."  className='bg-white'/>
+                        <FormInput type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." style={{backgroundColor:"white!important"}}/>
                     </li>
                     <li className={`px-1 mb-1`}>
                         <Link to='/apps/patients/new-patient'>
