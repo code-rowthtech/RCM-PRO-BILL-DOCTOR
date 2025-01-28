@@ -126,14 +126,16 @@ const PatientDetails = () => {
                             id="patientstatus"
                             {...register('patientStatus')}
                         >
-                            <option value="">Select status</option>  {/* Default option */}
-                            <option value="Active">Active</option>
+                            <option hidden >Select status</option>
+                            <option value="active">Active</option>
                             <option value="Inactive">Inactive</option>
                             <option value="Inactive-Deceased">Inactive-Deceased</option>
                             <option value="Other">Other</option>
                         </Form.Select>
                     </Form.Group>
                 </Col>
+
+
                 <Col sm={3}>
                     <Form.Group className="mb-1" controlId="templateSelect">
                         <Form.Label className="mb-0">Middle Name</Form.Label>
@@ -192,7 +194,7 @@ const PatientDetails = () => {
                         <div
                             onClick={() => logoFileInputRef.current.click()}
                             className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'}`}
-                            style={{ backgroundColor: '#d9ddd6' }}
+                            style={{ backgroundColor: '#e5f4ff' }}
                         >
                             {logoName
                                 ? logoName.length > 25
@@ -245,7 +247,7 @@ const PatientDetails = () => {
                             {...register('preferredCommunication')}
                             aria-label="Select Title"
                         >
-                            <option value="">Select Preferred Communication</option>
+                            <option hidden>Select Preferred Communication</option>
                             <option value="Home Phone">Home Phone</option>
                             <option value="Work Phone">Work Phone</option>
                             <option value="Cell Phone">Cell Phone</option>
@@ -275,7 +277,7 @@ const PatientDetails = () => {
                             {...register('reminderLanguage',
                             )}
                         >
-                            <option value="">Select Reminder Language</option>
+                            <option hidden>Select Reminder Language</option>
                             <option value="English">English</option>
                             <option value="Spanish">Spanish</option>
                             <option value="French">French</option>
@@ -299,7 +301,7 @@ const PatientDetails = () => {
                             {...register('medicationHistoryConsent',
                             )}
                         >
-                            <option value="">Select Medication History Concent</option>
+                            <option hidden>Select Medication History Concent</option>
                             <option value={'true'}>Yes</option>
                             <option value={'false'}>No</option>
                         </Form.Select>
@@ -321,7 +323,7 @@ const PatientDetails = () => {
                             {...register('paymentProfile')}
                             aria-label="Payment Profile"
                         >
-                            <option value="">Select Payment Profile</option>
+                            <option hidden>Select Payment Profile</option>
                             <option value="Cash">Cash</option>
                             <option value="Insurance">Insurance</option>
                             <option value="Insurance Out of Network">Insurance Out of Network</option>

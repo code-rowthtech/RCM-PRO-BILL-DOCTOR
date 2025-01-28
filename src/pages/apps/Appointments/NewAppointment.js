@@ -14,7 +14,7 @@ const NewAppointment = () => {
             {/* Card Header */}
             <div className="d-flex justify-content-between align-items-center mx-3 mt-2">
                 <h5 className="fw-bold mb-0">New Appointment</h5>
-                <Button onClick={handleAppointment}>Back</Button>
+                <Button className='custom-buttons' onClick={handleAppointment}>Back</Button>
             </div>
 
             {/* Card Body */}
@@ -103,9 +103,9 @@ const NewAppointment = () => {
             </Card.Body>
 
             {/* Card Footer */}
-            <div className="text-end mb-2 me-3">
-                <Button variant="secondary" className="me-2">Cancel</Button>
-                <Button variant="primary">Save</Button>
+            <div className="d-flex justify-content-end mb-2 me-3">
+                <Button  className="me-2 custom-buttons">Cancel</Button>
+                <Button className='custom-buttons'>Save</Button>
             </div>
         </Card>
     );
