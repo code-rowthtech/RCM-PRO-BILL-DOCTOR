@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Card, Col, Row } from 'react-bootstrap';
 import { HiOutlinePrinter } from "react-icons/hi2";
 import { LiaReceiptSolid } from 'react-icons/lia';
@@ -13,15 +13,33 @@ import CloseIcon from "../../../assets/images/Icon.png"
 import { MdPhone } from "react-icons/md";
 import { MdOutlineMarkEmailUnread } from "react-icons/md";
 import { BiSolidLocationPlus } from "react-icons/bi";
+import { getPatientsByIdAction } from '../../../redux/actions';
+import { encryptMessage } from '../../../cryptoUtils';
+import { useDispatch, useSelector } from 'react-redux';
 
 
 const NewPatient = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [activeTab, setActiveTab] = useState('Patient Details');
     const [isClinicalReviewExpanded, setIsClinicalReviewExpanded] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(null);
     const [isRunning, setIsRunning] = useState(false);
+    const [timeLeft, setTimeLeft] = useState(0);
+    const [searchParams] = useSearchParams();
+    const id = searchParams.get('id');
+    const primaryProvider = JSON.parse(sessionStorage.getItem('hyper_user'))?.firstName;
+    const store = useSelector((state) => state);
+    const patientsDataById = store?.getPatientsByIdReducer?.data?.patient || [];
+    console.log(patientsDataById, 'patientsDataByIdpatientsDataById')
+
+    useEffect(() => {
+        const data = {
+            id: id,
+        }
+        // console.log(data, 'dataaa123456789')
+        dispatch(getPatientsByIdAction({ key: encryptMessage(data) }));
+    }, [dispatch]);
 
     const handleSidebarToggle = () => {
         setSidebarCollapsed(!isSidebarCollapsed);
@@ -69,9 +87,14 @@ const NewPatient = () => {
         { label: 'Implantable Devices', icon: 'bi bi-person' },
     ];
 
-    const startTimer = () => {
-        setIsRunning(true);
-        setTimeLeft(30 * 60); // 30 minutes in seconds
+    const toggleTimer = () => {
+        if (!isRunning) {
+            // Start or Resume Timer
+            if (timeLeft === 0) {
+                setTimeLeft(30 * 60); // Set to 30 minutes if starting fresh
+            }
+        }
+        setIsRunning((prevIsRunning) => !prevIsRunning); // Toggle running state
     };
 
     useEffect(() => {
@@ -80,9 +103,8 @@ const NewPatient = () => {
             timer = setInterval(() => {
                 setTimeLeft((prevTime) => prevTime - 1);
             }, 1000);
-        } else if (timeLeft === 0) {
+        } else if (!isRunning || timeLeft === 0) {
             clearInterval(timer);
-            setIsRunning(false);
         }
         return () => clearInterval(timer);
     }, [isRunning, timeLeft]);
@@ -114,7 +136,7 @@ const NewPatient = () => {
                                     <Col sm={2} className='ps-2 pt-1'>
                                         <div>
                                             <img
-                                                src={profileDummy}
+                                                src={patientsDataById?.patientChartPhoto?.url || profileDummy}
                                                 alt="Patient Profile"
                                                 className="img-fluid rounded"
                                                 style={{ width: '126px', height: '129px', objectFit: 'cover' }}
@@ -127,13 +149,13 @@ const NewPatient = () => {
                                         <Row className='pt-1'>
                                             <div className='d-flex gap-2 ps-1'>
                                                 <p style={{ borderRight: '1px solid black' }} className='pe-2 text-nowrap fs-6'>
-                                                    <span className='fw-bold' style={{ color: 'rgb(249, 139, 55)' }}>Jane Cooper</span> <span className='fs-6 fw-bold'>Male</span>
+                                                    <span className='fw-bold text-capitalize' style={{ color: 'rgb(249, 139, 55)' }}>{patientsDataById?.firstName || 'N/A'} {patientsDataById?.middleName || ' '} {patientsDataById?.lastName || ' '}</span> <span className='fs-6 fw-bold'>Male</span>
                                                 </p>
                                                 <p style={{ borderRight: '1px solid black' }} className='pe-2 text-nowrap fw-bold fs-6'>
-                                                    <span>Sep 10,1971</span>
+                                                    <span>{patientsDataById?.dob || 'N/A'}</span>
                                                 </p>
                                                 <p className='text-nowrap fs-6 fw-bold'>
-                                                    <span>55 years old</span>
+                                                    <span>{patientsDataById?.yearsOld || 'N/A'}</span>
                                                 </p>
                                             </div>
                                             <Col sm={6} className='p-0'>
@@ -144,7 +166,7 @@ const NewPatient = () => {
                                                                 <span className='fw-bold fs-6'>Patients ID:</span>
                                                             </div>
                                                             <div className='col-9'>
-                                                                <span className='ps-2 text-primary fs-6' style={{ fontWeight: 600 }}>2322BDEW</span>
+                                                                <span className='ps-2 text-primary fs-6' style={{ fontWeight: 600 }}>{patientsDataById?.chartNumber}</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -154,7 +176,7 @@ const NewPatient = () => {
                                                                 <span><MdPhone className='fs-5 text-primary' /></span>
                                                             </div>
                                                             <div className='col-9'>
-                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>9887363532</span>
+                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>{patientsDataById?.cellPhone}</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -164,7 +186,7 @@ const NewPatient = () => {
                                                                 <span ><MdOutlineMarkEmailUnread className='fs-5 text-primary' /></span>
                                                             </div>
                                                             <div className='col-9'>
-                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>alma.lawson@example.com</span>
+                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>{patientsDataById?.email}</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -174,7 +196,7 @@ const NewPatient = () => {
                                                                 <span ><BiSolidLocationPlus className='fs-5 text-primary' /></span>
                                                             </div>
                                                             <div className='col-9'>
-                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>2972 Westheimer Rd. Santa Ana, Illinois 85486</span>
+                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>{patientsDataById?.address || 'N/A'}</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -188,7 +210,7 @@ const NewPatient = () => {
                                                                 <span className='fw-bold fs-6'>Primary Provider:</span>
                                                             </div>
                                                             <div className='col-7'>
-                                                                <span className='ps-2 text-primary fs-6' style={{ fontWeight: 600 }}>Nishchay Sharma</span>
+                                                                <span className='ps-2 text-primary fs-6' style={{ fontWeight: 600 }}>{primaryProvider}</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -198,7 +220,11 @@ const NewPatient = () => {
                                                                 <span className='fw-bold fs-6'>Date Added:</span>
                                                             </div>
                                                             <div className='col-7'>
-                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>01/11/2024</span>
+                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>
+                                                                    {patientsDataById?.createdAt
+                                                                        ? new Date(patientsDataById.createdAt).toLocaleDateString('en-GB')
+                                                                        : 'N/A'}
+                                                                </span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -208,7 +234,7 @@ const NewPatient = () => {
                                                                 <span className='fw-bold fs-6'>Last Appointment Date:</span>
                                                             </div>
                                                             <div className='col-7'>
-                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>01/01/2025</span>
+                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>{patientsDataById?.lastApptDate || 'N/A'}</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -218,7 +244,7 @@ const NewPatient = () => {
                                                                 <span className='fw-bold fs-6'>Next Appointment Date:</span>
                                                             </div>
                                                             <div className='col-7'>
-                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>None</span>
+                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>{patientsDataById?.nextApptDate || 'N/A'}</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -235,16 +261,21 @@ const NewPatient = () => {
                                                 New Referral
                                             </Button> */}
                                             <Button
-                                                className='text-black text-nowrap bg-white fs-6 d-flex align-items-center justify-content-center w-100'
-                                                style={{ height: '30px',borderRadius:"10px" }}
-                                                onClick={startTimer}
-                                                disabled={isRunning}  // Prevent multiple clicks
+                                                className="text-black text-nowrap bg-white fs-6 d-flex align-items-center justify-content-center w-100"
+                                                style={{ height: '30px', borderRadius: "10px" }}
+                                                onClick={toggleTimer} // Toggle the timer
                                             >
-                                                {isRunning ? formatTime(timeLeft) : 'Start Session'}
+                                                {isRunning
+                                                    ? `Pause (${formatTime(timeLeft)})`
+                                                    : timeLeft > 0
+                                                        ? `Resume (${formatTime(timeLeft)})`
+                                                        : 'Start Session'}
                                             </Button>
+
                                             <Button
                                                 className='text-black text-nowrap bg-white mt-1 fs-6 d-flex align-items-center justify-content-center w-100'
-                                                style={{ height: '30px',borderRadius:"10px" }}
+                                                style={{ height: '30px', borderRadius: "10px" }}
+                                                as={Link} to={'/apps/appointments/newAppointment'}
                                             >
                                                 Add Appointment
                                             </Button>
@@ -262,29 +293,34 @@ const NewPatient = () => {
 
                         <div className=' mt-2 '>
                             <Card className='px-2'>
-                                <div style={{ borderBottom: '2px solid grey' }}>
-                                    <ul className="nav nav-underline">
-                                        {[
-                                            'Patient Details',
-                                            'Demographics',
-                                            'Insurances',
-                                            'Eligibility',
-                                            'Authorizations',
-                                            'Vital Status',
-                                            'Balance',
-                                            'Payment'
-                                        ].map((tab) => (
-                                            <li className="nav-item " key={tab}>
-                                                <a
-                                                    className={`nav-link ms-3 pb-0 tab-font-family ${activeTab === tab ? 'active text-primary' : 'text-black'}`}
-                                                    onClick={() => handleTabClick(tab)}
-                                                    style={{ cursor: 'pointer',fontWeight:600 }}
-                                                >
-                                                    {tab}
-                                                </a>
-                                            </li>
-                                        ))}
-                                    </ul>
+                                <div className='d-flex justify-content-between pt-1'>
+                                    <div style={{ borderBottom: '2px solid grey' }}>
+                                        <ul className="nav nav-underline">
+                                            {[
+                                                'Patient Details',
+                                                'Demographics',
+                                                'Insurances',
+                                                'Eligibility',
+                                                'Authorizations',
+                                                'Vital Status',
+                                                'Balance',
+                                                'Payment'
+                                            ].map((tab) => (
+                                                <li className="nav-item " key={tab}>
+                                                    <a
+                                                        className={`nav-link ms-3 pb-0 tab-font-family ${activeTab === tab ? 'active text-primary' : 'text-black'}`}
+                                                        onClick={() => handleTabClick(tab)}
+                                                        style={{ cursor: 'pointer', fontWeight: 600 }}
+                                                    >
+                                                        {tab}
+                                                    </a>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    <div className=''>
+                                        <Button className="custom-buttons" onClick={() => navigate(-1)}>Back</Button>
+                                    </div>
                                 </div>
 
                                 <div className="mt-2 px-2 scroll-container" style={{ height: '65vh', overflow: 'auto' }}>

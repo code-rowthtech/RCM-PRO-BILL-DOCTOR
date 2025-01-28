@@ -8,7 +8,7 @@ import { createRolesReducer, getRolesDataReducer, updateRolesReducer } from './r
 import { createClinicsReducer, getClinicsReducer, getClinicByIdReducer, updateClinicsReducer } from './clinics/reducers';
 import { getDoctorsReducer } from './doctors/reducers';
 import { getAnalyticsReducer } from './dashboard/reducers';
-import { getPatientsReducer } from './patients/reducers';
+import { createPatientsReducer, getPatientsByIdReducer, getPatientsReducer } from './patients/reducers';
 import { getSubscriptionsReducer } from './subscriptions/reducers';
 import { createHolidayScheduleReducer, getHolidayScheduleReducer } from './schedule/reducers';
 export default (combineReducers({
@@ -19,7 +19,7 @@ export default (combineReducers({
     createClinicsReducer, getClinicsReducer, getClinicByIdReducer, updateClinicsReducer,
     getAnalyticsReducer,
     getDoctorsReducer,
-    getPatientsReducer,
+    getPatientsReducer,createPatientsReducer,getPatientsByIdReducer,
     getSubscriptionsReducer,
     createHolidayScheduleReducer,getHolidayScheduleReducer,
 }): any);

@@ -175,7 +175,7 @@ console.log(location.pathname)
                         <div className='d-flex align-items-center col-auto'>
                             <button className="button-menu-mobile open-left ps-3" onClick={handleLeftMenuCallBack} style={{paddingTop:"3.2rem"}}>
                                 {/* <i className="mdi mdi-menu" /> */}
-                                <img src={CloseIcon} alt='' style={{width:"100%",height:"100%",objectFit:"contain"}}/>
+                                <img src={CloseIcon} alt='' style={{width:"75%",height:"75%",objectFit:"contain"}}/>
                             </button>
                             {/* <h4 className=''>{pageTitle}</h4> */}
                         </div>

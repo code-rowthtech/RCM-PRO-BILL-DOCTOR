@@ -9,6 +9,16 @@ export const getPatientsAction = (data): AuthAction => ({
     data
 });
 
+export const getPatientsByIdAction = (data): AuthAction => ({
+    type: PatientsActionTypes.GET_PATIENTS_BY_ID,
+    data
+});
+
+export const createPatientsAction = (data): AuthAction => ({
+    type: PatientsActionTypes.CREATE_PATIENTS,
+    data
+});
+
 export const stateEmptydAction = (): LayoutAction => ({
     type: PatientsActionTypes.STATE_EMPTY_INTIAL_STATE,
 

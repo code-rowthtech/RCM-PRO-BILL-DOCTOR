@@ -55,6 +55,7 @@ type LeftSidebarProps = {
     isCondensed: boolean,
 };
 
+
 const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSidebarProps): React$Element<any> => {
     const menuNodeRef: any = useRef(null);
     const [search, setSearch] = useState('')
@@ -79,6 +80,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
             document.removeEventListener('mousedown', handleOtherClick, false);
         };
     }, []);
+    const [activeTab, setActiveTab] = useState("Today"); // Default to "Today"
 
     return (
         <>
@@ -106,34 +108,12 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                     </>
                 )}
 
-                {/* {!isCondensed && (
-                    <SimpleBar style={{ maxHeight: '100%' }} timeout={500} scrollbarMaxSize={320}>
-                        <SideBarContent
-                            menuClickHandler={() => { }}
-                            isLight={isLight}
-                            hideUserProfile={hideUserProfile}
-                        />
-                    </SimpleBar>
-                )}
-                {isCondensed && <SideBarContent isLight={isLight} hideUserProfile={hideUserProfile} />} */}
-                {/* <div class="row">
-                    <div class="col-12">
-                        <div class="search-bar p-1">
-                            <div class="input-group bg-white" style={{ border: "1px solid #D9D9D9", borderRadius: "8px", overflow: "hidden" }}>
-                                <span class="input-group-text bg-white border-0 pe-0">
-                                    <i class="bi bi-search"></i>
-                                </span>
-                                <input type="text" class="form-control border-0" placeholder="Search" aria-label="Search" />
-                            </div>
-                        </div>
-                    </div>
-                </div> */}
                 <ul style={{ listStyle: 'none' }} className='px-0 mt-1'>
                     <li className='px-1 mb-1'>
-                        <FormInput type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." style={{backgroundColor:"white!important"}}/>
+                        <FormInput type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." style={{ backgroundColor: "white!important" }} />
                     </li>
                     <li className={`px-1 mb-1`}>
-                        <Link to='/apps/patients/new-patient'>
+                        <Link to='/apps/patients/add-new-patient'>
                             <Button
                                 className='border-0 w-100 d-flex align-items-center justify-content-center text-black'
                                 style={{
@@ -142,13 +122,51 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                     boxShadow: 'none',
                                 }}
                             >
-                               <MdAdd /> &nbsp; New Patient
+                                <MdAdd /> &nbsp; New Patient
                             </Button>
                         </Link>
                     </li>
-                    <li className='px-1 mb-1 mt-2 text-white'>
-                        Today's appointments
+                    <li className='px-1 my-1 '>
+                        <div className="btn-group d-flex justify-content-center align-items-center custom-btn-group" style={{ height: '30px' }}>
+                            <button
+                                className={`btn btn-primary ${activeTab === "Today" ? "active" : ""}`}
+                                onClick={() => setActiveTab("Today")}
+                            >
+                                Today's
+                            </button>
+                            <button
+                                className={`btn btn-primary ${activeTab === "Upcoming" ? "active" : ""}`}
+                                onClick={() => setActiveTab("Upcoming")}
+                            >
+                                Upcoming
+                            </button>
+                            <button
+                                className={`btn btn-primary ${activeTab === "History" ? "active" : ""}`}
+                                onClick={() => setActiveTab("History")}
+                            >
+                                History
+                            </button>
+                        </div>
+
+
                     </li>
+
+                    {activeTab === "Today" && (
+                        <li className='px-1 mb-1 mt-2 text-white'>
+                            Today's Appointments
+                        </li>
+                    )}
+                    {activeTab === "Upcoming" && (
+                        <li className='px-1 mb-1 mt-2 text-white'>
+                            Upcoming Appointments
+                        </li>
+                    )}
+                    {activeTab === "History" && (
+                        <li className='px-1 mb-1 mt-2 text-white'>
+                            Appointment History
+                        </li>
+                    )}
+
                     {store?.getPatientsReducer?.loading ?
                         <div className='text-center my-5'>
                             <Spinner color='white' />
@@ -190,7 +208,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                         ))
                     }
                 </ul>
-            
+
             </div>
         </>
     );

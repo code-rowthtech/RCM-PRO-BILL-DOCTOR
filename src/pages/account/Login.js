@@ -102,15 +102,18 @@ const Login = (): React$Element<any> => {
                         type="password"
                         name="password"
                         placeholder={t('Enter your password')}
-                        defaultValue=''
-                        containerClass={'mb-3'}>
+                        defaultValue=""
+                        containerClass={'mb-3'}
+                        inputProps={{ style: { height: '30px!important', padding:'0px' } }} // Pass the height style here
+                    >
                         <Link to="/account/forget-password" className="text-muted float-end">
                             <small>{t('Forgot your password?')}</small>
                         </Link>
                     </FormInput>
 
-                    <div className="mb-3 mb-0 text-center">
-                        <Button className='custom-buttons' type="submit" disabled={loading}>
+
+                    <div className="mb-3 mb-0 d-flex justify-content-center ">
+                        <Button className='custom-buttons d-flex align-items-center justify-content-center' type="submit" disabled={loading}>
                             {loading ?
                                 <Spinner className="spinner-border-sm " />
                                 :
