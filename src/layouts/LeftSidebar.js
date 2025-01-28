@@ -129,24 +129,28 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                     <li className='px-1 my-1 '>
                         <div className="btn-group d-flex justify-content-center align-items-center custom-btn-group" style={{ height: '30px' }}>
                             <button
-                                className={`btn btn-primary ${activeTab === "Today" ? "active" : ""}`}
+                                className={`btn  ${activeTab === "Today" ? "active btn-light text-black" : "btn-transparent text-white"}`}
                                 onClick={() => setActiveTab("Today")}
+                                style={{ border: '1px solid white', boxShadow: 'none' }}
                             >
                                 Today's
                             </button>
                             <button
-                                className={`btn btn-primary ${activeTab === "Upcoming" ? "active" : ""}`}
+                                className={`btn ${activeTab === "Upcoming" ? "active text-black btn-light" : "btn-transparent text-white"}`}
                                 onClick={() => setActiveTab("Upcoming")}
+                                style={{ border: '1px solid white', boxShadow: 'none' }}
                             >
                                 Upcoming
                             </button>
                             <button
-                                className={`btn btn-primary ${activeTab === "History" ? "active" : ""}`}
+                                className={`btn ${activeTab === "History" ? "active text-black btn-light" : "btn-transparent text-white"}`}
                                 onClick={() => setActiveTab("History")}
+                                style={{ border: '1px solid white', boxShadow: 'none' }}
                             >
                                 History
                             </button>
                         </div>
+
 
 
                     </li>
