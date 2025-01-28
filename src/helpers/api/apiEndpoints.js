@@ -19,7 +19,10 @@ export const getDoctor = '/api/v1/doctor/getDoctorDetails';
 export const getCityByState = '/api/v1/clinic/cities/';
 
 // PATIENTS
-export const getPatients = '/api/v1/admin/getAllPatients';
+export const getPatients = '/api/v1/doctor/getPatientByDoctorId';
+export const getPatientsById = '/api/v1/doctor/patient-getById';
+export const createPatients = '/api/v1/doctor/patient-onboard';
+
 // DASHBOARD
 export const getAnalytics = '/api/v1/admin/analytics';
 // SUBSCRIPTIONS

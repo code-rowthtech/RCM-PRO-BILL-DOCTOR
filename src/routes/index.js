@@ -25,6 +25,7 @@ import NewPrescription from '../pages/Prescription/newPrescription';
 import NewDiagnosisTest from '../pages/diagnosis/NewDiagnosisTest';
 import Report from '../pages/Report/Report';
 import NewInvestigation from '../pages/Report/NewInvestigation';
+import AddNewPatient from '../pages/apps/Patients/AddPatient/AddNewPatient';
 
 // lazy load all the views
 
@@ -324,6 +325,10 @@ const AllRoutes = () => {
                                 {
                                     path: 'new-patient',
                                     element: <LoadComponent component={NewPatient} />,
+                                },
+                                {
+                                    path: 'add-new-patient',
+                                    element: <LoadComponent component={AddNewPatient} />,
                                 },
                             ],
                         },
