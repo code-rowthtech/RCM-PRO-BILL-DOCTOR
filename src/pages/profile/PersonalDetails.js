@@ -673,6 +673,7 @@ const PersonalDetails = () => {
                                                 padding: "7px ",
                                                 borderRadius: "4px",
                                                 border: "1px solid #ccc",
+                                                backgroundColor:"#e5f4ff!important",
                                                 color: getValues('state1')?.length === 0 ? "#a9a9a9" : "black", // Black if state is selected, gray otherwise
                                             }}
                                         >
@@ -1033,8 +1034,8 @@ const PersonalDetails = () => {
 
             <div className="col-12 mt-3">
                 <div className="d-flex justify-content-end gap-2">
-                    <Button variant="secondary">Cancel</Button>
-                    <Button variant="primary">Update</Button>
+                    <Button className='custom-buttons'>Cancel</Button>
+                    <Button className='custom-buttons'>Update</Button>
                 </div>
             </div>
         </div>

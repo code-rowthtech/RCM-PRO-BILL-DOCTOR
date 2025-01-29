@@ -40,13 +40,16 @@ textarea,
 select {
     /* border: 1px solid rgba(15, 13, 13, 0.473) !important; */
     border: 0px!important;
-    background-color: #e2dada33!important;
+    background-color: #e5f4ff!important;
+    height: 30px!important;
+    padding: 0%!important;
 }
 
 .form-label {
     color: black;
     font-weight: 500 !important;
     opacity: 0.4;
+    font-size: 13px!important;
 }
 .nav-underline .nav-link:hover{
     border-bottom-color:none!important;
@@ -182,4 +185,18 @@ font-family: 'Charlie Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Rob
 :root {
     overflow: hidden;
 }
-
+select.form-control:not([size]):not([multiple]) {
+    height: auto;
+}
+select.form-control:not([size]):not([multiple]) {
+    height: 30px;
+}
+.input-group-text{
+    height: 30px;
+}
+.custom-checkbox {
+    height: 20px !important;
+}
+.form-check-input{
+    height: 20px!important;
+}

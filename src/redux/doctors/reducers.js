@@ -16,6 +16,10 @@ const GET_CITIES_INITIAL_STATE = {
         loading: false,
     }
 };
+const GET_STATES_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
 
 export const getDoctorsReducer = (state = GET_DOCTORS_INITIAL_STATE, action) => {
     switch (action.type) {
@@ -93,9 +97,58 @@ export const getCitiesReducer = (state = GET_CITIES_INITIAL_STATE, action) => {
                     loading: false
                 }
             };
+        case DoctorsActionTypes.GET_CITIES3_LOADING:
+            return {
+                ...state,
+                cities3: {
+                    ...state.cities3,
+                    loading: true
+                }
+            };
+        case DoctorsActionTypes.GET_CITIES3_SUCCESS:
+            return {
+                ...state,
+                cities3: {
+                    data: action.payload,
+                    loading: false
+                }
+            };
+        case DoctorsActionTypes.GET_CITIES3_ERROR:
+            return {
+                ...state,
+                cities3: {
+                    data: [],
+                    loading: false
+                }
+            };
         default:
             return state;
     }
 };
+export const getStatesReducer = (state = GET_STATES_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case DoctorsActionTypes.GET_STATES_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case DoctorsActionTypes.GET_STATES_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case DoctorsActionTypes.GET_STATES_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false
+            }
+        default: return state
+    }
+}
 
 

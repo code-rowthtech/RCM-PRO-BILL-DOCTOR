@@ -44,6 +44,7 @@ const AddPatientDetails = () => {
             ...(data?.middleName ? { middleName: data?.middleName } : {}),
             ...(data?.lastName ? { lastName: data?.lastName } : {}),
             ...(data?.birthName ? { birthName: data?.birthName } : {}),
+            ...(data?.dateOfBirth ? { dateOfBirth: data?.dateOfBirth } : {}),
             ...(data?.suffix ? { suffix: data?.suffix } : {}),
             ...(logo?.url === null
                 ? {}
@@ -79,18 +80,6 @@ const AddPatientDetails = () => {
             <Form onSubmit={handleSubmit(onSubmit)}>
                 <Row>
                     <Col sm={3}>
-                        <Form.Group className="mb-1" controlId="templateSelect">
-                            <Form.Label className="mb-0">Primary Provider</Form.Label>
-                            <Form.Control
-                                id="primaryProvider"
-                                type="text"
-                                placeholder={doctorName}
-                                disabled
-                                {...register('primaryProvider')}
-                            />
-                        </Form.Group>
-                    </Col>
-                    <Col sm={3}>
                         <Form.Group>
                             <Form.Label htmlFor="firstName" className="mb-0">First Name <span className="text-danger">*</span></Form.Label>
                             <Form.Control
@@ -104,16 +93,115 @@ const AddPatientDetails = () => {
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label htmlFor="patientstatus" className="mb-0">Status</Form.Label>
-                            <Form.Select
-                                as="select"  // Use 'select' to make it a dropdown
-                                id="patientstatus"
-                                {...register('patientStatus')}
+                            <Form.Label htmlFor="lastName" className="mb-0">Last Name <span className="text-danger">*</span></Form.Label>
+                            <Form.Control
+                                id="lastName"
+                                type="text"
+                                placeholder="Last Name"
+                                {...register('lastName', { required: 'Last Name is required' })}
+                            />
+                            {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
+                        </Form.Group>
+                    </Col>
+                    <Col sm={3}>
+                        <Form.Group className="mb-1 position-relative">
+                            <Form.Label className='mb-0'>Cell Phone <span className="text-danger">*</span></Form.Label>
+                            <Form.Group>
+                                <InputGroup>
+                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '30px' }}>&nbsp;&nbsp;+1</InputGroup.Text>
+                                    <Form.Control
+                                        type="tel"
+                                        style={{ height: '30px!important' }}
+                                        {...register('cellPhone', {
+                                            pattern: {
+                                                value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                message: 'Contact must be in the format (XXX)XXX-XXXX',
+                                            },
+                                            maxLength: {
+                                                value: 13,
+                                                message: 'Contact must not exceed 13 digits'
+                                            },
+                                            minLength: {
+                                                value: 13,
+                                                message: 'Contact must not be less than 13 digits'
+                                            }
+                                        }
+                                        )}
+                                        onChange={(e) => {
+                                            let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
+                                            if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
+                                            const formattedValue = rawValue.replace(
+                                                /(\d{1,3})(\d{0,3})(\d{0,4})/,
+                                                (match, p1, p2, p3) => {
+                                                    if (p3) return `(${p1})${p2}-${p3}`;
+                                                    if (p2) return `(${p1})${p2}`;
+                                                    return `(${p1}`;
+                                                }
+                                            ); // Format dynamically as (XXX)XXX-XXXX
+                                            e.target.value = formattedValue; // Update input value
+                                            clearErrors('cellPhone'); // Clear validation errors
+                                        }}
+                                        placeholder="(XXX)XXX-XXXX"
+                                        maxLength={14}
+                                        onKeyPress={(event) => {
+                                            // Only allow numeric characters (0-9)
+                                            if (!/[0-9]/.test(event.key)) {
+                                                event.preventDefault();
+                                            }
+                                        }}
+                                    />
+                                </InputGroup>
+                            </Form.Group>
+
+                            <div
+                                className='position-absolute ' style={{ top: '48%', left: '1%' }}
                             >
-                                <option hidden>Select status</option>  {/* Default option */}
-                                <option value="Active">Active</option>
-                                <option value="Inactive">Inactive</option>
-                                <option value="Inactive-Deceased">Inactive-Deceased</option>
+                                <img
+                                    src={us}
+                                    alt="country code flag"
+                                    width={20} />
+                            </div>
+
+
+                        </Form.Group>
+                    </Col>
+                    <Col sm={3}>
+                        <Form.Group>
+                            <Form.Label className="mb-0">Patient Date of Birth <span className="text-danger">*</span></Form.Label>
+                            <Form.Control
+                                type="date"
+                                {...register('dateOfBirth')}
+                            // onChange={(e) => {
+                            //     const calculatedAge = calculateAge(e.target.value);
+                            //     setAge(calculatedAge);
+                            // }}
+                            />
+                        </Form.Group>
+                    </Col>
+                    <Col sm={3}>
+                        <Form.Group className="mb-1" controlId="templateSelect">
+                            <Form.Label className="mb-0">Primary Provider</Form.Label>
+                            <Form.Control
+                                id="primaryProvider"
+                                type="text"
+                                placeholder={doctorName}
+                                disabled
+                                {...register('primaryProvider')}
+                            />
+                        </Form.Group>
+                    </Col>
+                    <Col sm={3} className='mb-1'>
+                        <Form.Group>
+                            <Form.Label htmlFor="title" className="mb-0">Title</Form.Label>
+                            <Form.Select
+                                {...register('title')}
+                                aria-label="Select Title"
+                            >
+                                <option hidden value=''>Select Title</option>
+                                <option value="Mr.">Mr.</option>
+                                <option value="Mrs.">Mrs.</option>
+                                <option value="Miss">Miss</option>
+                                <option value="Dr.">Dr.</option>
                                 <option value="Other">Other</option>
                             </Form.Select>
                         </Form.Group>
@@ -130,32 +218,20 @@ const AddPatientDetails = () => {
                             {errors.middleName && <span className="text-danger">{errors.middleName.message}</span>}
                         </Form.Group>
                     </Col>
-                    <Col sm={3} className='mb-1'>
-                        <Form.Group>
-                            <Form.Label htmlFor="title" className="mb-0">Title</Form.Label>
-                            <Form.Select
-                                {...register('title')}
-                                aria-label="Select Title"
-                            >
-                                <option hidden>Select Title</option>
-                                <option value="Mr.">Mr.</option>
-                                <option value="Mrs.">Mrs.</option>
-                                <option value="Miss">Miss</option>
-                                <option value="Dr.">Dr.</option>
-                                <option value="Other">Other</option>
-                            </Form.Select>
-                        </Form.Group>
-                    </Col>
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label htmlFor="lastName" className="mb-0">Last Name <span className="text-danger">*</span></Form.Label>
-                            <Form.Control
-                                id="lastName"
-                                type="text"
-                                placeholder="Last Name"
-                                {...register('lastName', { required: 'Last Name is required' })}
-                            />
-                            {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
+                            <Form.Label htmlFor="patientstatus" className="mb-0">Status</Form.Label>
+                            <Form.Select
+                                as="select"  // Use 'select' to make it a dropdown
+                                id="patientstatus"
+                                {...register('patientStatus')}
+                            >
+                                <option hidden value=''>Select status</option>  {/* Default option */}
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="Inactive-Deceased">Inactive-Deceased</option>
+                                <option value="Other">Other</option>
+                            </Form.Select>
                         </Form.Group>
                     </Col>
                     <Col sm={3}>
@@ -267,68 +343,6 @@ const AddPatientDetails = () => {
                     </Col>
                     <Col sm={3}>
                         <Form.Group className="mb-1 position-relative">
-                            <Form.Label className='mb-0'>Cell Phone</Form.Label>
-                            <Form.Group>
-                                <InputGroup>
-                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '30px' }}>&nbsp;&nbsp;+1</InputGroup.Text>
-                                    <Form.Control
-                                        type="tel"
-                                        style={{ height: '30px!important' }}
-                                        {...register('cellPhone', {
-                                            pattern: {
-                                                value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                message: 'Contact must be in the format (XXX)XXX-XXXX',
-                                            },
-                                            maxLength: {
-                                                value: 13,
-                                                message: 'Contact must not exceed 13 digits'
-                                            },
-                                            minLength: {
-                                                value: 13,
-                                                message: 'Contact must not be less than 13 digits'
-                                            }
-                                        }
-                                        )}
-                                        onChange={(e) => {
-                                            let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
-                                            if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
-                                            const formattedValue = rawValue.replace(
-                                                /(\d{1,3})(\d{0,3})(\d{0,4})/,
-                                                (match, p1, p2, p3) => {
-                                                    if (p3) return `(${p1})${p2}-${p3}`;
-                                                    if (p2) return `(${p1})${p2}`;
-                                                    return `(${p1}`;
-                                                }
-                                            ); // Format dynamically as (XXX)XXX-XXXX
-                                            e.target.value = formattedValue; // Update input value
-                                            clearErrors('cellPhone'); // Clear validation errors
-                                        }}
-                                        placeholder="(XXX)XXX-XXXX"
-                                        maxLength={14}
-                                        onKeyPress={(event) => {
-                                            // Only allow numeric characters (0-9)
-                                            if (!/[0-9]/.test(event.key)) {
-                                                event.preventDefault();
-                                            }
-                                        }}
-                                    />
-                                </InputGroup>
-                            </Form.Group>
-
-                            <div
-                                className='position-absolute ' style={{ top: '48%', left: '1%' }}
-                            >
-                                <img
-                                    src={us}
-                                    alt="country code flag"
-                                    width={20} />
-                            </div>
-
-
-                        </Form.Group>
-                    </Col>
-                    <Col sm={3}>
-                        <Form.Group className="mb-1 position-relative">
                             <Form.Label className='mb-0'>Office Phone</Form.Label>
                             <Form.Group>
                                 <InputGroup>
@@ -396,7 +410,7 @@ const AddPatientDetails = () => {
                                 {...register('preferredCommunication')}
                                 aria-label="Select Title"
                             >
-                                <option hidden>Select Preferred Communication</option>
+                                <option hidden value=''>Select Preferred Communication</option>
                                 <option value="Home Phone">Home Phone</option>
                                 <option value="Work Phone">Work Phone</option>
                                 <option value="Cell Phone">Cell Phone</option>
@@ -416,7 +430,7 @@ const AddPatientDetails = () => {
                                 {...register('reminderLanguage',
                                 )}
                             >
-                                <option hidden>Select Reminder Language</option>
+                                <option hidden value=''>Select Reminder Language</option>
                                 <option value="English">English</option>
                                 <option value="Spanish">Spanish</option>
                                 <option value="French">French</option>
@@ -440,7 +454,7 @@ const AddPatientDetails = () => {
                                 {...register('medicationHistoryConsent',
                                 )}
                             >
-                                <option hidden>Select Medication History Concent</option>
+                                <option hidden value=''>Select Medication History Concent</option>
                                 <option value={'true'}>Yes</option>
                                 <option value={'false'}>No</option>
                             </Form.Select>
@@ -465,7 +479,7 @@ const AddPatientDetails = () => {
                                 {...register('paymentProfile')}
                                 aria-label="Payment Profile"
                             >
-                                <option hidden>Select Payment Profile</option>
+                                <option hidden value=''>Select Payment Profile</option>
                                 <option value="Cash">Cash</option>
                                 <option value="Insurance">Insurance</option>
                                 <option value="Insurance Out of Network">Insurance Out of Network</option>
@@ -524,8 +538,7 @@ const AddPatientDetails = () => {
                     <Col sm={12} className='d-flex justify-content-end mb-2'>
                         <Button
                             // variant='success'
-                            className='custom-buttons fs-6 d-flex align-items-center justify-content-center'
-                            style={{ height: '30px', padding: '0 15px' }}
+                            className='custom-buttons d-flex align-items-center justify-content-center'
                             type='submit'
                         >
                             Save
