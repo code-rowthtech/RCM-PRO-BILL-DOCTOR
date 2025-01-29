@@ -14,7 +14,7 @@ const NewDiagnosisTest = () => {
                     <div className="d-flex justify-content-between">
                         <p style={{ fontWeight: 600, textTransform: 'uppercase' }}>New Patient Diagnosis Test</p>
                         <div>
-                            <Button variant="secondary" onClick={() => navigate(-1)}>Back</Button>
+                            <Button className='custom-buttons' onClick={() => navigate(-1)}>Back</Button>
                         </div>
                     </div>
 
@@ -115,7 +115,7 @@ const NewDiagnosisTest = () => {
                                 <div className="d-flex gap-2 my-1">
                                     {/* <Button className="custom-button">New Medicine</Button>
                                     <Button className="custom-button">Suggest Medicines</Button> */}
-                                    <Button variant="success" className="custom-button">ADD</Button>
+                                    <Button  className="custom-buttons">ADD</Button>
                                 </div>
                             </div>
                             {/* <div className="d-flex justify-content-end mt-2">

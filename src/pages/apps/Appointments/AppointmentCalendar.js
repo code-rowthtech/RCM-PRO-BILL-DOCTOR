@@ -23,6 +23,7 @@ const AppointmentCalendar = () => {
                 <div className='d-flex justify-content-between mt-3'>
                     <p className='fw-bold mt-1'>Appointment Calendar</p>
                     <Button
+                    className='custom-buttons'
                         onClick={() => navigate("/apps/appointments/list")}
                     >
                         Back

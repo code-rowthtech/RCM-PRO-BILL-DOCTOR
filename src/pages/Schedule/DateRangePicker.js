@@ -182,7 +182,7 @@ const DateRangePicker = () => {
 
       {/* Custom Date Picker */}
       {isCustom && (
-        <div className="custom-date-picker py-1 rounded d-flex">
+        <div className="custom-date-picker py-1 rounded d-flex border-0">
           <DatePicker
             selected={startDate}
             onChange={(date) => {
@@ -204,7 +204,7 @@ const DateRangePicker = () => {
             startDate={startDate}
             endDate={endDate}
             placeholderText="End Date"
-            className="custom-date-input"
+            className="custom-date-input "
             disabled={!startDate} // Disable end date if start date is not selected
           />
         </div>

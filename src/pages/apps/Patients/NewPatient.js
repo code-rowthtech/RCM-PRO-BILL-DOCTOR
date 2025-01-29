@@ -13,9 +13,10 @@ import CloseIcon from "../../../assets/images/Icon.png"
 import { MdPhone } from "react-icons/md";
 import { MdOutlineMarkEmailUnread } from "react-icons/md";
 import { BiSolidLocationPlus } from "react-icons/bi";
-import { getPatientsByIdAction } from '../../../redux/actions';
+import { getPatientsByIdAction, resetUpdateAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import { useDispatch, useSelector } from 'react-redux';
+import { RiImageEditLine } from "react-icons/ri";
 
 
 const NewPatient = () => {
@@ -32,6 +33,7 @@ const NewPatient = () => {
     const store = useSelector((state) => state);
     const patientsDataById = store?.getPatientsByIdReducer?.data?.patient || [];
     console.log(patientsDataById, 'patientsDataByIdpatientsDataById')
+    const updateSuccess = store?.updatePatientsReducer?.data?.status;
 
     useEffect(() => {
         const data = {
@@ -40,6 +42,16 @@ const NewPatient = () => {
         // console.log(data, 'dataaa123456789')
         dispatch(getPatientsByIdAction({ key: encryptMessage(data) }));
     }, [dispatch]);
+
+    useEffect(() => {
+        const data = {
+            id: id,
+        }
+        if (updateSuccess === 200) {
+            dispatch(getPatientsByIdAction({ key: encryptMessage(data) }));
+            dispatch(resetUpdateAction())
+        }
+    }, [updateSuccess]);
 
     const handleSidebarToggle = () => {
         setSidebarCollapsed(!isSidebarCollapsed);
@@ -134,12 +146,20 @@ const NewPatient = () => {
                             <div className="p-1">
                                 <Row>
                                     <Col sm={2} className='ps-2 pt-1'>
-                                        <div>
+                                        <div className="position-relative" style={{ display: "inline-block" }}>
                                             <img
-                                                src={patientsDataById?.patientChartPhoto?.url || profileDummy}
+                                                src={patientsDataById?.patientChartPhoto?.url}
                                                 alt="Patient Profile"
                                                 className="img-fluid rounded"
-                                                style={{ width: '126px', height: '129px', objectFit: 'cover' }}
+                                                style={{ width: "126px", height: "129px", objectFit: "cover" }}
+                                            />
+                                            <RiImageEditLine
+                                                className="position-absolute fs-4 text-black"
+                                                style={{
+                                                    bottom: "-5px",
+                                                    right: "-9px",
+                                                    cursor: "pointer"
+                                                }}
                                             />
                                         </div>
 
@@ -152,10 +172,14 @@ const NewPatient = () => {
                                                     <span className='fw-bold text-capitalize' style={{ color: 'rgb(249, 139, 55)' }}>{patientsDataById?.firstName || 'N/A'} {patientsDataById?.middleName || ' '} {patientsDataById?.lastName || ' '}</span> <span className='fs-6 fw-bold'>Male</span>
                                                 </p>
                                                 <p style={{ borderRight: '1px solid black' }} className='pe-2 text-nowrap fw-bold fs-6'>
-                                                    <span>{patientsDataById?.dob || 'N/A'}</span>
+                                                    <span>
+                                                        {patientsDataById?.dateOfBirth
+                                                            ? new Date(patientsDataById.dateOfBirth).toLocaleDateString("en-GB")
+                                                            : "N/A"}
+                                                    </span>
                                                 </p>
                                                 <p className='text-nowrap fs-6 fw-bold'>
-                                                    <span>{patientsDataById?.yearsOld || 'N/A'}</span>
+                                                    <span>{patientsDataById?.approxAge+' years old' || 'N/A'}</span>
                                                 </p>
                                             </div>
                                             <Col sm={6} className='p-0'>
@@ -196,7 +220,13 @@ const NewPatient = () => {
                                                                 <span ><BiSolidLocationPlus className='fs-5 text-primary' /></span>
                                                             </div>
                                                             <div className='col-9'>
-                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>{patientsDataById?.address || 'N/A'}</span>
+                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>
+                                                                    {patientsDataById?.address?.address
+                                                                        ? patientsDataById.address.address.length > 30
+                                                                            ? patientsDataById.address.address.slice(0, 30) + "..."
+                                                                            : patientsDataById.address.address
+                                                                        : 'N/A'}
+                                                                </span>
                                                             </div>
                                                         </div>
                                                     </div>

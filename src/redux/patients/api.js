@@ -18,3 +18,8 @@ export function createPatientsApi(params: any): any {
     const { data } = params;
     return api.create(URL.createPatients, data);
 }
+
+export function updatePatientsApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.updatePatients, data);
+}

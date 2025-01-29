@@ -358,10 +358,10 @@ const ProfessionalInformation = () => {
       </div>
 
       <div className="d-flex justify-content-end gap-2 my-1">
-        <Button className="" variant="secondary">
+        <Button className="custom-buttons" >
           Cancel
         </Button>
-        <Button className="" type="submit">
+        <Button className="custom-buttons" type="submit">
           Update
         </Button>
       </div>

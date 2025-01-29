@@ -19,7 +19,11 @@ export const createPatientsAction = (data): AuthAction => ({
     data
 });
 
-export const stateEmptydAction = (): LayoutAction => ({
-    type: PatientsActionTypes.STATE_EMPTY_INTIAL_STATE,
+export const updatePatientsAction = (data): AuthAction => ({
+    type: PatientsActionTypes.UPDATE_PATIENTS,
+    data
+});
 
+export const resetUpdateAction = (): LayoutAction => ({
+    type: PatientsActionTypes.RESET_UPDATE_STATUS,
 });

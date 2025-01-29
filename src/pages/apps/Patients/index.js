@@ -7,15 +7,13 @@ import { Link } from 'react-router-dom';
 import { getPatientsAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import { useDispatch, useSelector } from 'react-redux';
-
+import Spinner from '../../../constants/Spinner'
 const Patients = () => {
 
     const dispatch = useDispatch();
     const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
     const store = useSelector((state) => state);
     const patientsData = store?.getPatientsReducer?.data?.patients || [];
-    console.log(patientsData, 'patientsData')
-
 
     useEffect(() => {
         const data = {
@@ -26,6 +24,7 @@ const Patients = () => {
         }
         // console.log(data, 'dataaa123456789')
         dispatch(getPatientsAction({ key: encryptMessage(data) }));
+        
     }, [dispatch]);
 
     // const patientsData = [
@@ -130,6 +129,13 @@ const Patients = () => {
                                                 <th className='text-white'>Action</th>
                                             </tr>
                                         </thead>
+                                        {store?.getPatientsReducer?.loading ? (
+                                            <tr>
+                                                <td className='text-center' colSpan={6}>
+                                                    <Spinner className=" my-5 " />
+                                                </td>
+                                            </tr>
+                                        ) : (
                                         <tbody>
                                             {patientsData?.length === 0 ? (
                                                 <tr>
@@ -156,6 +162,7 @@ const Patients = () => {
                                                 ))
                                             )}
                                         </tbody>
+                                        )}
                                     </Table>
                                 </Col>
                             </Row>

@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { DoctorsActionTypes } from './constants';
-import { getCityByStateApi, getDoctorsApi } from './api';
+import { getCityByStateApi, getDoctorsApi, getStateByCountry } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -89,6 +89,60 @@ function* getCities2Function(data) {
     }
 }
 
+function* getCities3Function(data) {
+    try {
+        yield put({
+            type: DoctorsActionTypes.GET_CITIES3_LOADING,
+        });
+        const response = yield call(getCityByStateApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            yield put({
+                type: DoctorsActionTypes.GET_CITIES3_SUCCESS,
+                payload: decryptedData,
+            });
+        } else {
+            yield put({
+                type: DoctorsActionTypes.GET_CITIES3_ERROR,
+                payload: decryptedData,
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: DoctorsActionTypes.GET_CITIES3_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* getStatesFunction(data) {
+    try {
+        yield put({
+            type: DoctorsActionTypes.GET_STATES_LOADING,
+            payload: {},
+        });
+        const response = yield call(getStateByCountry, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+
+        if (response.status === 200) {
+            yield put({
+                type: DoctorsActionTypes.GET_STATES_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: DoctorsActionTypes.GET_STATES_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: DoctorsActionTypes.GET_STATES_ERROR,
+            payload: error,
+        });
+    }
+}
+
 export function* callStateEmpty() {
     put({
         type: DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE,
@@ -105,11 +159,18 @@ export function* watchGetCities2() {
     yield takeEvery(DoctorsActionTypes.GET_CITIES2, getCities2Function);
 }
 
+export function* watchGetCities3() {
+    yield takeEvery(DoctorsActionTypes.GET_CITIES3, getCities3Function);
+}
+
 
 export function* watchGetDoctors() {
     yield takeEvery(DoctorsActionTypes.GET_DOCTORS, getDoctorsFunction);
 }
 
+export function* watchGetStates() {
+    yield takeEvery(DoctorsActionTypes.GET_STATES, getStatesFunction);
+}
 
 
 export function* watchresetState() {
@@ -119,7 +180,10 @@ export function* watchresetState() {
 function* doctorsSaga() {
     yield all([
         fork(watchGetDoctors),
-        fork(watchGetCities),fork(watchGetCities2),
+        fork(watchGetCities),
+        fork(watchGetCities2),
+        fork(watchGetCities3),
+        fork(watchGetStates),
         fork(watchresetState)
     ]);
 }

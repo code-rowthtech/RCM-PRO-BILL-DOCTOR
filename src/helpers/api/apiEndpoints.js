@@ -16,12 +16,22 @@ export const getClinicById = '/api/v1/clinic/byId';
 
 // DOCTORS
 export const getDoctor = '/api/v1/doctor/getDoctorDetails';
-export const getCityByState = '/api/v1/clinic/cities/';
+export const getCityByState = '/api/v1/doctor/cities/';
+export const getStatedByCountry = '/api/v1/doctor/states/US';
+
+// VITALS
+export const createVitals = '/api/v1/doctor/addVitals';
+export const updateVitals = '/api/v1/doctor/updateVitals';
+export const getVitals = '/api/v1/doctor/getAllVitals';
+export const getVitalsByPatientId = '/api/v1/doctor/vitalsByPatientId';
+export const getVitalsByAppointmentId = '/api/v1/doctor/vitalsByAppointmentId';
+
 
 // PATIENTS
 export const getPatients = '/api/v1/doctor/getPatientByDoctorId';
 export const getPatientsById = '/api/v1/doctor/patient-getById';
 export const createPatients = '/api/v1/doctor/patient-onboard';
+export const updatePatients = '/api/v1/doctor/patient-edit';
 
 // DASHBOARD
 export const getAnalytics = '/api/v1/admin/analytics';

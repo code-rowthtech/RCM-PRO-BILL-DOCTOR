@@ -126,10 +126,10 @@ const Diagnosis = () => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
+          <Button className='custom-buttons' onClick={() => setShowModal(false)}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={() => setShowModal(false)}>
+          <Button className='custom-buttons' onClick={() => setShowModal(false)}>
             Save
           </Button>
         </Modal.Footer>

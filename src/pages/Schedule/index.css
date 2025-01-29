@@ -5,21 +5,23 @@
 }
 
 .input-container {
-    border: 1px solid #827f7f;
+    border: none!important;
     /* padding: 6.5px; */
     cursor: pointer;
     text-align: center;
     background-color: white;
-    border-radius: 5px;
+    border-radius: 5px!important;
     height: 30px;
 }
 
 .input-container input {
-    border: none;
+    border: hidden!important;
     width: 100%;
     text-align: center;
     cursor: pointer;
     height: 30px;
+    background-color: #e5f4ff!important;
+    border-radius: 5px!important;
 }
 .input-container input::before{
     border: 1px solid white !important;
@@ -49,7 +51,7 @@
 .custom-date-picker {
     justify-content: center;
     width: 250px;
-    border: 1px solid #827f7f !important;
+    border: none !important;
 
 }
 .custom-date-input {
