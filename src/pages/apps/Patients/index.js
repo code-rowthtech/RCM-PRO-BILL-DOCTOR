@@ -14,7 +14,7 @@ const Patients = () => {
     const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
     const store = useSelector((state) => state);
     const patientsData = store?.getPatientsReducer?.data?.patients || [];
-
+    console.log(patientsData, 'patientsData')
     useEffect(() => {
         const data = {
             doctorId: doctorId,
@@ -24,7 +24,7 @@ const Patients = () => {
         }
         // console.log(data, 'dataaa123456789')
         dispatch(getPatientsAction({ key: encryptMessage(data) }));
-        
+
     }, [dispatch]);
 
     // const patientsData = [
@@ -136,32 +136,32 @@ const Patients = () => {
                                                 </td>
                                             </tr>
                                         ) : (
-                                        <tbody>
-                                            {patientsData?.length === 0 ? (
-                                                <tr>
-                                                    <td colSpan={5} className='text-center'>
-                                                        <h3 className='my-5'>No Patient Found !</h3>
-                                                    </td>
-                                                </tr>
-                                            ) : (
-                                                patientsData?.map((data, index) => (
-                                                    <tr key={index}>
-                                                        <td>{data.chartNumber}</td>
-                                                        <td className='text-capitalize'>
-                                                            {data.firstName + ' ' + data.lastName}
+                                            <tbody>
+                                                {patientsData?.length === 0 ? (
+                                                    <tr>
+                                                        <td colSpan={5} className='text-center'>
+                                                            <h3 className='my-5'>No Patient Found !</h3>
                                                         </td>
-                                                        <td>{data.cellPhone}</td>
-                                                        <td>{data.appointmentDate || 'N/A'}</td>
-                                                        <td>
-                                                            <Link to={`/apps/patients/new-patient?id=${data?._id}`} >
-                                                                <FiEdit className="fs-4 ms-2 cursor-pointer text-black" />
-                                                            </Link>
-                                                        </td>
-
                                                     </tr>
-                                                ))
-                                            )}
-                                        </tbody>
+                                                ) : (
+                                                    patientsData?.map((data, index) => (
+                                                        <tr key={index}>
+                                                            <td>{data.chartNumber}</td>
+                                                            <td className='text-capitalize'>
+                                                                {data.firstName + ' ' + data.lastName}
+                                                            </td>
+                                                            <td>{data.cellPhone || 'N/A'}</td>
+                                                            <td>{data.appointmentDate || 'N/A'}</td>
+                                                            <td>
+                                                                <Link to={`/apps/patients/new-patient?id=${data?._id}`} >
+                                                                    <FiEdit className="fs-4 ms-2 cursor-pointer text-black" />
+                                                                </Link>
+                                                            </td>
+
+                                                        </tr>
+                                                    ))
+                                                )}
+                                            </tbody>
                                         )}
                                     </Table>
                                 </Col>

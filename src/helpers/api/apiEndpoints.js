@@ -40,3 +40,9 @@ export const getSubscriptions = '/api/v1/admin/subscription/all'
 // SCHEDULE
 export const createHoliday = '/api/v1/doctor/addOrUpdateSchedule';
 export const getHoliday = '/api/v1/doctor/getSchedule';
+
+// APPOINTMENTS
+export const createAppointments = '/api/v1/doctor/appointments';
+export const getAppointments = '/api/v1/doctor/appointment/getAll';
+export const getAllAppointments = '/api/v1/doctor/getPatientsByAppointments';
+

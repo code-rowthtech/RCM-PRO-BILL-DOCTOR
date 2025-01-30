@@ -1,113 +1,76 @@
-// @flow
 import React, { useState } from 'react';
+import { Button, Card, Row, Col } from 'react-bootstrap';
+// import AppointmentForm from './Tabs/AppointmentForm';
+// import Vitals from './Tabs/Vitals';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, Form, Row, Col } from 'react-bootstrap';
+import AppointmentForm from './Tabs/AppointmentForm';
 
 const NewAppointment = () => {
+
     const navigate = useNavigate();
-    const handleAppointment = () => {
-        navigate('/apps/appointments/list');
+    const [activeTab, setActiveTab] = useState('Appointments');
+
+    const tabs = [
+        'Appointments',
+        'Billing',
+        'Eligibility',
+        'Vitals',
+        'Growthcharts',
+        'Log Comm.',
+        'Revisions',
+        'Mu Helper'
+    ];
+
+    const handleTabClick = (tab) => {
+        setActiveTab(tab);
     };
 
+    // const handleAppointment = () => {
+    //     navigate("/apps/appointments/list");
+    // };
+
     return (
-        <Card className="mt-4">
-            {/* Card Header */}
-            <div className="d-flex justify-content-between align-items-center mx-3 mt-2">
-                <h5 className="fw-bold mb-0">New Appointment</h5>
-                <Button className='custom-buttons' onClick={handleAppointment}>Back</Button>
-            </div>
+        <div>
+            <Card className=" scroll-container px-2 py-2 mt-2" style={{ height: '82vh', overflow: 'scroll' }}>
+                <Row className="mb-2">
+                    <Col sm={10}>
+                        <ul className="nav nav-underline">
+                            {tabs.map((tab) => (
+                                <li className="nav-item" key={tab}>
+                                    <a
+                                        className={`nav-link text-black me-2 ${activeTab === tab ? 'active fw-bold' : ''}`}
+                                        onClick={() => handleTabClick(tab)}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        {tab}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </Col>
+                    <Col sm={2} className="d-flex justify-content-end">
+                        <Button
+                            className='custom-buttons'
+                            style={{ height: '30px' }}
+                            // onClick={handleAppointment}
+                        >
+                            Back
+                        </Button>
+                    </Col>
+                </Row>
 
-            {/* Card Body */}
-            <Card.Body>
-                <Form>
-                    <Row>
-                        {/* Left Column */}
-                        <Col md={6}>
-                            <Form.Group className="mb-3" controlId="patient">
-                                <Form.Label>Patient</Form.Label>
-                                <Form.Select>
-                                    <option>Select Name</option>
-                                    <option value="Cardiology">Cardiology</option>
-                                    <option value="Neurology">Neurology</option>
-                                    <option value="Pediatrics">Pediatrics</option>
-                                    <option value="Orthopedics">Orthopedics</option>
-                                </Form.Select>
-                            </Form.Group>
-
-                            <Form.Group className="mb-3" controlId="doctor">
-                                <Form.Label>Doctor</Form.Label>
-                                <Form.Select>
-                                    <option>Select Doctor</option>
-                                    <option value="Cardiology">Cardiology</option>
-                                    <option value="Neurology">Neurology</option>
-                                    <option value="Pediatrics">Pediatrics</option>
-                                    <option value="Orthopedics">Orthopedics</option>
-                                </Form.Select>
-                            </Form.Group>
-
-                            <Form.Group className="mb-3" controlId="description">
-                                <Form.Label>Description</Form.Label>
-                                <Form.Control
-                                    as="textarea"
-                                    rows={3}
-                                    placeholder="Enter description"
-                                />
-                            </Form.Group>
-
-                            <Form.Group className="mb-3" controlId="belongToDoctor">
-                                <Form.Label>Belong to Doctor</Form.Label>
-                                <Form.Select>
-                                    <option>Belong to Doctor</option>
-                                    <option value="Cardiology">Cardiology</option>
-                                    <option value="Neurology">Neurology</option>
-                                    <option value="Pediatrics">Pediatrics</option>
-                                    <option value="Orthopedics">Orthopedics</option>
-                                </Form.Select>
-                            </Form.Group>
-                        </Col>
-
-                        {/* Right Column */}
-                        <Col md={6}>
-                            <Form.Group className="mb-3" controlId="doctorDepartment">
-                                <Form.Label>Doctor Department</Form.Label>
-                                <Form.Select>
-                                    <option>Doctor Department</option>
-                                    <option value="Cardiology">Cardiology</option>
-                                    <option value="Neurology">Neurology</option>
-                                    <option value="Pediatrics">Pediatrics</option>
-                                    <option value="Orthopedics">Orthopedics</option>
-                                </Form.Select>
-                            </Form.Group>
-
-                            <Form.Group className="mb-3" controlId="date">
-                                <Form.Label>Date</Form.Label>
-                                <Form.Control type="date" />
-                            </Form.Group>
-
-                            <Form.Group className="mb-5">
-                                <Form.Label className='mb-2'>Status</Form.Label>
-                                <Form.Check
-                                    type="switch"
-                                    id="statusSwitch"
-                                    label="Active"
-                                />
-                            </Form.Group>
-
-                            <Form.Group className="mb-3 pt-1" controlId="taraq">
-                                <Form.Label>Taraq</Form.Label>
-                                <Form.Control type="text" placeholder="Taraq" />
-                            </Form.Group>
-                        </Col>
-                    </Row>
-                </Form>
-            </Card.Body>
-
-            {/* Card Footer */}
-            <div className="d-flex justify-content-end mb-2 me-3">
-                <Button  className="me-2 custom-buttons">Cancel</Button>
-                <Button className='custom-buttons'>Save</Button>
-            </div>
-        </Card>
+                <div className=" ">
+                    {activeTab === 'Appointments' && <AppointmentForm />}
+                    {activeTab === 'Billing' && <p>Billing Content In Progress...</p>}
+                    {activeTab === 'Eligibility' && <p>Eligibility Content In Progress...</p>}
+                    {activeTab === 'Vitals' && <p>Vitals Content In Progress...</p>}
+                    {activeTab === 'Growthcharts' && <p>Growthcharts Content In Progress...</p>}
+                    {activeTab === 'Log Comm.' && <p>Log Comm. Content In Progress...</p>}
+                    {activeTab === 'Revisions' && <p>Revisions Content In Progress...</p>}
+                    {activeTab === 'Mu Helper' && <p>Mu Helper Content In Progress...</p>}
+                </div>
+            </Card>
+        </div>
     );
 };
 

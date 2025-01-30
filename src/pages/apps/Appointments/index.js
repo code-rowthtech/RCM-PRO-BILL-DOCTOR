@@ -1,5 +1,5 @@
 // @flow
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Badge, Button, Card, Col, Form, Row, Table } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
@@ -9,6 +9,9 @@ import { patientsData } from './data';
 import { GrDocumentText } from 'react-icons/gr';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { FiFileText, FiFilter } from 'react-icons/fi';
+import { getAppointmentsAction } from '../../../redux/actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { encryptMessage } from '../../../cryptoUtils';
 
 // Define the types for each order item
 type OrderListItems = {
@@ -28,27 +31,59 @@ type OrderListProps = {
 
 // Component for Appointments List Table
 const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React$FragmentType> => {
+    const dispatch = useDispatch();
+    const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const store = useSelector((state) => state)
+    const patientsAppointment = store?.getAppointmentsReducer?.data?.appointments || [];
+    console.log(patientsAppointment, '1234567890')
+
+
+    useEffect(() => {
+        const data = {
+            doctorId: doctorId,
+            clinicId: clinicId,
+            status: "All"
+        }
+        dispatch(getAppointmentsAction({ key: encryptMessage(data) }));
+
+    }, [dispatch]);
+
     return (
         <Table responsive className="table-centered table-nowrap mb-0">
             <thead className="text-white">
                 <tr>
                     <th className='text-white'>Sr.No.</th>
                     <th className='text-white'>Patients Name</th>
+                    <th className='text-white'>Reason</th>
+                    <th className='text-white'>Start Time</th>
                     {/* <th className='text-white'>Doctor</th> */}
                     {/* <th className='text-white'>Doctor Department</th> */}
-                    <th className='text-white text-end' style={{paddingRight:'70px'}}>Date</th>
+                    <th className='text-white text-end' style={{ paddingRight: '70px' }}>Date</th>
                     <th className='text-white text-end pe-3 '>Status</th>
                 </tr>
             </thead>
             <tbody>
-                {[0, 1, 2, 3, 4, 5].map((index) => (
+                {patientsAppointment?.map((data, index) => (
                     <tr key={index}>
                         <td>{index + 1}</td>
-                        <td>Patient Name</td>
+                        <td className='text-capitalize'>{data?.patient?.firstName} {data?.patient?.lastName}</td>
+                        <td className='text-capitalize'>{data?.reason} </td>
+                        <td className='text-capitalize'>
+                            {new Date(`1970-01-01T${data?.startTime}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+                        </td>
                         {/* <td>Doctor Demo</td> */}
                         {/* <td>Allergists</td> */}
-                        <td className='text-end'>DD/MM/YYYY</td>
-                        <td className='text-end'><span className='px-1 text-white bg-secondary rounded-2'>Confirm</span></td>
+                        <td className="text-end">
+                            {data?.date
+                                ? new Date(data?.date).toLocaleDateString("en-GB", {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                })
+                                : "N/A"}
+                        </td>
+                        <td className='text-end'><span className='px-1 text-white bg-success rounded-2'>{data?.status}</span></td>
                     </tr>
                 ))}
             </tbody>
@@ -66,7 +101,7 @@ const AppointmentsTransactionList = ({ patientsData }: OrderListProps): React$El
                     <th className='text-white'>Patient Name</th>
                     {/* <th className='text-white'>Doctor</th> */}
                     {/* <th className='text-white'>Doctor Department</th> */}
-                    <th className='text-white'>Appointment Date</th>                                                                          
+                    <th className='text-white'>Appointment Date</th>
                     <th className='text-white'>Payment Status</th>
                     <th className='text-white'>Payment Mode</th>
                     <th className='text-white'>Amount</th>

@@ -18,7 +18,7 @@ import logo from '../assets/images/logo.png';
 import helpBoxImage from '../assets/images/help-icon.svg';
 import profileImg from '../assets/images/users/avatar-1.jpg';
 import { useDispatch, useSelector } from 'react-redux';
-import { getPatientsAction } from '../redux/actions';
+import { getAllAppointmentsAction, getPatientsAction } from '../redux/actions';
 import { encryptMessage } from '../cryptoUtils';
 import { FormInput } from '../components';
 import Spinner from '../constants/Spinner';
@@ -58,13 +58,27 @@ type LeftSidebarProps = {
 
 const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSidebarProps): React$Element<any> => {
     const menuNodeRef: any = useRef(null);
+    const dispatch = useDispatch();
     const [search, setSearch] = useState('')
     const store = useSelector((state) => state)
     const navigate = useNavigate();
+    const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
-    /**
-     * Handle the click anywhere in doc
-     */
+    const patientsAppointment = store?.getAllAppointmentsReducer?.data?.appointments || [];
+    console.log(patientsAppointment, 'patientsAppointment')
+    const [activeTab, setActiveTab] = useState("Today"); // Default to "Today"
+
+    useEffect(() => {
+        const data = {
+            doctorId: doctorId,
+            clinicId: clinicId,
+            status: activeTab
+        }
+        dispatch(getAllAppointmentsAction({ key: encryptMessage(data) }));
+
+    }, [dispatch,activeTab]);
+
     const handleOtherClick = (e: any) => {
         if (menuNodeRef && menuNodeRef.current && menuNodeRef.current.contains(e.target)) return;
         // else hide the menubar
@@ -80,7 +94,6 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
             document.removeEventListener('mousedown', handleOtherClick, false);
         };
     }, []);
-    const [activeTab, setActiveTab] = useState("Today"); // Default to "Today"
 
     return (
         <>
@@ -176,39 +189,42 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                             <Spinner color='white' />
                         </div>
                         :
-                        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((data, index) => (
+                        patientsAppointment?.map((data, index) => (
                             <li
                                 key={index}
                                 className={`py-1 cursor-pointer patient-item px-1 d-flex justify-content-between`}
                                 style={{ borderBottom: '1px solid rgb(127 123 123 / 67%)' }}
-                                onClick={() => navigate(`/apps/patients/new-patient`)}
+                                onClick={() => navigate(`/apps/patients/new-patient?id=${data?.patient?._id}`)}
                             >
                                 <div className="d-flex gap-2 align-items-center">
                                     <img
                                         height='40'
                                         width='40'
-                                        src={profileDummy}
+                                        src={data?.patient?.patientChartPhoto?.url}
                                         // style={{ height: '5vh' }}
                                         className="rounded-circle border border-black"
                                         alt="profile image"
                                     />
                                     <div>
                                         <p className="mb-0 text-capitalize" style={{ fontSize: '12px' }}>
-                                            Glayn
+                                            {data?.patient?.firstName}
                                         </p>
-                                        <p className="mb-0 " style={{ fontSize: '10px' }}>Fever & Cold</p>
+                                        <p className="mb-0 " style={{ fontSize: '10px' }}>{data?.reason}</p>
                                     </div>
                                 </div>
                                 <div>
                                     <div>
-                                        <p className='mb-0' style={{ fontSize: '10px' }}><span>07/11</span><span className='ps-1 '>08:00AM</span></p>
+                                        <p className='mb-0' style={{ fontSize: '10px' }}><span>{new Date(data?.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })}</span>&nbsp;&nbsp;
+                                            <span>{new Date(`1970-01-01T${data?.startTime}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</span>
+                                        </p>
                                     </div>
                                     <div>
-                                        <p className='mb-0 text-end pt-1' style={{ fontSize: '10px' }}>First Time</p>
+                                        <p className='mb-0 text-end pt-1' style={{ fontSize: '10px' }}>{data?.profile}</p>
                                     </div>
 
                                 </div>
                             </li>
+
                         ))
                     }
                 </ul>

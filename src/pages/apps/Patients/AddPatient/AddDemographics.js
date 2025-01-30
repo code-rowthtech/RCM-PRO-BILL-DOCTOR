@@ -184,6 +184,7 @@ const AddDemographics = ({ patientId }) => {
             }
         };
         dispatch(updatePatientsAction({ key: encryptMessage(enrichedData) }))
+        console.log(enrichedData,'enrichedData')
     };
     useEffect(() => {
 
@@ -305,7 +306,7 @@ const AddDemographics = ({ patientId }) => {
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Sex<span className='text-danger'>*</span></Form.Label>
+                            <Form.Label className="mb-0">Sex</Form.Label>
                             <Form.Select
                                 {...register('sex', { required: "Sex is required" })} >
                                 <option value="">Select Sex</option>
@@ -318,7 +319,7 @@ const AddDemographics = ({ patientId }) => {
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Gender Identity<span className='text-danger'>*</span></Form.Label>
+                            <Form.Label className="mb-0">Gender Identity</Form.Label>
                             <Form.Select
                                 {...register('genderIdentity', { required: "Gender identity is required" })} >
                                 <option value="">Select Gender Identity</option>
@@ -340,7 +341,7 @@ const AddDemographics = ({ patientId }) => {
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Sexual Orientation<span className='text-danger'>*</span></Form.Label>
+                            <Form.Label className="mb-0">Sexual Orientation</Form.Label>
                             <Form.Select
                                 {...register('sexualOrientation', { required: "Sexual Orientation is required" })} >
                                 <option value="">Select Sexual Orientation</option>
@@ -356,7 +357,7 @@ const AddDemographics = ({ patientId }) => {
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Race<span className='text-danger'>*</span></Form.Label>
+                            <Form.Label className="mb-0">Race</Form.Label>
                             <Form.Select
                                 {...register('race', { required: "Race is required" })} >
                                 <option value="">Select Race</option>
@@ -893,7 +894,7 @@ const AddDemographics = ({ patientId }) => {
                     </Col>
                     <Col sm={3}>
                         <Form.Group className="mb-0 position-relative">
-                            <Form.Label className='mb-0'>Emergency Contact Phone <span className='text-danger'>*</span></Form.Label>
+                            <Form.Label className='mb-0'>Emergency Contact Phone </Form.Label>
                             <Form.Group>
                                 <InputGroup>
                                     <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '30px' }}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
@@ -974,7 +975,7 @@ const AddDemographics = ({ patientId }) => {
                                     </Col>
                                     <Col sm={6}>
                                         <Form.Group className="mb-0 position-relative">
-                                            <Form.Label className='mb-0'>Employer Phone <span className='text-danger'>*</span></Form.Label>
+                                            <Form.Label className='mb-0'>Employer Phone </Form.Label>
                                             <Form.Group>
                                                 <InputGroup>
                                                     <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '30px' }}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
