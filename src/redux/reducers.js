@@ -12,6 +12,7 @@ import { createPatientsReducer, getPatientsByIdReducer, getPatientsReducer, upda
 import { getSubscriptionsReducer } from './subscriptions/reducers';
 import { createHolidayScheduleReducer, getHolidayScheduleReducer } from './schedule/reducers';
 import { createVitalsReducer, getVitalsByPatientIdReducer, getVitalsReducer, updateVitalsReducer } from './vitals/reducers';
+import { createAppointmentsReducer, getAllAppointmentsReducer, getAppointmentsReducer } from './appointments/reducers';
 export default (combineReducers({
     Auth,
     Layout,
@@ -24,4 +25,5 @@ export default (combineReducers({
     getSubscriptionsReducer,
     createHolidayScheduleReducer,getHolidayScheduleReducer,
     createVitalsReducer,updateVitalsReducer,getVitalsReducer,getVitalsByPatientIdReducer,
+    createAppointmentsReducer,getAppointmentsReducer,getAllAppointmentsReducer,
 }): any);

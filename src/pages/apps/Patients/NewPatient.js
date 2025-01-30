@@ -153,14 +153,14 @@ const NewPatient = () => {
                                                 className="img-fluid rounded"
                                                 style={{ width: "126px", height: "129px", objectFit: "cover" }}
                                             />
-                                            <RiImageEditLine
+                                            {/* <RiImageEditLine
                                                 className="position-absolute fs-4 text-black"
                                                 style={{
                                                     bottom: "-5px",
                                                     right: "-9px",
                                                     cursor: "pointer"
                                                 }}
-                                            />
+                                            /> */}
                                         </div>
 
                                     </Col>
@@ -169,7 +169,7 @@ const NewPatient = () => {
                                         <Row className='pt-1'>
                                             <div className='d-flex gap-2 ps-1'>
                                                 <p style={{ borderRight: '1px solid black' }} className='pe-2 text-nowrap fs-6'>
-                                                    <span className='fw-bold text-capitalize' style={{ color: 'rgb(249, 139, 55)' }}>{patientsDataById?.firstName || 'N/A'} {patientsDataById?.middleName || ' '} {patientsDataById?.lastName || ' '}</span> <span className='fs-6 fw-bold'>Male</span>
+                                                    <span className='fw-bold text-capitalize' style={{ color: 'rgb(249, 139, 55)' }}>{patientsDataById?.firstName || 'N/A'} {patientsDataById?.lastName || ' '}</span> <span className='fs-6 fw-bold'>{patientsDataById?.sex || ' '}</span>
                                                 </p>
                                                 <p style={{ borderRight: '1px solid black' }} className='pe-2 text-nowrap fw-bold fs-6'>
                                                     <span>
@@ -200,7 +200,7 @@ const NewPatient = () => {
                                                                 <span><MdPhone className='fs-5 text-primary' /></span>
                                                             </div>
                                                             <div className='col-9'>
-                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>{patientsDataById?.cellPhone}</span>
+                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>{patientsDataById?.cellPhone || 'N/A    '}</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -210,7 +210,7 @@ const NewPatient = () => {
                                                                 <span ><MdOutlineMarkEmailUnread className='fs-5 text-primary' /></span>
                                                             </div>
                                                             <div className='col-9'>
-                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>{patientsDataById?.email}</span>
+                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>{patientsDataById?.email || 'N/A'}</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -349,7 +349,7 @@ const NewPatient = () => {
                                         </ul>
                                     </div>
                                     <div className=''>
-                                        <Button className="custom-buttons" onClick={() => navigate(-1)}>Back</Button>
+                                        <Button className="custom-buttons" as={Link} to={'/apps/patients/list'}>Back</Button>
                                     </div>
                                 </div>
 

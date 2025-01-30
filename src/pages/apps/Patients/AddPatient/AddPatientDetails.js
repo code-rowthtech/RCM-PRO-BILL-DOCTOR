@@ -21,6 +21,7 @@ const AddPatientDetails = () => {
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     const primaryProvider = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId
     const doctorName = JSON.parse(sessionStorage.getItem('hyper_user'))?.firstName
+
     // console.log(primaryProvider, 'primaryProvider')
 
     const handleFileChange = async (e) => {
@@ -33,6 +34,10 @@ const AddPatientDetails = () => {
         } catch (error) {
         }
     };
+
+    useEffect(() => {
+        setValue("primaryProvider", doctorName);
+    }, [doctorName, setValue]);
 
     const onSubmit = (data) => {
         const payload = {
@@ -77,116 +82,119 @@ const AddPatientDetails = () => {
 
     return (
         <div>
-            <Form onSubmit={handleSubmit(onSubmit)}>
+            <Form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
                 <Row>
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label htmlFor="firstName" className="mb-0">First Name <span className="text-danger">*</span></Form.Label>
-                            <Form.Control
-                                id="firstName"
-                                type="text"
-                                placeholder="First Name"
-                                {...register('firstName', { required: "First name is required" })}
-                            />
-                            {errors.firstName && <span className="text-danger">{errors.firstName.message}</span>}
-                        </Form.Group>
-                    </Col>
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label htmlFor="lastName" className="mb-0">Last Name <span className="text-danger">*</span></Form.Label>
-                            <Form.Control
-                                id="lastName"
-                                type="text"
-                                placeholder="Last Name"
-                                {...register('lastName', { required: 'Last Name is required' })}
-                            />
-                            {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
-                        </Form.Group>
-                    </Col>
-                    <Col sm={3}>
-                        <Form.Group className="mb-1 position-relative">
-                            <Form.Label className='mb-0'>Cell Phone <span className="text-danger">*</span></Form.Label>
+                    <Row className='w-100 px-0 mx-0'>
+                        <Col sm={3}>
                             <Form.Group>
-                                <InputGroup>
-                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '30px' }}>&nbsp;&nbsp;+1</InputGroup.Text>
-                                    <Form.Control
-                                        type="tel"
-                                        style={{ height: '30px!important' }}
-                                        {...register('cellPhone', {
-                                            pattern: {
-                                                value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                message: 'Contact must be in the format (XXX)XXX-XXXX',
-                                            },
-                                            maxLength: {
-                                                value: 13,
-                                                message: 'Contact must not exceed 13 digits'
-                                            },
-                                            minLength: {
-                                                value: 13,
-                                                message: 'Contact must not be less than 13 digits'
-                                            }
-                                        }
-                                        )}
-                                        onChange={(e) => {
-                                            let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
-                                            if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
-                                            const formattedValue = rawValue.replace(
-                                                /(\d{1,3})(\d{0,3})(\d{0,4})/,
-                                                (match, p1, p2, p3) => {
-                                                    if (p3) return `(${p1})${p2}-${p3}`;
-                                                    if (p2) return `(${p1})${p2}`;
-                                                    return `(${p1}`;
-                                                }
-                                            ); // Format dynamically as (XXX)XXX-XXXX
-                                            e.target.value = formattedValue; // Update input value
-                                            clearErrors('cellPhone'); // Clear validation errors
-                                        }}
-                                        placeholder="(XXX)XXX-XXXX"
-                                        maxLength={14}
-                                        onKeyPress={(event) => {
-                                            // Only allow numeric characters (0-9)
-                                            if (!/[0-9]/.test(event.key)) {
-                                                event.preventDefault();
-                                            }
-                                        }}
-                                    />
-                                </InputGroup>
+                                <Form.Label htmlFor="firstName" className="mb-0">First Name <span className="text-danger">*</span></Form.Label>
+                                <Form.Control
+                                    id="firstName"
+                                    type="text"
+                                    placeholder="First Name"
+                                    {...register('firstName', { required: "First name is required" })}
+                                />
+                                {errors.firstName && <span className="text-danger">{errors.firstName.message}</span>}
                             </Form.Group>
+                        </Col>
+                        <Col sm={3}>
+                            <Form.Group>
+                                <Form.Label htmlFor="lastName" className="mb-0">Last Name <span className="text-danger">*</span></Form.Label>
+                                <Form.Control
+                                    id="lastName"
+                                    type="text"
+                                    placeholder="Last Name"
+                                    {...register('lastName', { required: 'Last Name is required' })}
+                                />
+                                {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
+                            </Form.Group>
+                        </Col>
+                        <Col sm={3}>
+                            <Form.Group className="mb-1 position-relative">
+                                <Form.Label className='mb-0'>Cell Phone <span className="text-danger">*</span></Form.Label>
+                                <Form.Group>
+                                    <InputGroup>
+                                        <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '30px' }}>&nbsp;&nbsp;+1</InputGroup.Text>
+                                        <Form.Control
+                                            type="tel"
+                                            style={{ height: '30px!important' }}
+                                            {...register('cellPhone', {
+                                                pattern: {
+                                                    value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                    message: 'Contact must be in the format (XXX)XXX-XXXX',
+                                                },
+                                                maxLength: {
+                                                    value: 13,
+                                                    message: 'Contact must not exceed 13 digits'
+                                                },
+                                                minLength: {
+                                                    value: 13,
+                                                    message: 'Contact must not be less than 13 digits'
+                                                }
+                                            }
+                                            )}
+                                            onChange={(e) => {
+                                                let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
+                                                if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
+                                                const formattedValue = rawValue.replace(
+                                                    /(\d{1,3})(\d{0,3})(\d{0,4})/,
+                                                    (match, p1, p2, p3) => {
+                                                        if (p3) return `(${p1})${p2}-${p3}`;
+                                                        if (p2) return `(${p1})${p2}`;
+                                                        return `(${p1}`;
+                                                    }
+                                                ); // Format dynamically as (XXX)XXX-XXXX
+                                                e.target.value = formattedValue; // Update input value
+                                                clearErrors('cellPhone'); // Clear validation errors
+                                            }}
+                                            placeholder="(XXX)XXX-XXXX"
+                                            maxLength={14}
+                                            onKeyPress={(event) => {
+                                                // Only allow numeric characters (0-9)
+                                                if (!/[0-9]/.test(event.key)) {
+                                                    event.preventDefault();
+                                                }
+                                            }}
+                                        />
+                                    </InputGroup>
+                                </Form.Group>
 
-                            <div
-                                className='position-absolute ' style={{ top: '48%', left: '1%' }}
-                            >
-                                <img
-                                    src={us}
-                                    alt="country code flag"
-                                    width={20} />
-                            </div>
+                                <div
+                                    className='position-absolute ' style={{ top: '48%', left: '1%' }}
+                                >
+                                    <img
+                                        src={us}
+                                        alt="country code flag"
+                                        width={20} />
+                                </div>
 
 
-                        </Form.Group>
-                    </Col>
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Patient Date of Birth <span className="text-danger">*</span></Form.Label>
-                            <Form.Control
-                                type="date"
-                                {...register('dateOfBirth')}
-                            // onChange={(e) => {
-                            //     const calculatedAge = calculateAge(e.target.value);
-                            //     setAge(calculatedAge);
-                            // }}
-                            />
-                        </Form.Group>
-                    </Col>
+                            </Form.Group>
+                        </Col>
+                        <Col sm={3}>
+                            <Form.Group>
+                                <Form.Label className="mb-0">Date of Birth <span className="text-danger">*</span></Form.Label>
+                                <Form.Control
+                                    type="date"
+                                    {...register('dateOfBirth')}
+                                // onChange={(e) => {
+                                //     const calculatedAge = calculateAge(e.target.value);
+                                //     setAge(calculatedAge);
+                                // }}
+                                />
+                            </Form.Group>
+                        </Col>
+                    </Row>
+                    <hr className='my-2' />
                     <Col sm={3}>
                         <Form.Group className="mb-1" controlId="templateSelect">
                             <Form.Label className="mb-0">Primary Provider</Form.Label>
                             <Form.Control
                                 id="primaryProvider"
                                 type="text"
-                                placeholder={doctorName}
-                                disabled
-                                {...register('primaryProvider')}
+                                {...register("primaryProvider")}
+                                value={doctorName} // Ensures the value is displayed
+                                readOnly // Prevent user modification
                             />
                         </Form.Group>
                     </Col>

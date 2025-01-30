@@ -9,3 +9,4 @@ export * from './patients/actions';
 export * from './subscriptions/actions';
 export * from './schedule/actions';
 export * from './vitals/actions';
+export * from './appointments/actions';
