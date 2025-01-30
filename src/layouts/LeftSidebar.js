@@ -66,6 +66,8 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
     const patientsAppointment = store?.getAllAppointmentsReducer?.data?.appointments || [];
+    const updateSuccess = store?.updatePatientsReducer?.data?.status;
+
     console.log(patientsAppointment, 'patientsAppointment')
     const [activeTab, setActiveTab] = useState("Today"); // Default to "Today"
 
@@ -77,7 +79,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
         }
         dispatch(getAllAppointmentsAction({ key: encryptMessage(data) }));
 
-    }, [dispatch,activeTab]);
+    }, [dispatch,activeTab,updateSuccess]);
 
     const handleOtherClick = (e: any) => {
         if (menuNodeRef && menuNodeRef.current && menuNodeRef.current.contains(e.target)) return;
@@ -184,9 +186,9 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                         </li>
                     )}
 
-                    {store?.getPatientsReducer?.loading ?
-                        <div className='text-center my-5'>
-                            <Spinner color='white' />
+                    {store?.getAllAppointmentsReducer?.loading ?
+                        <div className='text-center mt-3 '>
+                            <Spinner color='white'  />
                         </div>
                         :
                         patientsAppointment?.map((data, index) => (

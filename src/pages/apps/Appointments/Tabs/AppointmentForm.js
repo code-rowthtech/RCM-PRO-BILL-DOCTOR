@@ -201,7 +201,8 @@ const AppointmentForm = () => {
 
         }
         dispatch(createAppointmentsAction({ key: encryptMessage(payload) }))
-        console.log({ payload })
+        // console.log({ payload })
+        reset();
     }
 
 
