@@ -12,6 +12,7 @@ import { FiFileText, FiFilter } from 'react-icons/fi';
 import { getAppointmentsAction } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { encryptMessage } from '../../../cryptoUtils';
+import Spinner from '../../../constants/Spinner';
 
 // Define the types for each order item
 type OrderListItems = {
@@ -59,34 +60,42 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
                     <th className='text-white'>Start Time</th>
                     {/* <th className='text-white'>Doctor</th> */}
                     {/* <th className='text-white'>Doctor Department</th> */}
-                    <th className='text-white text-end' style={{ paddingRight: '70px' }}>Date</th>
-                    <th className='text-white text-end pe-3 '>Status</th>
+                    <th className='text-white ' style={{ paddingRight: '70px' }}>Date</th>
+                    <th className='text-white '>Status</th>
                 </tr>
             </thead>
-            <tbody>
-                {patientsAppointment?.map((data, index) => (
-                    <tr key={index}>
-                        <td>{index + 1}</td>
-                        <td className='text-capitalize'>{data?.patient?.firstName} {data?.patient?.lastName}</td>
-                        <td className='text-capitalize'>{data?.reason} </td>
-                        <td className='text-capitalize'>
-                            {new Date(`1970-01-01T${data?.startTime}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
-                        </td>
-                        {/* <td>Doctor Demo</td> */}
-                        {/* <td>Allergists</td> */}
-                        <td className="text-end">
-                            {data?.date
-                                ? new Date(data?.date).toLocaleDateString("en-GB", {
-                                    day: "2-digit",
-                                    month: "2-digit",
-                                    year: "numeric",
-                                })
-                                : "N/A"}
-                        </td>
-                        <td className='text-end'><span className='px-1 text-white bg-success rounded-2'>{data?.status}</span></td>
-                    </tr>
-                ))}
-            </tbody>
+            {store?.getAppointmentsReducer?.loading ? (
+                <tr>
+                    <td className='text-center' colSpan={6}>
+                        <Spinner className=" my-5 " />
+                    </td>
+                </tr>
+            ) : (
+                <tbody>
+                    {patientsAppointment?.map((data, index) => (
+                        <tr key={index}>
+                            <td>{index + 1}</td>
+                            <td className='text-capitalize'>{data?.patient?.firstName} {data?.patient?.lastName}</td>
+                            <td className='text-capitalize'>{data?.reason} </td>
+                            <td className='text-capitalize'>
+                                {new Date(`1970-01-01T${data?.startTime}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+                            </td>
+                            {/* <td>Doctor Demo</td> */}
+                            {/* <td>Allergists</td> */}
+                            <td className="">
+                                {data?.date
+                                    ? new Date(data?.date).toLocaleDateString("en-GB", {
+                                        day: "2-digit",
+                                        month: "2-digit",
+                                        year: "numeric",
+                                    })
+                                    : "N/A"}
+                            </td>
+                            <td className=''><span className='px-1 text-white bg-success rounded-2'>{data?.status}</span></td>
+                        </tr>
+                    ))}
+                </tbody>
+            )}
         </Table>
     );
 };

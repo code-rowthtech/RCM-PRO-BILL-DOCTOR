@@ -25,9 +25,9 @@ const NewAppointment = () => {
         setActiveTab(tab);
     };
 
-    // const handleAppointment = () => {
-    //     navigate("/apps/appointments/list");
-    // };
+    const handleBack = () => {
+        navigate("/apps/appointments/list");
+    };
 
     return (
         <div>
@@ -52,7 +52,7 @@ const NewAppointment = () => {
                         <Button
                             className='custom-buttons'
                             style={{ height: '30px' }}
-                            // onClick={handleAppointment}
+                            onClick={handleBack}
                         >
                             Back
                         </Button>
