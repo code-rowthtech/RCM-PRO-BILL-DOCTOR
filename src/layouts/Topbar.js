@@ -162,7 +162,7 @@ console.log(location.pathname)
                                 <img src={logo} alt="logo" height="16" />
                             </span>
                             <span className="topnav-logo-sm">
-                                <img src={topbarDark ? logoSmLight : logoSmDark} alt="logo" height="16" />
+                                {/* <img src={topbarDark ? logoSmLight : logoSmDark} alt="logo" height="16" /> */}
                             </span>
                         </Link>
                     )}

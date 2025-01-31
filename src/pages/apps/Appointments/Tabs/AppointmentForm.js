@@ -23,7 +23,8 @@ import AddPatientDetails from '../../Patients/AddPatient/AddPatientDetails';
 
 
 
-const AppointmentForm = () => {
+const AppointmentForm = ({ Id }) => {
+
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
@@ -82,6 +83,7 @@ const AppointmentForm = () => {
         }
     };
 
+
     const handlePlusIconClick = () => {
         setShowModal(true);
     }
@@ -89,6 +91,10 @@ const AppointmentForm = () => {
     const handleCloseModal = () => {
         setShowModal(false);
     };
+
+    useEffect(() => {
+        setSelectedOption(Id)
+    }, [Id]);
 
     useEffect(() => {
         if (age) {
@@ -148,7 +154,6 @@ const AppointmentForm = () => {
     }, [dispatch, skip, search]);
 
     const patientsData = store?.getPatientsReducer?.data?.patients || [];
-    console.log('patientsData', patientsData)
 
     useEffect(() => {
         if (createResponse === 201) {
@@ -183,13 +188,13 @@ const AppointmentForm = () => {
 
 
     const onSubmit = (data) => {
-
+        console.log("i am owke dk")
         const payload = {
-            patient: data?.patient,
+            patient: Id ? Id : data?.patient,
             clinic: clinicId,
             doctor: doctorId,
             startTime: data?.startTime,
-            endTime: addDurationToTime(data?.startTime, data?.duration),
+            // endTime: addDurationToTime(data?.startTime, data?.duration),
             office: data?.office,
             date: data?.scheduled,
             duration: data?.duration,
@@ -201,11 +206,9 @@ const AppointmentForm = () => {
 
         }
         dispatch(createAppointmentsAction({ key: encryptMessage(payload) }))
-        // console.log({ payload })
+        console.log({ payload })
         reset();
     }
-
-
 
 
     return (
@@ -214,29 +217,42 @@ const AppointmentForm = () => {
             <Form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
                 <Row>
                     <Col sm={6}>
-                        <Form.Group className="mb-1" controlId="patient">
-                            <Form.Label className="mb-0">Patient<span className="text-danger">*</span></Form.Label>
+                        {/* {!Id && ( */}
+                        <Form.Group className="mb-1" >
+                            <Form.Label className="mb-0">
+                                Patient <span className="text-danger">*</span>
+                            </Form.Label>
                             <InputGroup>
-                                <Form.Control   {...register("patient", { required: "Patient is required" })} as="select" value={selectedOption} onChange={handleSelectChange}>
+                                <Form.Control
+                                    {...register("patient", { required: !Id && "Patient is required" })}
+                                    as="select"
+                                    value={selectedOption}
+                                    onChange={handleSelectChange}
+                                    disabled={Id}
+                                >
                                     <option value="" hidden>Select Patient</option>
-                                    {/* {/ <option value="new-patient">Add New Patient</option > /} */}
                                     {patientsData?.map((patient) => (
                                         <option key={patient?._id} value={patient?._id}>
                                             {patient?.firstName} {patient?.lastName}
                                         </option>
                                     ))}
                                 </Form.Control>
-                                <InputGroup.Text
-                                    onClick={handlePlusIconClick}
-                                    style={{ cursor: "pointer" }}
-                                >
-                                    <FaPlus className='text-primary' />
-                                </InputGroup.Text>
+
+                                {/* Show the plus icon only if there's no Id */}
+                                {!Id && (
+                                    <InputGroup.Text
+                                        onClick={handlePlusIconClick}
+                                        style={{ cursor: "pointer" }}
+                                    >
+                                        <FaPlus className="text-primary" />
+                                    </InputGroup.Text>
+                                )}
                             </InputGroup>
                         </Form.Group>
+
                     </Col>
                     <Col sm={6}>
-                        <Form.Group className="mb-1" controlId="doctor">
+                        <Form.Group className="mb-1">
                             <Form.Label className="mb-0">Doctor<span className="text-danger">*</span></Form.Label>
                             <Form.Control
                                 id="doctor"
@@ -248,7 +264,7 @@ const AppointmentForm = () => {
                         </Form.Group>
                     </Col>
                     <Col sm={6}>
-                        <Form.Group className="mb-1" controlId="office">
+                        <Form.Group className="mb-1" >
                             <Form.Label className="mb-0">Office</Form.Label>
                             <Form.Control as="select" {...register("office",
                                 // { required: "Office is required" }
@@ -262,7 +278,7 @@ const AppointmentForm = () => {
                         </Form.Group>
                     </Col>
                     <Col sm={6}>
-                        <Form.Group className="mb-1" controlId="reason">
+                        <Form.Group className="mb-1">
                             <Form.Label className="mb-0">Reason</Form.Label>
                             <Form.Control
                                 type="text"
@@ -273,7 +289,7 @@ const AppointmentForm = () => {
                         </Form.Group>
                     </Col>
                     <Col sm={6} className="d-flex gap-2">
-                        <Form.Group className="mb-1" style={{ width: "150px" }} controlId="scheduled">
+                        <Form.Group className="mb-1" style={{ width: "150px" }}>
                             <Form.Label className="mb-0">Scheduled<span className="text-danger">*</span></Form.Label>
                             <Form.Control
                                 type="date"
@@ -282,7 +298,7 @@ const AppointmentForm = () => {
                                 )}
                             />
                         </Form.Group>
-                        <Form.Group className="mb-1" style={{ width: "100px" }} controlId="starttime">
+                        <Form.Group className="mb-1" style={{ width: "100px" }} >
                             <Form.Label className="mb-0">Start Time<span className="text-danger">*</span></Form.Label>
                             <Form.Control
                                 type="time"
@@ -293,7 +309,7 @@ const AppointmentForm = () => {
                         </Form.Group>
 
                         <div className="d-flex">
-                            <Form.Group className="mb-1" style={{ width: "100px" }} controlId="duration">
+                            <Form.Group className="mb-1" style={{ width: "100px" }} >
                                 <Form.Label className="mb-0">Duration</Form.Label>
                                 <Form.Control
                                     type="number"
@@ -306,7 +322,7 @@ const AppointmentForm = () => {
                         </div>
                     </Col>
                     <Col sm={6}>
-                        <Form.Group className="mb-1" controlId="profile">
+                        <Form.Group className="mb-1" >
                             <Form.Label className="mb-0">Profile</Form.Label>
                             <Form.Control as="select" {...register("profile",
                                 // { required: "Profile is required" }
@@ -318,7 +334,7 @@ const AppointmentForm = () => {
                         </Form.Group>
                     </Col>
                     <Col sm={6}>
-                        <Form.Group className="mb-1" controlId="consultationRoom">
+                        <Form.Group className="mb-1" >
                             <Form.Label className="mb-0">Consultation Room</Form.Label>
                             <Form.Control
                                 as="select"
@@ -338,7 +354,7 @@ const AppointmentForm = () => {
                         </Form.Group>
                     </Col>
                     <Col sm={6}>
-                        <Form.Group className="mb-1" controlId="consentForms">
+                        <Form.Group className="mb-1" >
                             <Form.Label className="mb-0">Consent Forms</Form.Label>
                             <Form.Control
                                 as="select"
@@ -353,12 +369,12 @@ const AppointmentForm = () => {
                                 <option value="4">4</option>
                             </Form.Control>
                             {/* {errors.consentForms && (
-              <p className="text-danger">{errors.consentForms.message}</p>
-            )} */}
+                                <p className="text-danger">{errors.consentForms.message}</p>
+                                  )} */}
                         </Form.Group>
                     </Col>
                     <Col sm={6}>
-                        <Form.Group className="mb-1" controlId="consentForms">
+                        <Form.Group className="mb-1" >
                             <Form.Label className="mb-0">Status</Form.Label>
                             <Form.Control
                                 as="select"
@@ -381,9 +397,7 @@ const AppointmentForm = () => {
                                 <option value="Notconfirmed">Not Confirmed</option>
                                 <option value="Cancelled">Cancelled</option>
                             </Form.Control>
-                            {/* {errors.consentForms && (
-              <p className="text-danger">{errors.consentForms.message}</p>
-            )} */}
+
                         </Form.Group>
                     </Col>
                 </Row>
@@ -395,7 +409,7 @@ const AppointmentForm = () => {
                             Delete
                         </Button>
                         <Button
-                            type="submit"
+                            // type="submit"
                             className="custom-buttons"
                         >
                             Save and close

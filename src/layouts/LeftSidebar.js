@@ -79,7 +79,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
         }
         dispatch(getAllAppointmentsAction({ key: encryptMessage(data) }));
 
-    }, [dispatch,activeTab,updateSuccess]);
+    }, [dispatch, activeTab, updateSuccess]);
 
     const handleOtherClick = (e: any) => {
         if (menuNodeRef && menuNodeRef.current && menuNodeRef.current.contains(e.target)) return;
@@ -186,11 +186,17 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                         </li>
                     )}
 
-                    {store?.getAllAppointmentsReducer?.loading ?
+                    {store?.getAllAppointmentsReducer?.loading ? (
                         <div className='text-center mt-3 '>
-                            <Spinner color='white'  />
+                            <Spinner color='white' />
                         </div>
-                        :
+                    ) : patientsAppointment?.length === 0 ? (
+                        <>
+                            <div  className='text-center'>
+                                <p className='mt-3 fs-6 text-primary'>No scheduled appointments.</p>
+                            </div>
+                        </>
+                    ) : (
                         patientsAppointment?.map((data, index) => (
                             <li
                                 key={index}
@@ -202,8 +208,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                     <img
                                         height='40'
                                         width='40'
-                                        src={data?.patient?.patientChartPhoto?.url}
-                                        // style={{ height: '5vh' }}
+                                        src={data?.patient?.patientChartPhoto?.url || profileDummy}
                                         className="rounded-circle border border-black"
                                         alt="profile image"
                                     />
@@ -216,19 +221,19 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                 </div>
                                 <div>
                                     <div>
-                                        <p className='mb-0' style={{ fontSize: '10px' }}><span>{new Date(data?.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })}</span>&nbsp;&nbsp;
+                                        <p className='mb-0' style={{ fontSize: '10px' }}>
+                                            <span>{new Date(data?.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })}</span>&nbsp;&nbsp;
                                             <span>{new Date(`1970-01-01T${data?.startTime}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</span>
                                         </p>
                                     </div>
                                     <div>
                                         <p className='mb-0 text-end pt-1' style={{ fontSize: '10px' }}>{data?.profile}</p>
                                     </div>
-
                                 </div>
                             </li>
-
                         ))
-                    }
+                    )}
+
                 </ul>
 
             </div>

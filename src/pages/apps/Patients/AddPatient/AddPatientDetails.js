@@ -11,18 +11,40 @@ import us from '../../../../assets/images/flags/us.jpg'
 const AddPatientDetails = () => {
 
     const dispatch = useDispatch();
-    const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors } = useForm();
+    const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors, watch, getValues } = useForm();
     const [logo, setLogo] = useState(null);
-    console.log(logo)
     const [logoName, setLogoName] = useState('');
     const logoFileInputRef = useRef(null);
     const [profileUploading, setProfileUploading] = useState(false);
 
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
-    const primaryProvider = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId
-    const doctorName = JSON.parse(sessionStorage.getItem('hyper_user'))?.firstName
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const primaryProvider = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
+    const doctorName = JSON.parse(sessionStorage.getItem('hyper_user'))?.firstName;
 
-    // console.log(primaryProvider, 'primaryProvider')
+    // Function to calculate approximate age from date of birth
+    const calculateApproxAge = (dob) => {
+        if (!dob) return "";
+        const birthDate = new Date(dob);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+
+        // Adjust age if birthday hasn't occurred yet this year
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
+    };
+
+    // Watch for dateOfBirth changes
+    const dateOfBirth = watch("dateOfBirth");
+
+    useEffect(() => {
+        if (dateOfBirth) {
+            const approxAge = calculateApproxAge(dateOfBirth);
+            setValue("approxAge", approxAge);  // Dynamically update approxAge
+        }
+    }, [dateOfBirth, setValue]);
 
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];
@@ -30,8 +52,9 @@ const AddPatientDetails = () => {
             const url = await handleUpload(selectedFile, setProfileUploading);
             setLogo(url);
             setLogoName(selectedFile?.name);
-            clearErrors('profileImage')
+            clearErrors('profileImage');
         } catch (error) {
+            console.error("File upload failed", error);
         }
     };
 
@@ -40,17 +63,22 @@ const AddPatientDetails = () => {
     }, [doctorName, setValue]);
 
     const onSubmit = (data) => {
+
+        const updatedData = { ...data, approxAge: calculateApproxAge(data.dateOfBirth) };
+
+
         const payload = {
             clinicId: clinicId,
             doctorId: primaryProvider,
-            ...(data?.patientStatus ? { status: data?.patientStatus } : {}),
-            ...(data?.title ? { title: data?.title } : {}),
-            ...(data?.firstName ? { firstName: data?.firstName } : {}),
-            ...(data?.middleName ? { middleName: data?.middleName } : {}),
-            ...(data?.lastName ? { lastName: data?.lastName } : {}),
-            ...(data?.birthName ? { birthName: data?.birthName } : {}),
-            ...(data?.dateOfBirth ? { dateOfBirth: data?.dateOfBirth } : {}),
-            ...(data?.suffix ? { suffix: data?.suffix } : {}),
+            ...(updatedData?.patientStatus ? { status: updatedData?.patientStatus } : {}),
+            ...(updatedData?.title ? { title: updatedData?.title } : {}),
+            ...(updatedData?.firstName ? { firstName: updatedData?.firstName } : {}),
+            ...(updatedData?.middleName ? { middleName: updatedData?.middleName } : {}),
+            ...(updatedData?.lastName ? { lastName: updatedData?.lastName } : {}),
+            ...(updatedData?.birthName ? { birthName: updatedData?.birthName } : {}),
+            ...(updatedData?.dateOfBirth ? { dateOfBirth: updatedData?.dateOfBirth } : {}),
+            ...(updatedData?.approxAge ? { approxAge: updatedData?.approxAge } : {}),  // Ensure approxAge is included
+            ...(updatedData?.suffix ? { suffix: updatedData?.suffix } : {}),
             ...(logo?.url === null
                 ? {}
                 : {
@@ -59,26 +87,27 @@ const AddPatientDetails = () => {
                         fileName: logoName
                     }
                 }),
-            ...(data?.homePhone ? { homePhone: data?.homePhone?.replace(/\D/g, '') } : {}),
-            ...(data?.cellPhone ? { cellPhone: data?.cellPhone?.replace(/\D/g, '') } : {}),
-            ...(data?.officePhone ? { officePhone: data?.officePhone?.replace(/\D/g, '') } : {}),
-            ...(data?.email ? { email: data?.email } : {}),
-            ...(data?.alternateEmail ? { alternativeEmail: data?.alternateEmail } : {}),
-            ...(data?.preferredCommunication ? { preferredCommunication: data?.preferredCommunication } : {}),
-            ...(data?.reminderLanguage ? { reminderLanguage: data?.reminderLanguage } : {}),
-            ...(data?.medicationHistoryConsent ? { medicationHistoryConsent: data?.medicationHistoryConsent === 'true' ? true : false } : {}),
-            ...(data?.paymentProfile ? { paymentProfile: data?.paymentProfile } : {}),
-            ...(data?.patientCopayAmount ? { patientCopayAmount: data?.patientCopayAmount } : {}),
-            ...(data?.followupDate ? { followupDate: data?.followupDate } : {}),
-            ...(data?.followupReason ? { followupReason: data?.followupReason } : {}),
-        }
+            ...(updatedData?.homePhone ? { homePhone: updatedData?.homePhone?.replace(/\D/g, '') } : {}),
+            ...(updatedData?.cellPhone ? { cellPhone: updatedData?.cellPhone?.replace(/\D/g, '') } : {}),
+            ...(updatedData?.officePhone ? { officePhone: updatedData?.officePhone?.replace(/\D/g, '') } : {}),
+            ...(updatedData?.email ? { email: updatedData?.email } : {}),
+            ...(updatedData?.alternateEmail ? { alternativeEmail: updatedData?.alternateEmail } : {}),
+            ...(updatedData?.preferredCommunication ? { preferredCommunication: updatedData?.preferredCommunication } : {}),
+            ...(updatedData?.reminderLanguage ? { reminderLanguage: updatedData?.reminderLanguage } : {}),
+            ...(updatedData?.medicationHistoryConsent ? { medicationHistoryConsent: updatedData?.medicationHistoryConsent === 'true' } : {}),
+            ...(updatedData?.paymentProfile ? { paymentProfile: updatedData?.paymentProfile } : {}),
+            ...(updatedData?.patientCopayAmount ? { patientCopayAmount: updatedData?.patientCopayAmount } : {}),
+            ...(updatedData?.followupDate ? { followupDate: updatedData?.followupDate } : {}),
+            ...(updatedData?.followupReason ? { followupReason: updatedData?.followupReason } : {}),
+        };
 
-        dispatch(createPatientsAction({ key: encryptMessage(payload) }))
+        dispatch(createPatientsAction({ key: encryptMessage(payload) }));
         reset();
         setLogoName(null);
         setLogo(null);
-        console.log(payload, 'payloadpayloadpayload')
+        console.log(payload, 'Final Payload with approxAge');
     };
+
 
     return (
         <div>
@@ -90,6 +119,7 @@ const AddPatientDetails = () => {
                                 <Form.Label htmlFor="firstName" className="mb-0">First Name <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
                                     id="firstName"
+                                    data-has-value={!!watch('firstName')}
                                     type="text"
                                     placeholder="First Name"
                                     {...register('firstName', { required: "First name is required" })}
@@ -101,6 +131,7 @@ const AddPatientDetails = () => {
                             <Form.Group>
                                 <Form.Label htmlFor="lastName" className="mb-0">Last Name <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
+                                    data-has-value={!!watch('lastName')}
                                     id="lastName"
                                     type="text"
                                     placeholder="Last Name"
@@ -116,6 +147,7 @@ const AddPatientDetails = () => {
                                     <InputGroup>
                                         <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '30px' }}>&nbsp;&nbsp;+1</InputGroup.Text>
                                         <Form.Control
+                                            data-has-value={!!watch('cellPhone')}
                                             type="tel"
                                             style={{ height: '30px!important' }}
                                             {...register('cellPhone', {
@@ -173,16 +205,17 @@ const AddPatientDetails = () => {
                         </Col>
                         <Col sm={3}>
                             <Form.Group>
-                                <Form.Label className="mb-0">Date of Birth <span className="text-danger">*</span></Form.Label>
+                                <Form.Label className="mb-0">
+                                    Date of Birth <span className="text-danger">*</span>
+                                </Form.Label>
                                 <Form.Control
                                     type="date"
+                                    data-has-value={!!watch('dateOfBirth')}
                                     {...register('dateOfBirth')}
-                                // onChange={(e) => {
-                                //     const calculatedAge = calculateAge(e.target.value);
-                                //     setAge(calculatedAge);
-                                // }}
+                                    max={new Date().toISOString().split("T")[0]}  // Set max date to today's date
                                 />
                             </Form.Group>
+
                         </Col>
                     </Row>
                     <hr className='my-2' />
@@ -190,6 +223,7 @@ const AddPatientDetails = () => {
                         <Form.Group className="mb-1" controlId="templateSelect">
                             <Form.Label className="mb-0">Primary Provider</Form.Label>
                             <Form.Control
+                                data-has-value={!!watch('primaryProvider')}
                                 id="primaryProvider"
                                 type="text"
                                 {...register("primaryProvider")}
@@ -202,8 +236,8 @@ const AddPatientDetails = () => {
                         <Form.Group>
                             <Form.Label htmlFor="title" className="mb-0">Title</Form.Label>
                             <Form.Select
+                                data-has-value={!!watch('title')}
                                 {...register('title')}
-                                aria-label="Select Title"
                             >
                                 <option hidden value=''>Select Title</option>
                                 <option value="Mr.">Mr.</option>
@@ -218,6 +252,7 @@ const AddPatientDetails = () => {
                         <Form.Group>
                             <Form.Label htmlFor="middleName" className="mb-0">Middle Name</Form.Label>
                             <Form.Control
+                                data-has-value={!!watch('middleName')}
                                 id="middleName"
                                 type="text"
                                 placeholder="Middle Name"
@@ -230,8 +265,7 @@ const AddPatientDetails = () => {
                         <Form.Group>
                             <Form.Label htmlFor="patientstatus" className="mb-0">Status</Form.Label>
                             <Form.Select
-                                as="select"  // Use 'select' to make it a dropdown
-                                id="patientstatus"
+                                data-has-value={!!watch('patientStatus')}
                                 {...register('patientStatus')}
                             >
                                 <option hidden value=''>Select status</option>  {/* Default option */}
@@ -246,6 +280,7 @@ const AddPatientDetails = () => {
                         <Form.Group>
                             <Form.Label className="mb-0">Previous Birth Name </Form.Label>
                             <Form.Control
+                                data-has-value={!!watch('birthName')}
                                 type="text"
                                 placeholder="Previous Birth Name"
                                 {...register('birthName')}
@@ -258,6 +293,7 @@ const AddPatientDetails = () => {
                             <Form.Label className="mb-0">Suffix </Form.Label>
                             <Form.Control
                                 type="text"
+                                data-has-value={!!watch('suffix')}
                                 placeholder="Suffix"
                                 {...register('suffix')}
                             />
@@ -279,6 +315,7 @@ const AddPatientDetails = () => {
                             </div>
                             <Form.Control
                                 type="file"
+                                data-has-value={!!watch('profileImage')}
                                 className="d-none "
                                 style={{ height: '30px!important' }}
                                 {...register('profileImage', {
@@ -300,6 +337,7 @@ const AddPatientDetails = () => {
                                     <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '30px' }}>&nbsp;&nbsp;+1</InputGroup.Text>
                                     <Form.Control
                                         type="tel"
+                                        data-has-value={!!watch('homePhone')}
                                         style={{ height: '30px!important' }}
                                         {...register('homePhone', {
                                             pattern: {
@@ -357,6 +395,7 @@ const AddPatientDetails = () => {
                                     <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '30px' }}>&nbsp;&nbsp;+1</InputGroup.Text>
                                     <Form.Control
                                         type="tel"
+                                        data-has-value={!!watch('officePhone')}
                                         style={{ height: '30px!important' }}
                                         {...register('officePhone', {
                                             pattern: {
@@ -415,6 +454,7 @@ const AddPatientDetails = () => {
                         <Form.Group>
                             <Form.Label className="mb-0">Preferred Communication</Form.Label>
                             <Form.Select
+                                data-has-value={!!watch('preferredCommunication')}
                                 {...register('preferredCommunication')}
                                 aria-label="Select Title"
                             >
@@ -435,6 +475,7 @@ const AddPatientDetails = () => {
                         <Form.Group>
                             <Form.Label className="mb-0">Reminder Language</Form.Label>
                             <Form.Select
+                                data-has-value={!!watch('reminderLanguage')}
                                 {...register('reminderLanguage',
                                 )}
                             >
@@ -449,6 +490,7 @@ const AddPatientDetails = () => {
                         <Form.Group>
                             <Form.Label htmlFor="email" className="mb-0">Email ID</Form.Label>
                             <Form.Control
+                                data-has-value={!!watch('email')}
                                 type="email"
                                 placeholder="Email ID"
                                 {...register('email', { pattern: { value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/, message: "Invalid email address" } })}
@@ -459,6 +501,7 @@ const AddPatientDetails = () => {
                         <Form.Group>
                             <Form.Label className="mb-0">Medication History Concent</Form.Label>
                             <Form.Select
+                                data-has-value={!!watch('medicationHistoryConsent')}
                                 {...register('medicationHistoryConsent',
                                 )}
                             >
@@ -472,6 +515,7 @@ const AddPatientDetails = () => {
                         <Form.Group>
                             <Form.Label className="mb-0">Alternate Email</Form.Label>
                             <Form.Control
+                                data-has-value={!!watch('alternateEmail')}
                                 type="email"
                                 placeholder="Alternate Email ID"
                                 {...register('alternateEmail', {
@@ -484,6 +528,7 @@ const AddPatientDetails = () => {
                         <Form.Group>
                             <Form.Label className="mb-0">Payment Profile</Form.Label>
                             <Form.Select
+                                data-has-value={!!watch('paymentProfile')}
                                 {...register('paymentProfile')}
                                 aria-label="Payment Profile"
                             >
@@ -510,22 +555,27 @@ const AddPatientDetails = () => {
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Patient's Copay (in $)</Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="Patient's Copay"
-                                {...register('patientCopayAmount', {
-                                    pattern: {
-                                        value: /^[0-9]+(\.[0-9]+)?$/,
-                                        message: 'Only numbers or decimals are allowed'
-                                    }
-                                })}
-                            />
+                            <InputGroup>
+                                <InputGroup.Text style={{ backgroundColor: '#e5f4ff', color: 'black' }}>$</InputGroup.Text> {/* Static Dollar Sign */}
+                                <Form.Control
+                                    data-has-value={!!watch('patientCopayAmount')}
+                                    type="text"
+                                    placeholder="Patient's Copay"
+                                    {...register("patientCopayAmount", {
+                                        pattern: {
+                                            value: /^[0-9]+(\.[0-9]+)?$/,
+                                            message: "Only numbers or decimals are allowed",
+                                        },
+                                    })}
+                                />
+                            </InputGroup>
                         </Form.Group>
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label htmlFor="DOB" className="mb-0">Follow Up Date</Form.Label>
                             <Form.Control
+                                data-has-value={!!watch('followupDate')}
                                 type="date"  // Change type to "date" for date input
                                 placeholder="Follow Up Date"
                                 {...register('followupDate')}
@@ -538,6 +588,7 @@ const AddPatientDetails = () => {
                             <Form.Label className="mb-0">Follow Up Reason</Form.Label>
                             <Form.Control
                                 type="text"
+                                data-has-value={!!watch('followupReason')}
                                 placeholder="Follow Up Reason"
                                 {...register('followupReason')}
                             />

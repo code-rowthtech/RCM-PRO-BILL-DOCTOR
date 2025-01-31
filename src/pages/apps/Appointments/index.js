@@ -72,7 +72,14 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
                 </tr>
             ) : (
                 <tbody>
-                    {patientsAppointment?.map((data, index) => (
+                {patientsAppointment?.length === 0 ? (
+                    <tr>
+                        <td colSpan={6} className='text-center'>
+                            <h3 className='my-5 py-5'>No scheduled appointments.</h3>
+                        </td>
+                    </tr>
+                ) : (
+                    patientsAppointment?.map((data, index) => (
                         <tr key={index}>
                             <td>{index + 1}</td>
                             <td className='text-capitalize'>{data?.patient?.firstName} {data?.patient?.lastName}</td>
@@ -80,9 +87,7 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
                             <td className='text-capitalize'>
                                 {new Date(`1970-01-01T${data?.startTime}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
                             </td>
-                            {/* <td>Doctor Demo</td> */}
-                            {/* <td>Allergists</td> */}
-                            <td className="">
+                            <td>
                                 {data?.date
                                     ? new Date(data?.date).toLocaleDateString("en-GB", {
                                         day: "2-digit",
@@ -91,10 +96,12 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
                                     })
                                     : "N/A"}
                             </td>
-                            <td className=''><span className='px-1 text-white bg-success rounded-2'>{data?.status}</span></td>
+                            <td><span className='px-1 text-white bg-success rounded-2'>{data?.status}</span></td>
                         </tr>
-                    ))}
-                </tbody>
+                    ))
+                )}
+            </tbody>
+            
             )}
         </Table>
     );
