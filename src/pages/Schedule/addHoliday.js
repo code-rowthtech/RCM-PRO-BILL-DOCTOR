@@ -50,7 +50,7 @@ const AddHoliday = () => {
                     <div className="d-flex justify-content-between">
                         <p style={{ fontWeight: 600 }}>ADD HOLIDAY</p>
                         <div>
-                            <Button variant="secondary" onClick={() => navigate(-1)}>Back</Button>
+                            <Button className="custom-buttons fs-6" onClick={() => navigate(-1)}>Back</Button>
                         </div>
                     </div>
 
@@ -125,10 +125,10 @@ const AddHoliday = () => {
                             </div>
 
                             <div className="d-flex gap-2 justify-content-end mb-2">
-                                <Button variant="secondary" type="button">
+                                <Button className="custom-buttons fs-6" type="button">
                                     Cancel
                                 </Button>
-                                <Button variant="primary" disabled={store?.createHolidayScheduleReducer?.loading} type="submit">
+                                <Button className="custom-buttons fs-6" disabled={store?.createHolidayScheduleReducer?.loading} type="submit">
                                     {
                                         store?.createHolidayScheduleReducer?.loading ?
                                             <Spinner color="white" className="spinner-border-sm" />

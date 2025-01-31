@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Card, Col, Row } from 'react-bootstrap';
+import { Button, Card, Col, Modal, Row } from 'react-bootstrap';
 import { HiOutlinePrinter } from "react-icons/hi2";
 import { LiaReceiptSolid } from 'react-icons/lia';
 import { TbHeartRateMonitor } from 'react-icons/tb';
@@ -17,6 +17,8 @@ import { getPatientsByIdAction, resetUpdateAction } from '../../../redux/actions
 import { encryptMessage } from '../../../cryptoUtils';
 import { useDispatch, useSelector } from 'react-redux';
 import { RiImageEditLine } from "react-icons/ri";
+import NewAppointment from '../Appointments/NewAppointment';
+import AppointmentForm from '../Appointments/Tabs/AppointmentForm';
 
 
 const NewPatient = () => {
@@ -24,9 +26,13 @@ const NewPatient = () => {
     const dispatch = useDispatch();
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [activeTab, setActiveTab] = useState('Patient Details');
+    const [activeModalTab, setActiveModalTab] = useState('Appointments');
     const [isClinicalReviewExpanded, setIsClinicalReviewExpanded] = useState(false);
     const [isRunning, setIsRunning] = useState(false);
     const [timeLeft, setTimeLeft] = useState(0);
+    const [showModal, setShowModal] = useState(false); // Modal visibility state
+    const handleShow = () => setShowModal(true);
+    const handleClose = () => setShowModal(false);
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const primaryProvider = JSON.parse(sessionStorage.getItem('hyper_user'))?.firstName;
@@ -70,33 +76,28 @@ const NewPatient = () => {
         setIsClinicalReviewExpandedData(!isClinicalReviewExpandedData);
     };
     const patientMenuItems = [
-        { label: "Demographic", icon: "bi bi-person" },
-        { label: "Appointments", icon: "bi bi-person" },
-        { label: "Clinical Dashboard", icon: "bi bi-person" },
-        { label: "Documents", icon: "bi bi-person" },
+        { label: "Patient Info", icon: "bi bi-person" },
         {
             label: 'Clinical Review',
             icon: "bi bi-person",
             subItems: [
+                { label: 'Assign Task', icon: 'bi bi-person' },
                 { label: 'Problem List', icon: 'bi bi-person' },
                 { label: 'Allergy List', icon: 'bi bi-person' },
                 { label: 'Drug Medication', icon: 'bi bi-person' },
-                { label: 'Medication List', icon: 'bi bi-person' },
-                { label: 'Drug Interactions', icon: 'bi bi-person' },
-                { label: 'Care Quality Indicators (CQIs)', icon: 'bi bi-person' },
+                { label: 'Medication list', icon: 'bi bi-person' },
             ],
         },
-        { label: 'Intake Data', icon: 'bi bi-person' },
-        { label: 'Lab Orders', icon: 'bi bi-person' },
-        { label: 'Immunizations', icon: 'bi bi-person' },
-        { label: 'Patient Cost Estimator', icon: 'bi bi-person' },
-        { label: 'Growth Charts', icon: 'bi bi-person' },
-        { label: 'Onpatient Access', icon: 'bi bi-person' },
-        { label: 'Education Resources', icon: 'bi bi-person' },
-        { label: 'Communication', icon: 'bi bi-person' },
-        { label: 'Family History', icon: 'bi bi-person' },
-        { label: 'Imaging Orders', icon: 'bi bi-person' },
-        { label: 'Implantable Devices', icon: 'bi bi-person' },
+        { label: 'Drug Interactions', icon: 'bi bi-person' },
+        { label: 'Care Quality Indicators (CQIs)', icon: 'bi bi-person' },
+        { label: 'Lab Request', icon: 'bi bi-person' },
+        { label: 'Vaccinations', icon: 'bi bi-person' },
+        { label: 'Patient Access', icon: 'bi bi-person' },
+        { label: 'Patient Communication', icon: 'bi bi-person' },
+        { label: 'Genetic History', icon: 'bi bi-person' },
+        { label: 'Imaging Requests', icon: 'bi bi-person' },
+        { label: 'Growth Tracker', icon: 'bi bi-person' },
+        { label: 'Estimates', icon: 'bi bi-person' },
     ];
 
     const toggleTimer = () => {
@@ -128,7 +129,23 @@ const NewPatient = () => {
         return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
     };
 
+    const modalTabs = [
+        'Appointments',
+        'Billing',
+        'Eligibility',
+        'Vitals',
+        'Growthcharts',
+        'Log Comm.',
+        'Revisions',
+        'Mu Helper'
+    ];
+
+    const handleModalTabClick = (modalTabs) => {
+        setActiveModalTab(modalTabs);
+    };
+
     return (
+       <>
         <div className="background_Color  pb-2">
             <div className="container-fluid px-0 mt-0 pt-0">
                 <div className="row">
@@ -148,7 +165,7 @@ const NewPatient = () => {
                                     <Col sm={2} className='ps-2 pt-1'>
                                         <div className="position-relative" style={{ display: "inline-block" }}>
                                             <img
-                                                src={patientsDataById?.patientChartPhoto?.url}
+                                                src={patientsDataById?.patientChartPhoto?.url || profileDummy}
                                                 alt="Patient Profile"
                                                 className="img-fluid rounded"
                                                 style={{ width: "126px", height: "129px", objectFit: "cover" }}
@@ -179,7 +196,7 @@ const NewPatient = () => {
                                                     </span>
                                                 </p>
                                                 <p className='text-nowrap fs-6 fw-bold'>
-                                                    <span>{patientsDataById?.approxAge+' years old' || 'N/A'}</span>
+                                                    <span>{patientsDataById?.approxAge != null ? patientsDataById.approxAge + ' years old' : '-'}</span>
                                                 </p>
                                             </div>
                                             <Col sm={6} className='p-0'>
@@ -303,9 +320,9 @@ const NewPatient = () => {
                                             </Button>
 
                                             <Button
-                                                className='text-black text-nowrap bg-white mt-1 fs-6 d-flex align-items-center justify-content-center w-100'
-                                                style={{ height: '30px', borderRadius: "10px" }}
-                                                as={Link} to={'/apps/appointments/newAppointment'}
+                                                className="text-black text-nowrap bg-white mt-1 fs-6 d-flex align-items-center justify-content-center w-100"
+                                                style={{ height: '30px', borderRadius: '10px' }}
+                                                onClick={handleShow} // Open modal on button click
                                             >
                                                 Add Appointment
                                             </Button>
@@ -412,7 +429,7 @@ const NewPatient = () => {
                                     </button>
                                 </div>
                                 <div id="patientChartData" className="collapse">
-                                    <div className="card-body p-0 scroll-container" style={{ height: '83vh', overflow: 'auto' }}>
+                                    <div className="card-body p-0 scroll-container" style={{ height: '81.8vh', overflow: 'auto' }}>
                                         {patientMenuItems.map((item, index) => (
                                             item.subItems ? (
                                                 <div key={index} className='ms-0'>
@@ -482,7 +499,53 @@ const NewPatient = () => {
                     </div>
                 </div>
             </div>
+            {/* Modal component */}
         </div>
+          <Modal centered size='xl' show={showModal} onHide={handleClose}>
+          <Modal.Header closeButton>
+              <Modal.Title>Add Appointment</Modal.Title>
+          </Modal.Header>
+          <Modal.Body
+              className='pt-0'
+              style={{
+                  overflowY: "scroll",
+                  height: "60vh",
+                  scrollbarWidth: "none",
+                  msOverflowStyle: "none",
+              }}
+          >
+              <style>
+                  {`::-webkit-scrollbar {
+                     display: none; /* Chrome, Safari, and Edge */
+                     }`}
+              </style>
+              <div>
+                  <ul className="nav nav-underline">
+                      {modalTabs.map((modalTab) => (
+                          <li className="nav-item" key={modalTab}>
+                              <a
+                                  className={`nav-link text-black me-2 ${activeModalTab === modalTab ? 'active fw-bold' : ''}`}
+                                  onClick={() => handleModalTabClick(modalTab)}
+                                  style={{ cursor: 'pointer' }}
+                              >
+                                  {modalTab}
+                              </a>
+                          </li>
+                      ))}
+                  </ul>
+                  <div className=" ">
+                      {activeModalTab === 'Appointments' && <AppointmentForm Id={id} />}
+                      {activeModalTab === 'Billing' && <p>Billing Content In Progress...</p>}
+                      {activeModalTab === 'Eligibility' && <p>Eligibility Content In Progress...</p>}
+                      {activeModalTab === 'Vitals' && <p>Vitals Content In Progress...</p>}
+                      {activeModalTab === 'Growthcharts' && <p>Growthcharts Content In Progress...</p>}
+                      {activeModalTab === 'Log Comm.' && <p>Log Comm. Content In Progress...</p>}
+                      {activeModalTab === 'Revisions' && <p>Revisions Content In Progress...</p>}
+                      {activeModalTab === 'Mu Helper' && <p>Mu Helper Content In Progress...</p>}
+                  </div>
+              </div>
+          </Modal.Body>
+      </Modal></>
     );
 };
 

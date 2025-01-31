@@ -88,7 +88,7 @@ function* getAllAppointmentsFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle(error, 'danger');
+        // ToastHandle(error, 'danger');
         yield put({
             type: AppointmentsActionTypes.GET_ALL_APPOINTMENTS_ERROR,
             payload: error,

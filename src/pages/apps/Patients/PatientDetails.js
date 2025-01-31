@@ -36,7 +36,7 @@ const PatientDetails = () => {
         }
         // console.log(data, 'dataaa123456789')
         dispatch(getPatientsByIdAction({ key: encryptMessage(data) }));
-    }, [dispatch,id]);
+    }, [dispatch, id]);
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
 
     useEffect(() => {
@@ -174,6 +174,7 @@ const PatientDetails = () => {
                                 <Form.Group>
                                     <Form.Label htmlFor="firstName" className="mb-0">First Name <span className="text-danger">*</span></Form.Label>
                                     <Form.Control
+                                        data-has-value={!!watch('firstName')}
                                         id="firstName"
                                         type="text"
                                         placeholder="First Name"
@@ -185,6 +186,7 @@ const PatientDetails = () => {
                                 <Form.Group>
                                     <Form.Label htmlFor="lastName" className="mb-0">Last Name <span className="text-danger">*</span></Form.Label>
                                     <Form.Control
+                                        data-has-value={!!watch('lastName')}
                                         id="lastName"
                                         type="text"
                                         placeholder="Last Name"
@@ -199,6 +201,7 @@ const PatientDetails = () => {
                                         <InputGroup>
                                             <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '30px' }}>&nbsp;&nbsp;+1</InputGroup.Text>
                                             <Form.Control
+                                                data-has-value={!!watch('cellPhone')}
                                                 type="tel"
                                                 style={{ height: '30px!important' }}
                                                 {...register('cellPhone', {
@@ -259,6 +262,7 @@ const PatientDetails = () => {
                                     <Form.Label className="mb-0">Date of Birth <span className="text-danger">*</span></Form.Label>
                                     <Form.Control
                                         type="date"
+                                        data-has-value={!!watch('dateOfBirth')}
                                         {...register('dateOfBirth')}
                                     // onChange={(e) => {
                                     //     const calculatedAge = calculateAge(e.target.value);
@@ -274,6 +278,7 @@ const PatientDetails = () => {
                                 <Form.Label className="mb-0">Primary Provider</Form.Label>
                                 <Form.Control
                                     id="primaryProvider"
+                                    data-has-value={!!watch('primaryProvider')}
                                     type="text"
                                     {...register("primaryProvider")}
                                     value={doctorName} // Ensures the value is displayed
@@ -286,6 +291,7 @@ const PatientDetails = () => {
                                 <Form.Label className="mb-0">Title</Form.Label>
                                 <Form.Control
                                     type='text'
+                                    data-has-value={!!watch('title')}
                                     placeholder='Enter Title'
                                     {...register('title')}
                                 />
@@ -296,6 +302,7 @@ const PatientDetails = () => {
                                 <Form.Label className="mb-0">Middle Name</Form.Label>
                                 <Form.Control
                                     type='text'
+                                    data-has-value={!!watch('middleName')}
                                     placeholder='Enter Middle Name'
                                     {...register('middleName')}
 
@@ -307,6 +314,7 @@ const PatientDetails = () => {
                                 <Form.Label htmlFor="patientstatus" className="mb-0">Status</Form.Label>
                                 <Form.Select
                                     as="select"  // Use 'select' to make it a dropdown
+                                    data-has-value={!!watch('patientStatus')}
                                     id="patientstatus"
                                     {...register('patientStatus')}
                                 >
@@ -323,6 +331,7 @@ const PatientDetails = () => {
                                 <Form.Label className="mb-0">Previous Birth Name</Form.Label>
                                 <Form.Control
                                     type='text'
+                                    data-has-value={!!watch('birthName')}
                                     {...register('birthName')}
 
                                     placeholder='Enter Previous Birth Name'
@@ -334,6 +343,7 @@ const PatientDetails = () => {
                                 <Form.Label className="mb-0">Suffix</Form.Label>
                                 <Form.Control
                                     type='text'
+                                    data-has-value={!!watch('suffix')}
                                     {...register('suffix')}
                                     placeholder='Enter Previous Birth Name'
                                 />
@@ -345,7 +355,7 @@ const PatientDetails = () => {
                                 <div
                                     onClick={() => logoFileInputRef.current.click()}
                                     className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'}`}
-                                    style={{ backgroundColor: '#e5f4ff' }}
+                                    style={{ backgroundColor: '#e5f4ff', fontSize:'12px', fontWeight:600 }}
                                 >
                                     {logoName
                                         ? logoName.length > 25
@@ -360,7 +370,8 @@ const PatientDetails = () => {
                                 </div>
                                 <Form.Control
                                     type="file"
-                                    className="d-none  border-0"
+                                    data-has-value={!!watch('profileImage')}
+                                    className="d-none  border-0 fs-6"
                                     {...register('profileImage', {})}
                                     accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
                                     ref={logoFileInputRef}
@@ -378,6 +389,7 @@ const PatientDetails = () => {
                                     <InputGroup>
                                         <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '30px' }}>&nbsp;&nbsp;+1</InputGroup.Text>
                                         <Form.Control
+                                            data-has-value={!!watch('homePhone')}
                                             type="tel"
                                             style={{ height: '30px!important' }}
                                             {...register('homePhone', {
@@ -436,6 +448,7 @@ const PatientDetails = () => {
                                         <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '30px' }}>&nbsp;&nbsp;+1</InputGroup.Text>
                                         <Form.Control
                                             type="tel"
+                                            data-has-value={!!watch('officePhone')}
                                             style={{ height: '30px!important' }}
                                             {...register('officePhone', {
                                                 pattern: {
@@ -494,6 +507,7 @@ const PatientDetails = () => {
                             <Form.Group>
                                 <Form.Label className="mb-0">Preferred Communication</Form.Label>
                                 <Form.Select
+                                    data-has-value={!!watch('preferredCommunication')}
                                     {...register('preferredCommunication')}
                                     aria-label="Select Title"
                                 >
@@ -515,6 +529,7 @@ const PatientDetails = () => {
                             <Form.Group>
                                 <Form.Label className="mb-0">Reminder Language</Form.Label>
                                 <Form.Select
+                                    data-has-value={!!watch('reminderLanguage')}
                                     {...register('reminderLanguage',
                                     )}
                                 >
@@ -529,6 +544,7 @@ const PatientDetails = () => {
                             <Form.Group className="mb-1" controlId="templateSelect">
                                 <Form.Label className="mb-0">Email</Form.Label>
                                 <Form.Control
+                                    data-has-value={!!watch('email')}
                                     type='text'
                                     {...register('email')}
                                     placeholder='Enter Email'
@@ -539,6 +555,7 @@ const PatientDetails = () => {
                             <Form.Group>
                                 <Form.Label className="mb-0">Medication History Concent</Form.Label>
                                 <Form.Select
+                                    data-has-value={!!watch('medicationHistoryConsent')}
                                     {...register('medicationHistoryConsent',
                                     )}
                                 >
@@ -552,6 +569,7 @@ const PatientDetails = () => {
                             <Form.Group className="mb-1" controlId="templateSelect">
                                 <Form.Label className="mb-0">Alternate Email</Form.Label>
                                 <Form.Control
+                                    data-has-value={!!watch('alternateEmail')}
                                     {...register('alternateEmail',
                                     )}
                                     type='text'
@@ -563,6 +581,7 @@ const PatientDetails = () => {
                             <Form.Group>
                                 <Form.Label className="mb-0">Payment Profile</Form.Label>
                                 <Form.Select
+                                    data-has-value={!!watch('paymentProfile')}
                                     {...register('paymentProfile')}
                                     aria-label="Payment Profile"
                                 >
@@ -582,8 +601,9 @@ const PatientDetails = () => {
                             <Form.Group>
                                 <Form.Label className="mb-0">Patient's Copay (in $)</Form.Label>
                                 <InputGroup>
-                                    <InputGroup.Text style={{ backgroundColor: '#e5f4ff' }}>$</InputGroup.Text> {/* Static Dollar Sign */}
+                                    <InputGroup.Text style={{ backgroundColor: '#e5f4ff', color:'black' }}>$</InputGroup.Text> {/* Static Dollar Sign */}
                                     <Form.Control
+                                        data-has-value={!!watch('patientCopayAmount')}
                                         type="text"
                                         placeholder="Patient's Copay"
                                         {...register("patientCopayAmount", {
@@ -600,6 +620,7 @@ const PatientDetails = () => {
                             <Form.Group>
                                 <Form.Label htmlFor="DOB" className="mb-0">Follow Up Date</Form.Label>
                                 <Form.Control
+                                    data-has-value={!!watch('followupDate')}
                                     type="date"  // Change type to "date" for date input
                                     placeholder="Follow Up Date"
                                     {...register('followupDate')}
@@ -611,6 +632,7 @@ const PatientDetails = () => {
                             <Form.Group>
                                 <Form.Label className="mb-0">Follow Up Reason</Form.Label>
                                 <Form.Control
+                                    data-has-value={!!watch('followupReason')}
                                     type="text"
                                     placeholder="Follow Up Reason"
                                     {...register('followupReason')}
