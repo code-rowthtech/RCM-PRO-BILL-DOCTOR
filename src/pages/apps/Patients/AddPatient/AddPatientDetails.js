@@ -124,7 +124,7 @@ const AddPatientDetails = () => {
                                     placeholder="First Name"
                                     {...register('firstName', { required: "First name is required" })}
                                 />
-                                {errors.firstName && <span className="text-danger">{errors.firstName.message}</span>}
+                                {errors?.firstName && <span className="text-danger mb-0" style={{ fontSize: '10px' }}>{errors?.firstName?.message}</span>}
                             </Form.Group>
                         </Col>
                         <Col sm={3}>
@@ -137,7 +137,7 @@ const AddPatientDetails = () => {
                                     placeholder="Last Name"
                                     {...register('lastName', { required: 'Last Name is required' })}
                                 />
-                                {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
+                                {errors?.lastName && <span className="text-danger mb-0" style={{ fontSize: '10px' }}>{errors?.lastName?.message}</span>}
                             </Form.Group>
                         </Col>
                         <Col sm={3}>
@@ -151,6 +151,7 @@ const AddPatientDetails = () => {
                                             type="tel"
                                             style={{ height: '30px!important' }}
                                             {...register('cellPhone', {
+                                                required: "Cell Phone is required",  // ✅ Fix: Moved inside the validation object
                                                 pattern: {
                                                     value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
                                                     message: 'Contact must be in the format (XXX)XXX-XXXX',
@@ -163,8 +164,7 @@ const AddPatientDetails = () => {
                                                     value: 13,
                                                     message: 'Contact must not be less than 13 digits'
                                                 }
-                                            }
-                                            )}
+                                            })}
                                             onChange={(e) => {
                                                 let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
                                                 if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
@@ -189,6 +189,7 @@ const AddPatientDetails = () => {
                                             }}
                                         />
                                     </InputGroup>
+                                    {errors?.cellPhone && <span className="text-danger mb-0" style={{ fontSize: '10px' }}>{errors?.cellPhone?.message}</span>}
                                 </Form.Group>
 
                                 <div
@@ -211,9 +212,10 @@ const AddPatientDetails = () => {
                                 <Form.Control
                                     type="date"
                                     data-has-value={!!watch('dateOfBirth')}
-                                    {...register('dateOfBirth')}
+                                    {...register('dateOfBirth', { required: "Date of Birth is required" })}
                                     max={new Date().toISOString().split("T")[0]}  // Set max date to today's date
                                 />
+                                {errors?.dateOfBirth && <span className="text-danger mb-0" style={{ fontSize: '10px' }}>{errors?.dateOfBirth?.message}</span>}
                             </Form.Group>
 
                         </Col>

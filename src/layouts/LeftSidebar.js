@@ -18,7 +18,7 @@ import logo from '../assets/images/logo.png';
 import helpBoxImage from '../assets/images/help-icon.svg';
 import profileImg from '../assets/images/users/avatar-1.jpg';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllAppointmentsAction, getPatientsAction } from '../redux/actions';
+import { createAppointmentsAction, getAllAppointmentsAction, getPatientsAction, resetUpdateAction } from '../redux/actions';
 import { encryptMessage } from '../cryptoUtils';
 import { FormInput } from '../components';
 import Spinner from '../constants/Spinner';
@@ -70,6 +70,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
 
     console.log(patientsAppointment, 'patientsAppointment')
     const [activeTab, setActiveTab] = useState("Today"); // Default to "Today"
+    // const updateAppointment = store?.createAppointmentsReducer?.data?.status;
 
     useEffect(() => {
         const data = {
@@ -80,6 +81,18 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
         dispatch(getAllAppointmentsAction({ key: encryptMessage(data) }));
 
     }, [dispatch, activeTab, updateSuccess]);
+
+    //    useEffect(() => {
+    //     const data = {
+    //         doctorId: doctorId,
+    //         clinicId: clinicId,
+    //         status: activeTab
+    //     }
+    //         if (updateAppointment === 200) {
+    //             dispatch(getAllAppointmentsAction({ key: encryptMessage(data) }));
+    //             dispatch(resetUpdateAction())
+    //         }
+    //     }, [updateAppointment]);
 
     const handleOtherClick = (e: any) => {
         if (menuNodeRef && menuNodeRef.current && menuNodeRef.current.contains(e.target)) return;

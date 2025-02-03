@@ -11,7 +11,7 @@ import { handleUpload } from '../../../../helpers/HandleUpload';
 import { useDispatch, useSelector } from 'react-redux';
 import us from '../../../../assets/images/flags/us.jpg';
 import AddDemographics from '../../Patients/AddPatient/AddDemographics';
-import { createAppointmentsAction, createPatientsAction, getCitiesAction, getPatientsAction, getPatientsByIdAction, getStatesByCountryAction, stateEmptydAction } from '../../../../redux/actions';
+import { createAppointmentsAction, createPatientsAction, getAllAppointmentsAction, getCitiesAction, getPatientsAction, getPatientsByIdAction, getStatesByCountryAction, stateEmptydAction } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
 import { FaPlus } from "react-icons/fa";
 import AddPatientDetails from '../../Patients/AddPatient/AddPatientDetails';
@@ -154,6 +154,8 @@ const AppointmentForm = ({ Id }) => {
     }, [dispatch, skip, search]);
 
     const patientsData = store?.getPatientsReducer?.data?.patients || [];
+    const updateAppointment = store?.createAppointmentsReducer?.data?.status;
+
 
     useEffect(() => {
         if (createResponse === 201) {
@@ -161,6 +163,17 @@ const AppointmentForm = ({ Id }) => {
         }
     }, [createResponse])
 
+    useEffect(() => {
+        const data = {
+            doctorId: doctorId,
+            clinicId: clinicId,
+            status: activeTab
+        }
+        if (updateAppointment === 200) {
+            dispatch(getAllAppointmentsAction({ key: encryptMessage(data) }));
+            // dispatch(resetUpdateAction())
+        }
+    }, [updateAppointment]);
 
     useEffect(() => {
         if (id) {
@@ -188,7 +201,6 @@ const AppointmentForm = ({ Id }) => {
 
 
     const onSubmit = (data) => {
-        console.log("i am owke dk")
         const payload = {
             patient: Id ? Id : data?.patient,
             clinic: clinicId,
@@ -206,7 +218,7 @@ const AppointmentForm = ({ Id }) => {
 
         }
         dispatch(createAppointmentsAction({ key: encryptMessage(payload) }))
-        console.log({ payload })
+        console.log({ payload }, 'hello')
         reset();
     }
 
@@ -220,11 +232,12 @@ const AppointmentForm = ({ Id }) => {
                         {/* {!Id && ( */}
                         <Form.Group className="mb-1" >
                             <Form.Label className="mb-0">
-                                Patient <span className="text-danger">*</span>
+                                Patient{!Id && <span className="text-danger">*</span>}
                             </Form.Label>
                             <InputGroup>
                                 <Form.Control
                                     {...register("patient", { required: !Id && "Patient is required" })}
+                                    // data-has-value={!!watch('patient')}
                                     as="select"
                                     value={selectedOption}
                                     onChange={handleSelectChange}
@@ -248,12 +261,14 @@ const AppointmentForm = ({ Id }) => {
                                     </InputGroup.Text>
                                 )}
                             </InputGroup>
+                            {errors?.patient && <p className="text-danger mb-0" style={{ fontSize: '10px' }}>{errors?.patient?.message}</p>}
+
                         </Form.Group>
 
                     </Col>
                     <Col sm={6}>
                         <Form.Group className="mb-1">
-                            <Form.Label className="mb-0">Doctor<span className="text-danger">*</span></Form.Label>
+                            <Form.Label className="mb-0">Doctor</Form.Label>
                             <Form.Control
                                 id="doctor"
                                 type="text"
@@ -282,11 +297,11 @@ const AppointmentForm = ({ Id }) => {
                             <Form.Label className="mb-0">Reason</Form.Label>
                             <Form.Control
                                 type="text"
-                                {...register("reason",
-                                    //  { required: "Reason is required" }
-                                )}
+                                {...register("reason", { required: "Reason is required" })}
                             />
+                            {/* {errors?.reason && <p className="text-danger">{errors?.reason?.message}</p>} */}
                         </Form.Group>
+
                     </Col>
                     <Col sm={6} className="d-flex gap-2">
                         <Form.Group className="mb-1" style={{ width: "150px" }}>
@@ -294,18 +309,22 @@ const AppointmentForm = ({ Id }) => {
                             <Form.Control
                                 type="date"
                                 {...register("scheduled",
-                                    // { required: "Scheduled date is required" }
+                                    { required: "Scheduled date is required" }
                                 )}
                             />
+                            {errors?.scheduled && <p className="text-danger mb-0" style={{ fontSize: '10px' }}>{errors?.scheduled?.message}</p>}
+
                         </Form.Group>
                         <Form.Group className="mb-1" style={{ width: "100px" }} >
                             <Form.Label className="mb-0">Start Time<span className="text-danger">*</span></Form.Label>
                             <Form.Control
                                 type="time"
                                 {...register("startTime",
-                                    //  { required: "Time is required" }
+                                    { required: "Time is required" }
                                 )}
                             />
+                            {errors?.startTime && <p className="text-danger mb-0" style={{ fontSize: '10px' }}>{errors?.startTime?.message}</p>}
+
                         </Form.Group>
 
                         <div className="d-flex">
@@ -314,7 +333,7 @@ const AppointmentForm = ({ Id }) => {
                                 <Form.Control
                                     type="number"
                                     {...register("duration",
-                                        // { required: "Duration is required" }
+                                        { required: "Duration is required" }
                                     )}
                                 />
                             </Form.Group>
@@ -405,11 +424,13 @@ const AppointmentForm = ({ Id }) => {
                     <Col sm={12} className="d-flex justify-content-end my-2 gap-2">
                         <Button
                             className="custom-buttons"
+                            onClick={() => reset()} // Reset the form on click
                         >
                             Delete
                         </Button>
+
                         <Button
-                            // type="submit"
+                            type="submit"
                             className="custom-buttons"
                         >
                             Save and close
