@@ -13,6 +13,7 @@ import { getSubscriptionsReducer } from './subscriptions/reducers';
 import { createHolidayScheduleReducer, getHolidayScheduleReducer } from './schedule/reducers';
 import { createVitalsReducer, getVitalsByPatientIdReducer, getVitalsReducer, updateVitalsReducer } from './vitals/reducers';
 import { createAppointmentsReducer, getAllAppointmentsReducer, getAppointmentsReducer } from './appointments/reducers';
+import { createTaskReducer, getClinicEmployeesReducer, getTaskReducer, updateTaskReducer } from './clinicNotes/reducers';
 export default (combineReducers({
     Auth,
     Layout,
@@ -20,10 +21,11 @@ export default (combineReducers({
     createRolesReducer, getRolesDataReducer, updateRolesReducer,
     createClinicsReducer, getClinicsReducer, getClinicByIdReducer, updateClinicsReducer,
     getAnalyticsReducer,
-    getDoctorsReducer,getStatesReducer,getCitiesReducer,
-    getPatientsReducer,createPatientsReducer,getPatientsByIdReducer,updatePatientsReducer,
+    getDoctorsReducer, getStatesReducer, getCitiesReducer,
+    getPatientsReducer, createPatientsReducer, getPatientsByIdReducer, updatePatientsReducer,
     getSubscriptionsReducer,
-    createHolidayScheduleReducer,getHolidayScheduleReducer,
-    createVitalsReducer,updateVitalsReducer,getVitalsReducer,getVitalsByPatientIdReducer,
-    createAppointmentsReducer,getAppointmentsReducer,getAllAppointmentsReducer,
+    createHolidayScheduleReducer, getHolidayScheduleReducer,
+    createVitalsReducer, updateVitalsReducer, getVitalsReducer, getVitalsByPatientIdReducer,
+    createAppointmentsReducer, getAppointmentsReducer, getAllAppointmentsReducer,
+    getClinicEmployeesReducer, createTaskReducer, getTaskReducer, updateTaskReducer,
 }): any);

@@ -196,3 +196,9 @@ select.form-control:not([size]):not([multiple]) {
 .form-check-input{
     height: 20px!important;
 }
+.offcanvas{
+    width:35vw!important;
+}
+textarea.form-control{
+    height: auto!important;
+}

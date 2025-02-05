@@ -13,6 +13,7 @@ import subscriptionsSaga from './subscriptions/saga';
 import scheduleSaga from './schedule/saga';
 import vitalsSaga from './vitals/saga';
 import appointmentsSaga from './appointments/saga';
+import clinicNotesSaga from './clinicNotes/saga';
 export default function* rootSaga(): any {
-    yield all([authSaga(), layoutSaga(), permissionsSaga(), rolesSaga(), clinicsSaga(), doctorsSaga(), patientsSaga(), dashboardSaga(), subscriptionsSaga(), scheduleSaga(), vitalsSaga(), appointmentsSaga(), ]);
+    yield all([authSaga(), layoutSaga(), permissionsSaga(), rolesSaga(), clinicsSaga(), doctorsSaga(), patientsSaga(), dashboardSaga(), subscriptionsSaga(), scheduleSaga(), vitalsSaga(), appointmentsSaga(), clinicNotesSaga(),]);
 }

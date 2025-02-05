@@ -67,6 +67,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
 
     const patientsAppointment = store?.getAllAppointmentsReducer?.data?.appointments || [];
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
+    const createSuccess = store?.createAppointmentsReducer?.data?.message;
 
     console.log(patientsAppointment, 'patientsAppointment')
     const [activeTab, setActiveTab] = useState("Today"); // Default to "Today"
@@ -80,7 +81,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
         }
         dispatch(getAllAppointmentsAction({ key: encryptMessage(data) }));
 
-    }, [dispatch, activeTab, updateSuccess]);
+    }, [dispatch, activeTab, updateSuccess,createSuccess]);
 
     //    useEffect(() => {
     //     const data = {

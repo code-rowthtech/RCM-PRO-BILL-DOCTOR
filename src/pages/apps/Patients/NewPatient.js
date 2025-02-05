@@ -37,13 +37,16 @@ import { MdCorporateFare } from "react-icons/md";
 import { FiPlus } from "react-icons/fi";
 import Spinner from '../../../constants/Spinner';
 import { handleUpload } from '../../../helpers/HandleUpload';
+import AssignTask from './TaskTabs/AssignTask';
+import AddAsignTask from './TaskTabs/AddAsignTask';
+import ProblemList from './TaskTabs/ProblemList';
+import AllergyList from './TaskTabs/AllergyList';
 
 
 const NewPatient = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
-    const [activeTab, setActiveTab] = useState('Patient Details');
     const [activeModalTab, setActiveModalTab] = useState('Appointments');
     const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors, watch, getValues } = useForm();
     const [isClinicalReviewExpanded, setIsClinicalReviewExpanded] = useState(false);
@@ -60,13 +63,17 @@ const NewPatient = () => {
     console.log(patientsDataById, 'patientsDataByIdpatientsDataById')
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
     const [profilePhoto, setProfilePhoto] = useState(
-     profileDummy
+        profileDummy
     );
     const [isCameraOpen, setIsCameraOpen] = useState(false);
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
     const [logoName, setLogoName] = useState('');
     const [logo, setLogo] = useState(null);
+    const [selectedMainTab, setSelectedMainTab] = useState("Patient Details");
+    const [selectedSubTab, setSelectedSubTab] = useState("Assign Task");
+    const [visibleSection, setVisibleSection] = useState("patient"); // Default section
+
 
     useEffect(() => {
         const data = {
@@ -90,16 +97,27 @@ const NewPatient = () => {
         }
     }, [updateSuccess]);
 
+    const handleMainTabChange = (tab) => {
+        setSelectedMainTab(tab);
+        setVisibleSection("patient"); // Show Patient Section, Hide Task Section
+    };
+
+    const handleSubTabChange = (subTab) => {
+        setSelectedSubTab(subTab);
+        setVisibleSection("task"); // Show Task Section, Hide Patient Section
+    };
+
     const handleSidebarToggle = () => {
         setSidebarCollapsed(!isSidebarCollapsed);
     };
 
     const handleTabClick = (tab) => {
-        setActiveTab(tab);
+        setSelectedSubTab(tab);
     };
 
     const handleClinicalReviewToggle = () => {
         setIsClinicalReviewExpanded(!isClinicalReviewExpanded);
+        setVisibleSection("task")
     };
     const [isClinicalReviewExpandedData, setIsClinicalReviewExpandedData] = useState(false);
 
@@ -116,7 +134,7 @@ const NewPatient = () => {
                 { label: 'Problem List', icon: <FiPlus /> },
                 { label: 'Allergy List', icon: <FiPlus /> },
                 { label: 'Drug Medication', icon: <FiPlus /> },
-                { label: 'Medication list', icon: <FiPlus /> },
+                { label: 'Medication List', icon: <FiPlus /> },
             ],
         },
         { label: 'Drug Interactions', icon: <AiOutlineInteraction /> },
@@ -220,8 +238,7 @@ const NewPatient = () => {
 
     const stopCamera = () => {
         const stream = videoRef.current?.srcObject;
-        if (stream)
- {
+        if (stream) {
             stream.getTracks().forEach(track => track.stop());
         }
         setIsCameraOpen(false);
@@ -261,13 +278,15 @@ const NewPatient = () => {
                                 <div className="p-1">
                                     <Row>
                                         <Col sm={2} className='ps-2 pt-1'>
-                                        <Form onSubmit={handleSubmit(onSubmit)} className='d-flex flex-column align-items-center'>
+                                            <Form onSubmit={handleSubmit(onSubmit)} className='d-flex flex-column align-items-center'>
                                                 <div className="position-relative d-flex align-items-center flex-column justify-content-center" style={{ display: "inline-block" }}>
                                                     {isCameraOpen ? (
                                                         <video ref={videoRef} autoPlay playsInline className='rounded' style={{ width: "126px", height: "129px", objectFit: "cover" }} />
                                                     ) : (
                                                         uploading ?
-                                                            <Spinner />
+                                                            <div className='py-3'>
+                                                                <Spinner />
+                                                            </div>
                                                             :
                                                             <img
                                                                 src={
@@ -293,7 +312,7 @@ const NewPatient = () => {
                                                     )}
 
                                                     {isCameraOpen && (
-                                                        <div className="camera-controls d-flex justify-content-center gap-1">
+                                                        <div className="camera-controls d-flex justify-content-center gap-1 mt-1">
                                                             <Button onClick={capturePhoto} type='button' className='custom-buttons'><TbCapture className='text-white fs-5' /> </Button>
                                                             <Button onClick={stopCamera} className='custom-buttons'><IoClose className='text-white fs-5' /></Button>
                                                         </div>
@@ -463,51 +482,124 @@ const NewPatient = () => {
                                 </div>
                             </div>
 
-                            <div className=' mt-2 '>
-                                <Card className='px-2'>
-                                    <div className='d-flex justify-content-between pt-1'>
-                                        <div style={{ borderBottom: '2px solid grey' }}>
-                                            <ul className="nav nav-underline">
-                                                {[
-                                                    'Patient Details',
-                                                    'Demographics',
-                                                    'Insurances',
-                                                    'Eligibility',
-                                                    'Authorizations',
-                                                    'Vital Status',
-                                                    'Balance',
-                                                    'Payment'
-                                                ].map((tab) => (
-                                                    <li className="nav-item " key={tab}>
-                                                        <a
-                                                            className={`nav-link ms-3 pb-0 tab-font-family ${activeTab === tab ? 'active text-primary' : 'text-black'}`}
-                                                            onClick={() => handleTabClick(tab)}
-                                                            style={{ cursor: 'pointer', fontWeight: 600 }}
-                                                        >
-                                                            {tab}
-                                                        </a>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                        <div className='d-flex gap-2'>
-                                            <Button className="custom-buttons" > <FiPlus className='fs-5 text-white'/>&nbsp;Add Task</Button>
-                                            <Button className="custom-buttons" as={Link} to={'/apps/patients/list'}>Back</Button>
-                                        </div>
-                                    </div>
+                            {/* Patient Details Section */}
+                            {visibleSection === "patient" && (
+                                <div className="mt-2">
+                                    <Card className="px-2">
+                                        <div className="d-flex justify-content-between pt-2 px-2">
+                                            <div style={{ borderBottom: "2px solid grey" }}>
+                                                <ul className="nav nav-underline">
+                                                    {[
+                                                        "Patient Details",
+                                                        "Demographics",
+                                                        "Insurances",
+                                                        "Eligibility",
+                                                        "Authorizations",
+                                                        "Vital Status",
+                                                        "Balance",
+                                                        "Payment",
+                                                    ].map((tab) => (
+                                                        <li className="nav-item" key={tab}>
+                                                            <a
+                                                                className={`nav-link me-3 pb-0 tab-font-family ${selectedMainTab === tab ? "active text-primary" : "text-black"
+                                                                    }`}
+                                                                onClick={() => handleMainTabChange(tab)}
+                                                                style={{ cursor: "pointer", fontWeight: 600 }}
+                                                            >
+                                                                {tab}
+                                                            </a>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                            <div className="d-flex gap-1">
+                                                <Button className="custom-buttons" onClick={() => setVisibleSection("task")}>
+                                                    <FiPlus className="fs-5 text-white" />
+                                                    &nbsp;Task
+                                                </Button>
 
-                                    <div className="mt-2 px-2 scroll-container" style={{ height: '65vh', overflow: 'auto' }}>
-                                        {activeTab === 'Patient Details' && <PatientDetails />}
-                                        {activeTab === 'Demographics' && <Demographics />}
-                                        {activeTab === 'Insurances' && <Insurances />}
-                                        {activeTab === 'Eligibility' && <p>In Progress...</p>}
-                                        {activeTab === 'Authorizations' && <p>In Progress...</p>}
-                                        {activeTab === 'Vital Status' && <VitalStatus />}
-                                        {activeTab === 'Balance' && <p>In Progress...</p>}
-                                        {activeTab === 'Payment' && <p>In Progress...</p>}
-                                    </div>
-                                </Card>
-                            </div>
+                                                <Button className="custom-buttons" as={Link} to={"/apps/patients/list"}>
+                                                    Back
+                                                </Button>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-2 px-2 scroll-container" style={{ height: "65vh", overflow: "auto" }}>
+                                            {selectedMainTab === 'Patient Details' && <PatientDetails />}
+                                            {selectedMainTab === 'Demographics' && <Demographics />}
+                                            {selectedMainTab === 'Insurances' && <Insurances />}
+                                            {selectedMainTab === 'Eligibility' && <p>In Progress...</p>}
+                                            {selectedMainTab === 'Authorizations' && <p>In Progress...</p>}
+                                            {selectedMainTab === 'Vital Status' && <VitalStatus />}
+                                            {selectedMainTab === 'Balance' && <p>In Progress...</p>}
+                                            {selectedMainTab === 'Payment' && <p>In Progress...</p>}
+                                        </div>
+                                    </Card>
+                                </div>
+                            )}
+
+                            {/* Task Section */}
+                            {visibleSection === "task" && (
+                                <div className="mt-2">
+                                    <Card className="px-2">
+                                        <div className='d-flex justify-content-between pt-2 px-2 '>
+                                            <h4>Clinic Review</h4>
+                                            <div className='d-flex gap-1'>
+                                            <Button className="custom-buttons" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+                                                <FiPlus className="fs-5 text-white" />
+                                                &nbsp;Task
+                                            </Button>
+                                            <Button className="custom-buttons" onClick={() => setVisibleSection("patient")}>
+                                                    Back
+                                                </Button>
+                                            </div>
+                                           
+                                        </div>
+                                        <div className="d-flex justify-content-between ">
+                                            <div className='ms-2' style={{ borderBottom: "2px solid grey" }}>
+                                                <ul className="nav nav-underline">
+                                                    {["Assign Task", "Problem List", "Allergy List", "Drug Medication", "Medication List"].map(
+                                                        (subTab) => (
+                                                            <li className="nav-item" key={subTab}>
+                                                                <a
+                                                                    className={`nav-link me-2 pb-0 tab-font-family ${selectedSubTab === subTab ? "active text-primary" : "text-black"
+                                                                        }`}
+                                                                    onClick={() => handleSubTabChange(subTab)}
+                                                                    style={{ cursor: "pointer", fontWeight: 600 }}
+                                                                >
+                                                                    {subTab}
+                                                                </a>
+                                                            </li>
+                                                        )
+                                                    )}
+                                                </ul>
+                                            </div>
+                                            <div>
+
+                                                <div className="offcanvas offcanvas-end" style={{ width: '500px!important' }} tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+                                                    <div className="offcanvas-header py-1 " style={{ borderBottom: '2px solid grey' }}>
+                                                        <h4 id="offcanvasRightLabel">Add Assign Task</h4>
+                                                        <button type="button" className="btn-close text-danger" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                                                    </div>
+
+                                                    <div className="offcanvas-body">
+                                                        <AddAsignTask />
+                                                    </div>
+                                                </div>
+                                              
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-2 px-2 scroll-container" style={{ height: "65vh", overflow: "auto" }}>
+                                            {selectedSubTab === "Assign Task" && <AssignTask />}
+                                            {selectedSubTab === "Problem List" && <ProblemList />}
+                                            {selectedSubTab === "Allergy List" && <AllergyList />}
+                                            {selectedSubTab === "Drug Medication" && <p>Drug Medication In Progress...</p>}
+                                            {selectedSubTab === "Medication List" && <p>Medication List In Progress...</p>}
+                                        </div>
+                                    </Card>
+                                </div>
+                            )}
                         </div>
 
                         {/* Sidebar */}
@@ -583,17 +675,22 @@ const NewPatient = () => {
                                                             <div className="ms-0">
                                                                 {item.subItems.map((subItem, subIndex) => (
                                                                     <div className='d-flex justify-content-between align-items-center ps-4 border-bottom py-1 pe-2'>
+
                                                                         <p
                                                                             key={subIndex}
-                                                                            className="text-black mb-0"
+                                                                            className="text-black mb-0 d-flex"
                                                                             onClick={() => handleTabClick(subItem.label)}
                                                                             style={{
                                                                                 cursor: 'pointer',
-                                                                                backgroundColor:
-                                                                                    activeTab === subItem.label ? '#e9ecef' : 'transparent',
-                                                                                fontWeight: activeTab === subItem.label ? 'bold' : 'normal',
+                                                                                // backgroundColor:
+                                                                                //     selectedSubTab === subItem.label ? '#e9ecef' : 'transparent',
+                                                                                fontWeight: selectedSubTab === subItem.label ? 'bold' : 'normal',
                                                                             }}
                                                                         >
+                                                                            <span className="mb-0 bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
+                                                                                style={{ width: '20px', height: '20px', fontSize: '10px', lineHeight: '20px' }}>
+                                                                                0
+                                                                            </span>
                                                                             {subItem.label}
 
                                                                         </p>
@@ -614,8 +711,8 @@ const NewPatient = () => {
                                                         // onClick={() => handleTabClick(item.label)}
                                                         style={{
                                                             cursor: 'pointer',
-                                                            backgroundColor: activeTab === item.label ? '#f8f9fa' : 'transparent',
-                                                            fontWeight: activeTab === item.label ? 'bold' : 'normal',
+                                                            backgroundColor: selectedSubTab === item.label ? '#f8f9fa' : 'transparent',
+                                                            fontWeight: selectedSubTab === item.label ? 'bold' : 'normal',
                                                         }}
                                                     >
                                                         {item?.icon}&nbsp;{item.label}
