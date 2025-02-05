@@ -152,8 +152,9 @@ const VitalStatus = ({ patientId }) => {
                             </Row>
 
                             <Row className='' >
-                                <Col className='px-0'
-                                ><p className='m-0  fw-bold'>Name</p></Col>
+                                <Col className='px-0'>
+
+                                </Col>
                                 {previousVitals && previousVitals?.map((data) => (
                                     <Col key={data?._id} style={{ background: '#E6EBFF' }}>
                                         <p className='m-0 fw-bold'>
@@ -173,7 +174,7 @@ const VitalStatus = ({ patientId }) => {
                                     {/* Vital Name & Today's Data */}
                                     <Row className='border-bottom'>
                                         <Col className='px-0'>
-                                            <p className='mb-0'>{vital.label} <span className='text-secondary'>{vital.unit}</span></p>
+                                            <p className='mb-0 ps-2'>{vital.label} <span className='text-secondary'>{vital.unit}</span></p>
                                         </Col>
 
                                         {/* Display previous vitals under respective sections */}

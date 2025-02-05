@@ -10,3 +10,4 @@ export * from './subscriptions/actions';
 export * from './schedule/actions';
 export * from './vitals/actions';
 export * from './appointments/actions';
+export * from './clinicNotes/actions';

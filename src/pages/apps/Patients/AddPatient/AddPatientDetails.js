@@ -105,7 +105,7 @@ const AddPatientDetails = () => {
         reset();
         setLogoName(null);
         setLogo(null);
-        console.log(payload, 'Final Payload with approxAge');
+        // console.log(payload, 'Final Payload with approxAge');
     };
 
 

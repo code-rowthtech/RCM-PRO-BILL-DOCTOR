@@ -18,11 +18,7 @@ const Patients = () => {
     useEffect(() => {
         const data = {
             doctorId: doctorId,
-            // page: skip,
-            // limit: 10,
-            // search: search,
         }
-        // console.log(data, 'dataaa123456789')
         dispatch(getPatientsAction({ key: encryptMessage(data) }));
 
     }, [dispatch]);

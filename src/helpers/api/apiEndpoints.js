@@ -33,6 +33,12 @@ export const getPatientsById = '/api/v1/doctor/patient-getById';
 export const createPatients = '/api/v1/doctor/patient-onboard';
 export const updatePatients = '/api/v1/doctor/patient-edit';
 
+// CLINIC NOTES
+export const getClinicEmployees = '/api/v1/clinics/getClinicEmployees';
+export const createTask = '/api/v1/clinics/createTask';
+export const getAllTasks = '/api/v1/clinics/getAllTasks';
+export const updateTask = '/api/v1/clinics/updateTask';
+
 // DASHBOARD
 export const getAnalytics = '/api/v1/admin/analytics';
 // SUBSCRIPTIONS
