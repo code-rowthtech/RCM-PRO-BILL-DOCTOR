@@ -54,7 +54,22 @@ select {
 .nav-underline .nav-link:hover{
     border-bottom-color:none!important;
 }
-.form-control,
+
+.form-label {
+    color: black;
+    font-weight: 500 !important;
+    opacity: 0.4;
+    font-size: 13px;
+}
+
+.form-control {
+    color: black !important;
+    font-weight: 550 !important;
+    padding: 6px !important;
+    font-size: 12px;
+    background-color: #e8f0fe !important;
+    border: 0px !important;
+}
 .form-select {
     color: #0908084f !important;
     font-weight: 550 !important;
@@ -63,22 +78,18 @@ select {
     background-color: #e8f0fe !important;
     border: 0px !important;
 }
-
+.form-control:focus,
 .form-select:focus {
     color: black !important;
 }
-
+.form-control[data-has-value='true'],
 .form-select[data-has-value='true'] {
     color: black !important;
 }
-
 .custom-form-fields,
 .form-control::placeholder {
     color: #0908084f !important;
     font-size: 12px;
-}
-.form-control[data-has-value="true"] {
-    color: black !important;
 }
 
 .custom-file-upload {
