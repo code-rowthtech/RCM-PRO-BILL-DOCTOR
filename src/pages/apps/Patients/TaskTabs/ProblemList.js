@@ -122,7 +122,7 @@ const ProblemList = () => {
                                 </tr>
                             ) : (
                                 <tbody>
-                                    {filteredProblemList.length === 0 ? (
+                                    {filteredProblemList?.length === 0 ? (
                                         <tr key="">
                                             <td colSpan={10} className="text-center">
                                                 <h3 className="my-5">No Problem Found!</h3>

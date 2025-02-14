@@ -1,38 +1,31 @@
-import React, { useState } from "react";
-import { Row, Col, Table, Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
-import { FiEdit, FiPlus } from "react-icons/fi";
-import { IoInformationCircleOutline } from "react-icons/io5";
-import { MdDeleteOutline } from "react-icons/md";
-import { FaEye } from "react-icons/fa";
-import AddAllergy from "./AddAllergy"; // Renamed component
-
-const allergyData = [
-    {
-        allergen: "Peanuts",
-        reaction: "Anaphylaxis",
-        rxNormCode: "123456",
-        snomedCode: "91936005",
-        status: "Active",
-        notes: "Carries EpiPen",
-        updates: "Last checked on 2024-01-10",
-        id: 1,
-    },
-    {
-        allergen: "Pollen",
-        reaction: "Sneezing",
-        rxNormCode: "654321",
-        snomedCode: "40733004",
-        status: "Active",
-        notes: "Seasonal allergy",
-        updates: "Updated severity status",
-        id: 2,
-    },
-];
-
+import React, { useEffect, useState } from 'react';
+import { Row, Col, Table, Button } from 'react-bootstrap';
+import { Link, useSearchParams } from 'react-router-dom';
+import { FiEdit, FiPlus } from 'react-icons/fi';
+import { IoInformationCircleOutline } from 'react-icons/io5';
+import { MdDeleteOutline } from 'react-icons/md';
+import { FaEye } from 'react-icons/fa';
+import AddAllergy from './AddAllergy';
+import { getAllergiesOfPatientAction } from '../../../../redux/actions';
+import { useDispatch, useSelector } from 'react-redux';
+import Spinner from '../../../../constants/Spinner';
 
 const AllergyList = () => {
     const [showAddAllergy, setShowAddAllergy] = useState(false);
+    const [searchParams] = useSearchParams();
+    const patientId = searchParams.get('id');
+    const dispatch = useDispatch();
+    const store = useSelector((state) => state);
+    const allergyData = store?.getAllergiesOfAPatientReducer?.data?.allergies;
+    // console.log(allergyData, 'Allergies of Patient');
+
+    useEffect(() => {
+        const data = {
+            patientId: patientId,
+        };
+
+        dispatch(getAllergiesOfPatientAction(data));
+    }, [dispatch, patientId]);
 
     return (
         <div>
@@ -43,46 +36,62 @@ const AllergyList = () => {
                     <Col sm={12} className="d-flex justify-content-between">
                         <h4>Allergy List</h4>
                         <Button className="custom-buttons text-nowrap" onClick={() => setShowAddAllergy(true)}>
-                            <FiPlus className="fs-5 text-white" />&nbsp; Add Allergy
+                            <FiPlus className="fs-5 text-white" />
+                            &nbsp; Add Allergy
                         </Button>
                     </Col>
                     <Col sm={12}>
                         <Table responsive className="table-centered table-nowrap mb-0">
                             <thead className="text-white bg-dark">
-                                <tr key=''>
-                                    <th className="text-white">Allergen</th>
+                                <tr key="">
+                                    <th className="text-white">Allergy Type</th>
+                                    <th className="text-white">Allergy Name</th>
                                     <th className="text-white">Reaction</th>
-                                    <th className="text-white">RxNorm Code</th>
-                                    <th className="text-white">Snomed Code</th>
+                                    <th className="text-white">Severity</th>
                                     <th className="text-white">Status</th>
                                     <th className="text-white">Notes</th>
-                                    <th className="text-white">Updates</th>
+                                    {/* <th className="text-white">Updates</th> */}
                                     <th className="text-white">Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {allergyData.map((data) => (
-                                    <tr key={data.id}>
-                                        <td>{data.allergen}</td>
-                                        <td>{data.reaction}</td>
-                                        <td>{data.rxNormCode}</td>
-                                        <td>{data.snomedCode}</td>
-                                        <td>{data.status}</td>
-                                        <td>
-                                            <FaEye className="fs-4 ms-2 cursor-pointer text-black" />
-                                        </td>
-                                        <td>{data.updates}</td>
-                                        <td>
-                                            <Link to={`/edit-allergy/${data.id}`}>
-                                                <IoInformationCircleOutline className="fs-4 cursor-pointer text-black" />&nbsp;
-                                                <FiEdit className="fs-4 cursor-pointer text-black" />&nbsp;
-                                                <MdDeleteOutline className="fs-4 cursor-pointer text-black" />
-                                            </Link>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-
+                            {store?.getAllergiesOfAPatientReducer?.loading ? (
+                                <tr>
+                                    <td className="text-center" colSpan={10}>
+                                        <Spinner className=" my-5 " />
+                                    </td>
+                                </tr>
+                            ) : (
+                                <tbody>
+                                    {allergyData?.length === 0 ? (
+                                        <tr key="">
+                                            <td colSpan={10} className="text-center">
+                                                <h3 className="my-5">No Allergy Found!</h3>
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        allergyData?.map((data) => (
+                                            <tr key={data?.id}>
+                                                <td className="text-capitalize">{data?.allergyType}</td>
+                                                <td className="text-capitalize">{data?.allergyname}</td>
+                                                <td className="text-capitalize">{data?.reaction}</td>
+                                                <td className="text-capitalize">{data?.severity}</td>
+                                                <td className="text-capitalize">{data?.status}</td>
+                                                <td>
+                                                    <FaEye className="fs-4 ms-2 cursor-pointer text-black" />
+                                                </td>
+                                                {/* <td>{data?.updates}</td> */}
+                                                <td>
+                                                    <IoInformationCircleOutline className="fs-4 cursor-pointer text-black" />
+                                                    &nbsp;
+                                                    <FiEdit className="fs-4 cursor-pointer text-black" />
+                                                    &nbsp;
+                                                    <MdDeleteOutline className="fs-4 cursor-pointer text-black" />
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            )}
                         </Table>
                     </Col>
                 </Row>

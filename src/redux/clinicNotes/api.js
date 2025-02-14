@@ -58,3 +58,18 @@ export function getPatientAppointmentsApi(params: any): any {
    
     return api.create(`${URL.getPatientAppointments}`,payload);
 }
+
+export function createAllergyApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.createAllergy, data);
+}
+
+export function getAllergyDetailsApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.getAllergyDetails}?id=${data?.id}`);
+}
+
+export function getAllergiesOfAPatientApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.getAllergiesOfAPatient}?patientId=${data?.patientId}`);
+}
