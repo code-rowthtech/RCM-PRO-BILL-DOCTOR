@@ -46,7 +46,7 @@ const Patients = () => {
                                 <Col>
                                     <Table responsive className="table-centered table-nowrap mb-0">
                                         <thead className="text-white bg-dark">
-                                            <tr>
+                                            <tr key=''>
                                                 <th className='text-white'>Patients ID</th>
                                                 <th className='text-white'>Patients Name</th>
                                                 <th className='text-white'>Phone Number</th>
@@ -54,16 +54,17 @@ const Patients = () => {
                                                 <th className='text-white'>Action</th>
                                             </tr>
                                         </thead>
+                                        <tbody>
+
                                         {store?.getPatientsReducer?.loading ? (
-                                            <tr>
+                                            <tr key=''>
                                                 <td className='text-center' colSpan={6}>
                                                     <Spinner className=" my-5 " />
                                                 </td>
                                             </tr>
                                         ) : (
-                                            <tbody>
-                                                {patientsData?.length === 0 ? (
-                                                    <tr>
+                                                patientsData?.length === 0 ? (
+                                                    <tr key=''>
                                                         <td colSpan={5} className='text-center'>
                                                             <h3 className='my-5'>No Patient Found !</h3>
                                                         </td>
@@ -85,9 +86,10 @@ const Patients = () => {
 
                                                         </tr>
                                                     ))
-                                                )}
-                                            </tbody>
+                                                )
                                         )}
+                                            </tbody>
+
                                     </Table>
                                 </Col>
                             </Row>

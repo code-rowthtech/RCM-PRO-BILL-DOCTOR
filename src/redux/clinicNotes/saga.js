@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { ClinicNotesActionTypes } from './constants';
-import {  createTaskApi, getClinicEmployeesApi, getTaskApi, updateTaskApi,  } from './api';
+import {  createProblemApi, createTaskApi, getClinicEmployeesApi, getPatientAppointmentsApi, getPatientProblemsApi, getProblemDetailsApi, getSearchCodesApi, getTaskApi, getTaskDetailsApi, updateProblemsApi, updateTaskApi,  } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -103,8 +103,8 @@ function* updateTaskFunction(data) {
         });
         const response = yield call(updateTaskApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
-            // ToastHandle(decryptedData?.message, 'success');
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: ClinicNotesActionTypes.UPDATE_TASK_SUCCESS,
                 payload: { ...decryptedData },
@@ -119,6 +119,209 @@ function* updateTaskFunction(data) {
         ToastHandle(error, 'danger');
         yield put({
             type: ClinicNotesActionTypes.UPDATE_TASK_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* getTaskDetailsFunction(data) {
+    try {
+        yield put({
+            type: ClinicNotesActionTypes.GET_TASK_DETAILS_LOADING,
+            payload: {},
+        });
+        const response = yield call(getTaskDetailsApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 201) {
+            // ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: ClinicNotesActionTypes.GET_TASK_DETAILS_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: ClinicNotesActionTypes.GET_TASK_DETAILS_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: ClinicNotesActionTypes.GET_TASK_DETAILS_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* createProblemFunction(data) {
+    try {
+        yield put({
+            type: ClinicNotesActionTypes.CREATE_PROBLEM_LOADING,
+            payload: {},
+        });
+        const response = yield call(createProblemApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 201) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: ClinicNotesActionTypes.CREATE_PROBLEM_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: ClinicNotesActionTypes.CREATE_PROBLEM_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: ClinicNotesActionTypes.CREATE_PROBLEM_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function*getPatientProblemsFunction(data) {
+    try {
+        yield put({
+            type: ClinicNotesActionTypes.GET_PATIENT_PROBLEMS_LOADING,
+            payload: {},
+        });
+        const response = yield call(getPatientProblemsApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 201) {
+            // ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: ClinicNotesActionTypes.GET_PATIENT_PROBLEMS_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: ClinicNotesActionTypes.GET_PATIENT_PROBLEMS_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: ClinicNotesActionTypes.GET_PATIENT_PROBLEMS_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* updateProblemsFunction(data) {
+    try {
+        yield put({
+            type: ClinicNotesActionTypes.UPDATE_PROBLEM_LOADING,
+            payload: {},
+        });
+        const response = yield call(updateProblemsApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: ClinicNotesActionTypes.UPDATE_PROBLEM_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: ClinicNotesActionTypes.UPDATE_PROBLEM_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: ClinicNotesActionTypes.UPDATE_PROBLEM_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* getProblemDetailsFunction(data) {
+    try {
+        yield put({
+            type: ClinicNotesActionTypes.GET_PROBLEM_DETAILS_LOADING,
+            payload: {},
+        });
+        const response = yield call(getProblemDetailsApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 201) {
+            // ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: ClinicNotesActionTypes.GET_PROBLEM_DETAILS_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: ClinicNotesActionTypes.GET_PROBLEM_DETAILS_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: ClinicNotesActionTypes.GET_PROBLEM_DETAILS_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* getSearchCodesFunction(data) {
+    try {
+        yield put({
+            type: ClinicNotesActionTypes.GET_SEARCH_CODES_LOADING,
+            payload: {},
+        });
+        const response = yield call(getSearchCodesApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 201) {
+            // ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: ClinicNotesActionTypes.GET_SEARCH_CODES_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: ClinicNotesActionTypes.GET_SEARCH_CODES_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: ClinicNotesActionTypes.GET_SEARCH_CODES_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* getPatientAppointmentsFunction(data) {
+    try {
+        yield put({
+            type: ClinicNotesActionTypes.GET_PATIENT_APPOINTMENTS_LOADING,
+            payload: {},
+        });
+        const response = yield call(getPatientAppointmentsApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 201) {
+            // ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: ClinicNotesActionTypes.GET_PATIENT_APPOINTMENTS_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: ClinicNotesActionTypes.GET_PATIENT_APPOINTMENTS_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: ClinicNotesActionTypes.GET_PATIENT_APPOINTMENTS_ERROR,
             payload: error,
         });
     }
@@ -149,12 +352,47 @@ export function* watchUpdateTask() {
     yield takeEvery(ClinicNotesActionTypes.UPDATE_TASK, updateTaskFunction);
 }
 
+export function* watchGetTaskDetails() {
+    yield takeEvery(ClinicNotesActionTypes.GET_TASK_DETAILS, getTaskDetailsFunction);
+}
+
+export function* watchCreateProblem() {
+    yield takeEvery(ClinicNotesActionTypes.CREATE_PROBLEM, createProblemFunction);
+}
+
+export function* watchGetPatientProblems() {
+    yield takeEvery(ClinicNotesActionTypes.GET_PATIENT_PROBLEMS, getPatientProblemsFunction);
+}
+
+export function* watchUpdateProblems() {
+    yield takeEvery(ClinicNotesActionTypes.UPDATE_PROBLEM, updateProblemsFunction);
+}
+
+export function* watchGetProblemDetails() {
+    yield takeEvery(ClinicNotesActionTypes.GET_PROBLEM_DETAILS, getProblemDetailsFunction);
+}
+
+export function* watchGetSearchCodes() {
+    yield takeEvery(ClinicNotesActionTypes.GET_SEARCH_CODES, getSearchCodesFunction);
+}
+
+export function* watchGetPatientAppointments() {
+    yield takeEvery(ClinicNotesActionTypes.GET_PATIENT_APPOINTMENTS, getPatientAppointmentsFunction);
+}
+
 function* clinicNotesSaga() {
     yield all([
         fork(watchClinicEmployees),
         fork(watchCreateTask),
         fork(watchGetTask),
         fork(watchUpdateTask),
+        fork(watchGetTaskDetails),
+        fork(watchCreateProblem),
+        fork(watchGetPatientProblems),
+        fork(watchUpdateProblems),
+        fork(watchGetProblemDetails),
+        fork(watchGetSearchCodes),
+        fork(watchGetPatientAppointments),
 
     ]);
 }

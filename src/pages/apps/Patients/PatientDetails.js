@@ -28,24 +28,19 @@ const PatientDetails = () => {
 
 
     const patientsDataById = store?.getPatientsByIdReducer?.data?.patient || [];
-    console.log(patientsDataById, 'data0987654321')
+    // console.log(patientsDataById, 'data0987654321')
 
-    useEffect(() => {
-        const data = {
-            id: id,
-        }
-        // console.log(data, 'dataaa123456789')
-        dispatch(getPatientsByIdAction({ key: encryptMessage(data) }));
-    }, [dispatch, id]);
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
 
     useEffect(() => {
         const data = {
             id: id,
         }
-        // console.log(data, 'dataaa123456789')
-        dispatch(getPatientsByIdAction({ key: encryptMessage(data) }));
-    }, [dispatch]);
+        if(id){
+            dispatch(getPatientsByIdAction({ key: encryptMessage(data) }));
+        }
+    }, [id]);
+
     useEffect(() => {
         const data = {
             id: id,
@@ -274,7 +269,7 @@ const PatientDetails = () => {
                         </Row>
                         <hr className='my-2' />
                         <Col sm={3}>
-                            <Form.Group className="mb-1" controlId="templateSelect">
+                            <Form.Group className="mb-1" >
                                 <Form.Label className="mb-0">Primary Provider</Form.Label>
                                 <Form.Control
                                     id="primaryProvider"
@@ -287,7 +282,7 @@ const PatientDetails = () => {
                             </Form.Group>
                         </Col>
                         <Col sm={3}>
-                            <Form.Group className="mb-1" controlId="templateSelect">
+                            <Form.Group className="mb-1" >
                                 <Form.Label className="mb-0">Title</Form.Label>
                                 <Form.Control
                                     type='text'
@@ -298,7 +293,7 @@ const PatientDetails = () => {
                             </Form.Group>
                         </Col>
                         <Col sm={3}>
-                            <Form.Group className="mb-1" controlId="templateSelect">
+                            <Form.Group className="mb-1" >
                                 <Form.Label className="mb-0">Middle Name</Form.Label>
                                 <Form.Control
                                     type='text'
@@ -327,7 +322,7 @@ const PatientDetails = () => {
                             </Form.Group>
                         </Col>
                         <Col sm={3}>
-                            <Form.Group className="mb-1" controlId="templateSelect">
+                            <Form.Group className="mb-1" >
                                 <Form.Label className="mb-0">Previous Birth Name</Form.Label>
                                 <Form.Control
                                     type='text'
@@ -339,7 +334,7 @@ const PatientDetails = () => {
                             </Form.Group>
                         </Col>
                         <Col sm={3}>
-                            <Form.Group className="mb-1" controlId="templateSelect">
+                            <Form.Group className="mb-1" >
                                 <Form.Label className="mb-0">Suffix</Form.Label>
                                 <Form.Control
                                     type='text'
@@ -541,7 +536,7 @@ const PatientDetails = () => {
                             </Form.Group>
                         </Col>
                         <Col sm={3}>
-                            <Form.Group className="mb-1" controlId="templateSelect">
+                            <Form.Group className="mb-1" >
                                 <Form.Label className="mb-0">Email</Form.Label>
                                 <Form.Control
                                     data-has-value={!!watch('email')}
@@ -566,7 +561,7 @@ const PatientDetails = () => {
                             </Form.Group>
                         </Col>
                         <Col sm={3}>
-                            <Form.Group className="mb-1" controlId="templateSelect">
+                            <Form.Group className="mb-1" >
                                 <Form.Label className="mb-0">Alternate Email</Form.Label>
                                 <Form.Control
                                     data-has-value={!!watch('alternateEmail')}

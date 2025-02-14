@@ -49,7 +49,7 @@ const AllergyList = () => {
                     <Col sm={12}>
                         <Table responsive className="table-centered table-nowrap mb-0">
                             <thead className="text-white bg-dark">
-                                <tr>
+                                <tr key=''>
                                     <th className="text-white">Allergen</th>
                                     <th className="text-white">Reaction</th>
                                     <th className="text-white">RxNorm Code</th>

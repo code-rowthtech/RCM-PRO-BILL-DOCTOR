@@ -34,10 +34,17 @@ export const createPatients = '/api/v1/doctor/patient-onboard';
 export const updatePatients = '/api/v1/doctor/patient-edit';
 
 // CLINIC NOTES
-export const getClinicEmployees = '/api/v1/clinics/getClinicEmployees';
-export const createTask = '/api/v1/clinics/createTask';
-export const getAllTasks = '/api/v1/clinics/getAllTasks';
-export const updateTask = '/api/v1/clinics/updateTask';
+export const getClinicEmployees = '/api/v1/doctor/getClinicEmployees';
+export const createTask = '/api/v1/doctor/createTask';
+export const getAllTasks = '/api/v1/doctor/getAllTasks';
+export const updateTask = '/api/v1/doctor/updateTask';
+export const getTaskDetails = '/api/v1/doctor/getTaskDetails';
+export const createProblem = '/api/v1/doctor/createProblem';
+export const getPatientProblems = '/api/v1/doctor/getPatientProblems';
+export const updateProblems = '/api/v1/doctor/updateProblems';
+export const getProblemDetails = '/api/v1/doctor/getProblemDetails';
+export const getSearchCodes = '/api/v1/doctor/searchCodes';
+export const getPatientAppointments = '/api/v1/doctor/getPatientAppointments';
 
 // DASHBOARD
 export const getAnalytics = '/api/v1/admin/analytics';

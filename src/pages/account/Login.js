@@ -115,7 +115,7 @@ const Login = (): React$Element<any> => {
                     <div className="mb-3 mb-0 d-flex justify-content-center ">
                         <Button className='custom-buttons d-flex align-items-center justify-content-center' type="submit" disabled={loading}>
                             {loading ?
-                                <Spinner className="spinner-border-sm " />
+                                <Spinner className="spinner-border-sm text-white" />
                                 :
                                 `${t('Log In')}`
                             }
