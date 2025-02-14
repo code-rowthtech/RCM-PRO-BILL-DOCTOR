@@ -21,6 +21,41 @@ const UPDATE_TASK_INITIAL_STATE = {
     loading: false,
 }
 
+const GET_TASK_DETAILS_INITIAL_STATE = {
+    data: [],
+    loading: false,
+}
+
+const CREATE_PROBLEM_INITIAL_STATE = {
+    data: [],
+    loading: false,
+}
+
+const GET_PATIENT_PROBLEMS_INITIAL_STATE = {
+    data: [],
+    loading: false,
+}
+
+const UPDATE_PROBLEM_INITIAL_STATE = {
+    data: [],
+    loading: false,
+}
+
+const GET_PROBLEM_DETAILS_INITIAL_STATE = {
+    data: [],
+    loading: false,
+}
+
+const GET_SEARCH_CODES_INITIAL_STATE = {
+    data: [],
+    loading: false,
+}
+
+const GET_PATIENT_APPOINTMENTS_INITIAL_STATE = {
+    data: [],
+    loading: false,
+}
+
 export const getClinicEmployeesReducer = (state = GET_CLINIC_EMPLOYEES_INITIAL_STATE, action) => {
     switch (action.type) {
         case ClinicNotesActionTypes.GET_CLINIC_EMPLOYEES_LOADING:
@@ -112,6 +147,188 @@ export const updateTaskReducer = (state = UPDATE_TASK_INITIAL_STATE, action) => 
                 loading: false
             }
         case ClinicNotesActionTypes.UPDATE_TASK_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicNotesActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false
+            }
+        default: return state
+    }
+}
+
+export const getTaskDetailsReducer = (state = GET_TASK_DETAILS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case ClinicNotesActionTypes.GET_TASK_DETAILS_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case ClinicNotesActionTypes.GET_TASK_DETAILS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicNotesActionTypes.GET_TASK_DETAILS_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicNotesActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false
+            }
+        default: return state
+    }
+}
+
+export const createProblemReducer = (state = CREATE_PROBLEM_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case ClinicNotesActionTypes.CREATE_PROBLEM_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case ClinicNotesActionTypes.CREATE_PROBLEM_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicNotesActionTypes.CREATE_PROBLEM_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicNotesActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false
+            }
+        default: return state
+    }
+}
+
+export const getPatientProblemsReducer = (state = GET_PATIENT_PROBLEMS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case ClinicNotesActionTypes.GET_PATIENT_PROBLEMS_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case ClinicNotesActionTypes.GET_PATIENT_PROBLEMS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicNotesActionTypes.GET_PATIENT_PROBLEMS_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicNotesActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false
+            }
+        default: return state
+    }
+}
+
+export const updateProblemReducer = (state = UPDATE_PROBLEM_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case ClinicNotesActionTypes.UPDATE_PROBLEM_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case ClinicNotesActionTypes.UPDATE_PROBLEM_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicNotesActionTypes.UPDATE_PROBLEM_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicNotesActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false
+            }
+        default: return state
+    }
+}
+
+export const getProblemDetailsReducer = (state = GET_PROBLEM_DETAILS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case ClinicNotesActionTypes.GET_PROBLEM_DETAILS_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case ClinicNotesActionTypes.GET_PROBLEM_DETAILS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicNotesActionTypes.GET_PROBLEM_DETAILS_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicNotesActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false
+            }
+        default: return state
+    }
+}
+
+export const getSearchCodesReducer = (state = GET_SEARCH_CODES_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case ClinicNotesActionTypes.GET_SEARCH_CODES_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case ClinicNotesActionTypes.GET_SEARCH_CODES_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicNotesActionTypes.GET_SEARCH_CODES_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicNotesActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false
+            }
+        default: return state
+    }
+}
+
+export const getPatientAppointmentsReducer = (state = GET_PATIENT_APPOINTMENTS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case ClinicNotesActionTypes.GET_PATIENT_APPOINTMENTS_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case ClinicNotesActionTypes.GET_PATIENT_APPOINTMENTS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicNotesActionTypes.GET_PATIENT_APPOINTMENTS_ERROR:
             return {
                 data: action.payload,
                 loading: false

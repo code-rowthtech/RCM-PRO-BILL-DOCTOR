@@ -23,78 +23,7 @@ const Patients = () => {
 
     }, [dispatch]);
 
-    // const patientsData = [
-    //     {
-    //         id: 1,
-    //         firstName: 'John',
-    //         lastName: 'Doe',
-    //         phone: '123-456-7890',
-    //         appointmentDate: '2023-11-10',
-    //     },
-    //     {
-    //         id: 2,
-    //         firstName: 'Jane',
-    //         lastName: 'Smith',
-    //         phone: '555-789-1234',
-    //         appointmentDate: '2023-11-12',
-    //     },
-    //     {
-    //         id: 3,
-    //         firstName: 'Michael',
-    //         lastName: 'Johnson',
-    //         phone: '987-654-3210',
-    //         appointmentDate: '2023-11-15',
-    //     },
-    //     {
-    //         id: 4,
-    //         firstName: 'Emily',
-    //         lastName: 'Davis',
-    //         phone: '444-555-6666',
-    //         appointmentDate: '2023-11-18',
-    //     },
-    //     {
-    //         id: 5,
-    //         firstName: 'Chris',
-    //         lastName: 'Brown',
-    //         phone: '222-333-4444',
-    //         appointmentDate: '2023-11-20',
-    //     },
-    //     {
-    //         id: 6,
-    //         firstName: 'Amanda',
-    //         lastName: 'Wilson',
-    //         phone: '111-222-3333',
-    //         appointmentDate: '2023-11-25',
-    //     },
-    //     {
-    //         id: 7,
-    //         firstName: 'David',
-    //         lastName: 'Martinez',
-    //         phone: '999-888-7777',
-    //         appointmentDate: '2023-11-28',
-    //     },
-    //     {
-    //         id: 8,
-    //         firstName: 'Jessica',
-    //         lastName: 'Taylor',
-    //         phone: '666-777-8888',
-    //         appointmentDate: '2023-12-01',
-    //     },
-    //     {
-    //         id: 9,
-    //         firstName: 'Robert',
-    //         lastName: 'Anderson',
-    //         phone: '333-222-1111',
-    //         appointmentDate: '2023-12-05',
-    //     },
-    //     {
-    //         id: 10,
-    //         firstName: 'Sophia',
-    //         lastName: 'Thomas',
-    //         phone: '555-444-3333',
-    //         appointmentDate: '2023-12-10',
-    //     },
-    // ];
+
 
     return (
         <>
@@ -117,7 +46,7 @@ const Patients = () => {
                                 <Col>
                                     <Table responsive className="table-centered table-nowrap mb-0">
                                         <thead className="text-white bg-dark">
-                                            <tr>
+                                            <tr key=''>
                                                 <th className='text-white'>Patients ID</th>
                                                 <th className='text-white'>Patients Name</th>
                                                 <th className='text-white'>Phone Number</th>
@@ -125,16 +54,17 @@ const Patients = () => {
                                                 <th className='text-white'>Action</th>
                                             </tr>
                                         </thead>
+                                        <tbody>
+
                                         {store?.getPatientsReducer?.loading ? (
-                                            <tr>
+                                            <tr key=''>
                                                 <td className='text-center' colSpan={6}>
                                                     <Spinner className=" my-5 " />
                                                 </td>
                                             </tr>
                                         ) : (
-                                            <tbody>
-                                                {patientsData?.length === 0 ? (
-                                                    <tr>
+                                                patientsData?.length === 0 ? (
+                                                    <tr key=''>
                                                         <td colSpan={5} className='text-center'>
                                                             <h3 className='my-5'>No Patient Found !</h3>
                                                         </td>
@@ -156,9 +86,10 @@ const Patients = () => {
 
                                                         </tr>
                                                     ))
-                                                )}
-                                            </tbody>
+                                                )
                                         )}
+                                            </tbody>
+
                                     </Table>
                                 </Col>
                             </Row>

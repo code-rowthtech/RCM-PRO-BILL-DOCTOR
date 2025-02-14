@@ -13,7 +13,8 @@ import { getSubscriptionsReducer } from './subscriptions/reducers';
 import { createHolidayScheduleReducer, getHolidayScheduleReducer } from './schedule/reducers';
 import { createVitalsReducer, getVitalsByPatientIdReducer, getVitalsReducer, updateVitalsReducer } from './vitals/reducers';
 import { createAppointmentsReducer, getAllAppointmentsReducer, getAppointmentsReducer } from './appointments/reducers';
-import { createTaskReducer, getClinicEmployeesReducer, getTaskReducer, updateTaskReducer } from './clinicNotes/reducers';
+import { createProblemReducer, createTaskReducer, getClinicEmployeesReducer, getPatientAppointmentsReducer, getPatientProblemsReducer, getProblemDetailsReducer, getSearchCodesReducer, getTaskDetailsReducer, getTaskReducer, updateProblemReducer, updateTaskReducer } from './clinicNotes/reducers';
+
 export default (combineReducers({
     Auth,
     Layout,
@@ -27,5 +28,6 @@ export default (combineReducers({
     createHolidayScheduleReducer, getHolidayScheduleReducer,
     createVitalsReducer, updateVitalsReducer, getVitalsReducer, getVitalsByPatientIdReducer,
     createAppointmentsReducer, getAppointmentsReducer, getAllAppointmentsReducer,
-    getClinicEmployeesReducer, createTaskReducer, getTaskReducer, updateTaskReducer,
+    getClinicEmployeesReducer, createTaskReducer, getTaskReducer, updateTaskReducer,getTaskDetailsReducer, 
+    createProblemReducer, getPatientProblemsReducer, updateProblemReducer, getProblemDetailsReducer, getSearchCodesReducer, getPatientAppointmentsReducer,
 }): any);

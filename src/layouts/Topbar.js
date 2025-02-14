@@ -64,7 +64,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    console.log(MENU_ITEMS, 'MENU_ITEMSMENU_ITEMS')
+    // console.log(MENU_ITEMS, 'MENU_ITEMSMENU_ITEMS')
     const [isopen, setIsopen] = useState(false);
     const navbarCssClasses = navCssClasses || '';
     const containerCssClasses = !hideLogo ? 'container-fluid' : '';
@@ -151,7 +151,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
     };
     const pageTitle = getPageTitle(pathToTitleMap, pathname, search);
 
-console.log(location.pathname)
+// console.log(location.pathname)
     return (
         <>
             <div className={classNames('navbar-custom ', navbarCssClasses)} style={{ backgroundColor: "#ffffff" }}>
@@ -180,8 +180,8 @@ console.log(location.pathname)
                             {/* <h4 className=''>{pageTitle}</h4> */}
                         </div>
                         <div className='d-flex gap-3 align-items-center col-11' style={{marginLeft:"-32px"}}>
-                            {MENU_ITEMS?.map((data) => (
-                                <p onClick={() => navigate(data?.url)} className='fs-5 mb-0 fw-bold cursor-pointer' style={{color:location.pathname===data?.url?'black':'rgba(116, 114, 114, 0.51)'}}>{data?.label}</p>
+                            {MENU_ITEMS?.map((data,index) => (
+                                <p key={index} onClick={() => navigate(data?.url)} className='fs-5 mb-0 fw-bold cursor-pointer' style={{color:location.pathname===data?.url?'black':'rgba(116, 114, 114, 0.51)'}}>{data?.label}</p>
                             ))}
                         </div>
                         </>

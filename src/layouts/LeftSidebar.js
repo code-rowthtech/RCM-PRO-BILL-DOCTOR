@@ -69,7 +69,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
     const createSuccess = store?.createAppointmentsReducer?.data?.message;
 
-    console.log(patientsAppointment, 'patientsAppointment')
+    // console.log(patientsAppointment, 'patientsAppointment')
     const [activeTab, setActiveTab] = useState("Today"); // Default to "Today"
     // const updateAppointment = store?.createAppointmentsReducer?.data?.status;
 
