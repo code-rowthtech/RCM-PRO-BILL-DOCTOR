@@ -45,6 +45,9 @@ export const updateProblems = '/api/v1/doctor/updateProblems';
 export const getProblemDetails = '/api/v1/doctor/getProblemDetails';
 export const getSearchCodes = '/api/v1/doctor/searchCodes';
 export const getPatientAppointments = '/api/v1/doctor/getPatientAppointments';
+export const createAllergy = '/api/v1/doctor/addAllergy';
+export const getAllergyDetails = '/api/v1/doctor/getAllergyDetails';
+export const getAllergiesOfAPatient = '/api/v1/doctor/getAllergiesOfAPatient';
 
 // DASHBOARD
 export const getAnalytics = '/api/v1/admin/analytics';
