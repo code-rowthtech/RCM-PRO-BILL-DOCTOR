@@ -22,3 +22,59 @@ export function updateTaskApi(params: any): any {
     const { data } = params;
     return api.create(URL.updateTask, data);
 }
+
+export function getTaskDetailsApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.getTaskDetails}?id=${data?.id}`);
+}
+
+export function createProblemApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.createProblem, data);
+}
+
+export function getPatientProblemsApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.getPatientProblems}?patientId=${data?.patientId}`);
+}
+
+export function updateProblemsApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.updateProblems, data);
+}
+
+export function getProblemDetailsApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.getProblemDetails}?id=${data?.id}`);
+}
+
+export function getSearchCodesApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.getSearchCodes}?query=${data?.query}`);
+}
+
+export function getPatientAppointmentsApi(params: any): any {
+    const { payload } = params;
+   
+    return api.create(`${URL.getPatientAppointments}`,payload);
+}
+
+export function createAllergyApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.createAllergy, data);
+}
+
+export function getAllergyDetailsApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.getAllergyDetails}?id=${data?.id}`);
+}
+
+export function getAllergiesOfAPatientApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.getAllergiesOfAPatient}?patientId=${data?.patientId}`);
+}
+
+export function updateAllergyApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.updateAllergy, data);
+}

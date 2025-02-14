@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { Button, Col, Form, Row } from 'react-bootstrap'
-import { FiUploadCloud } from 'react-icons/fi'
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, Col, Form, Row } from 'react-bootstrap';
+import { FiUploadCloud } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { createTaskAction, getClinicEmployeesAction, getPatientsAction } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
@@ -8,13 +8,21 @@ import { useForm } from 'react-hook-form';
 import { handleUpload } from '../../../../helpers/HandleUpload';
 
 const AddAsignTask = () => {
-
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
     const employees = store?.getClinicEmployeesReducer?.data?.result || [];
-    const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors, watch, getValues } = useForm();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        setValue,
+        reset,
+        clearErrors,
+        watch,
+        getValues,
+    } = useForm();
     const patientsData = store?.getPatientsReducer?.data?.patients || [];
     const [logo, setLogo] = useState(null);
     const [logoName, setLogoName] = useState('');
@@ -22,20 +30,17 @@ const AddAsignTask = () => {
 
     const logoFileInputRef = useRef(null);
 
-    console.log(patientsData, 'patientsData')
+    console.log(patientsData, 'patientsData');
 
     useEffect(() => {
-
         dispatch(getClinicEmployeesAction({ clinicId: clinicId }));
-
     }, [dispatch]);
 
     useEffect(() => {
         const data = {
             doctorId: doctorId,
-        }
+        };
         dispatch(getPatientsAction({ key: encryptMessage(data) }));
-
     }, [dispatch]);
 
     const handleFileChange = async (e) => {
@@ -46,10 +51,9 @@ const AddAsignTask = () => {
             setLogoName(selectedFile?.name);
             clearErrors('profileImage');
         } catch (error) {
-            console.error("File upload failed", error);
+            console.error('File upload failed', error);
         }
     };
-
 
     const onSubmit = (data) => {
         const updatedData = { ...data };
@@ -69,14 +73,13 @@ const AddAsignTask = () => {
             ...(formattedDueDate ? { dueDate: formattedDueDate } : {}), // Use formatted date
             ...(updatedData?.priority ? { priority: updatedData?.priority } : {}),
             ...(updatedData?.note ? { note: updatedData?.note } : {}),
-            ...(updatedData?.associatedPatientId ? { associatedPatientId: updatedData?.associatedPatientId } : {}),
+            ...(store?.getPatientsByIdReducer?.data?.patient?._id ? { associatedPatientId: store?.getPatientsByIdReducer?.data?.patient?._id } : {}),
             ...(logo?.url === null
                 ? {}
                 : {
-                    associatedItemUrl: logo?.url?.split('?')[0],
-                    associatedItemName: logoName
-
-                }),
+                      associatedItemUrl: logo?.url?.split('?')[0],
+                      associatedItemName: logoName,
+                  }),
         };
 
         dispatch(createTaskAction({ key: encryptMessage(payload) }));
@@ -84,129 +87,130 @@ const AddAsignTask = () => {
         // console.log(payload, 'Final Payload');
     };
 
-
-
     return (
         <div>
             <Form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
                 <Row>
                     <Col sm={6}>
-                        <Form.Group className='mb-1'>
-                            <Form.Label htmlFor="taskTitle" className="mb-0">Task Title <span className="text-danger">*</span></Form.Label>
+                        <Form.Group className="mb-1">
+                            <Form.Label htmlFor="taskTitle" className="mb-0">
+                                Task Title <span className="text-danger">*</span>
+                            </Form.Label>
                             <Form.Control
                                 data-has-value={!!watch('taskTitle')}
                                 id="taskTitle"
                                 type="text"
                                 placeholder="Task Title"
-                                {...register('taskTitle', { required: "Task title is required" })}
+                                {...register('taskTitle', { required: 'Task title is required' })}
                             />
                         </Form.Group>
                     </Col>
                     <Col sm={6}>
-                        <Form.Group className='mb-1'>
-                            <Form.Label htmlFor="template" className="mb-0">Select Template</Form.Label>
+                        <Form.Group className="mb-1">
+                            <Form.Label htmlFor="template" className="mb-0">
+                                Select Template
+                            </Form.Label>
                             <Form.Select
-                                as="select"  // Use 'select' to make it a dropdown
+                                as="select" // Use 'select' to make it a dropdown
                                 data-has-value={!!watch('templateId')}
                                 id="templateId"
-                                {...register('templateId')}
-                            >
-                                <option value="" >Select Template</option>
+                                {...register('templateId')}>
+                                <option value="">Select Template</option>
                                 <option value="0001">Template 1</option>
                                 <option value="0002">Template 2</option>
-
                             </Form.Select>
                         </Form.Group>
                     </Col>
                     <Col sm={6}>
-                        <Form.Group className='mb-1'>
-                            <Form.Label htmlFor="template" className="mb-0">Assign To</Form.Label>
+                        <Form.Group className="mb-1">
+                            <Form.Label htmlFor="template" className="mb-0">
+                                Assign To
+                            </Form.Label>
                             <Form.Select
                                 id="assignedToId"
                                 data-has-value={!!watch('assignedToId')}
-                                {...register("assignedToId")}
-                            >
+                                {...register('assignedToId')}>
                                 <option value="">Select Assign To</option>
                                 {employees.map((data, index) => (
-                                    <option
-                                        key={index}
-                                        value={data?._id}
-                                    >
+                                    <option key={index} value={data?._id}>
                                         {data?.firstName} {data?.lastName}
                                     </option>
                                 ))}
                             </Form.Select>
                         </Form.Group>
-
                     </Col>
                     <Col sm={6}>
-                        <Form.Group className='mb-1'>
-                            <Form.Label htmlFor="category" className="mb-0">Category</Form.Label>
+                        <Form.Group className="mb-1">
+                            <Form.Label htmlFor="category" className="mb-0">
+                                Category
+                            </Form.Label>
                             <Form.Select
-                                as="select"  // Use 'select' to make it a dropdown
+                                as="select" // Use 'select' to make it a dropdown
                                 data-has-value={!!watch('category')}
                                 id="category"
-                                {...register('category')}
-                            >
-                                <option value="" >Select Category</option>
+                                {...register('category')}>
+                                <option value="">Select Category</option>
                                 <option value="Lab Results">Lab Results</option>
                                 <option value="Blood Testing">Blood Testing</option>
                                 <option value="Other">Other</option>
-
                             </Form.Select>
                         </Form.Group>
                     </Col>
                     <Col sm={6}>
-                        <Form.Group className='mb-1'>
-                            <Form.Label htmlFor="taskStatus" className="mb-0">Status</Form.Label>
+                        <Form.Group className="mb-1">
+                            <Form.Label htmlFor="taskStatus" className="mb-0">
+                                Status
+                            </Form.Label>
                             <Form.Select
-                                as="select"  // Use 'select' to make it a dropdown
+                                as="select" // Use 'select' to make it a dropdown
                                 data-has-value={!!watch('taskStatus')}
                                 id="taskStatus"
-                                {...register('taskStatus')}
-                            >
-                                <option value="" >Select Status</option>
+                                {...register('taskStatus')}>
+                                <option value="">Select Status</option>
                                 <option value="Complete">Complete</option>
                                 <option value="In Progress">In Progress</option>
                                 <option value="On Hold">On Hold</option>
                                 <option value="Open">Open</option>
-
                             </Form.Select>
                         </Form.Group>
                     </Col>
                     <Col sm={6}>
-                        <Form.Group className='mb-1'>
-                            <Form.Label htmlFor="dueDate" className="mb-0">Due Date </Form.Label>
+                        <Form.Group className="mb-1">
+                            <Form.Label htmlFor="dueDate" className="mb-0">
+                                Due Date{' '}
+                            </Form.Label>
                             <Form.Control
                                 data-has-value={!!watch('dueDate')}
                                 id="dueDate"
                                 type="date"
-                                {...register('dueDate', { required: "Due date is required" })}
+                                {...register('dueDate', { required: 'Due date is required' })}
                             />
                         </Form.Group>
                     </Col>
                     <Col sm={6}>
-                        <Form.Group className='mb-1'>
-                            <Form.Label htmlFor="priority" className="mb-0">Priority</Form.Label>
+                        <Form.Group className="mb-1">
+                            <Form.Label htmlFor="priority" className="mb-0">
+                                Priority
+                            </Form.Label>
                             <Form.Select
-                                as="select"  // Use 'select' to make it a dropdown
+                                as="select" // Use 'select' to make it a dropdown
                                 data-has-value={!!watch('priority')}
                                 id="priority"
-                                {...register('priority')}
-                            >
-                                <option value="" >Select Priority</option>
+                                {...register('priority')}>
+                                <option value="">Select Priority</option>
                                 <option value="High">High</option>
                                 <option value="Medium">Medium</option>
                                 <option value="Low">Low</option>
                                 <option value="Urgent">Urgent</option>
-
                             </Form.Select>
                         </Form.Group>
                     </Col>
                     <Col sm={6}>
-                        <Form.Group className='mb-1'>
-                            <Form.Label htmlFor="taskTitle" className="mb-0">Select Patient </Form.Label>
-                            <Form.Select
+                        <Form.Group className="mb-1">
+                            <Form.Label htmlFor="taskTitle" className="mb-0">
+                                Select Patient{' '}
+                            </Form.Label>
+                            {/* <Form.Select
                                 id="associatedPatientId"
                                 data-has-value={!!watch('associatedPatientId')}
                                 {...register("associatedPatientId")}
@@ -220,12 +224,24 @@ const AddAsignTask = () => {
                                         {data?.firstName} {data?.lastName}
                                     </option>
                                 ))}
-                            </Form.Select>
+                            </Form.Select> */}
+                            <Form.Control
+                                className="text-capitalize"
+                                readOnly
+                                value={store?.getPatientsByIdReducer?.data?.patient?.firstName + ' ' + store?.getPatientsByIdReducer?.data?.patient?.lastName}
+                                // value={
+                                //     taskDetails?.associatedPatientId?.firstName +
+                                //     ' ' +
+                                //     taskDetails?.associatedPatientId?.lastName
+                                // }
+                            />
                         </Form.Group>
                     </Col>
                     <Col sm={12}>
-                        <Form.Group className='mb-1'>
-                            <Form.Label htmlFor="note" className="mb-0">Note</Form.Label>
+                        <Form.Group className="mb-1">
+                            <Form.Label htmlFor="note" className="mb-0">
+                                Note
+                            </Form.Label>
                             <Form.Control
                                 id="note"
                                 as="textarea"
@@ -237,16 +253,16 @@ const AddAsignTask = () => {
                         </Form.Group>
                     </Col>
 
-
                     <Col sm={12}>
                         <div className="mb-1 d-flex flex-column position-relative">
                             <Form.Label className="mb-0">Add Associated Item</Form.Label>
                             <div
                                 onClick={() => logoFileInputRef.current.click()}
-                                className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'}`}
+                                className={`custom-file-upload justify-content-between cursor-pointer ${
+                                    logoName || profileUploading ? '' : 'custom-form-fields'
+                                }`}
                                 // className="custom-file-upload d-flex justify-content-between cursor-pointer"
-                                style={{ backgroundColor: '#e8f0fe', fontSize: '12px', fontWeight: 600 }}
-                            >
+                                style={{ backgroundColor: '#e8f0fe', fontSize: '12px', fontWeight: 600 }}>
                                 {logoName ? logoName : profileUploading ? 'Uploading...' : 'Upload Patient Photo'}
                                 <FiUploadCloud className="ms-auto" />
                             </div>
@@ -255,7 +271,7 @@ const AddAsignTask = () => {
                                 data-has-value={!!watch('associatedItem')}
                                 className="d-none  border-0 fs-6"
                                 {...register('associatedItem', {})}
-                                // accept=".png, .jpg, .jpeg, .svg" 
+                                // accept=".png, .jpg, .jpeg, .svg"
                                 ref={logoFileInputRef}
                                 onChange={handleFileChange}
                             />
@@ -265,15 +281,16 @@ const AddAsignTask = () => {
                         </div>
                     </Col>
 
-                    <Col sm={12} className='d-flex justify-content-end gap-1 mt-2'>
-                        <Button className='custom-buttons'>Reset</Button>
-                        <Button type='submit' className='custom-buttons'>Create Task</Button>
+                    <Col sm={12} className="d-flex justify-content-end gap-1 mt-2">
+                        <Button className="custom-buttons">Reset</Button>
+                        <Button type="submit" className="custom-buttons">
+                            Create Task
+                        </Button>
                     </Col>
                 </Row>
             </Form>
+        </div>
+    );
+};
 
-        </div >
-    )
-}
-
-export default AddAsignTask
+export default AddAsignTask;
