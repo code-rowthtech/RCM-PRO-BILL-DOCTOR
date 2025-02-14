@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { ClinicNotesActionTypes } from './constants';
-import {  createAllergyApi, createProblemApi, createTaskApi, getAllergiesOfAPatientApi, getAllergyDetailsApi, getClinicEmployeesApi, getPatientAppointmentsApi, getPatientProblemsApi, getProblemDetailsApi, getSearchCodesApi, getTaskApi, getTaskDetailsApi, updateProblemsApi, updateTaskApi,  } from './api';
+import {  createAllergyApi, createProblemApi, createTaskApi, getAllergiesOfAPatientApi, getAllergyDetailsApi, getClinicEmployeesApi, getPatientAppointmentsApi, getPatientProblemsApi, getProblemDetailsApi, getSearchCodesApi, getTaskApi, getTaskDetailsApi, updateAllergyApi, updateProblemsApi, updateTaskApi,  } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -335,7 +335,7 @@ function* createAllergyFunction(data) {
         });
         const response = yield call(createAllergyApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
+        if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: ClinicNotesActionTypes.CREATE_ALLERGY_SUCCESS,
@@ -414,6 +414,35 @@ function* getAllergiesOfAPatientFunction(data) {
     }
 }
 
+function* updateAllergyFunction(data) {
+    try {
+        yield put({
+            type: ClinicNotesActionTypes.UPDATE_ALLERGY_LOADING,
+            payload: {},
+        });
+        const response = yield call(updateAllergyApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: ClinicNotesActionTypes.UPDATE_ALLERGY_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: ClinicNotesActionTypes.UPDATE_ALLERGY_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: ClinicNotesActionTypes.UPDATE_ALLERGY_ERROR,
+            payload: error,
+        });
+    }
+}
+
 export function* callResetUpdate() {
     put({
         type: ClinicNotesActionTypes.RESET_UPDATE_STATUS,
@@ -479,6 +508,10 @@ export function* watchGetAllergiesOfAPatient() {
     yield takeEvery(ClinicNotesActionTypes.GET_ALLERGIES_OF_A_PATIENT, getAllergiesOfAPatientFunction);
 }
 
+export function* watchUpdateAllergy() {
+    yield takeEvery(ClinicNotesActionTypes.UPDATE_ALLERGY, updateAllergyFunction);
+}
+
 function* clinicNotesSaga() {
     yield all([
         fork(watchClinicEmployees),
@@ -495,6 +528,7 @@ function* clinicNotesSaga() {
         fork(watchCreateAllergy),
         fork(watchGetAllergyDetails),
         fork(watchGetAllergiesOfAPatient),
+        fork(watchUpdateAllergy),
 
     ]);
 }

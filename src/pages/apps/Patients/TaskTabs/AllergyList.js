@@ -6,12 +6,15 @@ import { IoInformationCircleOutline } from 'react-icons/io5';
 import { MdDeleteOutline } from 'react-icons/md';
 import { FaEye } from 'react-icons/fa';
 import AddAllergy from './AddAllergy';
-import { getAllergiesOfPatientAction } from '../../../../redux/actions';
+import { getAllergiesOfPatientAction, getAllergyDetailsAction } from '../../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import Spinner from '../../../../constants/Spinner';
+import UpdateAllergy from './UpdateTask/UpdateAllergy';
 
 const AllergyList = () => {
     const [showAddAllergy, setShowAddAllergy] = useState(false);
+    const [showUpdateAllergy, setShowUpdateAllergy] = useState(false);
+    const [selectedAllergy, setSelectedAllergy] = useState(null);
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const dispatch = useDispatch();
@@ -27,10 +30,17 @@ const AllergyList = () => {
         dispatch(getAllergiesOfPatientAction(data));
     }, [dispatch, patientId]);
 
+    const handleEditClick = (allergy) => {
+        setSelectedAllergy(allergy);
+        setShowUpdateAllergy(true);
+    };
+
     return (
         <div>
             {showAddAllergy ? (
                 <AddAllergy onCancel={() => setShowAddAllergy(false)} />
+            ) : showUpdateAllergy ? (
+                <UpdateAllergy allergy={selectedAllergy} onCancel={() => setShowUpdateAllergy(false)} />
             ) : (
                 <Row>
                     <Col sm={12} className="d-flex justify-content-between">
@@ -83,7 +93,17 @@ const AllergyList = () => {
                                                 <td>
                                                     <IoInformationCircleOutline className="fs-4 cursor-pointer text-black" />
                                                     &nbsp;
-                                                    <FiEdit className="fs-4 cursor-pointer text-black" />
+                                                    <FiEdit
+                                                        className="fs-4 cursor-pointer text-black"
+                                                        onClick={() => {
+                                                            handleEditClick(data);
+                                                            const requestData = {
+                                                                id: data?._id,
+                                                            };
+                                                            dispatch(getAllergyDetailsAction(requestData));
+                                                            // console.log(requestData, 'Request Data');
+                                                        }}
+                                                    />
                                                     &nbsp;
                                                     <MdDeleteOutline className="fs-4 cursor-pointer text-black" />
                                                 </td>

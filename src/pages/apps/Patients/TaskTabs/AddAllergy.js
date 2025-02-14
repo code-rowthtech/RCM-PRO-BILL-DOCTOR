@@ -140,25 +140,25 @@ const AddAllergy = ({ onCancel }) => {
                                 <option value="" hidden>
                                     Select Status
                                 </option>
-                                <option value="mild">Done</option>
-                                <option value="moderate">Pending</option>
-                                <option value="severe">Hold</option>
+                                <option value="Done">Done</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Hold">Hold</option>
                             </Form.Select>
                         </Form.Group>
                     </Col>
 
                     <Col sm={12}>
                         <Form.Group className="mb-1">
-                            <Form.Label htmlFor="note" className="mb-0">
+                            <Form.Label htmlFor="notes" className="mb-0">
                                 Note
                             </Form.Label>
                             <Form.Control
-                                id="note"
+                                id="notes"
                                 as="textarea"
                                 placeholder="Note"
                                 rows={4}
-                                {...register('note', { required: 'Note is required' })}
-                                data-has-value={!!watch('note')}
+                                {...register('notes', { required: 'Note is required' })}
+                                data-has-value={!!watch('notes')}
                             />
                         </Form.Group>
                     </Col>

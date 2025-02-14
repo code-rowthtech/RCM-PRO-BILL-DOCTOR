@@ -333,7 +333,7 @@ const NewPatient = () => {
 
                                                     {!isCameraOpen && (
                                                         <BiEdit
-                                                            className={`position-absolute fs-4 text-black ${
+                                                            className={`position-absolute fs-4 text-primary ${
                                                                 uploading ? 'd-none' : ''
                                                             }`}
                                                             style={{ bottom: '-5px', right: '-9px', cursor: 'pointer' }}

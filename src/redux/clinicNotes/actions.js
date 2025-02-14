@@ -72,3 +72,8 @@ export const getAllergiesOfPatientAction = (data): AuthAction => ({
     type: ClinicNotesActionTypes.GET_ALLERGIES_OF_A_PATIENT,
     data
 });
+
+export const updateAllergyAction = (data): AuthAction => ({
+    type: ClinicNotesActionTypes.UPDATE_ALLERGY,
+    data
+});

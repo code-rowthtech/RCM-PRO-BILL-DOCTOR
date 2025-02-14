@@ -71,6 +71,11 @@ export const GET_ALLERGIES_OF_A_PATIENT_INITIAL_STATE = {
     loading: false,
 }
 
+export const UPDATE_ALLERGY_INITIAL_STATE = {
+    data: [],
+    loading: false,
+}
+
 export const getClinicEmployeesReducer = (state = GET_CLINIC_EMPLOYEES_INITIAL_STATE, action) => {
     switch (action.type) {
         case ClinicNotesActionTypes.GET_CLINIC_EMPLOYEES_LOADING:
@@ -422,6 +427,32 @@ export const getAllergiesOfAPatientReducer = (state = GET_ALLERGIES_OF_A_PATIENT
                 loading: false
             }
         case ClinicNotesActionTypes.GET_ALLERGIES_OF_A_PATIENT_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicNotesActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false
+            }
+        default: return state
+    }
+}
+
+export const updateAllergyReducer = (state = UPDATE_ALLERGY_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case ClinicNotesActionTypes.UPDATE_ALLERGY_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case ClinicNotesActionTypes.UPDATE_ALLERGY_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicNotesActionTypes.UPDATE_ALLERGY_ERROR:
             return {
                 data: action.payload,
                 loading: false

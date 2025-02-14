@@ -73,3 +73,8 @@ export function getAllergiesOfAPatientApi(params: any): any {
     const { data } = params;
     return api.get(`${URL.getAllergiesOfAPatient}?patientId=${data?.patientId}`);
 }
+
+export function updateAllergyApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.updateAllergy, data);
+}

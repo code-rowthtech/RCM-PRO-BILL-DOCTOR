@@ -48,6 +48,7 @@ export const getPatientAppointments = '/api/v1/doctor/getPatientAppointments';
 export const createAllergy = '/api/v1/doctor/addAllergy';
 export const getAllergyDetails = '/api/v1/doctor/getAllergyDetails';
 export const getAllergiesOfAPatient = '/api/v1/doctor/getAllergiesOfAPatient';
+export const updateAllergy = '/api/v1/doctor/updateAllergy';
 
 // DASHBOARD
 export const getAnalytics = '/api/v1/admin/analytics';
