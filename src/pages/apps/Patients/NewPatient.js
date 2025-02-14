@@ -69,7 +69,7 @@ const NewPatient = () => {
     const primaryProvider = JSON.parse(sessionStorage.getItem('hyper_user'))?.firstName;
     const store = useSelector((state) => state);
     const patientsDataById = store?.getPatientsByIdReducer?.data?.patient || [];
-    
+
     // console.log(patientsDataById, 'patientsDataByIdpatientsDataById')
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
     const [profilePhoto, setProfilePhoto] = useState(profileDummy);
@@ -83,14 +83,13 @@ const NewPatient = () => {
     const [visibleSection, setVisibleSection] = useState('patient'); // Default section
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
 
-
     useEffect(() => {
-        dispatch(getPatientsByIdAction({ key: encryptMessage({id:id}) }));
-    }, [dispatch,id]);
+        dispatch(getPatientsByIdAction({ key: encryptMessage({ id: id }) }));
+    }, [dispatch, id]);
 
     useEffect(() => {
         if (updateSuccess === 200) {
-            dispatch(getPatientsByIdAction({ key: encryptMessage({id:id}) }));
+            dispatch(getPatientsByIdAction({ key: encryptMessage({ id: id }) }));
             dispatch(resetUpdateAction());
             setLogo(null);
             setLogoName('');
@@ -150,7 +149,7 @@ const NewPatient = () => {
             ],
         },
         { label: 'Drug Interactions', icon: <AiOutlineInteraction /> },
-        { label: 'Care Quality Indicators (CQIs)', icon: <FaUserDoctor /> },
+        { label: 'CQIs', icon: <FaUserDoctor /> },
         { label: 'Lab Request', icon: <TbReportSearch /> },
         { label: 'Vaccinations', icon: <TbVaccine /> },
         { label: 'Patient Access', icon: <SiPrivateinternetaccess /> },
@@ -715,7 +714,7 @@ const NewPatient = () => {
                                                         <AddAsignTask />
                                                     </div>
                                                 </div>
-                                                  {selectedSubTab === 'Assign Task' && (
+                                                {selectedSubTab === 'Assign Task' && (
                                                     <FilterDropdown
                                                         showFilterDropdown={showFilterDropdown}
                                                         setShowFilterDropdown={setShowFilterDropdown}
@@ -783,11 +782,12 @@ const NewPatient = () => {
                                                 item.subItems ? (
                                                     <div key={index} className="ms-0">
                                                         <p
-                                                            className={`patient-menu-item text-black mb-0 ps-2 pe-2 border-bottom py-1 ${
-                                                                isSidebarCollapsed
-                                                                    ? 'text-center fw-bold'
-                                                                    : 'd-flex justify-content-between align-items-center'
-                                                            }`}
+                                                            className={`patient-menu-item text-black mb-0 ps-2 pe-2 border-bottom py-1 
+                                                                         ${
+                                                                             isSidebarCollapsed
+                                                                                 ? 'text-center fw-bold'
+                                                                                 : 'd-flex justify-content-between align-items-center'
+                                                                         }`}
                                                             onClick={handleClinicalReviewToggle}
                                                             style={{
                                                                 cursor: 'pointer',
@@ -795,32 +795,44 @@ const NewPatient = () => {
                                                                     ? '#f8f9fa'
                                                                     : 'transparent',
                                                             }}>
-                                                            <span className="text-center">
-                                                                {item?.icon}&nbsp;{item.label}
-                                                            </span>
-                                                            <i
-                                                                className={`bi ${
-                                                                    isClinicalReviewExpanded
-                                                                        ? 'bi-chevron-up'
-                                                                        : 'bi-chevron-down'
+                                                            <span
+                                                                className={
+                                                                    isSidebarCollapsed
+                                                                        ? 'd-block w-100 text-center'
+                                                                        : 'd-flex'
                                                                 }
-                                                           ${isSidebarCollapsed ? 'd-none' : ''}     
-                                                                `}></i>
+                                                                title={isSidebarCollapsed ? item.label : ''}>
+                                                                <span
+                                                                    style={{
+                                                                        marginTop: '0px',
+                                                                        display: 'inline-block',
+                                                                    }}>
+                                                                    {item?.icon}
+                                                                </span>
+                                                                {!isSidebarCollapsed && <>&nbsp;{item.label}</>}
+                                                            </span>
+                                                            {!isSidebarCollapsed && (
+                                                                <i
+                                                                    className={`bi ${
+                                                                        isClinicalReviewExpanded
+                                                                            ? 'bi-chevron-up'
+                                                                            : 'bi-chevron-down'
+                                                                    }`}></i>
+                                                            )}
                                                         </p>
                                                         {isClinicalReviewExpanded && (
                                                             <div className="ms-0">
                                                                 {item.subItems.map((subItem, subIndex) => (
-                                                                    <div className="d-flex justify-content-between align-items-center ps-4 border-bottom py-1 pe-2">
+                                                                    <div
+                                                                        key={subIndex}
+                                                                        className="d-flex justify-content-between align-items-center ps-4 border-bottom py-1 pe-2">
                                                                         <p
-                                                                            key={subIndex}
                                                                             className="text-black mb-0 d-flex"
                                                                             onClick={() =>
                                                                                 handleTabClick(subItem.label)
                                                                             }
                                                                             style={{
                                                                                 cursor: 'pointer',
-                                                                                // backgroundColor:
-                                                                                //     selectedSubTab === subItem.label ? '#e9ecef' : 'transparent',
                                                                                 fontWeight:
                                                                                     selectedSubTab === subItem.label
                                                                                         ? 'bold'
@@ -836,18 +848,25 @@ const NewPatient = () => {
                                                                                 }}>
                                                                                 0
                                                                             </span>
-                                                                            {subItem.label}
+                                                                            {!isSidebarCollapsed && subItem.label}
                                                                         </p>
-                                                                        <p
-                                                                            className="mb-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
-                                                                            style={{
-                                                                                width: '20px',
-                                                                                height: '20px',
-                                                                                fontSize: '10px',
-                                                                                lineHeight: '20px',
-                                                                            }}>
-                                                                            {subItem.icon}
-                                                                        </p>
+                                                                        {!isSidebarCollapsed && (
+                                                                            <p
+                                                                                className="mb-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                                                                                style={{
+                                                                                    width: '20px',
+                                                                                    height: '20px',
+                                                                                    fontSize: '10px',
+                                                                                    lineHeight: '20px',
+                                                                                }}
+                                                                                title={
+                                                                                    isSidebarCollapsed
+                                                                                        ? subItem.label
+                                                                                        : ''
+                                                                                }>
+                                                                                {subItem.icon}
+                                                                            </p>
+                                                                        )}
                                                                     </div>
                                                                 ))}
                                                             </div>
@@ -856,9 +875,8 @@ const NewPatient = () => {
                                                 ) : (
                                                     <p
                                                         key={index}
-                                                        className={`patient-menu-item text-black mb-0 ps-2 py-1 d-flex align-items-center ${
-                                                            isSidebarCollapsed ? ' fw-bold' : ''
-                                                        }`}
+                                                        className={`patient-menu-item text-black mb-0 py-1 d-flex align-items-center 
+                                                                  ${isSidebarCollapsed ? 'text-center' : 'ps-2'}`}
                                                         onClick={() => handleChartTabChange(item.label)}
                                                         style={{
                                                             cursor: 'pointer',
@@ -868,9 +886,12 @@ const NewPatient = () => {
                                                                     : 'transparent',
                                                             fontWeight:
                                                                 selectedSubTab === item.label ? 'bold' : 'normal',
-                                                        }}>
-                                                        {item?.icon}&nbsp;{item.label}
-                                                        {/* <i className={`${item.icon}`}></i> <span className={`${isSidebarCollapsed ? 'd-none' : ''}`}>{item.label}</span> */}
+                                                        }}
+                                                        title={isSidebarCollapsed ? item.label : ''}>
+                                                        <span className={isSidebarCollapsed ? 'w-100 text-center' : ''}>
+                                                            {item?.icon}
+                                                        </span>
+                                                        {!isSidebarCollapsed && <>&nbsp;{item.label}</>}
                                                     </p>
                                                 )
                                             )}
