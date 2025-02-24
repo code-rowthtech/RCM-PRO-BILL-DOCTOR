@@ -42,6 +42,7 @@ import AddAsignTask from './TaskTabs/AddAsignTask';
 import ProblemList from './TaskTabs/ProblemList';
 import AllergyList from './TaskTabs/AllergyList';
 import FilterDropdown from './FilterDropdown';
+import Drug from './DrugIntraction/Drug';
 
 const NewPatient = () => {
     const navigate = useNavigate();
@@ -84,18 +85,21 @@ const NewPatient = () => {
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
 
     useEffect(() => {
-        dispatch(getPatientsByIdAction({ key: encryptMessage({ id: id }) }));
-    }, [dispatch, id]);
+        if (id) {
+            dispatch(getPatientsByIdAction({ key: encryptMessage({ id }) }));
+        }
+    }, [dispatch, id]); // Ensures this only runs when `id` changes
 
     useEffect(() => {
         if (updateSuccess === 200) {
-            dispatch(getPatientsByIdAction({ key: encryptMessage({ id: id }) }));
+            dispatch(getPatientsByIdAction({ key: encryptMessage({ id }) })); // Only if ID is valid
             dispatch(resetUpdateAction());
             setLogo(null);
             setLogoName('');
             setIsCameraOpen(false);
         }
-    }, [updateSuccess]);
+    }, [updateSuccess, id, dispatch]); // Ensure dependencies are correctly set
+
 
     const handleMainTabChange = (tab) => {
         setSelectedMainTab(tab);
@@ -116,13 +120,19 @@ const NewPatient = () => {
 
         setSelectedSubTab(tab);
     };
+    const tabMappings = {
+        'Patient Info': { mainTab: 'Patient Details', section: 'patient' },
+        'Drug Interactions': { mainTab: 'Drug Interactions', section: 'drug' }
+    };
+
     const handleChartTabChange = (tab) => {
-        if (tab === 'Patient Info') {
-            setSelectedMainTab('Patient Details');
-            setVisibleSection('patient');
-            return;
+        const mapping = tabMappings[tab];
+        if (mapping) {
+            setSelectedMainTab(mapping.mainTab);
+            setVisibleSection(mapping.section);
         }
     };
+
 
     const handleClinicalReviewToggle = () => {
         setIsClinicalReviewExpanded(!isClinicalReviewExpanded);
@@ -260,11 +270,11 @@ const NewPatient = () => {
             ...(logo?.url === null
                 ? {}
                 : {
-                      patientChartPhoto: {
-                          url: logo?.url?.split('?')[0] || patientsDataById?.patientChartPhoto?.url,
-                          fileName: logoName,
-                      },
-                  }),
+                    patientChartPhoto: {
+                        url: logo?.url?.split('?')[0] || patientsDataById?.patientChartPhoto?.url,
+                        fileName: logoName,
+                    },
+                }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
         // console.log(payload, 'payloadpayload')
@@ -317,8 +327,8 @@ const NewPatient = () => {
                                                                 logo?.url
                                                                     ? logo.url.split('?')[0]
                                                                     : patientsDataById?.patientChartPhoto?.url
-                                                                    ? patientsDataById.patientChartPhoto.url
-                                                                    : profilePhoto
+                                                                        ? patientsDataById.patientChartPhoto.url
+                                                                        : profilePhoto
                                                             }
                                                             alt="Patient Profile"
                                                             className="img-fluid rounded"
@@ -332,9 +342,8 @@ const NewPatient = () => {
 
                                                     {!isCameraOpen && (
                                                         <BiEdit
-                                                            className={`position-absolute fs-4 text-primary ${
-                                                                uploading ? 'd-none' : ''
-                                                            }`}
+                                                            className={`position-absolute fs-4 text-primary ${uploading ? 'd-none' : ''
+                                                                }`}
                                                             style={{ bottom: '-5px', right: '-9px', cursor: 'pointer' }}
                                                             onClick={openCamera}
                                                         />
@@ -388,8 +397,8 @@ const NewPatient = () => {
                                                         <span>
                                                             {patientsDataById?.dateOfBirth
                                                                 ? new Date(
-                                                                      patientsDataById.dateOfBirth
-                                                                  ).toLocaleDateString('en-GB')
+                                                                    patientsDataById.dateOfBirth
+                                                                ).toLocaleDateString('en-GB')
                                                                 : 'N/A'}
                                                         </span>
                                                     </p>
@@ -462,11 +471,11 @@ const NewPatient = () => {
                                                                         style={{ fontWeight: 600 }}>
                                                                         {patientsDataById?.address?.address
                                                                             ? patientsDataById.address.address.length >
-                                                                              30
+                                                                                30
                                                                                 ? patientsDataById.address.address.slice(
-                                                                                      0,
-                                                                                      30
-                                                                                  ) + '...'
+                                                                                    0,
+                                                                                    30
+                                                                                ) + '...'
                                                                                 : patientsDataById.address.address
                                                                             : 'N/A'}
                                                                     </span>
@@ -504,8 +513,8 @@ const NewPatient = () => {
                                                                         style={{ fontWeight: 600 }}>
                                                                         {patientsDataById?.createdAt
                                                                             ? new Date(
-                                                                                  patientsDataById.createdAt
-                                                                              ).toLocaleDateString('en-GB')
+                                                                                patientsDataById.createdAt
+                                                                            ).toLocaleDateString('en-GB')
                                                                             : 'N/A'}
                                                                     </span>
                                                                 </div>
@@ -561,8 +570,8 @@ const NewPatient = () => {
                                                     {isRunning
                                                         ? `Pause (${formatTime(timeLeft)})`
                                                         : timeLeft > 0
-                                                        ? `Resume (${formatTime(timeLeft)})`
-                                                        : 'Start Session'}
+                                                            ? `Resume (${formatTime(timeLeft)})`
+                                                            : 'Start Session'}
                                                 </Button>
 
                                                 <Button
@@ -602,11 +611,10 @@ const NewPatient = () => {
                                                     ].map((tab) => (
                                                         <li className="nav-item" key={tab}>
                                                             <a
-                                                                className={`nav-link me-3 pb-0 tab-font-family ${
-                                                                    selectedMainTab === tab
-                                                                        ? 'active text-primary'
-                                                                        : 'text-black'
-                                                                }`}
+                                                                className={`nav-link me-3 pb-0 tab-font-family ${selectedMainTab === tab
+                                                                    ? 'active text-primary'
+                                                                    : 'text-black'
+                                                                    }`}
                                                                 onClick={() => handleMainTabChange(tab)}
                                                                 style={{ cursor: 'pointer', fontWeight: 600 }}>
                                                                 {tab}
@@ -679,11 +687,10 @@ const NewPatient = () => {
                                                     ].map((subTab) => (
                                                         <li className="nav-item" key={subTab}>
                                                             <a
-                                                                className={`nav-link me-2 pb-0 tab-font-family ${
-                                                                    selectedSubTab === subTab
-                                                                        ? 'active text-primary'
-                                                                        : 'text-black'
-                                                                }`}
+                                                                className={`nav-link me-2 pb-0 tab-font-family ${selectedSubTab === subTab
+                                                                    ? 'active text-primary'
+                                                                    : 'text-black'
+                                                                    }`}
                                                                 onClick={() => handleSubTabChange(subTab)}
                                                                 style={{ cursor: 'pointer', fontWeight: 600 }}>
                                                                 {subTab}
@@ -739,6 +746,13 @@ const NewPatient = () => {
                                     </Card>
                                 </div>
                             )}
+
+                            {/* Other Sections */}
+                            {visibleSection === 'drug' && (
+                                <>
+                                    <Drug />
+                                </>
+                            )}
                         </div>
 
                         {/* Sidebar */}
@@ -768,9 +782,8 @@ const NewPatient = () => {
                                             aria-controls="patientChartData"
                                             onClick={handleToggle}>
                                             <i
-                                                className={`bi ${
-                                                    isClinicalReviewExpandedData ? 'bi-chevron-up' : 'bi-chevron-down'
-                                                }`}
+                                                className={`bi ${isClinicalReviewExpandedData ? 'bi-chevron-up' : 'bi-chevron-down'
+                                                    }`}
                                                 style={{ fontSize: '14px', color: 'white' }}></i>
                                         </button>
                                     </div>
@@ -783,11 +796,10 @@ const NewPatient = () => {
                                                     <div key={index} className="ms-0">
                                                         <p
                                                             className={`patient-menu-item text-black mb-0 ps-2 pe-2 border-bottom py-1 
-                                                                         ${
-                                                                             isSidebarCollapsed
-                                                                                 ? 'text-center fw-bold'
-                                                                                 : 'd-flex justify-content-between align-items-center'
-                                                                         }`}
+                                                                         ${isSidebarCollapsed
+                                                                    ? 'text-center fw-bold'
+                                                                    : 'd-flex justify-content-between align-items-center'
+                                                                }`}
                                                             onClick={handleClinicalReviewToggle}
                                                             style={{
                                                                 cursor: 'pointer',
@@ -813,11 +825,10 @@ const NewPatient = () => {
                                                             </span>
                                                             {!isSidebarCollapsed && (
                                                                 <i
-                                                                    className={`bi ${
-                                                                        isClinicalReviewExpanded
-                                                                            ? 'bi-chevron-up'
-                                                                            : 'bi-chevron-down'
-                                                                    }`}></i>
+                                                                    className={`bi ${isClinicalReviewExpanded
+                                                                        ? 'bi-chevron-up'
+                                                                        : 'bi-chevron-down'
+                                                                        }`}></i>
                                                             )}
                                                         </p>
                                                         {isClinicalReviewExpanded && (
@@ -926,9 +937,8 @@ const NewPatient = () => {
                             {modalTabs.map((modalTab) => (
                                 <li className="nav-item" key={modalTab}>
                                     <a
-                                        className={`nav-link text-black me-2 ${
-                                            activeModalTab === modalTab ? 'active fw-bold' : ''
-                                        }`}
+                                        className={`nav-link text-black me-2 ${activeModalTab === modalTab ? 'active fw-bold' : ''
+                                            }`}
                                         onClick={() => handleModalTabClick(modalTab)}
                                         style={{ cursor: 'pointer' }}>
                                         {modalTab}
