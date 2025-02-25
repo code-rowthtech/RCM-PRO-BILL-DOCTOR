@@ -43,6 +43,7 @@ import ProblemList from './TaskTabs/ProblemList';
 import AllergyList from './TaskTabs/AllergyList';
 import FilterDropdown from './FilterDropdown';
 import Drug from './DrugIntraction/Drug';
+import CQIs from './CQIs/CQIs';
 
 const NewPatient = () => {
     const navigate = useNavigate();
@@ -122,7 +123,9 @@ const NewPatient = () => {
     };
     const tabMappings = {
         'Patient Info': { mainTab: 'Patient Details', section: 'patient' },
-        'Drug Interactions': { mainTab: 'Drug Interactions', section: 'drug' }
+        'Drug Interactions': { mainTab: 'Drug Interactions', section: 'drug' },
+        'CQIs': { mainTab: 'CQIs', section: 'CQIs' }
+
     };
 
     const handleChartTabChange = (tab) => {
@@ -747,10 +750,16 @@ const NewPatient = () => {
                                 </div>
                             )}
 
-                            {/* Other Sections */}
+                            {/* Drug Sections */}
                             {visibleSection === 'drug' && (
                                 <>
                                     <Drug />
+                                </>
+                            )}
+                            {/* CQIs section */}
+                            {visibleSection === 'CQIs' && (
+                                <>
+                                    <CQIs />
                                 </>
                             )}
                         </div>
