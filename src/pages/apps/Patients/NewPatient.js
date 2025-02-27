@@ -44,6 +44,7 @@ import AllergyList from './TaskTabs/AllergyList';
 import FilterDropdown from './FilterDropdown';
 import Drug from './DrugIntraction/Drug';
 import CQIs from './CQIs/CQIs';
+import LabRequest from './LabRequest/LabRequest';
 
 const NewPatient = () => {
     const navigate = useNavigate();
@@ -124,7 +125,8 @@ const NewPatient = () => {
     const tabMappings = {
         'Patient Info': { mainTab: 'Patient Details', section: 'patient' },
         'Drug Interactions': { mainTab: 'Drug Interactions', section: 'drug' },
-        'CQIs': { mainTab: 'CQIs', section: 'CQIs' }
+        'CQIs': { mainTab: 'CQIs', section: 'CQIs' },
+        'Lab Request': { mainTab: 'Lab Request', section: 'Lab Request' }
 
     };
 
@@ -760,6 +762,12 @@ const NewPatient = () => {
                             {visibleSection === 'CQIs' && (
                                 <>
                                     <CQIs />
+                                </>
+                            )}
+                            {/* Lab Request section */}
+                            {visibleSection === 'Lab Request' && (
+                                <>
+                                    <LabRequest />
                                 </>
                             )}
                         </div>
