@@ -2,7 +2,7 @@ name: ARC-PRO-BILL-DOCTOR cicd
 
 on:
   push:
-    branches: [ FHIR-PROD ]
+    branches: [ main ]
 
 jobs:
   build:
