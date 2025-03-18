@@ -1,0 +1,2 @@
+(this["webpackJsonphyper-react"]=this["webpackJsonphyper-react"]||[]).push([[38],{894:function(e,t,a){"use strict";a.r(t);a(2);var r=a(449),s=a(1);t.default=()=>Object(s.jsx)(s.Fragment,{children:Object(s.jsx)(r.a,{breadCrumbItems:[{label:"Pages",path:"/pages/starter"},{label:"Starter",path:"/pages/starter",active:!0}],title:"Starter"})})}}]);
+//# sourceMappingURL=38.20522036.chunk.js.map
