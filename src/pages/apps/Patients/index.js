@@ -13,17 +13,15 @@ const Patients = () => {
     const dispatch = useDispatch();
     const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
     const store = useSelector((state) => state);
-    const patientsData = store?.getPatientsReducer?.data?.patients || [];
-    console.log(patientsData, 'patientsData')
+    const patientsData = store?.getPatientsReducer?.data?.data || [];
+    // console.log(store?.getPatientsReducer?.data?.data, 'patientsData')
     useEffect(() => {
         const data = {
             doctorId: doctorId,
         }
-        dispatch(getPatientsAction({ key: encryptMessage(data) }));
+        dispatch(getPatientsAction( data ));
 
     }, [dispatch]);
-
-
 
     return (
         <>
@@ -74,9 +72,9 @@ const Patients = () => {
                                                         <tr key={index}>
                                                             <td>{data.chartNumber}</td>
                                                             <td className='text-capitalize'>
-                                                                {data.firstName + ' ' + data.lastName}
+                                                                {data?.name?.[0]?.text}
                                                             </td>
-                                                            <td>{data.cellPhone || 'N/A'}</td>
+                                                            <td>{data?.telecom?.[1]?.value || 'N/A'}</td>
                                                             <td>{data.appointmentDate || 'N/A'}</td>
                                                             <td>
                                                                 <Link to={`/apps/patients/new-patient?id=${data?._id}`} >

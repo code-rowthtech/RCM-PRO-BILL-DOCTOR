@@ -39,20 +39,21 @@ input,
 textarea,
 select {
     /* border: 1px solid rgba(15, 13, 13, 0.473) !important; */
-    border: 0px!important;
-    background-color: #e5f4ff!important;
-    height: 30px!important;
-    padding: 0%!important;
+    border: 0px !important;
+    background-color: #e5f4ff !important;
+    height: 30px !important;
+    padding: 0% !important;
 }
 
 .form-label {
     color: black;
     font-weight: 500 !important;
     opacity: 0.4;
-    font-size: 13px!important;
+    font-size: 13px !important;
 }
-.nav-underline .nav-link:hover{
-    border-bottom-color:none!important;
+
+.nav-underline .nav-link:hover {
+    border-bottom-color: none !important;
 }
 
 .form-label {
@@ -70,6 +71,7 @@ select {
     background-color: #e8f0fe !important;
     border: 0px !important;
 }
+
 .form-select {
     color: #0908084f !important;
     font-weight: 550 !important;
@@ -78,14 +80,17 @@ select {
     background-color: #e8f0fe !important;
     border: 0px !important;
 }
+
 .form-control:focus,
 .form-select:focus {
     color: black !important;
 }
+
 .form-control[data-has-value='true'],
 .form-select[data-has-value='true'] {
     color: black !important;
 }
+
 .custom-form-fields,
 .form-control::placeholder {
     color: #0908084f !important;
@@ -97,10 +102,13 @@ select {
     align-items: center;
     /* border: 1px solid rgba(15, 13, 13, 0.473) !important; */
     border-radius: 4px;
-    padding: 7px 12px;
+    padding: 7px 7px;
     width: 100%;
-    background-color: #e5f4ff;
+    background-color: #e8f0fe;
+    font-weight: 600 !important;
+    font-size: 12px !important;
 }
+
 tbody tr:nth-child(even) {
     background-color: #efefef !important;
 }
@@ -119,17 +127,19 @@ table {
     box-shadow: none !important;
 }
 
-.select__input{
+.select__input {
     border: none !important;
 
 }
-.buttons-head div{
+
+.buttons-head div {
     width: 50% !important;
 }
+
 /* patient  */
 .patient-menu-container {
     max-width: 300px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
 }
 
@@ -160,10 +170,12 @@ table {
     color: black;
     transition: background-color 0.3s ease;
 }
-.nav-underline .nav-link.active{
+
+.nav-underline .nav-link.active {
     /* border-bottom-color: #727CF5!important; */
-    border-bottom: 3px solid #727CF5!important;
+    border-bottom: 3px solid #727CF5 !important;
 }
+
 .scroll-container {
     overflow: auto;
     /* / Allow scrolling / */
@@ -172,19 +184,29 @@ table {
     scrollbar-width: none;
     /* / Hide scrollbar for Firefox / */
 }
-body{
-font-family: 'Charlie Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Noto Sans', 'Oxygen', 'Ubuntu', 'Droid Sans', 'Helvetica Neue', sans-serif;
+
+body {
+    font-family: 'Charlie Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Noto Sans', 'Oxygen', 'Ubuntu', 'Droid Sans', 'Helvetica Neue', sans-serif;
 
 }
+
 .custom-btn-group button {
-    height: 30px !important; /* Ensure consistent height */
-    line-height: normal;     /* Allow proper vertical alignment */
-    padding: 0 10px;         /* Optional padding for aesthetics */
-    display: flex;           /* Use flexbox for alignment */
-    justify-content: center; /* Center text horizontally */
-    align-items: center;     /* Center text vertically */
-    text-align: center;      /* Center text alignment */
+    height: 30px !important;
+    /* Ensure consistent height */
+    line-height: normal;
+    /* Allow proper vertical alignment */
+    padding: 0 10px;
+    /* Optional padding for aesthetics */
+    display: flex;
+    /* Use flexbox for alignment */
+    justify-content: center;
+    /* Center text horizontally */
+    align-items: center;
+    /* Center text vertically */
+    text-align: center;
+    /* Center text alignment */
 }
+
 .scroll-container {
     overflow-y: auto;
 }
@@ -192,24 +214,64 @@ font-family: 'Charlie Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Rob
 :root {
     overflow: hidden;
 }
+
 select.form-control:not([size]):not([multiple]) {
     height: auto;
 }
+
 select.form-control:not([size]):not([multiple]) {
     height: 30px;
 }
-.input-group-text{
+
+.input-group-text {
     height: 30px;
 }
+
 .custom-checkbox {
     height: 20px !important;
 }
-.form-check-input{
-    height: 20px!important;
+
+.form-check-input {
+    height: 20px !important;
 }
-.offcanvas{
-    width:35vw!important;
+
+.offcanvas {
+    width: 35vw !important;
 }
-textarea.form-control{
-    height: auto!important;
+
+textarea.form-control {
+    height: auto !important;
+}
+
+
+.css-hlgwow {
+    height: 30px !important;
+    padding: 0px 8px !important;
+    background-color: #e8f0fe !important;
+    border-top-left-radius: 4px !important;
+    border-bottom-left-radius: 4px !important;
+
+}
+
+.css-1wy0on6 {
+    height: 30px !important;
+    background-color: #e8f0fe !important;
+    border-top-right-radius: 4px !important;
+    border-bottom-right-radius: 4px !important;
+}
+
+.cancel-button {
+    background-color: #5c636b !important;
+    border: none !important;
+    font-size: 13px;
+    height: 30px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    border-radius: 10px;
+}
+
+hr {
+    color: #726e6e8a !important;
+
 }
