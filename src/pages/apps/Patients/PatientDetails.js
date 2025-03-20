@@ -29,6 +29,7 @@ const PatientDetails = () => {
     const [deceasedDateTime, setDeceasedDateTime] = useState('');
     const [profileUploading, setProfileUploading] = useState(false);
     const doctorName = JSON.parse(sessionStorage.getItem('hyper_user'))?.name?.text
+    const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.userId
 
     const patientsDataById = store?.getPatientsByIdReducer?.data?.data;
     console.log(patientsDataById, 'data0987654321')
@@ -115,40 +116,121 @@ const PatientDetails = () => {
 
     const onSubmit = (data) => {
         const payload = {
-            id: id,
-            ...(selectedDoctor ? { primaryProvider: selectedDoctor?.value } : {}),
-            ...(data?.patientStatus ? { status: data?.patientStatus } : {}),
-            ...(data?.title ? { title: data?.title } : {}),
-            ...(data?.firstName ? { firstName: data?.firstName } : {}),
-            ...(data?.middleName ? { middleName: data?.middleName } : {}),
-            ...(data?.lastName ? { lastName: data?.lastName } : {}),
-            ...(data?.birthName ? { birthName: data?.birthName } : {}),
-            ...(data?.dateOfBirth ? { dateOfBirth: data?.dateOfBirth } : {}),
-            ...(data?.suffix ? { suffix: data?.suffix } : {}),
-            ...(logo?.url === null
-                ? {}
-                : {
-                    patientChartPhoto: {
-                        url: logo?.url?.split('?')[0] || patientsDataById?.patientChartPhoto?.url,
-                        fileName: logoName
-                    }
-                }),
-            ...(data?.homePhone ? { homePhone: data?.homePhone?.replace(/\D/g, '') } : {}),
-            ...(data?.cellPhone ? { cellPhone: data?.cellPhone?.replace(/\D/g, '') } : {}),
-            ...(data?.officePhone ? { officePhone: data?.officePhone?.replace(/\D/g, '') } : {}),
-            ...(data?.email ? { email: data?.email } : {}),
-            ...(data?.alternateEmail ? { alternativeEmail: data?.alternateEmail } : {}),
-            ...(data?.preferredCommunication ? { preferredCommunication: data?.preferredCommunication } : {}),
-            ...(data?.reminderLanguage ? { reminderLanguage: data?.reminderLanguage } : {}),
-            ...(data?.medicationHistoryConsent ? { medicationHistoryConsent: data?.medicationHistoryConsent === 'true' ? true : false } : {}),
-            ...(data?.paymentProfile ? { paymentProfile: data?.paymentProfile } : {}),
-            ...(data?.patientCopayAmount ? { patientCopayAmount: data?.patientCopayAmount } : {}),
-            ...(data?.followupDate ? { followupDate: data?.followupDate } : {}),
-            ...(data?.followupReason ? { followupReason: data?.followupReason } : {}),
+            id: id, // Ensure patient ID is included for update
+            // clinicId: clinicId || '',
+            birthDate: data?.dateOfBirth || '',
+            approxAge: data?.approxAge || '0',
+            followupDate: data?.followupDate || '',
+            gender: data?.gender || '',
+            followupReason: data?.followupReason || '',
+            medicationHistoryConsent: data?.medicationHistoryConsent ?? false,
+            patientCopayAmount: data?.patientCopayAmount || '0',
+            paymentProfile: data?.paymentProfile || '',
+            preferredCommunication: data?.preferredCommunication || '',
+            reminderLanguage: data?.reminderLanguage || '',
+            patientStatus: data?.patientStatus || '',
+            doctorId: doctorId || '', // Ensure _id of selected doctor is sent
+        };
+
+        // *Name structure (FHIR compliant)*
+        payload.name = [
+            {
+                given: [data?.firstName || '', data?.middleName || ''].filter(Boolean),
+                family: data?.lastName || '',
+                preferred: true,
+                text: `${data?.firstName || ''} ${data?.lastName || ''}`.trim(),
+                use: 'official',
+                suffix: [data?.suffix || ''],
+                prefix: [data?.title || ''],
+            },
+        ];
+        if (data?.previousBirthName) {
+
+            payload.name.push({
+                use: 'old',
+                text: data.previousBirthName,
+                family: data.lastName || '',
+                given: [data.firstName || '', data.middleName || ''].filter(Boolean),
+                period: {
+                    start: data?.previousBirthNameStartDate
+                        ? new Date(data.previousBirthNameStartDate).toISOString()
+                        : null,
+                    end: data?.previousBirthNameEndDate ? new Date(data.previousBirthNameEndDate).toISOString() : null,
+                },
+            });
         }
-        // dispatch(updatePatientsAction({ key: encryptMessage(payload) }))
-        console.log(payload, 'payload')
-    }
+
+        // *Telecom (Phone & Email)*
+        payload.telecom = [
+            { system: 'phone', use: 'home', value: data?.homePhone || '' },
+            { system: 'phone', use: 'mobile', value: data?.cellPhone || '' },
+            { system: 'phone', use: 'work', value: data?.officePhone || '' },
+            { system: 'email', use: 'mobile', value: data?.email || '' },
+            { system: 'email', use: 'work', value: data?.alternateEmail || '' },
+        ].filter((t) => t.value); // Remove empty values
+
+        // *Photo (if exists)*
+        if (logo?.url) {
+            payload.photo = [
+                {
+                    contentType: logo?.fileType || 'image/jpeg',
+                    url: logo?.url?.split('?')[0],
+                    data: logo?.base64 || undefined,
+                    hash: logo?.hash || '',
+                    title: logoName || '',
+                    creation: new Date().toISOString(),
+                },
+            ];
+        }
+
+        // *Handle Deceased Status*
+        if (data?.patientStatus === 'Inactive-Deceased') {
+            payload.deceasedBoolean = true;
+            if (data?.deceasedDateTime) {
+                payload.deceasedDateTime = new Date(data.deceasedDateTime).toISOString();
+            }
+        }
+
+        dispatch(updatePatientsAction({ key: encryptMessage(payload) }))
+        console.log(payload, 'main')
+    };
+    // const onSubmit = (data) => {
+    //     const payload = {
+    //         id: id,
+    //         ...(selectedDoctor ? { primaryProvider: selectedDoctor?.value } : {}),
+    //         ...(data?.patientStatus ? { status: data?.patientStatus } : {}),
+    //         ...(data?.title ? { title: data?.title } : {}),
+    //         ...(data?.firstName ? { firstName: data?.firstName } : {}),
+    //         ...(data?.middleName ? { middleName: data?.middleName } : {}),
+    //         ...(data?.lastName ? { lastName: data?.lastName } : {}),
+    //         ...(data?.birthName ? { birthName: data?.birthName } : {}),
+    //         ...(data?.dateOfBirth ? { dateOfBirth: data?.dateOfBirth } : {}),
+    //         ...(data?.suffix ? { suffix: data?.suffix } : {}),
+    //         ...(logo?.url === null
+    //             ? {}
+    //             : {
+    //                 patientChartPhoto: {
+    //                     url: logo?.url?.split('?')[0] || patientsDataById?.patientChartPhoto?.url,
+    //                     fileName: logoName
+    //                 }
+    //             }),
+    //         ...(data?.homePhone ? { homePhone: data?.homePhone?.replace(/\D/g, '') } : {}),
+    //         ...(data?.cellPhone ? { cellPhone: data?.cellPhone?.replace(/\D/g, '') } : {}),
+    //         ...(data?.officePhone ? { officePhone: data?.officePhone?.replace(/\D/g, '') } : {}),
+    //         ...(data?.email ? { email: data?.email } : {}),
+    //         ...(data?.alternateEmail ? { alternativeEmail: data?.alternateEmail } : {}),
+    //         ...(data?.preferredCommunication ? { preferredCommunication: data?.preferredCommunication } : {}),
+    //         ...(data?.reminderLanguage ? { reminderLanguage: data?.reminderLanguage } : {}),
+    //         ...(data?.medicationHistoryConsent ? { medicationHistoryConsent: data?.medicationHistoryConsent === 'true' ? true : false } : {}),
+    //         ...(data?.paymentProfile ? { paymentProfile: data?.paymentProfile } : {}),
+    //         ...(data?.patientCopayAmount ? { patientCopayAmount: data?.patientCopayAmount } : {}),
+    //         ...(data?.followupDate ? { followupDate: data?.followupDate } : {}),
+    //         ...(data?.followupReason ? { followupReason: data?.followupReason } : {}),
+
+    //     }
+    //     dispatch(updatePatientsAction({ key: encryptMessage(payload) }))
+    //     console.log(payload, 'payload')
+    // }
 
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];

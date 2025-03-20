@@ -275,7 +275,7 @@ const NewPatient = () => {
                 : {
                     photo: {
                         url: logo?.url?.split('?')[0] || patientsDataById?.patientChartPhoto?.url,
-                        fileName: logoName,
+                        title: logoName,
                     },
                 }),
         };
