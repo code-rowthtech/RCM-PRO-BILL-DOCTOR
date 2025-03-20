@@ -102,9 +102,11 @@ select {
     align-items: center;
     /* border: 1px solid rgba(15, 13, 13, 0.473) !important; */
     border-radius: 4px;
-    padding: 7px 12px;
+    padding: 7px 7px;
     width: 100%;
     background-color: #e8f0fe;
+    font-weight: 600 !important;
+    font-size: 12px !important;
 }
 
 tbody tr:nth-child(even) {
@@ -241,19 +243,21 @@ textarea.form-control {
     height: auto !important;
 }
 
-.css-c1flly-control {
-    font-size: 12px !important;
-    font-weight: 700 !important;
-    background-color: #e8f0fe !important;
+
+.css-hlgwow {
     height: 30px !important;
-    min-height: auto!important;
+    padding: 0px 8px !important;
+    background-color: #e8f0fe !important;
+    border-top-left-radius: 4px !important;
+    border-bottom-left-radius: 4px !important;
+
 }
 
-.css-1xc3v61-indicatorContainer {
+.css-1wy0on6 {
     height: 30px !important;
-    /* padding-top: 2px!important;
-    padding-bottom: 2px!important; */
-    /* padding: 0px!important; */
+    background-color: #e8f0fe !important;
+    border-top-right-radius: 4px !important;
+    border-bottom-right-radius: 4px !important;
 }
 
 .cancel-button {
@@ -265,4 +269,9 @@ textarea.form-control {
     justify-content: center !important;
     align-items: center !important;
     border-radius: 10px;
+}
+
+hr {
+    color: #726e6e8a !important;
+
 }

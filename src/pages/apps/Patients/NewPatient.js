@@ -47,19 +47,13 @@ import CQIs from './CQIs/CQIs';
 import LabRequest from './LabRequest/LabRequest';
 
 const NewPatient = () => {
-    const navigate = useNavigate();
     const dispatch = useDispatch();
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [activeModalTab, setActiveModalTab] = useState('Appointments');
     const {
-        register,
         handleSubmit,
         formState: { errors },
-        setValue,
-        reset,
-        clearErrors,
-        watch,
-        getValues,
+
     } = useForm();
     const [isClinicalReviewExpanded, setIsClinicalReviewExpanded] = useState(false);
     const [isRunning, setIsRunning] = useState(false);
@@ -69,11 +63,12 @@ const NewPatient = () => {
     const handleClose = () => setShowModal(false);
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
-    const primaryProvider = JSON.parse(sessionStorage.getItem('hyper_user'))?.firstName;
+    const primaryProvider = JSON.parse(sessionStorage.getItem('hyper_user'))?.name?.text;
+    console.log(primaryProvider, 'primaryProvider')
     const store = useSelector((state) => state);
-    const patientsDataById = store?.getPatientsByIdReducer?.data?.patient || [];
+    const patientsDataById = store?.getPatientsByIdReducer?.data?.data || [];
 
-    // console.log(patientsDataById, 'patientsDataByIdpatientsDataById')
+    console.log(patientsDataById, 'patientsDataByIdpatientsDataById')
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
     const [profilePhoto, setProfilePhoto] = useState(profileDummy);
     const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -87,14 +82,17 @@ const NewPatient = () => {
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
 
     useEffect(() => {
-        if (id) {
-            dispatch(getPatientsByIdAction({ key: encryptMessage({ id }) }));
+        const data = {
+            id: id,
         }
-    }, [dispatch, id]); // Ensures this only runs when `id` changes
+        if (id) {
+            dispatch(getPatientsByIdAction(data));
+        }
+    }, [id]);
 
     useEffect(() => {
         if (updateSuccess === 200) {
-            dispatch(getPatientsByIdAction({ key: encryptMessage({ id }) })); // Only if ID is valid
+            dispatch(getPatientsByIdAction({ id }));
             dispatch(resetUpdateAction());
             setLogo(null);
             setLogoName('');
@@ -275,7 +273,7 @@ const NewPatient = () => {
             ...(logo?.url === null
                 ? {}
                 : {
-                    patientChartPhoto: {
+                    photo: {
                         url: logo?.url?.split('?')[0] || patientsDataById?.patientChartPhoto?.url,
                         fileName: logoName,
                     },
@@ -331,8 +329,8 @@ const NewPatient = () => {
                                                             src={
                                                                 logo?.url
                                                                     ? logo.url.split('?')[0]
-                                                                    : patientsDataById?.patientChartPhoto?.url
-                                                                        ? patientsDataById.patientChartPhoto.url
+                                                                    : patientsDataById?.photo?.[0]?.url
+                                                                        ? patientsDataById?.photo?.[0]?.url
                                                                         : profilePhoto
                                                             }
                                                             alt="Patient Profile"
@@ -389,20 +387,19 @@ const NewPatient = () => {
                                                         <span
                                                             className="fw-bold text-capitalize"
                                                             style={{ color: 'rgb(249, 139, 55)' }}>
-                                                            {patientsDataById?.firstName || 'N/A'}{' '}
-                                                            {patientsDataById?.lastName || ' '}
+                                                            {patientsDataById?.name?.[0]?.text || 'N/A'}
                                                         </span>{' '}
                                                         <span className="fs-6 fw-bold">
-                                                            {patientsDataById?.sex || ' '}
+                                                            {patientsDataById?.gender || ' '}
                                                         </span>
                                                     </p>
                                                     <p
                                                         style={{ borderRight: '1px solid black' }}
                                                         className="pe-2 text-nowrap fw-bold fs-6">
                                                         <span>
-                                                            {patientsDataById?.dateOfBirth
+                                                            {patientsDataById?.birthDate
                                                                 ? new Date(
-                                                                    patientsDataById.dateOfBirth
+                                                                    patientsDataById.birthDate
                                                                 ).toLocaleDateString('en-GB')
                                                                 : 'N/A'}
                                                         </span>
@@ -442,7 +439,7 @@ const NewPatient = () => {
                                                                     <span
                                                                         className="ps-2 fs-6"
                                                                         style={{ fontWeight: 600 }}>
-                                                                        {patientsDataById?.cellPhone || 'N/A    '}
+                                                                        {patientsDataById?.telecom?.[1]?.value || 'N/A    '}
                                                                     </span>
                                                                 </div>
                                                             </div>
@@ -458,7 +455,7 @@ const NewPatient = () => {
                                                                     <span
                                                                         className="ps-2 fs-6"
                                                                         style={{ fontWeight: 600 }}>
-                                                                        {patientsDataById?.email || 'N/A'}
+                                                                        {patientsDataById?.telecom?.[3]?.value  || 'N/A'}
                                                                     </span>
                                                                 </div>
                                                             </div>

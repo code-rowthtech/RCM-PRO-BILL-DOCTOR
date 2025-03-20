@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Button, Card, Col, Form, InputGroup, Row } from 'react-bootstrap'
+import { Button, Col, Form, InputGroup } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { createPatientsAction } from '../../../../redux/patients/actions';
 import { useForm } from 'react-hook-form';
@@ -7,7 +7,6 @@ import { encryptMessage } from '../../../../cryptoUtils';
 import { FiUploadCloud } from 'react-icons/fi';
 import { handleUpload } from '../../../../helpers/HandleUpload';
 import us from '../../../../assets/images/flags/us.jpg'
-import Select from 'react-select';
 
 const AddPatientDetails = () => {
 
@@ -20,13 +19,12 @@ const AddPatientDetails = () => {
     const logoFileInputRef = useRef(null);
     const [profileUploading, setProfileUploading] = useState(false);
     const [selectedDoctor, setSelectedDoctor] = useState(null);
-    const [doctorSearch, setDoctorSearch] = useState('');
     const [submissionType, setSubmissionType] = useState(null);
     const [age, setAge] = useState(null);
     const store = useSelector((state) => state);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
-    const primaryProvider = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
-    const doctorName = JSON.parse(sessionStorage.getItem('hyper_user'))?.firstName;
+    const doctorName = JSON.parse(sessionStorage.getItem('hyper_user'))?.name?.text;
+    const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
 
     // Function to calculate approximate age from date of birth
     const calculateApproxAge = (dob) => {
@@ -71,81 +69,116 @@ const AddPatientDetails = () => {
 
     const onSubmit = (data) => {
 
-        const updatedData = { ...data, approxAge: calculateApproxAge(data.dateOfBirth) };
-
-
         const payload = {
+            resourceType: "Patient",
+            active: true,
+            photo: [
+                {
+                    contentType: logo?.type || 'image/jpeg',
+                    url: logo?.url?.split('?')[0] || logo,
+                    data: logo?.data || null, 
+                    hash: logo?.hash || null, 
+                    title: logoName || null,
+                    creation: new Date()
+                }
+            ],
+            gender: data?.gender || '',
+            birthDate: data?.dateOfBirth || '',
+            approxAge: data?.approxAge || '0',
+            followupDate: data?.followupDate || '',
+            followupReason: data?.followupReason || '',
+            patientCopayAmount: data?.patientCopayAmount || '0',
+            preferredCommunication: data?.preferredCommunication || '',
+            paymentProfile: data?.paymentProfile || '',
+            reminderLanguage: "en",
+            patientStatus: data?.patientStatus || '',
+            deceasedBoolean: false,
+            medicationHistoryConsent: data?.medicationHistoryConsent || false,
+            doctorId: doctorId,
             clinicId: clinicId,
-            doctorId: primaryProvider,
-            ...(updatedData?.patientStatus ? { status: updatedData?.patientStatus } : {}),
-            ...(updatedData?.title ? { title: updatedData?.title } : {}),
-            ...(updatedData?.firstName ? { firstName: updatedData?.firstName } : {}),
-            ...(updatedData?.middleName ? { middleName: updatedData?.middleName } : {}),
-            ...(updatedData?.lastName ? { lastName: updatedData?.lastName } : {}),
-            ...(updatedData?.birthName ? { birthName: updatedData?.birthName } : {}),
-            ...(updatedData?.dateOfBirth ? { dateOfBirth: updatedData?.dateOfBirth } : {}),
-            ...(updatedData?.approxAge ? { approxAge: updatedData?.approxAge } : {}),  // Ensure approxAge is included
-            ...(updatedData?.suffix ? { suffix: updatedData?.suffix } : {}),
-            ...(logo?.url === null
-                ? {}
-                : {
-                    patientChartPhoto: {
-                        url: logo?.url?.split('?')[0],
-                        fileName: logoName
-                    }
-                }),
-            ...(updatedData?.homePhone ? { homePhone: updatedData?.homePhone?.replace(/\D/g, '') } : {}),
-            ...(updatedData?.cellPhone ? { cellPhone: updatedData?.cellPhone?.replace(/\D/g, '') } : {}),
-            ...(updatedData?.officePhone ? { officePhone: updatedData?.officePhone?.replace(/\D/g, '') } : {}),
-            ...(updatedData?.email ? { email: updatedData?.email } : {}),
-            ...(updatedData?.alternateEmail ? { alternativeEmail: updatedData?.alternateEmail } : {}),
-            ...(updatedData?.preferredCommunication ? { preferredCommunication: updatedData?.preferredCommunication } : {}),
-            ...(updatedData?.reminderLanguage ? { reminderLanguage: updatedData?.reminderLanguage } : {}),
-            ...(updatedData?.medicationHistoryConsent ? { medicationHistoryConsent: updatedData?.medicationHistoryConsent === 'true' } : {}),
-            ...(updatedData?.paymentProfile ? { paymentProfile: updatedData?.paymentProfile } : {}),
-            ...(updatedData?.patientCopayAmount ? { patientCopayAmount: updatedData?.patientCopayAmount } : {}),
-            ...(updatedData?.followupDate ? { followupDate: updatedData?.followupDate } : {}),
-            ...(updatedData?.followupReason ? { followupReason: updatedData?.followupReason } : {}),
-        };
 
+            notes: data?.notes || '',
+        };
+        payload.name = [
+            {
+                given: [data?.firstName || '', data?.middleName || ''].filter(Boolean),
+                family: data?.lastName || '',
+                preferred: true,
+                text: `${data?.firstName || ''} ${data?.lastName || ''}`.trim(),
+                use: 'official',
+                suffix: [data?.suffix || ''],
+                prefix: [data?.prefix || ''],
+            },
+        ];
+        payload.telecom = [];
+
+        payload.telecom.push({
+            system: 'phone',
+            use: 'home',
+            value: data?.homePhone || '',
+        });
+
+        payload.telecom.push({
+            system: 'phone',
+            use: 'mobile',
+            value: data?.cellPhone || '',
+        });
+
+        payload.telecom.push({
+            system: 'phone',
+            use: 'work',
+            value: data?.officePhone || '',
+        });
+
+        payload.telecom.push({
+            system: 'email',
+            use: 'mobile',
+            value: data?.email || '',
+        });
+
+        payload.telecom.push({
+            system: 'email',
+            use: 'work',
+            value: data?.alternateEmail || '',
+        });
+        if (data?.patientStatus === 'Inactive-Deceased') {
+            payload.deceasedBoolean = true;
+
+            if (data?.deceasedDateTime) {
+                payload.deceasedDateTime = new Date(data.deceasedDateTime).toISOString();
+            }
+        }
         dispatch(createPatientsAction({ key: encryptMessage(payload) }));
         reset();
         setLogoName(null);
         setLogo(null);
-        // console.log(payload, 'Final Payload with approxAge');
+        // console.log(payload, 'Final Payload ');
     };
 
     const calculateAge = (dob) => {
         const birthDate = new Date(dob);
         const today = new Date();
-    
+
         let years = today.getFullYear() - birthDate.getFullYear();
         let months = today.getMonth() - birthDate.getMonth();
-    
+
         // Adjust if the current month/day is before the birth month/day
         if (months < 0 || (months === 0 && today.getDate() < birthDate.getDate())) {
             years--;
             months += 12; // Add 12 months to the negative month difference
         }
-    
+
         // Adjust the month difference for the day of the month
         if (today.getDate() < birthDate.getDate()) {
             months--;
         }
-    
+
         // Ensure months is non-negative after adjustment
         if (months < 0) {
             months += 12;
         }
-    
+
         return `${years}.${months}`;
-    };
-    
-    const handleInputChange = (data) => {
-        setDoctorSearch(data);
-    };
-    const handleChange = (selectedOption) => {
-        setSelectedDoctor(selectedOption);
     };
 
     return (
@@ -202,22 +235,22 @@ const AddPatientDetails = () => {
                                         style={{ height: '30px!important' }}
                                         {...register(
                                             'cellPhone',
-                                          {
-                                                    pattern: {
-                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                        message:
-                                                            'Contact must be in the format (XXX)XXX-XXXX',
-                                                    },
-                                                    maxLength: {
-                                                        value: 13,
-                                                        message: 'Contact must not exceed 13 digits',
-                                                    },
-                                                    minLength: {
-                                                        value: 13,
-                                                        message:
-                                                            'Contact must not be less than 13 digits',
-                                                    },
-                                                }
+                                            {
+                                                pattern: {
+                                                    value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                    message:
+                                                        'Contact must be in the format (XXX)XXX-XXXX',
+                                                },
+                                                maxLength: {
+                                                    value: 13,
+                                                    message: 'Contact must not exceed 13 digits',
+                                                },
+                                                minLength: {
+                                                    value: 13,
+                                                    message:
+                                                        'Contact must not be less than 13 digits',
+                                                },
+                                            }
                                         )}
                                         onChange={(e) => {
                                             let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
@@ -254,7 +287,7 @@ const AddPatientDetails = () => {
                     <div className="col-md-3 col-12 mb-2">
                         <Form.Group>
                             <Form.Label htmlFor="email" className="mb-0">
-                                Email ID
+                                Email ID <span className="text-danger">*</span>
                             </Form.Label>
                             <Form.Control
                                 type="email"
@@ -462,23 +495,23 @@ const AddPatientDetails = () => {
                                         style={{ height: '30px!important' }}
                                         {...register(
                                             'homePhone',
-                                                {
-                                                    pattern: {
-                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                        message:
-                                                            'Contact must be in the format (XXX)XXX-XXXX',
-                                                    },
-                                                    maxLength: {
-                                                        value: 13,
-                                                        message: 'Contact must not exceed 13 digits',
-                                                    },
-                                                    minLength: {
-                                                        value: 13,
-                                                        message:
-                                                            'Contact must not be less than 13 digits',
-                                                    },
-                                                }
-                                              
+                                            {
+                                                pattern: {
+                                                    value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                    message:
+                                                        'Contact must be in the format (XXX)XXX-XXXX',
+                                                },
+                                                maxLength: {
+                                                    value: 13,
+                                                    message: 'Contact must not exceed 13 digits',
+                                                },
+                                                minLength: {
+                                                    value: 13,
+                                                    message:
+                                                        'Contact must not be less than 13 digits',
+                                                },
+                                            }
+
                                         )}
                                         onChange={(e) => {
                                             let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
@@ -541,21 +574,21 @@ const AddPatientDetails = () => {
                                         {...register(
                                             'officePhone',
                                             {
-                                                    pattern: {
-                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                        message:
-                                                            'Contact must be in the format (XXX)XXX-XXXX',
-                                                    },
-                                                    maxLength: {
-                                                        value: 13,
-                                                        message: 'Contact must not exceed 13 digits',
-                                                    },
-                                                    minLength: {
-                                                        value: 13,
-                                                        message:
-                                                            'Contact must not be less than 13 digits',
-                                                    },
-                                                }
+                                                pattern: {
+                                                    value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                    message:
+                                                        'Contact must be in the format (XXX)XXX-XXXX',
+                                                },
+                                                maxLength: {
+                                                    value: 13,
+                                                    message: 'Contact must not exceed 13 digits',
+                                                },
+                                                minLength: {
+                                                    value: 13,
+                                                    message:
+                                                        'Contact must not be less than 13 digits',
+                                                },
+                                            }
                                         )}
                                         onChange={(e) => {
                                             let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
@@ -632,43 +665,16 @@ const AddPatientDetails = () => {
                     </div>
                 </div>
                 <hr className="mt-2" />
-
                 <div className="row">
                     <div className="col-md-3 col-12 mb-2">
                         <Form.Group className="responnsible-party-select">
                             <Form.Label className="mb-0">Primary Provider (Doctor Name)</Form.Label>
-                            <Select
-                                className="basic-single"
-                                classNamePrefix="select"
-                                isLoading={store?.getDoctorsReducer?.loading}
-                                isClearable={true}
-                                value={selectedDoctor}
-                                // isDisabled={id ? true : false}
-                                isSearchable={true}
-                                {...register('selectedDoctor')}
-                                onInputChange={(inputValue) => handleInputChange(inputValue, 'doctor')}
-                                onChange={(data) => {
-                                    setValue('selectedDoctor', data);
-                                    handleChange(data);
-                                    clearErrors('selectedDoctor');
-                                }}
-                                name="doctorName"
-                                // options={doctorOptions}
-                                placeholder="&nbsp; Select "
-                                styles={{
-                                    control: (provided) => ({
-                                        ...provided,
-                                        height: '30px',
-                                        minHeight: '30px',
-                                        border: '0px',
-                                    }),
-                                    placeholder: (provided) => ({
-                                        ...provided,
-                                        fontWeight: 'bold',
-                                        fontSize: '12px',
-                                        paddingBottom: '5px',
-                                    }),
-                                }}
+                            <Form.Control
+                                type="text"
+                                placeholder={doctorName}
+                                value={doctorName}
+                                {...register('selectedDoctor',)}
+                                data-has-value={!!watch('selectedDoctor')}
                             />
                         </Form.Group>
                     </div>

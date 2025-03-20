@@ -28,10 +28,10 @@ export const getVitalsByAppointmentId = '/api/v1/doctor/vitalsByAppointmentId';
 
 
 // PATIENTS
-export const getPatients = '/api/v1/doctor/getPatientByDoctorId';
-export const getPatientsById = '/api/v1/doctor/patient-getById';
-export const createPatients = '/api/v1/doctor/patient-onboard';
-export const updatePatients = '/api/v1/doctor/patient-edit';
+export const getPatients = '/api/v1/doctor/get-patients';
+export const getPatientsById = '/api/v1/doctor/patient/by/id';
+export const createPatients = '/api/v1/doctor/Patient/add';
+export const updatePatients = '/api/v1/doctor/Patient/update';
 
 // CLINIC NOTES
 export const getClinicEmployees = '/api/v1/doctor/getClinicEmployees';
