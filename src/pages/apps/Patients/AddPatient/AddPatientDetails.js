@@ -90,7 +90,7 @@ const AddPatientDetails = () => {
             patientCopayAmount: data?.patientCopayAmount || '0',
             preferredCommunication: data?.preferredCommunication || '',
             paymentProfile: data?.paymentProfile || '',
-            reminderLanguage: "en",
+            reminderLanguage: data?.reminderLanguage || '',
             patientStatus: data?.patientStatus || '',
             deceasedBoolean: false,
             medicationHistoryConsent: data?.medicationHistoryConsent || false,
@@ -107,9 +107,26 @@ const AddPatientDetails = () => {
                 text: `${data?.firstName || ''} ${data?.lastName || ''}`.trim(),
                 use: 'official',
                 suffix: [data?.suffix || ''],
-                prefix: [data?.prefix || ''],
+                prefix: [data?.title || ''],
             },
         ];
+        if (data?.previousBirthName) {
+            payload.name.push({
+                use: 'old', // Assuming 'old' or 'maiden' is appropriate for previous birth names
+                text: data.previousBirthName,
+                family: data.lastName || '', // Assuming the last name remains unchanged
+                given: [data.firstName || '', data.middleName || ''].filter(Boolean),
+                prefix: [], // Add any prefix if available
+                suffix: [], // Add any suffix if available
+                preferred: true, // Assuming this is the preferred name
+                period: {
+                    start: data?.previousBirthNameStartDate
+                        ? new Date(data.previousBirthNameStartDate).toISOString()
+                        : null,
+                    end: data?.previousBirthNameEndDate ? new Date(data.previousBirthNameEndDate).toISOString() : null,
+                },
+            });
+        }
         payload.telecom = [];
 
         payload.telecom.push({

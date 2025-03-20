@@ -28,8 +28,7 @@ const PatientDetails = () => {
     const [submissionType, setSubmissionType] = useState(null);
     const [deceasedDateTime, setDeceasedDateTime] = useState('');
     const [profileUploading, setProfileUploading] = useState(false);
-    const doctorName = JSON.parse(sessionStorage.getItem('hyper_user'))?.firstName
-
+    const doctorName = JSON.parse(sessionStorage.getItem('hyper_user'))?.name?.text
 
     const patientsDataById = store?.getPatientsByIdReducer?.data?.data;
     console.log(patientsDataById, 'data0987654321')
@@ -61,53 +60,55 @@ const PatientDetails = () => {
 
     useEffect(() => {
 
-       if(patientsDataById){
-        setValue('patientStatus', patientsDataById?.patientStatus);
-        setValue('firstName', patientsDataById?.name?.[0]?.given?.[0]);
-        setValue('middleName', patientsDataById?.name?.[0]?.given?.[1]);
-        setValue('lastName', patientsDataById?.name?.[0]?.family);
-        setValue('approxAge', patientsDataById?.approxAge);
-        setValue('title', patientsDataById?.title);
-        setValue('birthName', patientsDataById?.birthName);
-        setValue('gender', patientsDataById?.gender);
-        setValue('dateOfBirth', patientsDataById?.birthDate ? new Date(patientsDataById?.birthDate)?.toISOString().split('T')[0] : '')
+        if (patientsDataById) {
+            setValue('patientStatus', patientsDataById?.patientStatus);
+            setValue('firstName', patientsDataById?.name?.[0]?.given?.[0]);
+            setValue('middleName', patientsDataById?.name?.[0]?.given?.[1]);
+            setValue('lastName', patientsDataById?.name?.[0]?.family);
+            setValue('previousBirthName', patientsDataById?.name?.[1]?.text);
+            setValue('approxAge', patientsDataById?.approxAge);
+            setValue('title', patientsDataById?.title);
+            setValue('birthName', patientsDataById?.birthName);
+            setValue('gender', patientsDataById?.gender);
+            setValue('dateOfBirth', patientsDataById?.birthDate ? new Date(patientsDataById?.birthDate)?.toISOString().split('T')[0] : '')
 
-        setValue('suffix', patientsDataById?.name?.[0]?.suffix?.[0]);
-        setValue('homePhone', patientsDataById?.telecom?.[0]?.value
-            ? patientsDataById?.telecom?.[0]?.value.replace(/\D/g, '')
-                .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                    p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
-                )
-            : '');
-        setValue('cellPhone', patientsDataById?.telecom?.[1]?.value
-            ? patientsDataById?.telecom?.[1]?.value.replace(/\D/g, '')
-                .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                    p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
-                )
-            : '');
-        setValue('officePhone', patientsDataById?.telecom?.[2]?.value
-            ? patientsDataById?.telecom?.[2]?.value.replace(/\D/g, '')
-                .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                    p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
-                )
-            : '');
-        setValue('email', patientsDataById?.telecom?.[3]?.value);
-        setValue('alternateEmail', patientsDataById?.alternativeEmail);
-        setValue('preferredCommunication', patientsDataById?.preferredCommunication);
-        setValue('reminderLanguage', patientsDataById?.reminderLanguage);
-        setValue('medicationHistoryConsent', patientsDataById?.medicationHistoryConsent);
-        setValue('paymentProfile', patientsDataById?.paymentProfile);
-        setValue('patientCopayAmount', patientsDataById?.patientCopayAmount);
-        setValue(
-            'followupDate',
-            patientsDataById?.followupDate
-                ? new Date(patientsDataById.followupDate).toISOString().split('T')[0] // Extract YYYY-MM-DD
-                : ''
-        );
-        setValue('followupReason', patientsDataById?.followupReason);
-        setLogo(patientsDataById?.[0]?.photo?.url);
-        setLogoName(patientsDataById?.[0]?.photo?.url);
-       }
+            setValue('suffix', patientsDataById?.name?.[0]?.suffix?.[0]);
+            setValue('title', patientsDataById?.name[0]?.prefix[0] || '')
+            setValue('homePhone', patientsDataById?.telecom?.[0]?.value
+                ? patientsDataById?.telecom?.[0]?.value.replace(/\D/g, '')
+                    .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                        p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
+                    )
+                : '');
+            setValue('cellPhone', patientsDataById?.telecom?.[1]?.value
+                ? patientsDataById?.telecom?.[1]?.value.replace(/\D/g, '')
+                    .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                        p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
+                    )
+                : '');
+            setValue('officePhone', patientsDataById?.telecom?.[2]?.value
+                ? patientsDataById?.telecom?.[2]?.value.replace(/\D/g, '')
+                    .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                        p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
+                    )
+                : '');
+            setValue('email', patientsDataById?.telecom?.[3]?.value);
+            setValue('alternateEmail', patientsDataById?.telecom?.[4]?.value);
+            setValue('preferredCommunication', patientsDataById?.preferredCommunication);
+            setValue('reminderLanguage', patientsDataById?.reminderLanguage);
+            setValue('medicationHistoryConsent', patientsDataById?.medicationHistoryConsent);
+            setValue('paymentProfile', patientsDataById?.paymentProfile);
+            setValue('patientCopayAmount', patientsDataById?.patientCopayAmount);
+            setValue(
+                'followupDate',
+                patientsDataById?.followupDate
+                    ? new Date(patientsDataById.followupDate).toISOString().split('T')[0] // Extract YYYY-MM-DD
+                    : ''
+            );
+            setValue('followupReason', patientsDataById?.followupReason);
+            setLogo(patientsDataById?.photo?.[0]?.url);
+            setLogoName(patientsDataById?.photo?.[0]?.title);
+        }
 
 
     }, [patientsDataById])
@@ -145,8 +146,8 @@ const PatientDetails = () => {
             ...(data?.followupDate ? { followupDate: data?.followupDate } : {}),
             ...(data?.followupReason ? { followupReason: data?.followupReason } : {}),
         }
-        dispatch(updatePatientsAction({ key: encryptMessage(payload) }))
-
+        // dispatch(updatePatientsAction({ key: encryptMessage(payload) }))
+        console.log(payload, 'payload')
     }
 
     const handleFileChange = async (e) => {
@@ -775,7 +776,7 @@ const PatientDetails = () => {
 
                     {/* Buttons */}
                     <div className="d-flex gap-2 justify-content-end mb-2 mt-md-4">
-                       
+
                         <Button
                             onClick={() => {
                                 setSubmissionType('saveAndNext');
@@ -788,7 +789,7 @@ const PatientDetails = () => {
                             type="submit">
                             Update
                         </Button>
-                      
+
                     </div>
                 </Form>
             )}
