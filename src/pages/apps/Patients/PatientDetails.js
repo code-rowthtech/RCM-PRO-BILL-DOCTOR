@@ -129,7 +129,7 @@ const PatientDetails = () => {
             preferredCommunication: data?.preferredCommunication || '',
             reminderLanguage: data?.reminderLanguage || '',
             patientStatus: data?.patientStatus || '',
-            doctorId: doctorId || '', // Ensure _id of selected doctor is sent
+            // doctorId: doctorId || '', // Ensure _id of selected doctor is sent
         };
 
         // *Name structure (FHIR compliant)*
