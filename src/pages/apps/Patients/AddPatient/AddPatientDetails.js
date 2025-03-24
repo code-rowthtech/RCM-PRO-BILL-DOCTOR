@@ -76,8 +76,8 @@ const AddPatientDetails = () => {
                 {
                     contentType: logo?.type || 'image/jpeg',
                     url: logo?.url?.split('?')[0] || logo,
-                    data: logo?.data || null, 
-                    hash: logo?.hash || null, 
+                    data: logo?.data || null,
+                    hash: logo?.hash || null,
                     title: logoName || null,
                     creation: new Date()
                 }
@@ -214,7 +214,7 @@ const AddPatientDetails = () => {
                                 {...register('firstName', { required: 'First name is required' })}
                             />
                             {errors.firstName && (
-                                <span className="text-danger">{errors.firstName.message}</span>
+                                <span className="text-danger err-font">{errors.firstName.message}</span>
                             )}
                         </Form.Group>
                     </div>
@@ -230,7 +230,7 @@ const AddPatientDetails = () => {
                                 {...register('lastName', { required: 'Last Name is required' })}
                             />
                             {errors.lastName && (
-                                <span className="text-danger">{errors.lastName.message}</span>
+                                <span className="text-danger err-font">{errors.lastName.message}</span>
                             )}
                         </Form.Group>
                     </div>
@@ -250,25 +250,22 @@ const AddPatientDetails = () => {
                                     <Form.Control
                                         type="tel"
                                         style={{ height: '30px!important' }}
-                                        {...register(
-                                            'cellPhone',
-                                            {
-                                                pattern: {
-                                                    value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                    message:
-                                                        'Contact must be in the format (XXX)XXX-XXXX',
-                                                },
-                                                maxLength: {
-                                                    value: 13,
-                                                    message: 'Contact must not exceed 13 digits',
-                                                },
-                                                minLength: {
-                                                    value: 13,
-                                                    message:
-                                                        'Contact must not be less than 13 digits',
-                                                },
+                                        {...register('cellPhone', {
+                                            required: 'Cell Phone is required',
+                                            pattern: {
+                                                value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                message: 'Contact must be in the format (XXX)XXX-XXXX'
+                                            },
+                                            maxLength: {
+                                                value: 13,
+                                                message: 'Contact must not exceed 13 digits'
+                                            },
+                                            minLength: {
+                                                value: 13,
+                                                message: 'Contact must not be less than 13 digits'
                                             }
-                                        )}
+                                        })}
+
                                         onChange={(e) => {
                                             let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
                                             if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
@@ -293,6 +290,9 @@ const AddPatientDetails = () => {
                                         }}
                                     />
                                 </InputGroup>
+                                {errors.cellPhone && (
+                                    <span className="text-danger err-font">{errors.cellPhone.message}</span>
+                                )}
                             </Form.Group>
 
                             <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
@@ -310,12 +310,16 @@ const AddPatientDetails = () => {
                                 type="email"
                                 placeholder="Email ID"
                                 {...register('email', {
+                                    required: 'Email ID is required',
                                     pattern: {
                                         value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
                                         message: 'Invalid email address',
                                     },
                                 })}
                             />
+                            {errors.email && (
+                                <span className="text-danger err-font">{errors.email.message}</span>
+                            )}
                         </Form.Group>
                     </div>
                     <Col md={3} className="mb-2">
