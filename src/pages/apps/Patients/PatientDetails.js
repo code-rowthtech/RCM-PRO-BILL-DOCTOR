@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Button, Card, Col, Form, InputGroup, Row } from 'react-bootstrap'
+import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap'
 import { useSearchParams } from 'react-router-dom';
 import { getPatientsByIdAction, resetUpdateAction, updatePatientsAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
@@ -19,7 +19,6 @@ const PatientDetails = () => {
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const store = useSelector((state) => state);
-    const [selectedDoctor, setSelectedDoctor] = useState(null);
     const [logoName, setLogoName] = useState('');
     const [logo, setLogo] = useState(null);
     const logoFileInputRef = useRef(null);
@@ -29,7 +28,7 @@ const PatientDetails = () => {
     const [deceasedDateTime, setDeceasedDateTime] = useState('');
     const [profileUploading, setProfileUploading] = useState(false);
     const doctorName = JSON.parse(sessionStorage.getItem('hyper_user'))?.name?.text
-    const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.userId
+    // const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.userId
 
     const patientsDataById = store?.getPatientsByIdReducer?.data?.data;
     console.log(patientsDataById, 'data0987654321')
