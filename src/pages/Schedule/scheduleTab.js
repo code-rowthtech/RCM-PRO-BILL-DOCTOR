@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { Button, Table, Spinner } from "react-bootstrap";
+import { Button, Table, Spinner, Form, Row, Col } from "react-bootstrap";
 import { FiEdit } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 // import {
@@ -16,23 +16,13 @@ const ScheduleTab = () => {
     const store = useSelector((state) => state);
     const [time, setTime] = useState("");
     const [name, setName] = useState("");
-    const doctorLists = store?.getDoctorsListReducer?.data?.result;
     const scheduleList = store?.getScheduleReducer?.data?.result || [];
     const isLoading = store?.getScheduleReducer?.loading;
+    const user = JSON.parse(sessionStorage.getItem('hyper_user'));
+    // console.log(user,'user')
+    const doctorName = user?.name?.text;
 
     const { control, handleSubmit, setValue, register } = useForm();
-
-    //   useEffect(() => {
-    //     dispatch(getDoctorsListAction());
-    //     dispatch(
-    //       getScheduleAction({
-    //         type: "Schedule",
-    //         search: "",
-    //         startDate: "",
-    //         endDate: "",
-    //       })
-    //     );
-    //   }, [dispatch]);
 
     useEffect(() => {
         if (selectedDoctor) {
@@ -178,52 +168,36 @@ const ScheduleTab = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <Form onSubmit={handleSubmit(onSubmit)}>
             <h4>Edit Schedule</h4>
+            <Row>
+                <Col sm={6}>
+                    <Form.Group className="mb-2">
+                        <Form.Label for="doctorName" className="fw-bold mb-0">
+                            Doctor Name
+                        </Form.Label>
+                        <Form.Control
+                            type="text"
+                            defaultValue={doctorName}
+                        />
+                    </Form.Group>
+                </Col>
+                <Col sm={6}>
+                    {/* Per Patient Time Input */}
+                    <Form.Group className="mb-2">
+                        <Form.Label for="perPatientTime" className="fw-bold mb-0">
+                            Per Patient Time<span className="text-danger">*</span>
+                        </Form.Label>
+                        <Form.Control
+                            type="time"
+                            id="perPatientTime"
+                            value={time}
+                            onChange={(e) => setTime(e.target.value)}
+                        />
+                    </Form.Group>
+                </Col>
 
-            <div className="mb-1 w-50">
-                <label htmlFor="doctorName" style={{ fontWeight: "bold", marginBottom: '0px!important' }}>
-                    Doctor Name<span className="text-danger">*</span>
-                </label>
-                <select
-                    id="doctorName"
-                    value={selectedDoctor}
-                    onChange={(e) => setSelectedDoctor(e.target.value)}
-                    style={{
-                        padding: "8px",
-                        borderRadius: "4px",
-                        border: "1px solid #ccc",
-                        width: "100%",
-                        // marginTop: "10px",
-                    }}
-                >
-                    <option value="">Select a doctor</option>
-                    {doctorLists?.map((doctor, index) => (
-                        <option
-                            key={index}
-                            value={JSON.stringify({
-                                id: doctor?.userId?._id,
-                                name: `${doctor?.userId?.firstName} ${doctor?.userId?.lastName}`,
-                            })}
-                        >
-                            {`${doctor?.userId?.firstName} ${doctor?.userId?.lastName}`}
-                        </option>
-                    ))}
-                </select>
-            </div>
-
-            <div className="mb-1 w-50">
-                <label htmlFor="perPatientTime" style={{ fontWeight: "bold" }}>
-                    Per Patient Time<span className="text-danger">*</span>
-                </label>
-                <input
-                    type="time"
-                    id="perPatientTime"
-                    className="form-control"
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
-                />
-            </div>
+            </Row>
 
             <Table striped bordered hover>
                 <thead>
@@ -236,12 +210,13 @@ const ScheduleTab = () => {
                 </thead>
                 <tbody>{renderEmptyScheduleData()}</tbody>
             </Table>
-
-            <Button type="submit" variant="primary">
-                Save Schedule
-            </Button>
-            {isLoading && <Spinner animation="border" />}
-        </form>
+            <div className="d-flex justify-content-end">
+                <Button type="submit" className="custom-buttons">
+                    Save Schedule
+                </Button>
+                {isLoading && <Spinner animation="border" />}
+            </div>
+        </Form>
     );
 };
 

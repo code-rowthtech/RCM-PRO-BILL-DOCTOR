@@ -5,10 +5,13 @@ const api = new APICore();
 
 export function createHolidayScheduleApi(params: any): any {
     const { data } = params;
-    return api.create(URL.createHoliday,data);
+    return api.create(URL.createHoliday, data);
 }
 export function getHolidayScheduleApi(params: any): any {
     const { data } = params;
-    return api.create(`${URL.getHoliday}?startDate=${data?.startDate}&endDate=${data?.endDate}&search=${data?.search}&type=${data?.type}&doctorId=${data?.doctorId}`);
+    return api.get(`${URL.getHoliday}?fromDate=${data?.startDate}&toDate=${data?.endDate}&search=${data?.search}&clinicId=${data?.clinicId}&doctorId=${data?.doctorId}&forAppiontment=${data?.forAppiontment}`);
 }
-
+export function deleteHolidayScheduleApi(params: any): any {
+    const { data } = params;
+    return api.delete(`${URL.deleteHoliday}/${data}`);
+}

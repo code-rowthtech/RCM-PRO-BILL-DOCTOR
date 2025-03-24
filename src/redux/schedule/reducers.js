@@ -63,4 +63,34 @@ export const getHolidayScheduleReducer = (state = FETCH_HOLIDAY_INITIAL_STATE, a
     }
 }
 
+const DELETE_HOLIDAY_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
+
+export const deleteHolidayScheduleReducer = (state = DELETE_HOLIDAY_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case ScheduleActionTypes.DELETE_HOLIDAY_SCHEDULE_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case ScheduleActionTypes.DELETE_HOLIDAY_SCHEDULE_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ScheduleActionTypes.DELETE_HOLIDAY_SCHEDULE_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ScheduleActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false
+            }
+        default: return state
+    }
+}
 

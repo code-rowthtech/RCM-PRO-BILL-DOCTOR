@@ -13,7 +13,13 @@ export const getHolidayScheduleAction = (data): AuthAction => ({
     data
 });
 
+export const deleteHolidayScheduleAction =(data): AuthAction=>({
+    type: ScheduleActionTypes.DELETE_HOLIDAY_SCHEDULE,
+    data
+})
+
 export const stateEmptydAction = (): LayoutAction => ({
     type: ScheduleActionTypes.STATE_EMPTY_INTIAL_STATE,
 
 });
+

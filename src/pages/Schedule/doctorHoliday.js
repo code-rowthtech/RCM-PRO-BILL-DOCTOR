@@ -1,16 +1,20 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table } from 'react-bootstrap';
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { useDispatch, useSelector } from 'react-redux';
-import { getHolidayScheduleAction } from '../../redux/schedule/actions';
+import { deleteHolidayScheduleAction, getHolidayScheduleAction } from '../../redux/schedule/actions';
 import Spinner from '../../constants/Spinner';
-const DoctorHoliday = () => {
+
+const DoctorHoliday = ({search}) => {
+
   const dispatch = useDispatch();
   const store = useSelector((state) => state);
-  const scheduleResponse = store?.getHolidayScheduleReducer?.data?.result || [];
-  console.log(store?.getHolidayScheduleReducer, 'iddd')
+  const scheduleResponse = store?.getHolidayScheduleReducer?.data?.holidays || [];
+  console.log(store?.getHolidayScheduleReducer, 'scheduleResponse')
   const isLoading = store?.getScheduleReducer?.loading;
   const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
+  const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+
   useEffect(() => {
     const payload = {
       startDate: '',
@@ -19,18 +23,19 @@ const DoctorHoliday = () => {
       search: '',
       doctorId: doctorId
     };
-    dispatch(getHolidayScheduleAction({ startDate: '', endDate: '', type: 'Holiday', search: '', doctorId: doctorId }));
-  }, [dispatch]);
+    dispatch(getHolidayScheduleAction({ startDate: '', endDate: '', search: search, doctorId: doctorId, clinicId: clinicId, forAppiontment: false }));
+  }, [dispatch, search]);
 
   const deleteHandle = (id) => {
-    // dispatch(deleteScheduleAction(id))
+    dispatch(deleteHolidayScheduleAction(id))
     const payload = {
       startDate: '',
       endDate: '',
       type: "Holiday",
       search: ''
     };
-    // dispatch(getScheduleAction(payload));
+    console.log(payload, 'payload123')
+    dispatch(getHolidayScheduleAction({ startDate: '', endDate: '', search: search, doctorId: doctorId, clinicId: clinicId, forAppiontment: false }));
   }
   return (
     <div>
@@ -72,11 +77,11 @@ const DoctorHoliday = () => {
               scheduleResponse.map((holiday, index) => (
                 <tr key={holiday.id || index}>
                   <td>{index + 1}</td>
-                  <td>{holiday.name}</td>
+                  <td>{holiday?.doctorId?.userId?.name?.text}</td>
                   <td>{holiday.reason ? holiday.reason : 'NAN'}</td>
                   <td>
-                    <div className=" py-1 text-white text-center bg-secondary rounded-2" style={{ width: '100px' }}>
-                      {new Date(holiday.fromDate).toLocaleDateString()}
+                    <div className=" py-0 text-white text-center bg-secondary rounded-2" style={{ width: '100px' }}>
+                      {new Date(holiday.date).toLocaleDateString()}
                     </div>
                   </td>
                   <td>

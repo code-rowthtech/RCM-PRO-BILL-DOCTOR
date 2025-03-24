@@ -55,8 +55,10 @@ export const getAnalytics = '/api/v1/admin/analytics';
 // SUBSCRIPTIONS
 export const getSubscriptions = '/api/v1/admin/subscription/all'
 // SCHEDULE
-export const createHoliday = '/api/v1/doctor/addOrUpdateSchedule';
-export const getHoliday = '/api/v1/doctor/getSchedule';
+export const createHoliday = '/api/v1/practitioner/holiday/create';
+export const getHoliday = '/api/v1/practitioner/holidays';
+export const deleteHoliday ='/api/v1/practitioner/holiday/delete';
+export const createSchedule ='/api/v1/practitioner/schedule/create';
 
 // APPOINTMENTS
 export const createAppointments = '/api/v1/doctor/appointments';

@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { ScheduleActionTypes } from './constants';
-import { createHolidayScheduleApi, getHolidayScheduleApi } from './api';
+import { createHolidayScheduleApi, deleteHolidayScheduleApi, getHolidayScheduleApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -56,8 +56,36 @@ function* getHolidayScheduleFunction(data) {
             });
         }
     } catch (error) {
+        console.log(error, 'error')
         yield put({
             type: ScheduleActionTypes.GET_HOLIDAY_SCHEDULE_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* deleteHolidayScheduleFunction(data) {
+    try {
+        yield put({
+            type: ScheduleActionTypes.DELETE_HOLIDAY_SCHEDULE_LOADING,
+            payload: {},
+        });
+        const response = yield call(deleteHolidayScheduleApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            yield put({
+                type: ScheduleActionTypes.DELETE_HOLIDAY_SCHEDULE_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: ScheduleActionTypes.DELETE_HOLIDAY_SCHEDULE_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: ScheduleActionTypes.DELETE_HOLIDAY_SCHEDULE_ERROR,
             payload: error,
         });
     }
@@ -80,6 +108,9 @@ export function* watchGetHolidaySchedule() {
     yield takeEvery(ScheduleActionTypes.GET_HOLIDAY_SCHEDULE, getHolidayScheduleFunction);
 }
 
+export function* watchDeleteHolidaySchedule() {
+    yield takeEvery(ScheduleActionTypes.DELETE_HOLIDAY_SCHEDULE, deleteHolidayScheduleFunction);
+}
 
 
 export function* watchresetState() {
@@ -90,6 +121,7 @@ function* scheduleSaga() {
     yield all([
         fork(watchCreateHolidaySchedule),
         fork(watchGetHolidaySchedule),
+        fork(watchDeleteHolidaySchedule),
         fork(watchresetState)
     ]);
 }
