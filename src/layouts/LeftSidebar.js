@@ -82,7 +82,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
             clinicId: clinicId,
             status: activeTab,
         };
-        dispatch(getAllAppointmentsAction({ key: encryptMessage(data) }));
+        dispatch(getAllAppointmentsAction(data));
     }, [dispatch, activeTab, updateSuccess, createSuccess]);
 
     //    useEffect(() => {

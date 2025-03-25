@@ -20,7 +20,7 @@ const Schedule = () => {
     const renderTabContent = () => {
         switch (activeTab) {
             case 'DoctorHolidays':
-                return <DoctorHoliday />;
+                return <DoctorHoliday search={searchQuery} />;
             case 'breaks':
                 return <Breaks />;
             case 'schedules':
@@ -58,7 +58,7 @@ const Schedule = () => {
                                 {/* Navigation Tabs */}
                                 <Col sm={4} className='p-0'>
                                     <ul className="nav nav-underline">
-                                        {['DoctorHolidays', 'breaks', 'schedules'].map((tab, index) => (
+                                        {['DoctorHolidays', 'schedules'].map((tab, index) => (
                                             <li className="nav-item ms-2" key={index}>
                                                 <a
                                                     className={classNames('nav-link fw-bold text-black', {
@@ -71,7 +71,7 @@ const Schedule = () => {
                                                     }}
                                                 >
                                                     {tab === 'DoctorHolidays' && 'Doctor Holidays'}
-                                                    {tab === 'breaks' && 'Breaks'}
+                                                    {/* {tab === 'breaks' && 'Breaks'} */}
                                                     {tab === 'schedules' && 'Schedules'}
                                                 </a>
                                             </li>

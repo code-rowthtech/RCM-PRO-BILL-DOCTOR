@@ -13,8 +13,10 @@ const AddHoliday = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
     const user = JSON.parse(sessionStorage.getItem('hyper_user'));
-    const doctorName = `${user?.firstName || ''} ${user?.lastName || ''}`.trim();
+    // console.log(user,'user')
+    const doctorName = user?.name?.text;
 
     const {
         register,
@@ -28,12 +30,12 @@ const AddHoliday = () => {
         const payload = {
             clinicId: clinic_id,
             type: 'Holiday',
-            name: doctorName,
+            doctorId: doctorId,
             reason: data.reason,
             fromDate: data.fromDate,
-            tillDate: data.tillDate,
+            toDate: data.tillDate,
         };
-        console.log(payload,'payloadddddddd')
+        // console.log(payload,'payloadddddddd')
         dispatch(createHolidayScheduleAction({ key: encryptMessage(payload) }));
     };
     const createResponse = store?.createHolidayScheduleReducer?.data?.status;
@@ -50,7 +52,7 @@ const AddHoliday = () => {
                     <div className="d-flex justify-content-between">
                         <p style={{ fontWeight: 600 }}>ADD HOLIDAY</p>
                         <div>
-                            <Button className="custom-buttons fs-6" onClick={() => navigate(-1)}>Back</Button>
+                            <Button className="cancel-button fs-6" onClick={() => navigate(-1)}>Back</Button>
                         </div>
                     </div>
 
@@ -112,6 +114,7 @@ const AddHoliday = () => {
                                         </Form.Label>
                                         <Form.Control
                                             as="textarea"
+                                            placeholder="Enter Reason"
                                             rows={3}
                                             {...register("reason", {
                                                 required: "Reason is required",
@@ -125,7 +128,7 @@ const AddHoliday = () => {
                             </div>
 
                             <div className="d-flex gap-2 justify-content-end mb-2">
-                                <Button className="custom-buttons fs-6" type="button">
+                                <Button className="cancel-button fs-6" type="button">
                                     Cancel
                                 </Button>
                                 <Button className="custom-buttons fs-6" disabled={store?.createHolidayScheduleReducer?.loading} type="submit">

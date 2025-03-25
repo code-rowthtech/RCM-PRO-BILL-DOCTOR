@@ -15,5 +15,5 @@ export function getAppointmentsApi(params: any): any {
 
 export function getAllAppointmentsApi(params: any): any {
     const { data } = params;
-    return api.create(URL.getAllAppointments, data);
+    return api.get(URL.getAllAppointments, data);
 }
