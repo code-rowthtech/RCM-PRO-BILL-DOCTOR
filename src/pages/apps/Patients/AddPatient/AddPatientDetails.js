@@ -330,7 +330,7 @@ const AddPatientDetails = () => {
                                 {...register('dateOfBirth')}
                                 onChange={(e) => {
                                     const calculatedAge = calculateAge(e.target.value);
-                                    setAge(calculatedAge);
+                                    setValue('approxAge',calculatedAge);
                                 }}
                                 max={new Date().toISOString().split('T')[0]} // Restricts future dates
                             />
