@@ -52,13 +52,17 @@ export const updateAllergy = '/api/v1/doctor/updateAllergy';
 
 // DASHBOARD
 export const getAnalytics = '/api/v1/admin/analytics';
+
 // SUBSCRIPTIONS
 export const getSubscriptions = '/api/v1/admin/subscription/all'
+
 // SCHEDULE
 export const createHoliday = '/api/v1/practitioner/holiday/create';
 export const getHoliday = '/api/v1/practitioner/holidays';
-export const deleteHoliday ='/api/v1/practitioner/holiday/delete';
-export const createSchedule ='/api/v1/practitioner/schedule/create';
+export const deleteHoliday = '/api/v1/practitioner/holiday/delete';
+export const createSchedule = '/api/v1/practitioner/schedule/create';
+export const updateSchedule = '/api/v1/practitioner/schedule/update';
+export const getSchedule = '/api/v1/practitioner/schedule';
 
 // APPOINTMENTS
 export const createAppointments = '/api/v1/doctor/appointments';

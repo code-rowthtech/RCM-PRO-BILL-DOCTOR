@@ -10,7 +10,7 @@ import { getCitiesReducer, getDoctorsReducer, getStatesReducer } from './doctors
 import { getAnalyticsReducer } from './dashboard/reducers';
 import { createPatientsReducer, getPatientsByIdReducer, getPatientsReducer, updatePatientsReducer } from './patients/reducers';
 import { getSubscriptionsReducer } from './subscriptions/reducers';
-import { createHolidayScheduleReducer, deleteHolidayScheduleReducer, getHolidayScheduleReducer } from './schedule/reducers';
+import { createHolidayScheduleReducer, createScheduleReducer, deleteHolidayScheduleReducer, getHolidayScheduleReducer, getScheduleReducer, updateScheduleReducer } from './schedule/reducers';
 import { createVitalsReducer, getVitalsByPatientIdReducer, getVitalsReducer, updateVitalsReducer } from './vitals/reducers';
 import { createAppointmentsReducer, getAllAppointmentsReducer, getAppointmentsReducer } from './appointments/reducers';
 import { createAllergyReducer, createProblemReducer, createTaskReducer, getAllergiesOfAPatientReducer, getAllergyDetailsReducer, getClinicEmployeesReducer, getPatientAppointmentsReducer, getPatientProblemsReducer, getProblemDetailsReducer, getSearchCodesReducer, getTaskDetailsReducer, getTaskReducer, updateAllergyReducer, updateProblemReducer, updateTaskReducer } from './clinicNotes/reducers';
@@ -25,10 +25,10 @@ export default (combineReducers({
     getDoctorsReducer, getStatesReducer, getCitiesReducer,
     getPatientsReducer, createPatientsReducer, getPatientsByIdReducer, updatePatientsReducer,
     getSubscriptionsReducer,
-    createHolidayScheduleReducer, getHolidayScheduleReducer, deleteHolidayScheduleReducer,
+    createHolidayScheduleReducer, getHolidayScheduleReducer, deleteHolidayScheduleReducer, createScheduleReducer, getScheduleReducer, updateScheduleReducer,
     createVitalsReducer, updateVitalsReducer, getVitalsReducer, getVitalsByPatientIdReducer,
     createAppointmentsReducer, getAppointmentsReducer, getAllAppointmentsReducer,
-    getClinicEmployeesReducer, createTaskReducer, getTaskReducer, updateTaskReducer,getTaskDetailsReducer, 
+    getClinicEmployeesReducer, createTaskReducer, getTaskReducer, updateTaskReducer, getTaskDetailsReducer,
     createProblemReducer, getPatientProblemsReducer, updateProblemReducer, getProblemDetailsReducer, getSearchCodesReducer, getPatientAppointmentsReducer,
     createAllergyReducer, getAllergyDetailsReducer, getAllergiesOfAPatientReducer, updateAllergyReducer,
 }): any);

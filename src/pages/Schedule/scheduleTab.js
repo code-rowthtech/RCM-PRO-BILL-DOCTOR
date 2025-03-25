@@ -3,6 +3,8 @@ import { useForm, Controller } from "react-hook-form";
 import { Button, Table, Spinner, Form, Row, Col } from "react-bootstrap";
 import { FiEdit } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
+import { createScheduleAction, getScheduleAction } from "../../redux/schedule/actions";
+import { encryptMessage } from "../../cryptoUtils";
 // import {
 //   createScheduleAction,
 //   getDoctorsListAction,
@@ -14,16 +16,23 @@ const ScheduleTab = () => {
     const [selectedDoctor, setSelectedDoctor] = useState("");
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
-    const [time, setTime] = useState("");
+    const [time, setTime] = useState("12:00"); // Ensure a default valid value
     const [name, setName] = useState("");
     const scheduleList = store?.getScheduleReducer?.data?.result || [];
+    console.log(store?.getScheduleReducer,'scheduleList')
     const isLoading = store?.getScheduleReducer?.loading;
     const user = JSON.parse(sessionStorage.getItem('hyper_user'));
     // console.log(user,'user')
     const doctorName = user?.name?.text;
+    const doctorId = user?.doctorId
 
     const { control, handleSubmit, setValue, register } = useForm();
 
+     useEffect(() => {
+        
+        dispatch(getScheduleAction({  clinicId: user?.clinicId,page:'',limit:''}));
+      }, [dispatch]);
+      
     useEffect(() => {
         if (selectedDoctor) {
             const doctorInfo = JSON.parse(selectedDoctor || "{}");
@@ -78,7 +87,6 @@ const ScheduleTab = () => {
     };
 
     const onSubmit = (data) => {
-        const doctorInfo = JSON.parse(selectedDoctor || "{}");
         const availability = days.map((day, index) => ({
             availableOn: day.day,
             availableFrom:
@@ -90,24 +98,15 @@ const ScheduleTab = () => {
         }));
 
         const payload = {
-            doctorId: doctorInfo.id,
-            type: "Schedule",
-            name: doctorInfo.name,
-            perPatientTime: time,
+            clinicId: user?.clinicId,
+            doctorId: doctorId,
+            name: doctorName,
+            perPatientTime: data.perPatientTime, // Get value from form data
             availability,
         };
 
-        // dispatch(createScheduleAction({ key: encryptMessage(payload) }));
-        console.log({ payload });
-
-        // dispatch(
-        //   getScheduleAction({
-        //     type: "Schedule",
-        //     search: "",
-        //     startDate: "",
-        //     endDate: "",
-        //   })
-        // );
+        dispatch(createScheduleAction({ key: encryptMessage(payload) }));
+        console.log(payload, 'createScheduleAction');
     };
 
     const days = [
@@ -185,15 +184,20 @@ const ScheduleTab = () => {
                 <Col sm={6}>
                     {/* Per Patient Time Input */}
                     <Form.Group className="mb-2">
-                        <Form.Label for="perPatientTime" className="fw-bold mb-0">
-                            Per Patient Time<span className="text-danger">*</span>
+                        <Form.Label htmlFor="perPatientTime" className="fw-bold mb-0">
+                            Per Patient Time (in minutes)<span className="text-danger">*</span>
                         </Form.Label>
                         <Form.Control
-                            type="time"
+                            type="number"
                             id="perPatientTime"
-                            value={time}
-                            onChange={(e) => setTime(e.target.value)}
+                            placeholder="Enter Per Patient Time"
+                            {...register("perPatientTime", { required: "Per Patient Time is required" })}
+                            // onChange={(e) => {
+                            //     console.log("Selected Time:", e.target.value);
+                            //     setTime(e.target.value);
+                            // }}
                         />
+                        {/* {errors.perPatientTime && <span className="text-danger err-font">{errors.perPatientTime.message}</span>} */}
                     </Form.Group>
                 </Col>
 

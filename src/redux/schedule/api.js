@@ -15,3 +15,16 @@ export function deleteHolidayScheduleApi(params: any): any {
     const { data } = params;
     return api.delete(`${URL.deleteHoliday}/${data}`);
 }
+export function createScheduleApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.createSchedule, data);
+}
+export function updateScheduleApi(params: any): any {
+    const { data } = params;
+    return api.put(URL.updateSchedule, data);
+}
+export function getScheduleApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.getSchedule}?clinicId=${data?.clinicId}&page=${data?.page}&limit=${data?.limit}`);
+    
+}

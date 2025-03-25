@@ -23,3 +23,17 @@ export const stateEmptydAction = (): LayoutAction => ({
 
 });
 
+export const createScheduleAction = (data): AuthAction => ({
+    type: ScheduleActionTypes.CREATE_SCHEDULE,
+    data
+});
+
+export const updateScheduleAction = (data): AuthAction => ({
+    type: ScheduleActionTypes.UPDATE_SCHEDULE,
+    data
+});
+
+export const getScheduleAction = (data): AuthAction => ({
+    type: ScheduleActionTypes.GET_SCHEDULE,
+    data
+});
