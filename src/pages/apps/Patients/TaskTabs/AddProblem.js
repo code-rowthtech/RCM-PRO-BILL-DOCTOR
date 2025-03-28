@@ -36,18 +36,12 @@ const AddProblem = ({ onCancel }) => {
         dispatch(getSearchCodesAction({ query: search }));
     }, [dispatch, search]);
 
-    // useEffect(() => {
-    //     if (patientId) {
-    //         dispatch(getPatientAppointmentsAction( {key:encryptMessage({patientId})} ));
-    //     }
-    // }, [dispatch, patientId]);
-
     useEffect(() => {
         const data = {
             patientId: patientId,
         };
         dispatch(getPatientAppointmentsAction({ key: encryptMessage(data) }));
-    }, [dispatch]);
+    }, [dispatch,patientId]);
 
     // Watch for changes in the ICD code field
     const icdCodeValue = watch('icdCode');
