@@ -80,6 +80,8 @@ const NewPatient = () => {
     const [selectedSubTab, setSelectedSubTab] = useState('Assign Task');
     const [visibleSection, setVisibleSection] = useState('patient'); // Default section
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+
 
     useEffect(() => {
         const data = {
@@ -291,12 +293,18 @@ const NewPatient = () => {
                         {/* Main Content */}
                         <div className={isSidebarCollapsed ? 'col-11' : 'col-10'}>
 
-                            <div class="accordion border-none" id="accordionExample">
+                            <div class="accordion border-none custom-shadow rounded-1" id="accordionExample">
                                 <div class="accordion-item collapsed border-0">
-                                    <h2 class="accordion-header mt-0">
-                                        <button class="accordion-button collapsed  py-1 bg-white" 
-                                        style={{border:'0 4px 10px rgba(0, 0, 0, 0.1) '}}
-                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne"
+                                    <h2 class="accordion-header mt-0" >
+                                        <button
+                                            className="accordion-button collapsed py-1 bg-white"
+                                            style={{ border: "#000", height: "43px" }}
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#collapseOne"
+                                            aria-expanded={isOpen}
+                                            aria-controls="collapseOne"
+                                            onClick={() => setIsOpen(!isOpen)} // Toggle state on click
                                         >
                                             <div className="d-flex gap-2 ps-1 pt-2">
                                                 <p
@@ -350,8 +358,8 @@ const NewPatient = () => {
                                                                         playsInline
                                                                         className="rounded"
                                                                         style={{
-                                                                            width: '126px',
-                                                                            height: '129px',
+                                                                            width: '105px',
+                                                                            height: '100px',
                                                                             objectFit: 'cover',
                                                                         }}
                                                                     />
@@ -615,7 +623,7 @@ const NewPatient = () => {
                             {/* Patient Details Section */}
                             {visibleSection === 'patient' && (
                                 <div className="mt-2">
-                                    <Card className="px-2">
+                                    <Card className="px-2" style={{ height: isOpen ? "64.4vh" : "80.3vh", transition: "height 0.3s ease-in-out" }}>
                                         <div className="d-flex justify-content-between pt-2 px-2">
                                             <div style={{ borderBottom: '2px solid grey' }}>
                                                 <ul className="nav nav-underline">
@@ -658,8 +666,8 @@ const NewPatient = () => {
                                         </div>
 
                                         <div
-                                            className="mt-2 px-2 scroll-container"
-                                            style={{ height: '65vh', overflow: 'auto' }}>
+                                            className="px-2 scroll-container"
+                                            style={{ overflow: 'auto' }}>
                                             {selectedMainTab === 'Patient Details' && <PatientDetails />}
                                             {selectedMainTab === 'Demographics' && <Demographics />}
                                             {selectedMainTab === 'Insurances' && <Insurances />}
@@ -797,16 +805,15 @@ const NewPatient = () => {
                                 }}>
                                 <div className="card m-0 overflow-hidden" style={{ borderRadius: '5px' }}>
                                     <div
-                                        className="card-header d-flex justify-content-between align-items-center text-white px-2 py-1"
-                                        style={{ backgroundColor: '#313A46' }}>
-                                        <button
+                                        className="card-header d-flex justify-content-center align-items-center text-white px-2 py-1"
+                                        style={{ backgroundColor: '#313A46', height:'43px' }}>
+                                        {/* <button
                                             className="btn p-0 shadow-none outline-none"
                                             onClick={handleSidebarToggle}>
                                             <i className="bi bi-list text-white" style={{ fontSize: '18px' }}></i>
-                                            {/* <img src={CloseIcon} alt='' style={{ width: "30%", height: "30%", objectFit: "contain" }} /> */}
-                                        </button>
-                                        {!isSidebarCollapsed && <h5 className="m-0">Patient Chart</h5>}
-                                        <button
+                                        </button> */}
+                                        <h5 className="m-0">Patient Chart</h5>
+                                        {/* <button
                                             className="btn p-0 shadow-none outline-none"
                                             data-bs-toggle="collapse"
                                             data-bs-target="#patientChartData"
@@ -817,9 +824,9 @@ const NewPatient = () => {
                                                 className={`bi ${isClinicalReviewExpandedData ? 'bi-chevron-up' : 'bi-chevron-down'
                                                     }`}
                                                 style={{ fontSize: '14px', color: 'white' }}></i>
-                                        </button>
+                                        </button> */}
                                     </div>
-                                    <div id="patientChartData" className="collapse">
+                                    <div id="patientChartData" className="expanded">
                                         <div
                                             className="card-body p-0 scroll-container"
                                             style={{ height: '81.8vh', overflow: 'auto' }}>

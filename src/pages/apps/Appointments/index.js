@@ -1,17 +1,12 @@
 // @flow
 import React, { useEffect, useState } from 'react';
-import { Badge, Button, Card, Col, Form, Row, Table } from 'react-bootstrap';
+import { Button, Card, Col, Row, Table } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
-import PageTitle from '../../../components/PageTitle';
 import { FormInput } from '../../../components';
-import { patientsData } from './data';
-import { GrDocumentText } from 'react-icons/gr';
-import Dropdown from 'react-bootstrap/Dropdown';
 import { FiFileText, FiFilter } from 'react-icons/fi';
 import { getAppointmentsAction } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { encryptMessage } from '../../../cryptoUtils';
 import Spinner from '../../../constants/Spinner';
 
 // Define the types for each order item
@@ -35,20 +30,24 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
     const dispatch = useDispatch();
     const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
-    const store = useSelector((state) => state)
-    const patientsAppointment = store?.getAppointmentsReducer?.data?.appointments || [];
-    console.log(patientsAppointment, '1234567890')
 
+    const store = useSelector((state) => state)
+    // const patientsAppointment = '' || [];
+    // console.log(patientsAppointment, '1234567890')
+    const patientsAppointmentData = store?.getAppointmentsReducer?.data?.appointments || [];
+    console.log(patientsAppointmentData, 'patientsAppointmentData')
 
     useEffect(() => {
+
         const data = {
             doctorId: doctorId,
             clinicId: clinicId,
-            status: "All"
-        }
-        dispatch(getAppointmentsAction({ key: encryptMessage(data) }));
+            status: "upcoming"
+        };
 
+        dispatch(getAppointmentsAction(data));
     }, [dispatch]);
+
 
     return (
         <Table responsive className="table-centered table-nowrap mb-0">
@@ -72,36 +71,46 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
                 </tr>
             ) : (
                 <tbody>
-                {patientsAppointment?.length === 0 ? (
-                    <tr>
-                        <td colSpan={6} className='text-center'>
-                            <h3 className='my-5 py-5'>No scheduled appointments.</h3>
-                        </td>
-                    </tr>
-                ) : (
-                    patientsAppointment?.map((data, index) => (
-                        <tr key={index}>
-                            <td>{index + 1}</td>
-                            <td className='text-capitalize'>{data?.patient?.firstName} {data?.patient?.lastName}</td>
-                            <td className='text-capitalize'>{data?.reason} </td>
-                            <td className='text-capitalize'>
-                                {new Date(`1970-01-01T${data?.startTime}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+                    {patientsAppointmentData?.length === 0 ? (
+                        <tr>
+                            <td colSpan={6} className='text-center'>
+                                <h3 className='my-5 py-5'>No scheduled appointments.</h3>
                             </td>
-                            <td>
-                                {data?.date
-                                    ? new Date(data?.date).toLocaleDateString("en-GB", {
-                                        day: "2-digit",
-                                        month: "2-digit",
-                                        year: "numeric",
-                                    })
-                                    : "N/A"}
-                            </td>
-                            <td><span className='px-1 text-white bg-success rounded-2'>{data?.status}</span></td>
                         </tr>
-                    ))
-                )}
-            </tbody>
-            
+                    ) : (
+                        patientsAppointmentData?.map((data, index) => (
+                            <tr key={index}>
+                                <td>{index + 1}</td>
+                                <td className='text-capitalize'>{data?.subject?.name?.[0]?.text} </td>
+                                <td className="text-capitalize" title={data?.reason?.[0]?.text}>
+                                    {data?.reason?.[0]?.text?.length > 40
+                                        ? `${data.reason[0].text.substring(0, 40)}...`
+                                        : data?.reason?.[0]?.text}
+                                </td>
+
+                                <td className='text-capitalize'>
+                                    {data?.start ? new Date(data.start).toLocaleTimeString('en-US', {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        hour12: true
+                                    }) : '--'}
+                                </td>
+                                <td>
+                                    {data?.date
+                                        ? new Date(data?.date).toLocaleDateString("en-GB", {
+                                            day: "2-digit",
+                                            month: "2-digit",
+                                            year: "numeric",
+                                        })
+                                        : "N/A"}
+                                </td>
+
+                                <td><span className='px-2 fw-bold text-white bg-success rounded-2 fs-6'>{data?.status}</span></td>
+                            </tr>
+                        ))
+                    )}
+                </tbody>
+
             )}
         </Table>
     );
@@ -109,36 +118,88 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
 
 // Component for Appointments Transaction Table
 const AppointmentsTransactionList = ({ patientsData }: OrderListProps): React$Element<React$FragmentType> => {
+
+    const dispatch = useDispatch();
+    const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+
+    const store = useSelector((state) => state)
+
+    const patientsAppointmentData = store?.getAppointmentsReducer?.data?.appointments || [];
+    console.log(patientsAppointmentData, 'patientsAppointmentData')
+
+    useEffect(() => {
+
+        const data = {
+            doctorId: doctorId,
+            clinicId: clinicId,
+            status: "history"
+        };
+
+        dispatch(getAppointmentsAction(data));
+    }, [dispatch]);
     return (
         <Table responsive className="table-centered table-nowrap mb-0">
             <thead className="text-white">
-                <tr>
+            <tr>
                     <th className='text-white'>Sr.No.</th>
-                    <th className='text-white'>Patient Name</th>
+                    <th className='text-white'>Patients Name</th>
+                    <th className='text-white'>Reason</th>
+                    <th className='text-white'>Start Time</th>
                     {/* <th className='text-white'>Doctor</th> */}
                     {/* <th className='text-white'>Doctor Department</th> */}
-                    <th className='text-white'>Appointment Date</th>
-                    <th className='text-white'>Payment Status</th>
-                    <th className='text-white'>Payment Mode</th>
-                    <th className='text-white'>Amount</th>
-                    <th className='text-white'>Status</th>
+                    <th className='text-white ' style={{ paddingRight: '70px' }}>Date</th>
+                    <th className='text-white '>Status</th>
                 </tr>
             </thead>
-            <tbody>
-                {[0, 1, 2, 3].map((index) => (
-                    <tr key={index}>
-                        <td>{index + 1}</td>
-                        <td>John Doe</td>
-                        {/* <td>Doctor Demo</td> */}
-                        {/* <td>Nephrologists</td> */}
-                        <td>26th sep, 2024</td>
-                        <td><span className='px-1 text-white bg-success rounded-2'>Confirm</span></td>
-                        <td>Paystack</td>
-                        <td>AR$1,000,00</td>
-                        <td><span className='px-1 text-white bg-success rounded-2'>30th apr,2024</span></td>
-                    </tr>
-                ))}
-            </tbody>
+            {store?.getAppointmentsReducer?.loading ? (
+                <tr>
+                    <td className='text-center' colSpan={6}>
+                        <Spinner className=" my-5 " />
+                    </td>
+                </tr>
+            ) : (
+                <tbody>
+                    {patientsAppointmentData?.length === 0 ? (
+                        <tr>
+                            <td colSpan={6} className='text-center'>
+                                <h3 className='my-5 py-5'>No appointment history.</h3>
+                            </td>
+                        </tr>
+                    ) : (
+                        patientsAppointmentData?.map((data, index) => (
+                            <tr key={index}>
+                                <td>{index + 1}</td>
+                                <td className='text-capitalize'>{data?.subject?.name?.[0]?.text} </td>
+                                <td className="text-capitalize" title={data?.reason?.[0]?.text}>
+                                    {data?.reason?.[0]?.text?.length > 40
+                                        ? `${data.reason[0].text.substring(0, 40)}...`
+                                        : data?.reason?.[0]?.text}
+                                </td>
+
+                                <td className='text-capitalize'>
+                                    {data?.start ? new Date(data.start).toLocaleTimeString('en-US', {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        hour12: true
+                                    }) : '--'}
+                                </td>
+                                <td>
+                                    {data?.date
+                                        ? new Date(data?.date).toLocaleDateString("en-GB", {
+                                            day: "2-digit",
+                                            month: "2-digit",
+                                            year: "numeric",
+                                        })
+                                        : "N/A"}
+                                </td>
+
+                                <td><span className='px-2 fw-bold text-white bg-success rounded-2 fs-6'>{data?.status}</span></td>
+                            </tr>
+                        ))
+                    )}
+                </tbody>
+            )}
         </Table>
     );
 };
@@ -156,7 +217,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
         <>
             <Row className="mt-2">
                 <Col xs={12}>
-                    <Card>
+                    <Card style={{height:'87vh'}}>
                         <Card.Body>
                             <Row className="mb-2">
                                 <Col sm={4}>
@@ -176,7 +237,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                 href="#"
                                                 onClick={() => setActiveTab('transactions')}
                                             >
-                                                Appointments transaction
+                                                Appointments History
                                             </a>
                                         </li>
                                     </ul>

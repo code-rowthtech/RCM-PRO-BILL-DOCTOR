@@ -32,3 +32,8 @@ export const stateEmptydAction = (): LayoutAction => ({
     type: DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE,
 
 });
+
+export const updateDoctorAction = (data) => ({
+    type: DoctorsActionTypes.UPDATE_DOCTORS,
+    data
+});

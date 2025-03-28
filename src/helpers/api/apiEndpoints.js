@@ -18,6 +18,7 @@ export const getClinicById = '/api/v1/clinic/byId';
 export const getDoctor = '/api/v1/doctor/getDoctorDetails';
 export const getCityByState = '/api/v1/doctor/cities/';
 export const getStatedByCountry = '/api/v1/doctor/states/US';
+export const updateDoctor = '/api/v1/doctor/updateDoctor';
 
 // VITALS
 export const createVitals = '/api/v1/doctor/addVitals';
@@ -65,7 +66,8 @@ export const updateSchedule = '/api/v1/practitioner/schedule/update';
 export const getSchedule = '/api/v1/practitioner/schedule';
 
 // APPOINTMENTS
-export const createAppointments = '/api/v1/doctor/appointments';
-export const getAppointments = '/api/v1/doctor/appointment/getAll';
+export const createAppointments = '/api/v1/practitioner/appointment/create';
+export const getAppointments = '/api/v1/practitioner/appointment/list';
 export const getAllAppointments = '/api/v1/doctor/getPatientsByAppointments';
+export const getPractitionerAvailability ='/api/v1/practitioner/appointment/practitionerAvailability'
 

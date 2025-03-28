@@ -856,7 +856,7 @@ const PatientDetails = () => {
                     </div>
 
                     {/* Buttons */}
-                    <div className="d-flex gap-2 justify-content-end mb-2 mt-md-4">
+                    <div className="d-flex gap-2 justify-content-end mb-2 mt-md-2">
 
                         <Button
                             onClick={() => {

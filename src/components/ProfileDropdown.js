@@ -39,7 +39,7 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
     // console.log(changedLogo, 'changedLogo')
     const logo=JSON.parse(sessionStorage.getItem('hyper_user'))?.photo?.[0]?.url;
     const changedLogo=JSON.parse(sessionStorage.getItem('hyper_user'))?.logo?.[0]?.url;
-console.log(changedLogo,'changedLogo')
+// console.log(changedLogo,'changedLogo')
     return (
         <Dropdown show={dropdownOpen} onToggle={toggleDropdown}>
             <Dropdown.Toggle

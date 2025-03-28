@@ -1,8 +1,9 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { DoctorsActionTypes } from './constants';
-import { getCityByStateApi, getDoctorsApi, getStateByCountry } from './api';
+import { getCityByStateApi, getDoctorsApi, getStateByCountry, updateDoctorApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
+import { t } from 'i18next';
 /**
  * Login the user
  * @param {*} payload - username and password
@@ -143,6 +144,35 @@ function* getStatesFunction(data) {
     }
 }
 
+function* updateDoctorsFunction(data) {
+    try {
+        yield put({
+            type: DoctorsActionTypes.UPDATE_DOCTORS_LOADING,
+            payload: {},
+        });
+        const response = yield call(updateDoctorApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: DoctorsActionTypes.UPDATE_DOCTORS_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: DoctorsActionTypes.UPDATE_DOCTORS_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: DoctorsActionTypes.UPDATE_DOCTORS_ERROR,
+            payload: error,
+        });
+    }
+}
+
 export function* callStateEmpty() {
     put({
         type: DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE,
@@ -172,6 +202,9 @@ export function* watchGetStates() {
     yield takeEvery(DoctorsActionTypes.GET_STATES, getStatesFunction);
 }
 
+export function* watchUpdateDoctors() {
+    yield takeEvery(DoctorsActionTypes.UPDATE_DOCTORS, updateDoctorsFunction);
+}
 
 export function* watchresetState() {
     yield takeEvery(DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE, callStateEmpty);
@@ -184,6 +217,7 @@ function* doctorsSaga() {
         fork(watchGetCities2),
         fork(watchGetCities3),
         fork(watchGetStates),
+        fork(watchUpdateDoctors),
         fork(watchresetState)
     ]);
 }
