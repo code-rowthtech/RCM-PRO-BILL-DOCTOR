@@ -101,6 +101,7 @@ function* createScheduleFunction(data) {
         // console.log(response,'response')
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: ScheduleActionTypes.CREATE_SCHEDULE_SUCCESS,
                 payload: { ...decryptedData },
@@ -128,6 +129,7 @@ function* updateScheduleFunction(data) {
         const response = yield call(updateScheduleApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: ScheduleActionTypes.UPDATE_SCHEDULE_SUCCESS,
                 payload: { ...decryptedData },

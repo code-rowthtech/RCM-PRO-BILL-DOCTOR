@@ -16,3 +16,8 @@ export const getAllAppointmentsAction = (data): AuthAction => ({
     type: AppointmentsActionTypes.GET_ALL_APPOINTMENTS,
     data
 });
+
+export const getPractitionerAvailabilityAction = (data): AuthAction => ({
+    type: AppointmentsActionTypes.GET_PRACTITIONER_AVAILABILITY,
+    data
+});

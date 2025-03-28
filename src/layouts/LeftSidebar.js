@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import profileDummy from '../assets/images/profileDummy.png';
 
 import { getMenuItems } from '../helpers/menu';
-import { MdAdd } from 'react-icons/md';
+import { MdAdd, MdOutlineInfo } from 'react-icons/md';
 
 // components
 import AppMenu from './Menu';
@@ -69,6 +69,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
     const patientsAppointment = store?.getAllAppointmentsReducer?.data?.appointments || [];
+    console.log(store?.getAllAppointmentsReducer?.data, 'appointment123')
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
     const createSuccess = store?.createAppointmentsReducer?.data?.message;
 
@@ -166,31 +167,28 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                     className="btn-group d-flex justify-content-center align-items-center custom-btn-group"
                                     style={{ height: '30px' }}>
                                     <button
-                                        className={`btn  ${
-                                            activeTab === 'Today'
-                                                ? 'active btn-light text-black'
-                                                : 'btn-transparent text-white'
-                                        }`}
+                                        className={`btn  ${activeTab === 'Today'
+                                            ? 'active btn-light text-black'
+                                            : 'btn-transparent text-white'
+                                            }`}
                                         onClick={() => setActiveTab('Today')}
                                         style={{ border: '1px solid white', boxShadow: 'none' }}>
                                         Today's
                                     </button>
                                     <button
-                                        className={`btn ${
-                                            activeTab === 'Upcoming'
-                                                ? 'active text-black btn-light'
-                                                : 'btn-transparent text-white'
-                                        }`}
+                                        className={`btn ${activeTab === 'Upcoming'
+                                            ? 'active text-black btn-light'
+                                            : 'btn-transparent text-white'
+                                            }`}
                                         onClick={() => setActiveTab('Upcoming')}
                                         style={{ border: '1px solid white', boxShadow: 'none' }}>
                                         Upcoming
                                     </button>
                                     <button
-                                        className={`btn ${
-                                            activeTab === 'History'
-                                                ? 'active text-black btn-light'
-                                                : 'btn-transparent text-white'
-                                        }`}
+                                        className={`btn ${activeTab === 'History'
+                                            ? 'active text-black btn-light'
+                                            : 'btn-transparent text-white'
+                                            }`}
                                         onClick={() => setActiveTab('History')}
                                         style={{ border: '1px solid white', boxShadow: 'none' }}>
                                         History
@@ -224,27 +222,30 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                         key={index}
                                         className={`py-1 cursor-pointer patient-item px-1 d-flex justify-content-between`}
                                         style={{ borderBottom: '1px solid rgb(127 123 123 / 67%)' }}
-                                        onClick={() => navigate(`/apps/patients/new-patient?id=${data?.patient?._id}`)}>
+                                        onClick={() => navigate(`/apps/patients/new-patient?id=${data?.subject?._id}`)}>
                                         <div className="d-flex gap-2 align-items-center">
                                             <img
                                                 height="40"
                                                 width="40"
-                                                src={data?.patient?.patientChartPhoto?.url || profileDummy}
+                                                src={data?.subject?.photo?.[0]?.url || profileDummy}
                                                 className="rounded-circle border border-black"
                                                 alt="profile image"
                                             />
                                             <div>
-                                                <p className="mb-0 text-capitalize" style={{ fontSize: '12px' }}>
-                                                    {data?.patient?.firstName}
+                                                <p className="text-capitalize" style={{ fontSize: '12px', marginBottom: '5px' }}>
+                                                    {data?.subject?.name?.[0]?.text}
                                                 </p>
-                                                <p className="mb-0 " style={{ fontSize: '10px' }}>
-                                                    {data?.reason}
+                                                <p className="mb-0" style={{ fontSize: '10px' }}>
+                                                    <span>
+                                                        {data?.appointmentType?.coding?.[0]?.display}
+                                                    </span>
                                                 </p>
+
                                             </div>
                                         </div>
                                         <div>
                                             <div>
-                                                <p className="mb-0" style={{ fontSize: '10px' }}>
+                                                <p className="mb-0 mt-1" style={{ fontSize: '10px' }}>
                                                     <span>
                                                         {new Date(data?.date).toLocaleDateString('en-GB', {
                                                             day: '2-digit',
@@ -253,16 +254,22 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                                     </span>
                                                     &nbsp;&nbsp;
                                                     <span>
-                                                        {new Date(`1970-01-01T${data?.startTime}`).toLocaleTimeString(
-                                                            'en-US',
-                                                            { hour: 'numeric', minute: '2-digit', hour12: true }
-                                                        )}
+                                                        {data?.start
+                                                            ? new Date(data.start).toLocaleTimeString('en-GB', {
+                                                                hour: '2-digit',
+                                                                minute: '2-digit',
+                                                                hour12: false
+                                                            })
+                                                            : '--'}
                                                     </span>
+
                                                 </p>
                                             </div>
                                             <div>
                                                 <p className="mb-0 text-end pt-1" style={{ fontSize: '10px' }}>
-                                                    {data?.profile}
+                                                    <span title={data?.reason?.[0]?.text || "No reason provided"} style={{ cursor: 'pointer', color: '#0d6efd' }}>
+                                                        <MdOutlineInfo className='fs-5' />
+                                                    </span>
                                                 </p>
                                             </div>
                                         </div>
@@ -284,18 +291,21 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                         style={{ borderBottom: '1px solid rgb(127 123 123 / 67%)' }}
                                         onClick={() => navigate(`/apps/patients/new-patient?id=${data?.patient?._id}`)}>
                                         <div className="">
-                                            <img
-                                                height="40"
-                                                width="40"
-                                                src={data?.patient?.patientChartPhoto?.url || profileDummy}
-                                                className="rounded-circle border border-black"
-                                                alt="profile image"
-                                            />
-                                            <div>
+                                            <span title={data?.subject?.name?.[0]?.text || " "} style={{ cursor: 'pointer', color: '#fff' }}>
+
+                                                <img
+                                                    height="40"
+                                                    width="40"
+                                                    src={data?.subject?.photo?.[0]?.url || profileDummy}
+                                                    className="rounded-circle border border-black"
+                                                    alt="profile image"
+                                                />
+                                            </span>
+                                            {/* <div>
                                                 <p className="mb-0 text-capitalize mt-1" style={{ fontSize: '12px' }}>
-                                                    {data?.patient?.firstName}
+                                                    {data?.subject?.name?.[0]?.text}
                                                 </p>
-                                            </div>
+                                            </div> */}
                                         </div>
                                         <div></div>
                                     </li>
