@@ -18,7 +18,7 @@ const AddNewPatient = () => {
         <div>
             <div className=' mt-2 '>
                 <Card className='px-2 '>
-                    <div className='d-flex justify-content-between pt-1'>
+                    <div className='d-flex justify-content-between pt-2 px-2'>
                         <div style={{ borderBottom: '2px solid grey' }}>
                             <ul className="nav nav-underline">
                                 {[
@@ -44,11 +44,11 @@ const AddNewPatient = () => {
                             </ul>
                         </div>
                         <div className=''>
-                            <Button className="custom-buttons" onClick={() => navigate(-1)}>Back</Button>
+                            <Button className="cancel-button " onClick={() => navigate(-1)}>Back</Button>
                         </div>
                     </div>
 
-                    <div className="mt-2 px-2 scroll-container" style={{ height: '78vh', overflow: 'auto' }}>
+                    <div className=" px-2 scroll-container" style={{ height: '78vh', overflow: 'auto' }}>
                         {activeTab === 'Patient Details' && <AddPatientDetails />}
                         {activeTab === 'Demographics' && <AddDemographics />}
                         {activeTab === 'Insurances' && <AddInsurance />}

@@ -42,21 +42,18 @@ import AddAsignTask from './TaskTabs/AddAsignTask';
 import ProblemList from './TaskTabs/ProblemList';
 import AllergyList from './TaskTabs/AllergyList';
 import FilterDropdown from './FilterDropdown';
+import Drug from './DrugIntraction/Drug';
+import CQIs from './CQIs/CQIs';
+import LabRequest from './LabRequest/LabRequest';
 
 const NewPatient = () => {
-    const navigate = useNavigate();
     const dispatch = useDispatch();
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [activeModalTab, setActiveModalTab] = useState('Appointments');
     const {
-        register,
         handleSubmit,
         formState: { errors },
-        setValue,
-        reset,
-        clearErrors,
-        watch,
-        getValues,
+
     } = useForm();
     const [isClinicalReviewExpanded, setIsClinicalReviewExpanded] = useState(false);
     const [isRunning, setIsRunning] = useState(false);
@@ -66,11 +63,12 @@ const NewPatient = () => {
     const handleClose = () => setShowModal(false);
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
-    const primaryProvider = JSON.parse(sessionStorage.getItem('hyper_user'))?.firstName;
+    const primaryProvider = JSON.parse(sessionStorage.getItem('hyper_user'))?.name?.text;
+    console.log(primaryProvider, 'primaryProvider')
     const store = useSelector((state) => state);
-    const patientsDataById = store?.getPatientsByIdReducer?.data?.patient || [];
+    const patientsDataById = store?.getPatientsByIdReducer?.data?.data || [];
 
-    // console.log(patientsDataById, 'patientsDataByIdpatientsDataById')
+    console.log(patientsDataById, 'patientsDataByIdpatientsDataById')
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
     const [profilePhoto, setProfilePhoto] = useState(profileDummy);
     const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -84,18 +82,24 @@ const NewPatient = () => {
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
 
     useEffect(() => {
-        dispatch(getPatientsByIdAction({ key: encryptMessage({ id: id }) }));
-    }, [dispatch, id]);
+        const data = {
+            id: id,
+        }
+        if (id) {
+            dispatch(getPatientsByIdAction(data));
+        }
+    }, [id]);
 
     useEffect(() => {
         if (updateSuccess === 200) {
-            dispatch(getPatientsByIdAction({ key: encryptMessage({ id: id }) }));
+            dispatch(getPatientsByIdAction({ id }));
             dispatch(resetUpdateAction());
             setLogo(null);
             setLogoName('');
             setIsCameraOpen(false);
         }
-    }, [updateSuccess]);
+    }, [updateSuccess, id, dispatch]); // Ensure dependencies are correctly set
+
 
     const handleMainTabChange = (tab) => {
         setSelectedMainTab(tab);
@@ -116,13 +120,22 @@ const NewPatient = () => {
 
         setSelectedSubTab(tab);
     };
+    const tabMappings = {
+        'Patient Info': { mainTab: 'Patient Details', section: 'patient' },
+        'Drug Interactions': { mainTab: 'Drug Interactions', section: 'drug' },
+        'CQIs': { mainTab: 'CQIs', section: 'CQIs' },
+        'Lab Request': { mainTab: 'Lab Request', section: 'Lab Request' }
+
+    };
+
     const handleChartTabChange = (tab) => {
-        if (tab === 'Patient Info') {
-            setSelectedMainTab('Patient Details');
-            setVisibleSection('patient');
-            return;
+        const mapping = tabMappings[tab];
+        if (mapping) {
+            setSelectedMainTab(mapping.mainTab);
+            setVisibleSection(mapping.section);
         }
     };
+
 
     const handleClinicalReviewToggle = () => {
         setIsClinicalReviewExpanded(!isClinicalReviewExpanded);
@@ -260,11 +273,11 @@ const NewPatient = () => {
             ...(logo?.url === null
                 ? {}
                 : {
-                      patientChartPhoto: {
-                          url: logo?.url?.split('?')[0] || patientsDataById?.patientChartPhoto?.url,
-                          fileName: logoName,
-                      },
-                  }),
+                    photo: {
+                        url: logo?.url?.split('?')[0] || patientsDataById?.patientChartPhoto?.url,
+                        title: logoName,
+                    },
+                }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
         // console.log(payload, 'payloadpayload')
@@ -273,11 +286,321 @@ const NewPatient = () => {
     return (
         <>
             <div className="background_Color  pb-2">
-                <div className="container-fluid px-0 mt-0 pt-0">
+                <div className="container-fluid px-0 mt-2 pt-0">
                     <div className="row">
                         {/* Main Content */}
                         <div className={isSidebarCollapsed ? 'col-11' : 'col-10'}>
-                            <div
+
+                            <div class="accordion border-none" id="accordionExample">
+                                <div class="accordion-item collapsed border-0">
+                                    <h2 class="accordion-header mt-0">
+                                        <button class="accordion-button collapsed  py-1 bg-white" 
+                                        style={{border:'0 4px 10px rgba(0, 0, 0, 0.1) '}}
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne"
+                                        >
+                                            <div className="d-flex gap-2 ps-1 pt-2">
+                                                <p
+                                                    style={{ borderRight: '1px solid black' }}
+                                                    className="pe-2 text-nowrap fs-6">
+                                                    <span
+                                                        className="fw-bold text-capitalize"
+                                                        style={{ color: 'rgb(249, 139, 55)' }}>
+                                                        {patientsDataById?.name?.[0]?.text || 'N/A'}
+                                                    </span>{' '}
+                                                    <span className="fs-6 fw-bold">
+                                                        {patientsDataById?.gender || ' '}
+                                                    </span>
+                                                </p>
+                                                <p
+                                                    style={{ borderRight: '1px solid black' }}
+                                                    className="pe-2 text-nowrap fw-bold fs-6">
+                                                    <span>
+                                                        {patientsDataById?.birthDate
+                                                            ? new Date(
+                                                                patientsDataById.birthDate
+                                                            ).toLocaleDateString('en-GB')
+                                                            : 'N/A'}
+                                                    </span>
+                                                </p>
+                                                <p className="text-nowrap fs-6 fw-bold">
+                                                    <span>
+                                                        {patientsDataById?.approxAge != null
+                                                            ? patientsDataById.approxAge + ' years old'
+                                                            : '-'}
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </button>
+                                    </h2>
+                                    <div id="collapseOne" class="accordion-collapse collapse " data-bs-parent="#accordionExample">
+                                        <div class="accordion-body  p-0 bg-white pb-1" style={{ borderBottomLeftRadius: '5px', borderBottomRightRadius: '5px' }}>
+                                            <div className="p-1">
+                                                <Row>
+                                                    <Col sm={2} className="ps-0 pt-1">
+                                                        <Form
+                                                            onSubmit={handleSubmit(onSubmit)}
+                                                            className="d-flex flex-column align-items-center">
+                                                            <div
+                                                                className="position-relative d-flex align-items-center flex-column justify-content-center"
+                                                                style={{ display: 'inline-block' }}>
+                                                                {isCameraOpen ? (
+                                                                    <video
+                                                                        ref={videoRef}
+                                                                        autoPlay
+                                                                        playsInline
+                                                                        className="rounded"
+                                                                        style={{
+                                                                            width: '126px',
+                                                                            height: '129px',
+                                                                            objectFit: 'cover',
+                                                                        }}
+                                                                    />
+                                                                ) : uploading ? (
+                                                                    <div className="py-3">
+                                                                        <Spinner />
+                                                                    </div>
+                                                                ) : (
+                                                                    <img
+                                                                        src={
+                                                                            logo?.url
+                                                                                ? logo.url.split('?')[0]
+                                                                                : patientsDataById?.photo?.[0]?.url
+                                                                                    ? patientsDataById?.photo?.[0]?.url
+                                                                                    : profilePhoto
+                                                                        }
+                                                                        alt="Patient Profile"
+                                                                        className="img-fluid rounded"
+                                                                        style={{
+                                                                            width: '126px',
+                                                                            height: '129px',
+                                                                            objectFit: 'cover',
+                                                                        }}
+                                                                    />
+                                                                )}
+
+                                                                {!isCameraOpen && (
+                                                                    <BiEdit
+                                                                        className={`position-absolute fs-4 text-primary ${uploading ? 'd-none' : ''
+                                                                            }`}
+                                                                        style={{ bottom: '-5px', right: '-9px', cursor: 'pointer' }}
+                                                                        onClick={openCamera}
+                                                                    />
+                                                                )}
+
+                                                                {isCameraOpen && (
+                                                                    <div className="camera-controls d-flex justify-content-center gap-1 mt-1">
+                                                                        <Button
+                                                                            onClick={capturePhoto}
+                                                                            type="button"
+                                                                            className="custom-buttons">
+                                                                            <TbCapture className="text-white fs-5" />{' '}
+                                                                        </Button>
+                                                                        <Button onClick={stopCamera} className="custom-buttons">
+                                                                            <IoClose className="text-white fs-5" />
+                                                                        </Button>
+                                                                    </div>
+                                                                )}
+
+                                                                <canvas ref={canvasRef} style={{ display: 'none' }} />
+                                                            </div>
+
+                                                            <Button
+                                                                type="submit"
+                                                                className={`${!logo ? 'd-none' : 'mt-1 custom-buttons'}`}
+                                                                disabled={!logo}>
+                                                                Submit
+                                                            </Button>
+                                                        </Form>
+                                                    </Col>
+
+                                                    <Col sm={8}>
+                                                        <Row className="pt-1">
+
+                                                            <Col sm={6} className="p-0">
+                                                                <div className="row">
+                                                                    <div className="col-12 mx-1 ">
+                                                                        <div className="row">
+                                                                            <div className="col-3">
+                                                                                <span className="fw-bold fs-6">Patients ID:</span>
+                                                                            </div>
+                                                                            <div className="col-9">
+                                                                                <span
+                                                                                    className="ps-2 text-primary fs-6"
+                                                                                    style={{ fontWeight: 600 }}>
+                                                                                    {patientsDataById?.chartNumber}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-12 mx-1 ">
+                                                                        <div className="row">
+                                                                            <div className="col-3">
+                                                                                <span>
+                                                                                    <MdPhone className="fs-5 text-primary" />
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className="col-9">
+                                                                                <span
+                                                                                    className="ps-2 fs-6"
+                                                                                    style={{ fontWeight: 600 }}>
+                                                                                    {patientsDataById?.telecom?.[1]?.value || 'N/A    '}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-12 mx-1 ">
+                                                                        <div className="row">
+                                                                            <div className="col-3">
+                                                                                <span>
+                                                                                    <MdOutlineMarkEmailUnread className="fs-5 text-primary" />
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className="col-9">
+                                                                                <span
+                                                                                    className="ps-2 fs-6"
+                                                                                    style={{ fontWeight: 600 }}>
+                                                                                    {patientsDataById?.telecom?.[3]?.value || 'N/A'}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-12 mx-1 ">
+                                                                        <div className="row">
+                                                                            <div className="col-3">
+                                                                                <span>
+                                                                                    <BiSolidLocationPlus className="fs-5 text-primary" />
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className="col-9">
+                                                                                <span
+                                                                                    className="ps-2 fs-6"
+                                                                                    style={{ fontWeight: 600 }}>
+                                                                                    {patientsDataById?.address?.address
+                                                                                        ? patientsDataById.address.address.length >
+                                                                                            30
+                                                                                            ? patientsDataById.address.address.slice(
+                                                                                                0,
+                                                                                                30
+                                                                                            ) + '...'
+                                                                                            : patientsDataById.address.address
+                                                                                        : 'N/A'}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </Col>
+                                                            <Col sm={6}>
+                                                                <div className="row">
+                                                                    <div className="col-12 mx-1 ">
+                                                                        <div className="row">
+                                                                            <div className="col-5">
+                                                                                <span className="fw-bold fs-6">
+                                                                                    Primary Provider:
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className="col-7">
+                                                                                <span
+                                                                                    className="ps-2 text-primary fs-6"
+                                                                                    style={{ fontWeight: 600 }}>
+                                                                                    {primaryProvider}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-12 mx-1 ">
+                                                                        <div className="row">
+                                                                            <div className="col-5">
+                                                                                <span className="fw-bold fs-6">Date Added:</span>
+                                                                            </div>
+                                                                            <div className="col-7">
+                                                                                <span
+                                                                                    className="ps-2 fs-6"
+                                                                                    style={{ fontWeight: 600 }}>
+                                                                                    {patientsDataById?.createdAt
+                                                                                        ? new Date(
+                                                                                            patientsDataById.createdAt
+                                                                                        ).toLocaleDateString('en-GB')
+                                                                                        : 'N/A'}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-12 mx-1 ">
+                                                                        <div className="row">
+                                                                            <div className="col-5">
+                                                                                <span className="fw-bold fs-6">
+                                                                                    Last Appointment Date:
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className="col-7">
+                                                                                <span
+                                                                                    className="ps-2 fs-6"
+                                                                                    style={{ fontWeight: 600 }}>
+                                                                                    {patientsDataById?.lastApptDate || 'N/A'}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-12 mx-1 ">
+                                                                        <div className="row">
+                                                                            <div className="col-5">
+                                                                                <span className="fw-bold fs-6">
+                                                                                    Next Appointment Date:
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className="col-7">
+                                                                                <span
+                                                                                    className="ps-2 fs-6"
+                                                                                    style={{ fontWeight: 600 }}>
+                                                                                    {patientsDataById?.nextApptDate || 'N/A'}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </Col>
+                                                        </Row>
+                                                    </Col>
+
+                                                    <Col sm={2} className="d-flex justify-content-end pe-2">
+                                                        <div className="text-center">
+                                                            {/* <Button className='text-black text-nowrap bg-white mt-1 fs-6 d-flex align-items-center justify-content-center w-100' style={{ height: '30px' }}>
+                                                New Referral
+                                            </Button> */}
+                                                            <Button
+                                                                className="text-black text-nowrap bg-white fs-6 d-flex align-items-center justify-content-center w-100"
+                                                                style={{ height: '30px', borderRadius: '10px' }}
+                                                                onClick={toggleTimer} // Toggle the timer
+                                                            >
+                                                                {isRunning
+                                                                    ? `Pause (${formatTime(timeLeft)})`
+                                                                    : timeLeft > 0
+                                                                        ? `Resume (${formatTime(timeLeft)})`
+                                                                        : 'Start Session'}
+                                                            </Button>
+
+                                                            <Button
+                                                                className="text-black text-nowrap bg-white mt-1 fs-6 d-flex align-items-center justify-content-center w-100"
+                                                                style={{ height: '30px', borderRadius: '10px' }}
+                                                                onClick={handleShow} // Open modal on button click
+                                                            >
+                                                                Add Appointment
+                                                            </Button>
+                                                            <div className="mt-2 d-flex gap-2  justify-content-end">
+                                                                <HiOutlinePrinter className="fs-3 text-black" />
+                                                                <LiaReceiptSolid className="fs-3 text-black" />
+                                                                {/* <TbHeartRateMonitor className='fs-3' /> */}
+                                                            </div>
+                                                        </div>
+                                                    </Col>
+                                                </Row>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {/* <div
                                 className="mb-1"
                                 style={{
                                     background: 'transparent',
@@ -286,302 +609,8 @@ const NewPatient = () => {
                                     bordertop: '0px!important',
                                     boxShadow: 0,
                                 }}>
-                                <div className="p-1">
-                                    <Row>
-                                        <Col sm={2} className="ps-2 pt-1">
-                                            <Form
-                                                onSubmit={handleSubmit(onSubmit)}
-                                                className="d-flex flex-column align-items-center">
-                                                <div
-                                                    className="position-relative d-flex align-items-center flex-column justify-content-center"
-                                                    style={{ display: 'inline-block' }}>
-                                                    {isCameraOpen ? (
-                                                        <video
-                                                            ref={videoRef}
-                                                            autoPlay
-                                                            playsInline
-                                                            className="rounded"
-                                                            style={{
-                                                                width: '126px',
-                                                                height: '129px',
-                                                                objectFit: 'cover',
-                                                            }}
-                                                        />
-                                                    ) : uploading ? (
-                                                        <div className="py-3">
-                                                            <Spinner />
-                                                        </div>
-                                                    ) : (
-                                                        <img
-                                                            src={
-                                                                logo?.url
-                                                                    ? logo.url.split('?')[0]
-                                                                    : patientsDataById?.patientChartPhoto?.url
-                                                                    ? patientsDataById.patientChartPhoto.url
-                                                                    : profilePhoto
-                                                            }
-                                                            alt="Patient Profile"
-                                                            className="img-fluid rounded"
-                                                            style={{
-                                                                width: '126px',
-                                                                height: '129px',
-                                                                objectFit: 'cover',
-                                                            }}
-                                                        />
-                                                    )}
-
-                                                    {!isCameraOpen && (
-                                                        <BiEdit
-                                                            className={`position-absolute fs-4 text-primary ${
-                                                                uploading ? 'd-none' : ''
-                                                            }`}
-                                                            style={{ bottom: '-5px', right: '-9px', cursor: 'pointer' }}
-                                                            onClick={openCamera}
-                                                        />
-                                                    )}
-
-                                                    {isCameraOpen && (
-                                                        <div className="camera-controls d-flex justify-content-center gap-1 mt-1">
-                                                            <Button
-                                                                onClick={capturePhoto}
-                                                                type="button"
-                                                                className="custom-buttons">
-                                                                <TbCapture className="text-white fs-5" />{' '}
-                                                            </Button>
-                                                            <Button onClick={stopCamera} className="custom-buttons">
-                                                                <IoClose className="text-white fs-5" />
-                                                            </Button>
-                                                        </div>
-                                                    )}
-
-                                                    <canvas ref={canvasRef} style={{ display: 'none' }} />
-                                                </div>
-
-                                                <Button
-                                                    type="submit"
-                                                    className={`${!logo ? 'd-none' : 'mt-1 custom-buttons'}`}
-                                                    disabled={!logo}>
-                                                    Submit
-                                                </Button>
-                                            </Form>
-                                        </Col>
-
-                                        <Col sm={8}>
-                                            <Row className="pt-1">
-                                                <div className="d-flex gap-2 ps-1">
-                                                    <p
-                                                        style={{ borderRight: '1px solid black' }}
-                                                        className="pe-2 text-nowrap fs-6">
-                                                        <span
-                                                            className="fw-bold text-capitalize"
-                                                            style={{ color: 'rgb(249, 139, 55)' }}>
-                                                            {patientsDataById?.firstName || 'N/A'}{' '}
-                                                            {patientsDataById?.lastName || ' '}
-                                                        </span>{' '}
-                                                        <span className="fs-6 fw-bold">
-                                                            {patientsDataById?.sex || ' '}
-                                                        </span>
-                                                    </p>
-                                                    <p
-                                                        style={{ borderRight: '1px solid black' }}
-                                                        className="pe-2 text-nowrap fw-bold fs-6">
-                                                        <span>
-                                                            {patientsDataById?.dateOfBirth
-                                                                ? new Date(
-                                                                      patientsDataById.dateOfBirth
-                                                                  ).toLocaleDateString('en-GB')
-                                                                : 'N/A'}
-                                                        </span>
-                                                    </p>
-                                                    <p className="text-nowrap fs-6 fw-bold">
-                                                        <span>
-                                                            {patientsDataById?.approxAge != null
-                                                                ? patientsDataById.approxAge + ' years old'
-                                                                : '-'}
-                                                        </span>
-                                                    </p>
-                                                </div>
-                                                <Col sm={6} className="p-0">
-                                                    <div className="row">
-                                                        <div className="col-12 mx-1 ">
-                                                            <div className="row">
-                                                                <div className="col-3">
-                                                                    <span className="fw-bold fs-6">Patients ID:</span>
-                                                                </div>
-                                                                <div className="col-9">
-                                                                    <span
-                                                                        className="ps-2 text-primary fs-6"
-                                                                        style={{ fontWeight: 600 }}>
-                                                                        {patientsDataById?.chartNumber}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-12 mx-1 ">
-                                                            <div className="row">
-                                                                <div className="col-3">
-                                                                    <span>
-                                                                        <MdPhone className="fs-5 text-primary" />
-                                                                    </span>
-                                                                </div>
-                                                                <div className="col-9">
-                                                                    <span
-                                                                        className="ps-2 fs-6"
-                                                                        style={{ fontWeight: 600 }}>
-                                                                        {patientsDataById?.cellPhone || 'N/A    '}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-12 mx-1 ">
-                                                            <div className="row">
-                                                                <div className="col-3">
-                                                                    <span>
-                                                                        <MdOutlineMarkEmailUnread className="fs-5 text-primary" />
-                                                                    </span>
-                                                                </div>
-                                                                <div className="col-9">
-                                                                    <span
-                                                                        className="ps-2 fs-6"
-                                                                        style={{ fontWeight: 600 }}>
-                                                                        {patientsDataById?.email || 'N/A'}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-12 mx-1 ">
-                                                            <div className="row">
-                                                                <div className="col-3">
-                                                                    <span>
-                                                                        <BiSolidLocationPlus className="fs-5 text-primary" />
-                                                                    </span>
-                                                                </div>
-                                                                <div className="col-9">
-                                                                    <span
-                                                                        className="ps-2 fs-6"
-                                                                        style={{ fontWeight: 600 }}>
-                                                                        {patientsDataById?.address?.address
-                                                                            ? patientsDataById.address.address.length >
-                                                                              30
-                                                                                ? patientsDataById.address.address.slice(
-                                                                                      0,
-                                                                                      30
-                                                                                  ) + '...'
-                                                                                : patientsDataById.address.address
-                                                                            : 'N/A'}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </Col>
-                                                <Col sm={6}>
-                                                    <div className="row">
-                                                        <div className="col-12 mx-1 ">
-                                                            <div className="row">
-                                                                <div className="col-5">
-                                                                    <span className="fw-bold fs-6">
-                                                                        Primary Provider:
-                                                                    </span>
-                                                                </div>
-                                                                <div className="col-7">
-                                                                    <span
-                                                                        className="ps-2 text-primary fs-6"
-                                                                        style={{ fontWeight: 600 }}>
-                                                                        {primaryProvider}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-12 mx-1 ">
-                                                            <div className="row">
-                                                                <div className="col-5">
-                                                                    <span className="fw-bold fs-6">Date Added:</span>
-                                                                </div>
-                                                                <div className="col-7">
-                                                                    <span
-                                                                        className="ps-2 fs-6"
-                                                                        style={{ fontWeight: 600 }}>
-                                                                        {patientsDataById?.createdAt
-                                                                            ? new Date(
-                                                                                  patientsDataById.createdAt
-                                                                              ).toLocaleDateString('en-GB')
-                                                                            : 'N/A'}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-12 mx-1 ">
-                                                            <div className="row">
-                                                                <div className="col-5">
-                                                                    <span className="fw-bold fs-6">
-                                                                        Last Appointment Date:
-                                                                    </span>
-                                                                </div>
-                                                                <div className="col-7">
-                                                                    <span
-                                                                        className="ps-2 fs-6"
-                                                                        style={{ fontWeight: 600 }}>
-                                                                        {patientsDataById?.lastApptDate || 'N/A'}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-12 mx-1 ">
-                                                            <div className="row">
-                                                                <div className="col-5">
-                                                                    <span className="fw-bold fs-6">
-                                                                        Next Appointment Date:
-                                                                    </span>
-                                                                </div>
-                                                                <div className="col-7">
-                                                                    <span
-                                                                        className="ps-2 fs-6"
-                                                                        style={{ fontWeight: 600 }}>
-                                                                        {patientsDataById?.nextApptDate || 'N/A'}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </Col>
-                                            </Row>
-                                        </Col>
-
-                                        <Col sm={2} className="d-flex justify-content-end pe-3">
-                                            <div className="text-center">
-                                                {/* <Button className='text-black text-nowrap bg-white mt-1 fs-6 d-flex align-items-center justify-content-center w-100' style={{ height: '30px' }}>
-                                                New Referral
-                                            </Button> */}
-                                                <Button
-                                                    className="text-black text-nowrap bg-white fs-6 d-flex align-items-center justify-content-center w-100"
-                                                    style={{ height: '30px', borderRadius: '10px' }}
-                                                    onClick={toggleTimer} // Toggle the timer
-                                                >
-                                                    {isRunning
-                                                        ? `Pause (${formatTime(timeLeft)})`
-                                                        : timeLeft > 0
-                                                        ? `Resume (${formatTime(timeLeft)})`
-                                                        : 'Start Session'}
-                                                </Button>
-
-                                                <Button
-                                                    className="text-black text-nowrap bg-white mt-1 fs-6 d-flex align-items-center justify-content-center w-100"
-                                                    style={{ height: '30px', borderRadius: '10px' }}
-                                                    onClick={handleShow} // Open modal on button click
-                                                >
-                                                    Add Appointment
-                                                </Button>
-                                                <div className="mt-2 d-flex gap-2  justify-content-end">
-                                                    <HiOutlinePrinter className="fs-3 text-black" />
-                                                    <LiaReceiptSolid className="fs-3 text-black" />
-                                                    {/* <TbHeartRateMonitor className='fs-3' /> */}
-                                                </div>
-                                            </div>
-                                        </Col>
-                                    </Row>
-                                </div>
-                            </div>
+                              
+                            </div> */}
 
                             {/* Patient Details Section */}
                             {visibleSection === 'patient' && (
@@ -602,11 +631,10 @@ const NewPatient = () => {
                                                     ].map((tab) => (
                                                         <li className="nav-item" key={tab}>
                                                             <a
-                                                                className={`nav-link me-3 pb-0 tab-font-family ${
-                                                                    selectedMainTab === tab
-                                                                        ? 'active text-primary'
-                                                                        : 'text-black'
-                                                                }`}
+                                                                className={`nav-link me-3 pb-0 tab-font-family ${selectedMainTab === tab
+                                                                    ? 'active text-primary'
+                                                                    : 'text-black'
+                                                                    }`}
                                                                 onClick={() => handleMainTabChange(tab)}
                                                                 style={{ cursor: 'pointer', fontWeight: 600 }}>
                                                                 {tab}
@@ -679,11 +707,10 @@ const NewPatient = () => {
                                                     ].map((subTab) => (
                                                         <li className="nav-item" key={subTab}>
                                                             <a
-                                                                className={`nav-link me-2 pb-0 tab-font-family ${
-                                                                    selectedSubTab === subTab
-                                                                        ? 'active text-primary'
-                                                                        : 'text-black'
-                                                                }`}
+                                                                className={`nav-link me-2 pb-0 tab-font-family ${selectedSubTab === subTab
+                                                                    ? 'active text-primary'
+                                                                    : 'text-black'
+                                                                    }`}
                                                                 onClick={() => handleSubTabChange(subTab)}
                                                                 style={{ cursor: 'pointer', fontWeight: 600 }}>
                                                                 {subTab}
@@ -739,6 +766,25 @@ const NewPatient = () => {
                                     </Card>
                                 </div>
                             )}
+
+                            {/* Drug Sections */}
+                            {visibleSection === 'drug' && (
+                                <>
+                                    <Drug />
+                                </>
+                            )}
+                            {/* CQIs section */}
+                            {visibleSection === 'CQIs' && (
+                                <>
+                                    <CQIs />
+                                </>
+                            )}
+                            {/* Lab Request section */}
+                            {visibleSection === 'Lab Request' && (
+                                <>
+                                    <LabRequest />
+                                </>
+                            )}
                         </div>
 
                         {/* Sidebar */}
@@ -768,9 +814,8 @@ const NewPatient = () => {
                                             aria-controls="patientChartData"
                                             onClick={handleToggle}>
                                             <i
-                                                className={`bi ${
-                                                    isClinicalReviewExpandedData ? 'bi-chevron-up' : 'bi-chevron-down'
-                                                }`}
+                                                className={`bi ${isClinicalReviewExpandedData ? 'bi-chevron-up' : 'bi-chevron-down'
+                                                    }`}
                                                 style={{ fontSize: '14px', color: 'white' }}></i>
                                         </button>
                                     </div>
@@ -783,11 +828,10 @@ const NewPatient = () => {
                                                     <div key={index} className="ms-0">
                                                         <p
                                                             className={`patient-menu-item text-black mb-0 ps-2 pe-2 border-bottom py-1 
-                                                                         ${
-                                                                             isSidebarCollapsed
-                                                                                 ? 'text-center fw-bold'
-                                                                                 : 'd-flex justify-content-between align-items-center'
-                                                                         }`}
+                                                                         ${isSidebarCollapsed
+                                                                    ? 'text-center fw-bold'
+                                                                    : 'd-flex justify-content-between align-items-center'
+                                                                }`}
                                                             onClick={handleClinicalReviewToggle}
                                                             style={{
                                                                 cursor: 'pointer',
@@ -813,11 +857,10 @@ const NewPatient = () => {
                                                             </span>
                                                             {!isSidebarCollapsed && (
                                                                 <i
-                                                                    className={`bi ${
-                                                                        isClinicalReviewExpanded
-                                                                            ? 'bi-chevron-up'
-                                                                            : 'bi-chevron-down'
-                                                                    }`}></i>
+                                                                    className={`bi ${isClinicalReviewExpanded
+                                                                        ? 'bi-chevron-up'
+                                                                        : 'bi-chevron-down'
+                                                                        }`}></i>
                                                             )}
                                                         </p>
                                                         {isClinicalReviewExpanded && (
@@ -926,9 +969,8 @@ const NewPatient = () => {
                             {modalTabs.map((modalTab) => (
                                 <li className="nav-item" key={modalTab}>
                                     <a
-                                        className={`nav-link text-black me-2 ${
-                                            activeModalTab === modalTab ? 'active fw-bold' : ''
-                                        }`}
+                                        className={`nav-link text-black me-2 ${activeModalTab === modalTab ? 'active fw-bold' : ''
+                                            }`}
                                         onClick={() => handleModalTabClick(modalTab)}
                                         style={{ cursor: 'pointer' }}>
                                         {modalTab}
