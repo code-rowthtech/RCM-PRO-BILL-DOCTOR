@@ -7,10 +7,12 @@ import AddDemographics from '../../Patients/AddPatient/AddDemographics';
 import {
     createAppointmentsAction,
     getAllAppointmentsAction,
+    getAppointmentDetailsAction,
     getPatientsAction,
     getPatientsByIdAction,
     getPractitionerAvailabilityAction,
     stateEmptydAction,
+    updateAppointmentDetailsAction,
 } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
 import { FaPlus } from 'react-icons/fa';
@@ -23,19 +25,20 @@ const AppointmentForm = ({ Id }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
-    const id = searchParams.get('updateid');
+    const id = searchParams.get('id');
+    // console.log(id, 'iddddddddddddddd')
     const store = useSelector((state) => state);
     const createResponse = store?.createPatientsReducer?.data?.status;
-    console.log(createResponse, 'createResponseStatus');
+    // console.log(createResponse, 'createResponseStatus');
     const createPatientResponse = store?.createPatientsReducer?.data?.patient;
     const [submissionType, setSubmissionType] = useState(null);
-    const [smShow, setSmShow] = useState(false);
     const [age, setAge] = useState(null);
     const [patientId, setPatientId] = useState(null);
-const [createAppointmentType,setCreateAppointmentType]=useState(null)
-const createAppointmentResponse=store?.createAppointmentsReducer?.data?.status;
-
-console.log(createAppointmentResponse,'createAppointmentResponse')
+    const [createAppointmentType, setCreateAppointmentType] = useState(null)
+    const createAppointmentResponse = store?.createAppointmentsReducer?.data?.status;
+    const appointmentDetails = store?.getAppointmentDetailsReducer?.data?.appointment;
+    console.log(appointmentDetails, 'appointmentDetails')
+    // console.log(createAppointmentResponse, 'createAppointmentResponse')
     const [search, setSearch] = useState('');
     const [skip, setSkip] = useState(1);
     const [logoName, setLogoName] = useState('');
@@ -48,14 +51,15 @@ console.log(createAppointmentResponse,'createAppointmentResponse')
     const doctorName = JSON.parse(sessionStorage.getItem('hyper_user'))?.name?.text;
     const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
-    useEffect(()=>{
-if(createAppointmentResponse===200&&createAppointmentType==='back'){
-    reset();
-    navigate('/apps/appointments/list')
-}else if(createAppointmentResponse===200&&createAppointmentType==='save'){
-    
-}
-    },[createAppointmentType,createAppointmentResponse])
+
+    useEffect(() => {
+        if (createAppointmentResponse === 200 && createAppointmentType === 'back') {
+            reset();
+            navigate('/apps/appointments/list')
+        } else if (createAppointmentResponse === 200 && createAppointmentType === 'save') {
+
+        }
+    }, [createAppointmentType, createAppointmentResponse])
 
     const handleSelectChange = (e) => {
         const value = e.target.value;
@@ -66,6 +70,15 @@ if(createAppointmentResponse===200&&createAppointmentType==='back'){
             setSelectedOption(value);
         }
     };
+
+    useEffect(() => {
+
+        const data = {
+            id: id,
+        };
+
+        dispatch(getAppointmentDetailsAction(data));
+    }, [dispatch]);
 
     const handlePlusIconClick = () => {
         setShowModal(true);
@@ -157,7 +170,7 @@ if(createAppointmentResponse===200&&createAppointmentType==='back'){
 
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const availabilityResponse = store?.getPractitionerAvailabilityReducer?.data
-    console.log(availabilityResponse, 'availabilityResponseavailabilityResponse')
+    // console.log(availabilityResponse, 'availabilityResponseavailabilityResponse')
     useEffect(() => {
         if (selectedDate) {
             const data = { date: selectedDate };
@@ -174,10 +187,9 @@ if(createAppointmentResponse===200&&createAppointmentType==='back'){
     }, [availabilityResponse])
 
     const patientsData = store?.getPatientsReducer?.data?.data || [];
-    console.log(patientsData,'patientsDatapatientsDatapatientsDatapatientsData')
+    // console.log(patientsData, 'patientsDatapatientsDatapatientsDatapatientsData')
     // const patientsList =store?.getPatientsReducer?.data
-    console.log(patientsData, 'patientsData')
-    const updateAppointment = store?.createAppointmentsReducer?.data?.status;
+    // console.log(patientsData, 'patientsData')
 
     useEffect(() => {
         if (createResponse === 201) {
@@ -185,16 +197,21 @@ if(createAppointmentResponse===200&&createAppointmentType==='back'){
         }
     }, [createResponse]);
 
-    // useEffect(() => {
-    //     const data = {
-    //         doctorId: doctorId,
-    //         clinicId: clinicId,
-    //         status: activeTab,
-    //     };
-    //     if (updateAppointment === 200) {
-    //         dispatch(getAllAppointmentsAction({ key: encryptMessage(data) }));
-    //     }
-    // }, [updateAppointment]);
+    useEffect(() => {
+
+        if (appointmentDetails && patientsData?.length > 0) {
+            setValue('minutesDuration', appointmentDetails?.minutesDuration);
+            setValue('consultationRoom', appointmentDetails?.examRoom);
+            setValue('status', appointmentDetails?.status);
+            setValue('patient', appointmentDetails?.subject?._id);
+            setValue('appointmentType', appointmentDetails?.appointmentType?.coding?.[0]?.display);
+
+            setValue('scheduled', appointmentDetails?.start ? new Date(appointmentDetails?.start).toISOString().split('T')[0] : '');
+            setValue('startTime', appointmentDetails?.start ? new Date(appointmentDetails?.start).toISOString().split('T')[1].slice(0, 5) : '');
+        }
+
+
+    }, [appointmentDetails, patientsData])
 
     useEffect(() => {
         if (id) {
@@ -223,28 +240,35 @@ if(createAppointmentResponse===200&&createAppointmentType==='back'){
         const endDateTime = new Date(startDateTime.getTime() + data.duration * 60000);
 
         const payload = {
+            ...(id && { id }), // Include `id` only if it exists (update case)
             subject: data?.patient,
-            clinicId: clinicId,
+            ...(id ? {} : { clinicId }), // Exclude `clinicId` in update case
             // doctor: doctorId,
             start: data?.startTime,
             appointmentType: appointmentTypePayload,
             date: data?.scheduled,
-            start: startDateTime.toISOString(), // ✅ ISO format
-            end: endDateTime.toISOString(), // ✅ ISO format
-            created: new Date().toISOString(), // ✅ Now in ISO
-            minutesDuration: data.duration, // ✅ Number
+            start: startDateTime.toISOString(),
+            end: endDateTime.toISOString(),
+            created: new Date().toISOString(),
+            minutesDuration: data?.duration,
             examRoom: data?.consultationRoom,
             status: data?.status,
             reason: [
                 {
                     coding: appointmentReason,
-                    text: appointmentReason?.display, // use display text
+                    text: appointmentReason?.display,
                 },
             ],
-            status: data?.status,
             slot: data?.startTime,
         };
-        dispatch(createAppointmentsAction({ key: encryptMessage(payload) }));
+
+        // Dispatch update if `id` exists, otherwise create a new one
+        if (id) {
+            dispatch(updateAppointmentDetailsAction({ key: encryptMessage(payload) }));
+            console.log(payload, 'payloaddddd')
+        } else {
+            dispatch(createAppointmentsAction({ key: encryptMessage(payload) }));
+        }
         // reset();
     };
 
@@ -258,7 +282,8 @@ if(createAppointmentResponse===200&&createAppointmentType==='back'){
     };
     const selectedReasonOption =
         formattedReasonOptions.find((option) => option?.value?.display === appointmentReason?.text) ||
-        formattedReasonOptions.find((option) => option?.display === appointmentReason);
+        formattedReasonOptions.find((option) => option?.display === appointmentReason) ||
+        formattedReasonOptions.find((option) => option?.display === appointmentDetails?.reason?.[0]?.coding?.[0]?.display);
 
     return (
         <div>
@@ -267,16 +292,16 @@ if(createAppointmentResponse===200&&createAppointmentType==='back'){
                     <Col sm={6}>
                         <Form.Group className="mb-1">
                             <Form.Label className="mb-0">
-                                Patient{!Id && <span className="text-danger">*</span>}
+                                Patient{!id && <span className="text-danger">*</span>}
                             </Form.Label>
                             <InputGroup>
                                 <Form.Select
-                                    {...register('patient', { required: !Id && 'Patient is required' })}
+                                    {...register('patient', { required: !id && 'Patient is required' })}
                                     className="form-select"
                                     value={selectedOption}
                                     onChange={handleSelectChange}
                                     data-has-value={!!selectedOption}
-                                    disabled={Id}>
+                                    disabled={id}>
                                     <option value="" hidden >
                                         Select Patient
                                     </option>
@@ -287,7 +312,7 @@ if(createAppointmentResponse===200&&createAppointmentType==='back'){
                                     ))}
                                 </Form.Select>
 
-                                {!Id && (
+                                {!id && (
                                     <InputGroup.Text onClick={handlePlusIconClick} style={{ cursor: 'pointer' }}>
                                         <FaPlus className="text-primary" />
                                     </InputGroup.Text>
@@ -329,7 +354,7 @@ if(createAppointmentResponse===200&&createAppointmentType==='back'){
                     </Col> */}
                     <Col sm={6}>
                         <Form.Group className="mb-1" controlId="appointmentType">
-                            <Form.Label className="mb-0">Appointment Type{!Id && <span className="text-danger">*</span>}</Form.Label>
+                            <Form.Label className="mb-0">Appointment Type{!id && <span className="text-danger">*</span>}</Form.Label>
                             <Form.Select
                                 className="form-select"
                                 {...register('appointmentType', { required: 'Appointment Type is required' })}
@@ -349,7 +374,7 @@ if(createAppointmentResponse===200&&createAppointmentType==='back'){
                     <Col sm={6} className="d-flex gap-2">
                         <Form.Group className="mb-1" style={{ width: "150px" }}>
                             <Form.Label className="mb-0">
-                                Scheduled<span className="text-danger">*</span>
+                                Scheduled{!id && <span className="text-danger">*</span>}
                             </Form.Label>
                             <Form.Control
                                 type="date"
@@ -364,7 +389,7 @@ if(createAppointmentResponse===200&&createAppointmentType==='back'){
                         </Form.Group>
                         <Form.Group className="mb-1" style={{ width: '100px' }}>
                             <Form.Label className="mb-0">
-                                Start Time<span className="text-danger">*</span>
+                                Start Time{!id && <span className="text-danger">*</span>}
                             </Form.Label>
                             <Form.Control
                                 type="time"
@@ -486,15 +511,17 @@ if(createAppointmentResponse===200&&createAppointmentType==='back'){
                 </Row>
                 <Row>
                     <Col sm={12} className="d-flex justify-content-end my-2 gap-2">
-                        <Button className="custom-buttons" onClick={() => reset()}>
+                        {!id && <Button className="custom-buttons" onClick={() => reset()}>
                             Delete
                         </Button>
-
-                        <Button type="submit" onClick={()=>setCreateAppointmentType('back')} className="custom-buttons">
-                            Save and close
-                        </Button>
-                        <Button type="submit" onClick={()=>setCreateAppointmentType('save')}  className="custom-buttons">
-                            Save
+                        }
+                        {!id &&
+                            <Button type="submit" onClick={() => setCreateAppointmentType('back')} className="custom-buttons">
+                                Save and close
+                            </Button>
+                        }
+                        <Button type="submit" onClick={() => setCreateAppointmentType('save')} className="custom-buttons">
+                            {!id ? 'Save' : 'Update'}
                         </Button>
                         {/* <Button className="custom-buttons">Cancel</Button> */}
                     </Col>
@@ -581,7 +608,7 @@ if(createAppointmentResponse===200&&createAppointmentType==='back'){
             </Modal>
 
             {/* Confirmation Modal */}
-            <Modal show={showConfirmationModal} onHide={() => {setShowConfirmationModal(false); setValue("scheduled", "");}} centered>
+            <Modal show={showConfirmationModal} onHide={() => { setShowConfirmationModal(false); setValue("scheduled", ""); }} centered>
                 <Modal.Body>
                     <div className='text-center'>
                         <h4>Confirmation Needed</h4>

@@ -286,3 +286,8 @@ hr {
 .err-font {
     font-size: 11px !important;
 }
+
+.no-arrow {
+    appearance: none;
+    background-image: none !important;
+}

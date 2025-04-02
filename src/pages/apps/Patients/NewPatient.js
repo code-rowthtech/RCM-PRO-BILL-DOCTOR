@@ -414,7 +414,8 @@ const NewPatient = () => {
 
                                                             <Button
                                                                 type="submit"
-                                                                className={`${!logo ? 'd-none' : 'mt-1 custom-buttons'}`}
+                                                                className={`${!logo ? 'd-none' : 'custom-buttons'}`}
+                                                                style={!logo ? {} : { marginTop: '5px' }}
                                                                 disabled={!logo}>
                                                                 Submit
                                                             </Button>
@@ -659,7 +660,7 @@ const NewPatient = () => {
                                                     &nbsp;Task
                                                 </Button>
 
-                                                <Button className="custom-buttons" as={Link} to={'/apps/patients/list'}>
+                                                <Button className="cancel-button" as={Link} to={'/apps/patients/list'}>
                                                     Back
                                                 </Button>
                                             </div>
@@ -697,7 +698,7 @@ const NewPatient = () => {
                                                     &nbsp;Task
                                                 </Button>
                                                 <Button
-                                                    className="custom-buttons"
+                                                    className="cancel-button"
                                                     onClick={() => setVisibleSection('patient')}>
                                                     Back
                                                 </Button>
@@ -806,7 +807,7 @@ const NewPatient = () => {
                                 <div className="card m-0 overflow-hidden" style={{ borderRadius: '5px' }}>
                                     <div
                                         className="card-header d-flex justify-content-center align-items-center text-white px-2 py-1"
-                                        style={{ backgroundColor: '#313A46', height:'43px' }}>
+                                        style={{ backgroundColor: '#313A46', height: '43px' }}>
                                         {/* <button
                                             className="btn p-0 shadow-none outline-none"
                                             onClick={handleSidebarToggle}>

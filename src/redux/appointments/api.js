@@ -22,3 +22,13 @@ export function getPractitionerAvailabilityApi(params: any): any {
     const { data } = params;
     return api.get(URL.getPractitionerAvailability, data);
 }
+
+export function getAppointmentDetailsApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.getAppointmentDetails}/${data?.id}`);
+}
+
+export function updateAppointmentDetailsApi(params: any): any {
+    const { data } = params;
+    return api.update(URL.updateAppointmentDetails, data);
+}
