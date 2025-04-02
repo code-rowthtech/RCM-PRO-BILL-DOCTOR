@@ -69,5 +69,7 @@ export const getSchedule = '/api/v1/practitioner/schedule';
 export const createAppointments = '/api/v1/practitioner/appointment/create';
 export const getAppointments = '/api/v1/practitioner/appointment/list';
 export const getAllAppointments = '/api/v1/doctor/getPatientsByAppointments';
-export const getPractitionerAvailability ='/api/v1/practitioner/appointment/practitionerAvailability'
+export const getPractitionerAvailability ='/api/v1/practitioner/appointment/practitionerAvailability';
+export const getAppointmentDetails ='/api/v1/practitioner/appointment/details';
+export const updateAppointmentDetails='/api/v1/practitioner/appointment/update';
 

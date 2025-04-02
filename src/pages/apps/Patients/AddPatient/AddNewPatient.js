@@ -48,7 +48,7 @@ const AddNewPatient = () => {
                         </div>
                     </div>
 
-                    <div className=" px-2 scroll-container" style={{ height: '78vh', overflow: 'auto' }}>
+                    <div className=" px-2 scroll-container" style={{ height: '83vh', overflow: 'auto' }}>
                         {activeTab === 'Patient Details' && <AddPatientDetails />}
                         {activeTab === 'Demographics' && <AddDemographics />}
                         {activeTab === 'Insurances' && <AddInsurance />}

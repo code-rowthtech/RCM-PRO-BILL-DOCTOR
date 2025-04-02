@@ -4,7 +4,7 @@ import { Button, Card, Col, Row, Table } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
 import { FormInput } from '../../../components';
-import { FiFileText, FiFilter } from 'react-icons/fi';
+import { FiEdit, FiFileText, FiFilter } from 'react-icons/fi';
 import { getAppointmentsAction } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import Spinner from '../../../constants/Spinner';
@@ -61,6 +61,7 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
                     {/* <th className='text-white'>Doctor Department</th> */}
                     <th className='text-white ' style={{ paddingRight: '70px' }}>Date</th>
                     <th className='text-white '>Status</th>
+                    <th className='text-white '>Action</th>
                 </tr>
             </thead>
             {store?.getAppointmentsReducer?.loading ? (
@@ -104,8 +105,12 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
                                         })
                                         : "N/A"}
                                 </td>
-
                                 <td><span className='px-2 fw-bold text-white bg-success rounded-2 fs-6'>{data?.status}</span></td>
+                                <td>
+                                    <Link to={`/apps/appointments/newAppointment?id=${data?._id}`} >
+                                        <FiEdit className="fs-4 ms-2 cursor-pointer text-black" />
+                                    </Link>
+                                </td>
                             </tr>
                         ))
                     )}
@@ -141,7 +146,7 @@ const AppointmentsTransactionList = ({ patientsData }: OrderListProps): React$El
     return (
         <Table responsive className="table-centered table-nowrap mb-0">
             <thead className="text-white">
-            <tr>
+                <tr>
                     <th className='text-white'>Sr.No.</th>
                     <th className='text-white'>Patients Name</th>
                     <th className='text-white'>Reason</th>
@@ -217,7 +222,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
         <>
             <Row className="mt-2">
                 <Col xs={12}>
-                    <Card style={{height:'87vh'}}>
+                    <Card style={{ height: '87vh' }}>
                         <Card.Body>
                             <Row className="mb-2">
                                 <Col sm={4}>

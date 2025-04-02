@@ -159,14 +159,37 @@ const PatientDetails = () => {
             });
         }
 
-        // *Telecom (Phone & Email)*
-        payload.telecom = [
-            { system: 'phone', use: 'home', value: data?.homePhone || '' },
-            { system: 'phone', use: 'mobile', value: data?.cellPhone || '' },
-            { system: 'phone', use: 'work', value: data?.officePhone || '' },
-            { system: 'email', use: 'mobile', value: data?.email || '' },
-            { system: 'email', use: 'work', value: data?.alternateEmail || '' },
-        ].filter((t) => t.value); // Remove empty values
+        payload.telecom = [];
+
+        payload.telecom.push({
+            system: 'phone',
+            use: 'home',
+            value: data?.homePhone || '',
+        });
+
+        payload.telecom.push({
+            system: 'phone',
+            use: 'mobile',
+            value: data?.cellPhone || '',
+        });
+
+        payload.telecom.push({
+            system: 'phone',
+            use: 'work',
+            value: data?.officePhone || '',
+        });
+
+        payload.telecom.push({
+            system: 'email',
+            use: 'mobile',
+            value: data?.email || '',
+        });
+
+        payload.telecom.push({
+            system: 'email',
+            use: 'work',
+            value: data?.alternateEmail || '',
+        });
 
         // *Photo (if exists)*
         if (logo?.url) {
@@ -288,10 +311,21 @@ const PatientDetails = () => {
                                     id="firstName"
                                     type="text"
                                     placeholder="First Name"
-                                    {...register('firstName', { required: 'First name is required' })}
+                                    {...register('firstName', {
+                                        required: 'First name is required',
+                                        minLength: {
+                                            value: 3,
+                                            message: 'First name must be at least 3 characters',
+                                        },
+                                        pattern: {
+                                            value: /^[A-Za-z]{3,}$/, // At least 3 letters, no spaces or numbers
+                                            message: 'Only alphabets are allowed, minimum 3 characters',
+                                        },
+                                    })}
+                                    onInput={(e) => e.target.value = e.target.value.replace(/[^A-Za-z]/g, '')} // Prevent spaces/numbers while typing
                                 />
                                 {errors.firstName && (
-                                    <span className="text-danger">{errors.firstName.message}</span>
+                                    <span className="text-danger err-font">{errors.firstName.message}</span>
                                 )}
                             </Form.Group>
                         </div>
@@ -304,10 +338,21 @@ const PatientDetails = () => {
                                     id="lastName"
                                     type="text"
                                     placeholder="Last Name"
-                                    {...register('lastName', { required: 'Last Name is required' })}
+                                    {...register('lastName', {
+                                        required: 'Last Name is required',
+                                        minLength: {
+                                            value: 3,
+                                            message: 'Last name must be at least 3 characters',
+                                        },
+                                        pattern: {
+                                            value: /^[A-Za-z]{3,}$/, // At least 3 letters, no spaces or numbers
+                                            message: 'Only alphabets are allowed, minimum 3 characters',
+                                        },
+                                    })}
+                                    onInput={(e) => e.target.value = e.target.value.replace(/[^A-Za-z]/g, '')} // Prevent spaces/numbers while typing
                                 />
                                 {errors.lastName && (
-                                    <span className="text-danger">{errors.lastName.message}</span>
+                                    <span className="text-danger err-font">{errors.lastName.message}</span>
                                 )}
                             </Form.Group>
                         </div>
