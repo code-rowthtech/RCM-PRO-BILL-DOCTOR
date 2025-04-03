@@ -15,15 +15,17 @@ const AddPatientDetails = ({ setSubmissionType }) => {
     const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors, watch, getValues } = useForm();
     const patientStatus = watch('patientStatus'); // Watch selected option
     const [logo, setLogo] = useState(null);
-const location=useLocation();
+    const location = useLocation();
 
-console.log(location.pathname, 'url');
+    console.log(location.pathname, 'url');
 
     const [logoName, setLogoName] = useState('');
     const [deceasedDateTime, setDeceasedDateTime] = useState('');
     const logoFileInputRef = useRef(null);
     const [profileUploading, setProfileUploading] = useState(false);
     const [selectedDoctor, setSelectedDoctor] = useState(null);
+    const [showResponsibleTab, setShowResponsibleTab] = useState(true);
+    const [showReferringTab, setShowReferringTab] = useState(true);
     // const [submissionType, setSubmissionType] = useState(null);
     const [age, setAge] = useState(null);
     const store = useSelector((state) => state);
@@ -204,6 +206,14 @@ console.log(location.pathname, 'url');
         return `${years}.${months}`;
     };
 
+    const handleResponsibleChange = (e) => {
+        setShowResponsibleTab(e.target.value === 'true');
+    };
+
+    const handleReferringChange = (e) => {
+        setShowReferringTab(e.target.value === 'true');
+    };
+
     return (
         <div>
             <Form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
@@ -232,6 +242,23 @@ console.log(location.pathname, 'url');
                             />
                             {errors.firstName && (
                                 <span className="text-danger err-font">{errors.firstName.message}</span>
+                            )}
+                        </Form.Group>
+                    </div>
+                    <div className="col-md-3 col-12 mb-2">
+                        <Form.Group>
+                            <Form.Label htmlFor="middleName" className="mb-0">
+                                Middle Name
+                            </Form.Label>
+                            <Form.Control
+                                id="middleName"
+                                type="text"
+                                placeholder="Middle Name"
+                                {...register('middleName')}
+                                onInput={(e) => e.target.value = e.target.value.replace(/[^A-Za-z]/g, '')} // Prevent spaces/numbers while typing
+                            />
+                            {errors.middleName && (
+                                <span className="text-danger">{errors.middleName.message}</span>
                             )}
                         </Form.Group>
                     </div>
@@ -400,7 +427,7 @@ console.log(location.pathname, 'url');
                         </Form.Group>
                     </div>
                 </div>
-                <hr className="mt-0" />
+                <hr className="my-1" />
 
                 <div className="row">
                     <div className="col-md-3 col-12">
@@ -491,22 +518,7 @@ console.log(location.pathname, 'url');
                             </Form.Select>
                         </Form.Group>
                     </div>
-                    <div className="col-md-3 col-12 mb-2">
-                        <Form.Group>
-                            <Form.Label htmlFor="middleName" className="mb-0">
-                                Middle Name
-                            </Form.Label>
-                            <Form.Control
-                                id="middleName"
-                                type="text"
-                                placeholder="Middle Name"
-                                {...register('middleName')}
-                            />
-                            {errors.middleName && (
-                                <span className="text-danger">{errors.middleName.message}</span>
-                            )}
-                        </Form.Group>
-                    </div>
+
                     <div className="col-md-3 col-12 mb-2">
                         <Form.Group>
                             <Form.Label className="mb-0">Suffix </Form.Label>
@@ -712,8 +724,27 @@ console.log(location.pathname, 'url');
                             </Form.Select>
                         </Form.Group>
                     </div>
+                    <div className="col-md-3 col-12">
+                        <Form.Group>
+                            <Form.Label className="mb-0">Responsible Party</Form.Label>
+                            <Form.Select onChange={handleResponsibleChange} defaultValue="true">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </Form.Select>
+                        </Form.Group>
+                    </div>
+
+                    <div className="col-md-3 col-12">
+                        <Form.Group>
+                            <Form.Label className="mb-0">Referring Doctor</Form.Label>
+                            <Form.Select onChange={handleReferringChange} defaultValue="true">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </Form.Select>
+                        </Form.Group>
+                    </div>
                 </div>
-                <hr className="mt-2" />
+                <hr className="mt-1" />
                 <div className="row">
                     <div className="col-md-3 col-12 mb-2">
                         <Form.Group className="responnsible-party-select">
@@ -824,9 +855,9 @@ console.log(location.pathname, 'url');
                     </Button>
                     <Button
                         onClick={() => {
-                            if(location.pathname!=='/apps/patients/add-new-patient'){
-                            setSubmissionType('saveAndReset');
-                        }
+                            if (location.pathname !== '/apps/patients/add-new-patient') {
+                                setSubmissionType('saveAndReset');
+                            }
                         }}
                         disabled={
                             store?.createPatientsReducer?.loading ||
@@ -838,9 +869,9 @@ console.log(location.pathname, 'url');
                     </Button>
                     <Button
                         onClick={() => {
-                            if(location.pathname!=='/apps/patients/add-new-patient'){
-                            setSubmissionType('saveAndNext');
-                        }
+                            if (location.pathname !== '/apps/patients/add-new-patient') {
+                                setSubmissionType('saveAndNext');
+                            }
                         }}
                         disabled={
                             store?.createPatientsReducer?.loading ||
