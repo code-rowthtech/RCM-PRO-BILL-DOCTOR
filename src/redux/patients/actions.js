@@ -27,3 +27,12 @@ export const updatePatientsAction = (data): AuthAction => ({
 export const resetUpdateAction = (): LayoutAction => ({
     type: PatientsActionTypes.RESET_UPDATE_STATUS,
 });
+
+export const createReferringDoctorAction = (data): AuthAction => ({
+    type: PatientsActionTypes.CREATE_REFERRING_DOCTOR,
+    data
+});
+export const createResponsiblePartyAction = (data): AuthAction => ({
+    type: PatientsActionTypes.CREATE_RESPONSIBLE_PARTY,
+    data
+});

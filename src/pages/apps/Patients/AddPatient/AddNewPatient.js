@@ -4,15 +4,25 @@ import { useNavigate } from 'react-router-dom';
 import AddPatientDetails from './AddPatientDetails';
 import AddDemographics from './AddDemographics';
 import AddInsurance from './AddInsurance';
+import { useSelector } from 'react-redux';
 
 const AddNewPatient = () => {
     const navigate = useNavigate();
+    const store = useSelector((state) => state);
     const [activeTab, setActiveTab] = useState('Patient Details');
+    const [patientId, setPatientId] = useState(null);
 
 
     const handleTabClick = (tab) => {
         setActiveTab(tab);
     };
+
+    const createResponse = store?.createPatientsReducer?.data?.status;
+    const createPatientResponse = store?.createPatientsReducer?.data?.data;
+
+    if (createResponse === 201 && createPatientResponse?._id) {
+        setPatientId(createPatientResponse._id);
+    }
 
     return (
         <div>
@@ -50,7 +60,7 @@ const AddNewPatient = () => {
 
                     <div className=" px-2 scroll-container" style={{ height: '83vh', overflow: 'auto' }}>
                         {activeTab === 'Patient Details' && <AddPatientDetails />}
-                        {activeTab === 'Demographics' && <AddDemographics />}
+                        {activeTab === 'Demographics' && <AddDemographics patientId={patientId} />}
                         {activeTab === 'Insurances' && <AddInsurance />}
                         {activeTab === 'Eligibility' && <p>In Progress...</p>}
                         {activeTab === 'Authorizations' && <p>In Progress...</p>}

@@ -23,3 +23,13 @@ export function updatePatientsApi(params: any): any {
     const { data } = params;
     return api.update(URL.updatePatients, data);
 }
+
+export function createReferringDoctorApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.createReferringDoctor, data);
+}
+
+export function createResponsiblePartyApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.createResponsibleParty, data);
+}

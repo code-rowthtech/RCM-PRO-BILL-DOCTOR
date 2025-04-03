@@ -33,6 +33,8 @@ export const getPatients = '/api/v1/doctor/get-patients';
 export const getPatientsById = '/api/v1/doctor/patient/by/id';
 export const createPatients = '/api/v1/doctor/Patient/add';
 export const updatePatients = '/api/v1/doctor/Patient/update';
+export const createReferringDoctor='/api/v1/doctor/add/referringDoc';
+export const createResponsibleParty = '/api/v1/doctor/Patient/responsible-party';
 
 // CLINIC NOTES
 export const getClinicEmployees = '/api/v1/doctor/getClinicEmployees';
