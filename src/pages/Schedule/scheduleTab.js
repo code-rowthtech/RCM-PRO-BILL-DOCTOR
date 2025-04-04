@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { Button, Table, Spinner } from "react-bootstrap";
+import { Button, Table, Spinner, Form, Row, Col } from "react-bootstrap";
 import { FiEdit } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
+import { createScheduleAction, getScheduleAction, updateScheduleAction } from "../../redux/schedule/actions";
+import { encryptMessage } from "../../cryptoUtils";
+import ToastHandle from "../../helpers/ToastMessage";
+import { updateSchedule } from "../../helpers/api/apiEndpoints";
 // import {
 //   createScheduleAction,
 //   getDoctorsListAction,
@@ -11,238 +15,415 @@ import { useDispatch, useSelector } from "react-redux";
 // import { encryptMessage } from "../../../cryptoUtils";
 
 const ScheduleTab = () => {
-    const [selectedDoctor, setSelectedDoctor] = useState("");
-    const dispatch = useDispatch();
-    const store = useSelector((state) => state);
-    const [time, setTime] = useState("");
-    const [name, setName] = useState("");
-    const doctorLists = store?.getDoctorsListReducer?.data?.result;
-    const scheduleList = store?.getScheduleReducer?.data?.result || [];
-    const isLoading = store?.getScheduleReducer?.loading;
+  const [selectedDoctor, setSelectedDoctor] = useState("");
+  const dispatch = useDispatch();
+  const store = useSelector((state) => state);
+  const [time, setTime] = useState("12:00"); // Ensure a default valid value
+  const [name, setName] = useState("");
+  const scheduleList = store?.getScheduleReducer?.data?.data || [];
+  const scheduleData = store?.getScheduleReducer?.data?.schedule || [];
+  console.log(store?.getScheduleReducer?.data?.schedule, 'scheduleList32322')
+  const isLoading = store?.getScheduleReducer?.loading;
+  const user = JSON.parse(sessionStorage.getItem('hyper_user'));
+  // console.log(user,'user')
+  const doctorName = user?.name?.text;
+  const doctorId = user?.doctorId
 
-    const { control, handleSubmit, setValue, register } = useForm();
+  const { control, handleSubmit, setValue, register, reset } = useForm();
 
-    //   useEffect(() => {
-    //     dispatch(getDoctorsListAction());
-    //     dispatch(
-    //       getScheduleAction({
-    //         type: "Schedule",
-    //         search: "",
-    //         startDate: "",
-    //         endDate: "",
-    //       })
-    //     );
-    //   }, [dispatch]);
+  useEffect(() => {
 
-    useEffect(() => {
-        if (selectedDoctor) {
-            const doctorInfo = JSON.parse(selectedDoctor || "{}");
-            const filteredScheduleList = scheduleList.filter(
-                (schedule) => schedule?.doctorId === doctorInfo?.id
-            );
+    dispatch(getScheduleAction({ clinicId: user?.clinicId, page: '', limit: '' }));
+  }, [dispatch]);
 
-            if (filteredScheduleList.length > 0) {
-                const firstSchedule = filteredScheduleList[0];
-                setTime(firstSchedule.perPatientTime || "");
-                setName(firstSchedule.name || "");
-
-                firstSchedule?.availability?.forEach((schedule, index) => {
-                    setValue(
-                        `schedules.newSchedule.${index}.availableOn`,
-                        schedule.availableOn || "Not Available"
-                    );
-                    setValue(
-                        `schedules.newSchedule.${index}.availableFrom`,
-                        schedule.availableFrom || ""
-                    );
-                    setValue(
-                        `schedules.newSchedule.${index}.availableTo`,
-                        schedule.availableTo || ""
-                    );
-                });
-            } else {
-                setTime("");
-                setName("");
-
-                scheduleList.forEach((schedule, index) => {
-                    setValue(`schedules.newSchedule.${index}.availableOn`, "");
-                    setValue(`schedules.newSchedule.${index}.availableFrom`, "");
-                    setValue(`schedules.newSchedule.${index}.availableTo`, "");
-                });
-            }
-        } else {
-            setTime("");
-            setName("");
-            scheduleList.forEach((schedule, index) => {
-                setValue(`schedules.newSchedule.${index}.availableOn`, "");
-                setValue(`schedules.newSchedule.${index}.availableFrom`, "");
-                setValue(`schedules.newSchedule.${index}.availableTo`, "");
-            });
-        }
-    }, [selectedDoctor, scheduleList, setValue]);
-
-    const formatTime = (time) => {
-        if (!time) return null;
-        const [hours, minutes] = time.split(":");
-        return `${hours}:${minutes}:00`;
-    };
-
-    const onSubmit = (data) => {
-        const doctorInfo = JSON.parse(selectedDoctor || "{}");
-        const availability = days.map((day, index) => ({
-            availableOn: day.day,
-            availableFrom:
-                formatTime(data.schedules?.newSchedule?.[index]?.availableFrom) ||
-                "00:00:00",
-            availableTo:
-                formatTime(data.schedules?.newSchedule?.[index]?.availableTo) ||
-                "00:00:00",
-        }));
-
-        const payload = {
-            doctorId: doctorInfo.id,
-            type: "Schedule",
-            name: doctorInfo.name,
-            perPatientTime: time,
-            availability,
-        };
-
-        // dispatch(createScheduleAction({ key: encryptMessage(payload) }));
-        console.log({ payload });
-
-        // dispatch(
-        //   getScheduleAction({
-        //     type: "Schedule",
-        //     search: "",
-        //     startDate: "",
-        //     endDate: "",
-        //   })
-        // );
-    };
-
-    const days = [
-        { day: "Monday" },
-        { day: "Tuesday" },
-        { day: "Wednesday" },
-        { day: "Thursday" },
-        { day: "Friday" },
-        { day: "Saturday" },
-        { day: "Sunday" },
-    ];
-
-    const renderEmptyScheduleData = () => {
-        return (
-            <>
-                {days.map((day, index) => (
-                    <tr key={index}>
-                        <td>
-                            <input
-                                type="text"
-                                {...register(`schedules.newSchedule.${index}.availableOn`)}
-                                className="form-control"
-                                defaultValue={day.day}
-                            />
-                        </td>
-                        <td>
-                            <Controller
-                                name={`schedules.newSchedule.${index}.availableFrom`}
-                                control={control}
-                                defaultValue=""
-                                render={({ field }) => (
-                                    <input
-                                        type="time"
-                                        className="form-control"
-                                        {...field}
-                                        value={field.value || ""}
-                                    />
-                                )}
-                            />
-                        </td>
-                        <td>
-                            <Controller
-                                name={`schedules.newSchedule.${index}.availableTo`}
-                                control={control}
-                                defaultValue=""
-                                render={({ field }) => (
-                                    <input type="time" className="form-control" {...field} />
-                                )}
-                            />
-                        </td>
-                        <td className="text-center">
-                            <FiEdit className="fs-4 ms-2" />
-                        </td>
-                    </tr>
-                ))}
-            </>
+  useEffect(() => {
+    if (scheduleData?.length > 0) {
+      setValue('perPatientTime', scheduleData?.[0]?.perPatientTime);
+      const updatedDays = days.map((day) => {
+        const matchingAvailability = scheduleData?.[0]?.availability.find(
+          (item) => item?.day === day?.day
         );
+        return {
+          ...day,
+          slots: matchingAvailability?.slots?.map((slot) => ({
+            startTime: formatTo24Hour(slot.startTime) || "",
+            endTime: formatTo24Hour(slot.endTime) || "",
+          })) || [{ startTime: "", endTime: "" }],
+        };
+      });
+
+      // Only update state if `updatedDays` is different from current `days`
+      if (JSON.stringify(updatedDays) !== JSON.stringify(days)) {
+        setDays(updatedDays);
+      }
+    } else {
+      reset();
+    }
+    // Removed `days` from dependency array
+  }, [scheduleData, reset]);
+
+  // useEffect(() => {
+  //     if (selectedDoctor) {
+  //         setValue("perPatientTime", scheduleData?.schedule?.[0]?.perPatientTime || "");
+
+  //         const doctorInfo = JSON.parse(selectedDoctor || "{}");
+  //         const filteredScheduleList = scheduleList.filter(
+  //             (schedule) => schedule?.doctorId === doctorInfo?.id
+  //         );
+
+  //         if (filteredScheduleList.length > 0) {
+  //             const firstSchedule = filteredScheduleList[0];
+  //             setTime(firstSchedule?.schedule?.perPatientTime || "");
+  //             setName(firstSchedule.name || "");
+
+  //             firstSchedule?.availability?.forEach((schedule, index) => {
+  //                 setValue(
+  //                     `schedules.newSchedule.${index}.availableOn`,
+  //                     schedule.availableOn || "Not Available"
+  //                 );
+  //                 setValue(
+  //                     `schedules.newSchedule.${index}.availableFrom`,
+  //                     schedule.availableFrom || ""
+  //                 );
+  //                 setValue(
+  //                     `schedules.newSchedule.${index}.availableTo`,
+  //                     schedule.availableTo || ""
+  //                 );
+  //             });
+  //         } else {
+  //             setTime("");
+  //             setName("");
+
+  //             scheduleList.forEach((schedule, index) => {
+  //                 setValue(`schedules.newSchedule.${index}.availableOn`, "");
+  //                 setValue(`schedules.newSchedule.${index}.availableFrom`, "");
+  //                 setValue(`schedules.newSchedule.${index}.availableTo`, "");
+  //             });
+  //         }
+  //     } else {
+  //         setTime("");
+  //         setName("");
+  //         scheduleList.forEach((schedule, index) => {
+  //             setValue(`schedules.newSchedule.${index}.availableOn`, "");
+  //             setValue(`schedules.newSchedule.${index}.availableFrom`, "");
+  //             setValue(`schedules.newSchedule.${index}.availableTo`, "");
+  //         });
+  //     }
+  // }, [selectedDoctor, scheduleList, setValue]);
+
+  // useEffect(() => {
+  //     if (selectedDoctor && scheduleList?.availability) {
+  //       setValue('perPatientTime', scheduleList?.perPatientTime);
+  //       const updatedDays = days.map((day) => {
+  //         const matchingAvailability = scheduleList.availability.find(
+  //           (item) => item.day === day.day
+  //         );
+  //         return {
+  //           ...day,
+  //           slots: matchingAvailability?.slots.map((slot) => ({
+  //             startTime: formatTo24Hour(slot.startTime) || "",
+  //             endTime: formatTo24Hour(slot.endTime) || "",
+  //           })) || [{ startTime: "", endTime: "" }],
+  //         };
+  //       });
+
+  //       // Only update state if `updatedDays` is different from current `days`
+  //       if (JSON.stringify(updatedDays) !== JSON.stringify(days)) {
+  //         setDays(updatedDays);
+  //       }
+  //     } else {
+  //       reset();
+  //     }
+  //     // Removed `days` from dependency array
+  //   }, [selectedDoctor, scheduleList, reset]);
+
+  const formatTimeTo12Hour = (time) => {
+    if (!time) return null;
+
+    let [hours, minutes] = time.split(":");
+    hours = parseInt(hours, 10);
+    let suffix = "AM";
+
+    if (hours >= 12) {
+      suffix = "PM";
+      if (hours > 12) {
+        hours = hours - 12;  // Convert hours from 24-hour format to 12-hour format
+      }
+    } else if (hours === 0) {
+      hours = 12; // Midnight is represented as 12 AM
+    }
+
+    return `${hours}:${minutes} ${suffix}`;
+  };
+
+  const formatTo24Hour = (time) => {
+    if (!time) return '';
+
+    let [hour, minute] = time.split(':');
+    let [minutePart, period] = minute.split(' ');
+    hour = parseInt(hour, 10);
+
+    if (period === "PM" && hour < 12) {
+      hour += 12;
+    } else if (period === "AM" && hour === 12) {
+      hour = 0; // Midnight case
+    }
+
+    return `${String(hour).padStart(2, '0')}:${minutePart}`;
+  };
+
+  const onSubmit = (data) => {
+    const availability = days.map((day) => ({
+        day: day.day,
+        slots: day.slots.map(slot => ({
+            startTime: formatTimeTo12Hour(slot.startTime),
+            endTime: formatTimeTo12Hour(slot.endTime),
+        })),
+    }));
+
+    
+    if (scheduleData?.length > 0) {
+      const payload = {
+        scheduleId:scheduleData?.[0]?._id,
+        clinicId: user?.clinicId,
+        doctorId: doctorId,
+        name: doctorName,
+        perPatientTime: data.perPatientTime, // Get value from form data
+        availability,
     };
+        dispatch(updateScheduleAction({key:encryptMessage(payload)})); // Send payload directly
+    } else {
+      const payload = {
+        clinicId: user?.clinicId,
+        doctorId: doctorId,
+        name: doctorName,
+        perPatientTime: data.perPatientTime, // Get value from form data
+        availability,
+    };
+        dispatch(createScheduleAction(payload)); // Send payload directly
+    }
 
-    return (
-        <form onSubmit={handleSubmit(onSubmit)}>
-            <h4>Edit Schedule</h4>
+    // console.log(payload, 'payload');
+};
 
-            <div className="mb-1 w-50">
-                <label htmlFor="doctorName" style={{ fontWeight: "bold", marginBottom: '0px!important' }}>
-                    Doctor Name<span className="text-danger">*</span>
-                </label>
-                <select
-                    id="doctorName"
-                    value={selectedDoctor}
-                    onChange={(e) => setSelectedDoctor(e.target.value)}
-                    style={{
-                        padding: "8px",
-                        borderRadius: "4px",
-                        border: "1px solid #ccc",
-                        width: "100%",
-                        // marginTop: "10px",
-                    }}
-                >
-                    <option value="">Select a doctor</option>
-                    {doctorLists?.map((doctor, index) => (
-                        <option
-                            key={index}
-                            value={JSON.stringify({
-                                id: doctor?.userId?._id,
-                                name: `${doctor?.userId?.firstName} ${doctor?.userId?.lastName}`,
-                            })}
-                        >
-                            {`${doctor?.userId?.firstName} ${doctor?.userId?.lastName}`}
-                        </option>
-                    ))}
-                </select>
-            </div>
+  const [days, setDays] = useState([
+    { day: "Monday", slots: [{ startTime: '', endTime: '' }] },
+    { day: "Tuesday", slots: [{ startTime: '', endTime: '' }] },
+    { day: "Wednesday", slots: [{ startTime: '', endTime: '' }] },
+    { day: "Thursday", slots: [{ startTime: '', endTime: '' }] },
+    { day: "Friday", slots: [{ startTime: '', endTime: '' }] },
+    { day: "Saturday", slots: [{ startTime: '', endTime: '' }] },
+    { day: "Sunday", slots: [{ startTime: '', endTime: '' }] },
+  ]);
 
-            <div className="mb-1 w-50">
-                <label htmlFor="perPatientTime" style={{ fontWeight: "bold" }}>
-                    Per Patient Time<span className="text-danger">*</span>
-                </label>
-                <input
-                    type="time"
-                    id="perPatientTime"
-                    className="form-control"
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
-                />
-            </div>
+  const handleAddSlots = (dayIndex) => {
+    setDays((prevDays) => {
+      const updatedDays = [...prevDays];
+      const daySlots = updatedDays[dayIndex].slots;
 
-            <Table striped bordered hover>
+      // Check for overlapping slots
+      const hasOverlap = daySlots.some((slot, idx1) =>
+        daySlots.some((slotToCompare, idx2) => {
+          if (idx1 !== idx2) {
+            const start1 = slot.startTime || '';
+            const end1 = slot.endTime || '';
+            const start2 = slotToCompare.startTime || '';
+            const end2 = slotToCompare.endTime || '';
+            return start1 < end2 && start2 < end1;
+          }
+          return false;
+        })
+      );
+      if (hasOverlap) {
+        ToastHandle(`Overlapping time ranges detected for day ${updatedDays[dayIndex].day}.`, 'danger');
+        return prevDays;
+      }
+
+      // Add new slot if no overlaps
+      updatedDays[dayIndex].slots = [
+        ...daySlots,
+        { startTime: '', endTime: '' },
+      ];
+      return updatedDays;
+    });
+  };
+
+  const handleRemoveSlot = (dayIndex, slotIndex) => {
+    setDays((prevDays) => {
+      const updatedDays = [...prevDays];
+      if (updatedDays[dayIndex].slots.length > 1) {
+        updatedDays[dayIndex].slots = updatedDays[dayIndex].slots.filter(
+          (_, idx) => idx !== slotIndex
+        );
+      }
+      return updatedDays;
+    });
+  };
+
+  return (
+    <Form onSubmit={handleSubmit(onSubmit)}>
+      <h4>Edit Schedule</h4>
+      <Row>
+        <Col sm={6}>
+          <Form.Group className="mb-2">
+            <Form.Label for="doctorName" className="fw-bold mb-0">
+              Doctor Name
+            </Form.Label>
+            <Form.Control
+              type="text"
+              className="text-capitalize"
+              defaultValue={doctorName}
+            />
+          </Form.Group>
+        </Col>
+        <Col sm={6}>
+          {/* Per Patient Time Input */}
+          <Form.Group className="mb-2">
+            <Form.Label htmlFor="perPatientTime" className="fw-bold mb-0">
+              Per Patient Time (in minutes)<span className="text-danger">*</span>
+            </Form.Label>
+            <Form.Control
+              type="number"
+              id="perPatientTime"
+              placeholder="Enter Per Patient Time"
+              {...register("perPatientTime", { required: "Per Patient Time is required" })}
+            // onChange={(e) => {
+            //     console.log("Selected Time:", e.target.value);
+            //     setTime(e.target.value);
+            // }}
+            />
+            {/* {errors.perPatientTime && <span className="text-danger err-font">{errors.perPatientTime.message}</span>} */}
+          </Form.Group>
+        </Col>
+
+      </Row>
+
+      <Table striped className="mt-2">
+        <thead>
+          <tr>
+            <th className="text-white">Available On</th>
+            <th>
+              <table className="schedule-table" style={{ width: "100%" }}>
                 <thead>
-
-                    <th className="py-2 ps-2">Available On</th>
-                    <th className="py-2">Available From</th>
-                    <th className="py-2">Available To</th>
-                    <th className="py-2">Action</th>
-
+                  <tr className="text-white">
+                    <th style={{ width: "40%" }} className="pe-1">Available From</th>
+                    <th style={{ width: "40%" }} className="ps-1">Available To</th>
+                    <th style={{ width: "20%" }}>Action</th>
+                  </tr>
                 </thead>
-                <tbody>{renderEmptyScheduleData()}</tbody>
-            </Table>
+              </table>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {/* Loading State */}
+          {store?.getPractitionerTimingsReducer?.loading ? (
+            <tr>
+              <td className="text-center" colSpan={2}>
+                <Spinner />
+              </td>
+            </tr>
+          ) : (
+            days?.map((day, dayIndex) => (
+              <tr key={dayIndex}>
+                <td>
+                  {/* Day Name */}
+                  <input
+                    className="form-control"
+                    type="text"
+                    value={day?.day}
+                    readOnly
+                  />
+                </td>
+                <td>
+                  {/* Slot Table for Each Day */}
+                  <table className="schedule-table" style={{ width: "100%" }}>
+                    <tbody>
+                      {day?.slots?.map((slot, slotIndex) => (
+                        <tr key={slotIndex}>
 
-            <Button type="submit" variant="primary">
-                Save Schedule
-            </Button>
-            {isLoading && <Spinner animation="border" />}
-        </form>
-    );
+                          <td style={{ width: "40%" }} className="text-black pe-1">
+                            {/* <input
+                              className="form-control"
+                              type="time"
+                              defaultValue={slot?.startTime}
+                            /> */}
+                            <input
+                              className="form-control"
+                              type="time"
+                              value={slot.startTime || ''}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                setDays((prevDays) => {
+                                  const updatedDays = [...prevDays];
+                                  updatedDays[dayIndex].slots[slotIndex].startTime = value;
+                                  return updatedDays;
+                                });
+                              }}
+                            />
+
+                          </td>
+                          <td style={{ width: "40%" }} className="ps-1">
+                            {/* <input
+                              className="form-control"
+                              type="time"
+                              defaultValue={slot?.endTime}
+                            // value={slot?.endTime}
+                            /> */}
+                            <input
+                              className="form-control"
+                              type="time"
+                              value={slot.endTime || ''}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                setDays((prevDays) => {
+                                  const updatedDays = [...prevDays];
+                                  updatedDays[dayIndex].slots[slotIndex].endTime = value;
+                                  return updatedDays;
+                                });
+                              }}
+                            />
+
+                          </td>
+                          <td style={{ width: "20%" }}>
+                            <span
+                              className="uil-plus-circle plusicon fw-bold cursor-pointer"
+                              onClick={() => handleAddSlots(dayIndex, slotIndex)}
+                            >
+                            </span>
+                            {day.slots.length > 1 && (
+                              <span
+                                className="uil-minus-circle minusicon fw-bold cursor-pointer ms-2"
+                                onClick={() => handleRemoveSlot(dayIndex, slotIndex)}
+                              >
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </Table>
+      <div className="d-flex justify-content-end">
+        {scheduleData?.length > 0 ?
+          <Button type="submit" className="custom-buttons">
+            Update Schedule
+          </Button>
+          :
+          <Button type="submit" className="custom-buttons">
+            Save Schedule
+          </Button>
+        }
+
+        {/* {isLoading && <Spinner animation="border" />} */}
+      </div>
+    </Form>
+  );
 };
 
 export default ScheduleTab;

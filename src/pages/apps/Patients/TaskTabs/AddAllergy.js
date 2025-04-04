@@ -2,14 +2,15 @@ import React, { useEffect } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
-import { createAllergyAction } from '../../../../redux/actions';
+import { createAllergyAction, getAllergiesOfPatientAction } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 const AddAllergy = ({ onCancel }) => {
-    const dispatch = useDispatch(); 
+    const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
+   
     const {
         register,
         handleSubmit,
@@ -38,6 +39,7 @@ const AddAllergy = ({ onCancel }) => {
         // reset();
         console.log(payload, 'Allergy created');
     };
+   
 
     return (
         <div>

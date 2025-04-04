@@ -5,12 +5,12 @@ const api = new APICore();
 
 export function getPatientsApi(params: any): any {
     const { data } = params;
-    return api.create(URL.getPatients, data);
+    return api.get(URL.getPatients, data);
 }
 
 export function getPatientsByIdApi(params: any): any {
     const { data } = params;
-    return api.create(URL.getPatientsById, data);
+    return api.get(`${URL.getPatientsById}?id=${data.id}`);
 }
 
 
@@ -21,5 +21,15 @@ export function createPatientsApi(params: any): any {
 
 export function updatePatientsApi(params: any): any {
     const { data } = params;
-    return api.create(URL.updatePatients, data);
+    return api.update(URL.updatePatients, data);
+}
+
+export function createReferringDoctorApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.createReferringDoctor, data);
+}
+
+export function createResponsiblePartyApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.createResponsibleParty, data);
 }

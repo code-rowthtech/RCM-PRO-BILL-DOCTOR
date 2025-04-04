@@ -47,19 +47,13 @@ import CQIs from './CQIs/CQIs';
 import LabRequest from './LabRequest/LabRequest';
 
 const NewPatient = () => {
-    const navigate = useNavigate();
     const dispatch = useDispatch();
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [activeModalTab, setActiveModalTab] = useState('Appointments');
     const {
-        register,
         handleSubmit,
         formState: { errors },
-        setValue,
-        reset,
-        clearErrors,
-        watch,
-        getValues,
+
     } = useForm();
     const [isClinicalReviewExpanded, setIsClinicalReviewExpanded] = useState(false);
     const [isRunning, setIsRunning] = useState(false);
@@ -69,11 +63,12 @@ const NewPatient = () => {
     const handleClose = () => setShowModal(false);
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
-    const primaryProvider = JSON.parse(sessionStorage.getItem('hyper_user'))?.firstName;
+    const primaryProvider = JSON.parse(sessionStorage.getItem('hyper_user'))?.name?.text;
+    console.log(primaryProvider, 'primaryProvider')
     const store = useSelector((state) => state);
-    const patientsDataById = store?.getPatientsByIdReducer?.data?.patient || [];
+    const patientsDataById = store?.getPatientsByIdReducer?.data?.data || [];
 
-    // console.log(patientsDataById, 'patientsDataByIdpatientsDataById')
+    console.log(patientsDataById, 'patientsDataByIdpatientsDataById')
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
     const [profilePhoto, setProfilePhoto] = useState(profileDummy);
     const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -85,16 +80,21 @@ const NewPatient = () => {
     const [selectedSubTab, setSelectedSubTab] = useState('Assign Task');
     const [visibleSection, setVisibleSection] = useState('patient'); // Default section
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+
 
     useEffect(() => {
-        if (id) {
-            dispatch(getPatientsByIdAction({ key: encryptMessage({ id }) }));
+        const data = {
+            id: id,
         }
-    }, [dispatch, id]); // Ensures this only runs when `id` changes
+        if (id) {
+            dispatch(getPatientsByIdAction(data));
+        }
+    }, [id]);
 
     useEffect(() => {
         if (updateSuccess === 200) {
-            dispatch(getPatientsByIdAction({ key: encryptMessage({ id }) })); // Only if ID is valid
+            dispatch(getPatientsByIdAction({ id }));
             dispatch(resetUpdateAction());
             setLogo(null);
             setLogoName('');
@@ -275,9 +275,9 @@ const NewPatient = () => {
             ...(logo?.url === null
                 ? {}
                 : {
-                    patientChartPhoto: {
+                    photo: {
                         url: logo?.url?.split('?')[0] || patientsDataById?.patientChartPhoto?.url,
-                        fileName: logoName,
+                        title: logoName,
                     },
                 }),
         };
@@ -288,11 +288,328 @@ const NewPatient = () => {
     return (
         <>
             <div className="background_Color  pb-2">
-                <div className="container-fluid px-0 mt-0 pt-0">
+                <div className="container-fluid px-0 mt-2 pt-0">
                     <div className="row">
                         {/* Main Content */}
                         <div className={isSidebarCollapsed ? 'col-11' : 'col-10'}>
-                            <div
+
+                            <div class="accordion border-none custom-shadow rounded-1" id="accordionExample">
+                                <div class="accordion-item collapsed border-0">
+                                    <h2 class="accordion-header mt-0" >
+                                        <button
+                                            className="accordion-button collapsed py-1 bg-white"
+                                            style={{ border: "#000", height: "43px" }}
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#collapseOne"
+                                            aria-expanded={isOpen}
+                                            aria-controls="collapseOne"
+                                            onClick={() => setIsOpen(!isOpen)} // Toggle state on click
+                                        >
+                                            <div className="d-flex gap-2 ps-1 pt-2">
+                                                <p
+                                                    style={{ borderRight: '1px solid black' }}
+                                                    className="pe-2 text-nowrap fs-6">
+                                                    <span
+                                                        className="fw-bold text-capitalize"
+                                                        style={{ color: 'rgb(249, 139, 55)' }}>
+                                                        {patientsDataById?.name?.[0]?.text || 'N/A'}
+                                                    </span>{' '}
+                                                    <span className="fs-6 fw-bold">
+                                                        {patientsDataById?.gender || ' '}
+                                                    </span>
+                                                </p>
+                                                <p
+                                                    style={{ borderRight: '1px solid black' }}
+                                                    className="pe-2 text-nowrap fw-bold fs-6">
+                                                    <span>
+                                                        {patientsDataById?.birthDate
+                                                            ? new Date(
+                                                                patientsDataById.birthDate
+                                                            ).toLocaleDateString('en-GB')
+                                                            : 'N/A'}
+                                                    </span>
+                                                </p>
+                                                <p className="text-nowrap fs-6 fw-bold">
+                                                    <span>
+                                                        {patientsDataById?.approxAge != null
+                                                            ? patientsDataById.approxAge + ' years old'
+                                                            : '-'}
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </button>
+                                    </h2>
+                                    <div id="collapseOne" class="accordion-collapse collapse " data-bs-parent="#accordionExample">
+                                        <div class="accordion-body  p-0 bg-white pb-1" style={{ borderBottomLeftRadius: '5px', borderBottomRightRadius: '5px' }}>
+                                            <div className="p-1">
+                                                <Row>
+                                                    <Col sm={2} className="ps-0 pt-1">
+                                                        <Form
+                                                            onSubmit={handleSubmit(onSubmit)}
+                                                            className="d-flex flex-column align-items-center">
+                                                            <div
+                                                                className="position-relative d-flex align-items-center flex-column justify-content-center"
+                                                                style={{ display: 'inline-block' }}>
+                                                                {isCameraOpen ? (
+                                                                    <video
+                                                                        ref={videoRef}
+                                                                        autoPlay
+                                                                        playsInline
+                                                                        className="rounded"
+                                                                        style={{
+                                                                            width: '105px',
+                                                                            height: '100px',
+                                                                            objectFit: 'cover',
+                                                                        }}
+                                                                    />
+                                                                ) : uploading ? (
+                                                                    <div className="py-3">
+                                                                        <Spinner />
+                                                                    </div>
+                                                                ) : (
+                                                                    <img
+                                                                        src={
+                                                                            logo?.url
+                                                                                ? logo.url.split('?')[0]
+                                                                                : patientsDataById?.photo?.[0]?.url
+                                                                                    ? patientsDataById?.photo?.[0]?.url
+                                                                                    : profilePhoto
+                                                                        }
+                                                                        alt="Patient Profile"
+                                                                        className="img-fluid rounded"
+                                                                        style={{
+                                                                            width: '126px',
+                                                                            height: '129px',
+                                                                            objectFit: 'cover',
+                                                                        }}
+                                                                    />
+                                                                )}
+
+                                                                {!isCameraOpen && (
+                                                                    <BiEdit
+                                                                        className={`position-absolute fs-4 text-primary ${uploading ? 'd-none' : ''
+                                                                            }`}
+                                                                        style={{ bottom: '-5px', right: '-9px', cursor: 'pointer' }}
+                                                                        onClick={openCamera}
+                                                                    />
+                                                                )}
+
+                                                                {isCameraOpen && (
+                                                                    <div className="camera-controls d-flex justify-content-center gap-1 mt-1">
+                                                                        <Button
+                                                                            onClick={capturePhoto}
+                                                                            type="button"
+                                                                            className="custom-buttons">
+                                                                            <TbCapture className="text-white fs-5" />{' '}
+                                                                        </Button>
+                                                                        <Button onClick={stopCamera} className="custom-buttons">
+                                                                            <IoClose className="text-white fs-5" />
+                                                                        </Button>
+                                                                    </div>
+                                                                )}
+
+                                                                <canvas ref={canvasRef} style={{ display: 'none' }} />
+                                                            </div>
+
+                                                            <Button
+                                                                type="submit"
+                                                                className={`${!logo ? 'd-none' : 'custom-buttons'}`}
+                                                                style={!logo ? {} : { marginTop: '5px' }}
+                                                                disabled={!logo}>
+                                                                Submit
+                                                            </Button>
+                                                        </Form>
+                                                    </Col>
+
+                                                    <Col sm={8}>
+                                                        <Row className="pt-1">
+
+                                                            <Col sm={6} className="p-0">
+                                                                <div className="row">
+                                                                    <div className="col-12 mx-1 ">
+                                                                        <div className="row">
+                                                                            <div className="col-3">
+                                                                                <span className="fw-bold fs-6">Patients ID:</span>
+                                                                            </div>
+                                                                            <div className="col-9">
+                                                                                <span
+                                                                                    className="ps-2 text-primary fs-6"
+                                                                                    style={{ fontWeight: 600 }}>
+                                                                                    {patientsDataById?.chartNumber}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-12 mx-1 ">
+                                                                        <div className="row">
+                                                                            <div className="col-3">
+                                                                                <span>
+                                                                                    <MdPhone className="fs-5 text-primary" />
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className="col-9">
+                                                                                <span
+                                                                                    className="ps-2 fs-6"
+                                                                                    style={{ fontWeight: 600 }}>
+                                                                                    {patientsDataById?.telecom?.[1]?.value || 'N/A    '}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-12 mx-1 ">
+                                                                        <div className="row">
+                                                                            <div className="col-3">
+                                                                                <span>
+                                                                                    <MdOutlineMarkEmailUnread className="fs-5 text-primary" />
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className="col-9">
+                                                                                <span
+                                                                                    className="ps-2 fs-6"
+                                                                                    style={{ fontWeight: 600 }}>
+                                                                                    {patientsDataById?.telecom?.[3]?.value || 'N/A'}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-12 mx-1 ">
+                                                                        <div className="row">
+                                                                            <div className="col-3">
+                                                                                <span>
+                                                                                    <BiSolidLocationPlus className="fs-5 text-primary" />
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className="col-9">
+                                                                                <span
+                                                                                    className="ps-2 fs-6"
+                                                                                    style={{ fontWeight: 600 }}>
+                                                                                    {patientsDataById?.address?.address
+                                                                                        ? patientsDataById.address.address.length >
+                                                                                            30
+                                                                                            ? patientsDataById.address.address.slice(
+                                                                                                0,
+                                                                                                30
+                                                                                            ) + '...'
+                                                                                            : patientsDataById.address.address
+                                                                                        : 'N/A'}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </Col>
+                                                            <Col sm={6}>
+                                                                <div className="row">
+                                                                    <div className="col-12 mx-1 ">
+                                                                        <div className="row">
+                                                                            <div className="col-5">
+                                                                                <span className="fw-bold fs-6">
+                                                                                    Primary Provider:
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className="col-7">
+                                                                                <span
+                                                                                    className="ps-2 text-primary fs-6"
+                                                                                    style={{ fontWeight: 600 }}>
+                                                                                    {primaryProvider}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-12 mx-1 ">
+                                                                        <div className="row">
+                                                                            <div className="col-5">
+                                                                                <span className="fw-bold fs-6">Date Added:</span>
+                                                                            </div>
+                                                                            <div className="col-7">
+                                                                                <span
+                                                                                    className="ps-2 fs-6"
+                                                                                    style={{ fontWeight: 600 }}>
+                                                                                    {patientsDataById?.createdAt
+                                                                                        ? new Date(
+                                                                                            patientsDataById.createdAt
+                                                                                        ).toLocaleDateString('en-GB')
+                                                                                        : 'N/A'}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-12 mx-1 ">
+                                                                        <div className="row">
+                                                                            <div className="col-5">
+                                                                                <span className="fw-bold fs-6">
+                                                                                    Last Appointment Date:
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className="col-7">
+                                                                                <span
+                                                                                    className="ps-2 fs-6"
+                                                                                    style={{ fontWeight: 600 }}>
+                                                                                    {patientsDataById?.lastApptDate || 'N/A'}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-12 mx-1 ">
+                                                                        <div className="row">
+                                                                            <div className="col-5">
+                                                                                <span className="fw-bold fs-6">
+                                                                                    Next Appointment Date:
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className="col-7">
+                                                                                <span
+                                                                                    className="ps-2 fs-6"
+                                                                                    style={{ fontWeight: 600 }}>
+                                                                                    {patientsDataById?.nextApptDate || 'N/A'}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </Col>
+                                                        </Row>
+                                                    </Col>
+
+                                                    <Col sm={2} className="d-flex justify-content-end pe-2">
+                                                        <div className="text-center">
+                                                            {/* <Button className='text-black text-nowrap bg-white mt-1 fs-6 d-flex align-items-center justify-content-center w-100' style={{ height: '30px' }}>
+                                                New Referral
+                                            </Button> */}
+                                                            <Button
+                                                                className="text-black text-nowrap bg-white fs-6 d-flex align-items-center justify-content-center w-100"
+                                                                style={{ height: '30px', borderRadius: '10px' }}
+                                                                onClick={toggleTimer} // Toggle the timer
+                                                            >
+                                                                {isRunning
+                                                                    ? `Pause (${formatTime(timeLeft)})`
+                                                                    : timeLeft > 0
+                                                                        ? `Resume (${formatTime(timeLeft)})`
+                                                                        : 'Start Session'}
+                                                            </Button>
+
+                                                            <Button
+                                                                className="text-black text-nowrap bg-white mt-1 fs-6 d-flex align-items-center justify-content-center w-100"
+                                                                style={{ height: '30px', borderRadius: '10px' }}
+                                                                onClick={handleShow} // Open modal on button click
+                                                            >
+                                                                Add Appointment
+                                                            </Button>
+                                                            <div className="mt-2 d-flex gap-2  justify-content-end">
+                                                                <HiOutlinePrinter className="fs-3 text-black" />
+                                                                <LiaReceiptSolid className="fs-3 text-black" />
+                                                                {/* <TbHeartRateMonitor className='fs-3' /> */}
+                                                            </div>
+                                                        </div>
+                                                    </Col>
+                                                </Row>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {/* <div
                                 className="mb-1"
                                 style={{
                                     background: 'transparent',
@@ -301,306 +618,13 @@ const NewPatient = () => {
                                     bordertop: '0px!important',
                                     boxShadow: 0,
                                 }}>
-                                <div className="p-1">
-                                    <Row>
-                                        <Col sm={2} className="ps-2 pt-1">
-                                            <Form
-                                                onSubmit={handleSubmit(onSubmit)}
-                                                className="d-flex flex-column align-items-center">
-                                                <div
-                                                    className="position-relative d-flex align-items-center flex-column justify-content-center"
-                                                    style={{ display: 'inline-block' }}>
-                                                    {isCameraOpen ? (
-                                                        <video
-                                                            ref={videoRef}
-                                                            autoPlay
-                                                            playsInline
-                                                            className="rounded"
-                                                            style={{
-                                                                width: '126px',
-                                                                height: '129px',
-                                                                objectFit: 'cover',
-                                                            }}
-                                                        />
-                                                    ) : uploading ? (
-                                                        <div className="py-3">
-                                                            <Spinner />
-                                                        </div>
-                                                    ) : (
-                                                        <img
-                                                            src={
-                                                                logo?.url
-                                                                    ? logo.url.split('?')[0]
-                                                                    : patientsDataById?.patientChartPhoto?.url
-                                                                        ? patientsDataById.patientChartPhoto.url
-                                                                        : profilePhoto
-                                                            }
-                                                            alt="Patient Profile"
-                                                            className="img-fluid rounded"
-                                                            style={{
-                                                                width: '126px',
-                                                                height: '129px',
-                                                                objectFit: 'cover',
-                                                            }}
-                                                        />
-                                                    )}
-
-                                                    {!isCameraOpen && (
-                                                        <BiEdit
-                                                            className={`position-absolute fs-4 text-primary ${uploading ? 'd-none' : ''
-                                                                }`}
-                                                            style={{ bottom: '-5px', right: '-9px', cursor: 'pointer' }}
-                                                            onClick={openCamera}
-                                                        />
-                                                    )}
-
-                                                    {isCameraOpen && (
-                                                        <div className="camera-controls d-flex justify-content-center gap-1 mt-1">
-                                                            <Button
-                                                                onClick={capturePhoto}
-                                                                type="button"
-                                                                className="custom-buttons">
-                                                                <TbCapture className="text-white fs-5" />{' '}
-                                                            </Button>
-                                                            <Button onClick={stopCamera} className="custom-buttons">
-                                                                <IoClose className="text-white fs-5" />
-                                                            </Button>
-                                                        </div>
-                                                    )}
-
-                                                    <canvas ref={canvasRef} style={{ display: 'none' }} />
-                                                </div>
-
-                                                <Button
-                                                    type="submit"
-                                                    className={`${!logo ? 'd-none' : 'mt-1 custom-buttons'}`}
-                                                    disabled={!logo}>
-                                                    Submit
-                                                </Button>
-                                            </Form>
-                                        </Col>
-
-                                        <Col sm={8}>
-                                            <Row className="pt-1">
-                                                <div className="d-flex gap-2 ps-1">
-                                                    <p
-                                                        style={{ borderRight: '1px solid black' }}
-                                                        className="pe-2 text-nowrap fs-6">
-                                                        <span
-                                                            className="fw-bold text-capitalize"
-                                                            style={{ color: 'rgb(249, 139, 55)' }}>
-                                                            {patientsDataById?.firstName || 'N/A'}{' '}
-                                                            {patientsDataById?.lastName || ' '}
-                                                        </span>{' '}
-                                                        <span className="fs-6 fw-bold">
-                                                            {patientsDataById?.sex || ' '}
-                                                        </span>
-                                                    </p>
-                                                    <p
-                                                        style={{ borderRight: '1px solid black' }}
-                                                        className="pe-2 text-nowrap fw-bold fs-6">
-                                                        <span>
-                                                            {patientsDataById?.dateOfBirth
-                                                                ? new Date(
-                                                                    patientsDataById.dateOfBirth
-                                                                ).toLocaleDateString('en-GB')
-                                                                : 'N/A'}
-                                                        </span>
-                                                    </p>
-                                                    <p className="text-nowrap fs-6 fw-bold">
-                                                        <span>
-                                                            {patientsDataById?.approxAge != null
-                                                                ? patientsDataById.approxAge + ' years old'
-                                                                : '-'}
-                                                        </span>
-                                                    </p>
-                                                </div>
-                                                <Col sm={6} className="p-0">
-                                                    <div className="row">
-                                                        <div className="col-12 mx-1 ">
-                                                            <div className="row">
-                                                                <div className="col-3">
-                                                                    <span className="fw-bold fs-6">Patients ID:</span>
-                                                                </div>
-                                                                <div className="col-9">
-                                                                    <span
-                                                                        className="ps-2 text-primary fs-6"
-                                                                        style={{ fontWeight: 600 }}>
-                                                                        {patientsDataById?.chartNumber}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-12 mx-1 ">
-                                                            <div className="row">
-                                                                <div className="col-3">
-                                                                    <span>
-                                                                        <MdPhone className="fs-5 text-primary" />
-                                                                    </span>
-                                                                </div>
-                                                                <div className="col-9">
-                                                                    <span
-                                                                        className="ps-2 fs-6"
-                                                                        style={{ fontWeight: 600 }}>
-                                                                        {patientsDataById?.cellPhone || 'N/A    '}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-12 mx-1 ">
-                                                            <div className="row">
-                                                                <div className="col-3">
-                                                                    <span>
-                                                                        <MdOutlineMarkEmailUnread className="fs-5 text-primary" />
-                                                                    </span>
-                                                                </div>
-                                                                <div className="col-9">
-                                                                    <span
-                                                                        className="ps-2 fs-6"
-                                                                        style={{ fontWeight: 600 }}>
-                                                                        {patientsDataById?.email || 'N/A'}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-12 mx-1 ">
-                                                            <div className="row">
-                                                                <div className="col-3">
-                                                                    <span>
-                                                                        <BiSolidLocationPlus className="fs-5 text-primary" />
-                                                                    </span>
-                                                                </div>
-                                                                <div className="col-9">
-                                                                    <span
-                                                                        className="ps-2 fs-6"
-                                                                        style={{ fontWeight: 600 }}>
-                                                                        {patientsDataById?.address?.address
-                                                                            ? patientsDataById.address.address.length >
-                                                                                30
-                                                                                ? patientsDataById.address.address.slice(
-                                                                                    0,
-                                                                                    30
-                                                                                ) + '...'
-                                                                                : patientsDataById.address.address
-                                                                            : 'N/A'}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </Col>
-                                                <Col sm={6}>
-                                                    <div className="row">
-                                                        <div className="col-12 mx-1 ">
-                                                            <div className="row">
-                                                                <div className="col-5">
-                                                                    <span className="fw-bold fs-6">
-                                                                        Primary Provider:
-                                                                    </span>
-                                                                </div>
-                                                                <div className="col-7">
-                                                                    <span
-                                                                        className="ps-2 text-primary fs-6"
-                                                                        style={{ fontWeight: 600 }}>
-                                                                        {primaryProvider}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-12 mx-1 ">
-                                                            <div className="row">
-                                                                <div className="col-5">
-                                                                    <span className="fw-bold fs-6">Date Added:</span>
-                                                                </div>
-                                                                <div className="col-7">
-                                                                    <span
-                                                                        className="ps-2 fs-6"
-                                                                        style={{ fontWeight: 600 }}>
-                                                                        {patientsDataById?.createdAt
-                                                                            ? new Date(
-                                                                                patientsDataById.createdAt
-                                                                            ).toLocaleDateString('en-GB')
-                                                                            : 'N/A'}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-12 mx-1 ">
-                                                            <div className="row">
-                                                                <div className="col-5">
-                                                                    <span className="fw-bold fs-6">
-                                                                        Last Appointment Date:
-                                                                    </span>
-                                                                </div>
-                                                                <div className="col-7">
-                                                                    <span
-                                                                        className="ps-2 fs-6"
-                                                                        style={{ fontWeight: 600 }}>
-                                                                        {patientsDataById?.lastApptDate || 'N/A'}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-12 mx-1 ">
-                                                            <div className="row">
-                                                                <div className="col-5">
-                                                                    <span className="fw-bold fs-6">
-                                                                        Next Appointment Date:
-                                                                    </span>
-                                                                </div>
-                                                                <div className="col-7">
-                                                                    <span
-                                                                        className="ps-2 fs-6"
-                                                                        style={{ fontWeight: 600 }}>
-                                                                        {patientsDataById?.nextApptDate || 'N/A'}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </Col>
-                                            </Row>
-                                        </Col>
-
-                                        <Col sm={2} className="d-flex justify-content-end pe-3">
-                                            <div className="text-center">
-                                                {/* <Button className='text-black text-nowrap bg-white mt-1 fs-6 d-flex align-items-center justify-content-center w-100' style={{ height: '30px' }}>
-                                                New Referral
-                                            </Button> */}
-                                                <Button
-                                                    className="text-black text-nowrap bg-white fs-6 d-flex align-items-center justify-content-center w-100"
-                                                    style={{ height: '30px', borderRadius: '10px' }}
-                                                    onClick={toggleTimer} // Toggle the timer
-                                                >
-                                                    {isRunning
-                                                        ? `Pause (${formatTime(timeLeft)})`
-                                                        : timeLeft > 0
-                                                            ? `Resume (${formatTime(timeLeft)})`
-                                                            : 'Start Session'}
-                                                </Button>
-
-                                                <Button
-                                                    className="text-black text-nowrap bg-white mt-1 fs-6 d-flex align-items-center justify-content-center w-100"
-                                                    style={{ height: '30px', borderRadius: '10px' }}
-                                                    onClick={handleShow} // Open modal on button click
-                                                >
-                                                    Add Appointment
-                                                </Button>
-                                                <div className="mt-2 d-flex gap-2  justify-content-end">
-                                                    <HiOutlinePrinter className="fs-3 text-black" />
-                                                    <LiaReceiptSolid className="fs-3 text-black" />
-                                                    {/* <TbHeartRateMonitor className='fs-3' /> */}
-                                                </div>
-                                            </div>
-                                        </Col>
-                                    </Row>
-                                </div>
-                            </div>
+                              
+                            </div> */}
 
                             {/* Patient Details Section */}
                             {visibleSection === 'patient' && (
                                 <div className="mt-2">
-                                    <Card className="px-2">
+                                    <Card className="px-2" style={{ height: isOpen ? "64.4vh" : "80.3vh", transition: "height 0.3s ease-in-out" }}>
                                         <div className="d-flex justify-content-between pt-2 px-2">
                                             <div style={{ borderBottom: '2px solid grey' }}>
                                                 <ul className="nav nav-underline">
@@ -636,15 +660,15 @@ const NewPatient = () => {
                                                     &nbsp;Task
                                                 </Button>
 
-                                                <Button className="custom-buttons" as={Link} to={'/apps/patients/list'}>
+                                                <Button className="cancel-button" as={Link} to={'/apps/patients/list'}>
                                                     Back
                                                 </Button>
                                             </div>
                                         </div>
 
                                         <div
-                                            className="mt-2 px-2 scroll-container"
-                                            style={{ height: '65vh', overflow: 'auto' }}>
+                                            className="px-2 scroll-container"
+                                            style={{ overflow: 'auto' }}>
                                             {selectedMainTab === 'Patient Details' && <PatientDetails />}
                                             {selectedMainTab === 'Demographics' && <Demographics />}
                                             {selectedMainTab === 'Insurances' && <Insurances />}
@@ -674,7 +698,7 @@ const NewPatient = () => {
                                                     &nbsp;Task
                                                 </Button>
                                                 <Button
-                                                    className="custom-buttons"
+                                                    className="cancel-button"
                                                     onClick={() => setVisibleSection('patient')}>
                                                     Back
                                                 </Button>
@@ -782,16 +806,15 @@ const NewPatient = () => {
                                 }}>
                                 <div className="card m-0 overflow-hidden" style={{ borderRadius: '5px' }}>
                                     <div
-                                        className="card-header d-flex justify-content-between align-items-center text-white px-2 py-1"
-                                        style={{ backgroundColor: '#313A46' }}>
-                                        <button
+                                        className="card-header d-flex justify-content-center align-items-center text-white px-2 py-1"
+                                        style={{ backgroundColor: '#313A46', height: '43px' }}>
+                                        {/* <button
                                             className="btn p-0 shadow-none outline-none"
                                             onClick={handleSidebarToggle}>
                                             <i className="bi bi-list text-white" style={{ fontSize: '18px' }}></i>
-                                            {/* <img src={CloseIcon} alt='' style={{ width: "30%", height: "30%", objectFit: "contain" }} /> */}
-                                        </button>
-                                        {!isSidebarCollapsed && <h5 className="m-0">Patient Chart</h5>}
-                                        <button
+                                        </button> */}
+                                        <h5 className="m-0">Patient Chart</h5>
+                                        {/* <button
                                             className="btn p-0 shadow-none outline-none"
                                             data-bs-toggle="collapse"
                                             data-bs-target="#patientChartData"
@@ -802,9 +825,9 @@ const NewPatient = () => {
                                                 className={`bi ${isClinicalReviewExpandedData ? 'bi-chevron-up' : 'bi-chevron-down'
                                                     }`}
                                                 style={{ fontSize: '14px', color: 'white' }}></i>
-                                        </button>
+                                        </button> */}
                                     </div>
-                                    <div id="patientChartData" className="collapse">
+                                    <div id="patientChartData" className="expanded">
                                         <div
                                             className="card-body p-0 scroll-container"
                                             style={{ height: '81.8vh', overflow: 'auto' }}>
