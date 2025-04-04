@@ -20,7 +20,7 @@ const Patients = () => {
     useEffect(() => {
         const data = {
             doctorId: doctorId,
-            currentPage: skip,
+            page: skip,
             limit: 10,
             search: search,
         };
