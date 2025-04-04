@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { PatientsActionTypes } from './constants';
-import { createPatientsApi, getPatientsApi, getPatientsByIdApi, updatePatientsApi } from './api';
+import { createPatientsApi, createReferringDoctorApi, createResponsiblePartyApi, getPatientsApi, getPatientsByIdApi, updatePatientsApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -122,6 +122,64 @@ function* updatePatientsFunction(data) {
     }
 }
 
+function* createReferringDoctorFunction(data) {
+    try {
+        yield put({
+            type: PatientsActionTypes.CREATE_REFERRING_DOCTOR_LOADING,
+            payload: {},
+        });
+        const response = yield call(createReferringDoctorApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: PatientsActionTypes.CREATE_REFERRING_DOCTOR_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: PatientsActionTypes.CREATE_REFERRING_DOCTOR_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: PatientsActionTypes.CREATE_REFERRING_DOCTOR_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* createResponsiblePartyFunction(data) {
+    try {
+        yield put({
+            type: PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_LOADING,
+            payload: {},
+        });
+        const response = yield call(createResponsiblePartyApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_ERROR,
+            payload: error,
+        });
+    }
+}
+
 export function* callResetUpdate() {
     put({
         type: PatientsActionTypes.RESET_UPDATE_STATUS,
@@ -143,6 +201,12 @@ export function* watchCreatePatients() {
 export function* watchUpdatePatients() {
     yield takeEvery(PatientsActionTypes.UPDATE_PATIENTS, updatePatientsFunction);
 }
+export function* watchCreateReferringDoctor() {
+    yield takeEvery(PatientsActionTypes.CREATE_REFERRING_DOCTOR, createReferringDoctorFunction);
+}
+export function* watchCreateResponsibleParty() {
+    yield takeEvery(PatientsActionTypes.CREATE_RESPONSIBLE_PARTY, createResponsiblePartyFunction);
+}
 
 export function* watchresetState() {
     yield takeEvery(PatientsActionTypes.RESET_UPDATE_STATUS, callResetUpdate);
@@ -154,6 +218,8 @@ function* patientsSaga() {
         fork(watchCreatePatients),
         fork(watchUpdatePatients),
         fork(watchresetState),
+        fork(watchCreateReferringDoctor),
+        fork(watchCreateResponsibleParty),
     ]);
 }
 export default patientsSaga;

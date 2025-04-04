@@ -10,10 +10,25 @@ export function createAppointmentsApi(params: any): any {
 
 export function getAppointmentsApi(params: any): any {
     const { data } = params;
-    return api.create(URL.getAppointments, data);
+    return api.get(URL.getAppointments, data);
 }
 
 export function getAllAppointmentsApi(params: any): any {
     const { data } = params;
     return api.get(URL.getAllAppointments, data);
+}
+
+export function getPractitionerAvailabilityApi(params: any): any {
+    const { data } = params;
+    return api.get(URL.getPractitionerAvailability, data);
+}
+
+export function getAppointmentDetailsApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.getAppointmentDetails}/${data?.id}`);
+}
+
+export function updateAppointmentDetailsApi(params: any): any {
+    const { data } = params;
+    return api.update(URL.updateAppointmentDetails, data);
 }

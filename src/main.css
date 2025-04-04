@@ -9,15 +9,17 @@
 .custom-buttons {
     background-color: #6169d0 !important;
     border: none !important;
-    color: white !important;
+    font-size: 13px;
+    height: 30px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
     border-radius: 10px;
-    /* font-size: 13px;
-    font-weight: 400;
-    height: 30px; */
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+}
+
+.custom-shadow {
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgb(164, 197, 213);
 }
 
 .light-border-bottom {
@@ -280,6 +282,12 @@ hr {
     font-size: 12px !important;
     font-weight: 600 !important;
 }
-.err-font{
-    font-size: 11px!important;
+
+.err-font {
+    font-size: 11px !important;
+}
+
+.no-arrow {
+    appearance: none;
+    background-image: none !important;
 }

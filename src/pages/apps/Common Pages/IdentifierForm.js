@@ -169,6 +169,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                     <Col>
                         <Form.Select
                             value={item?.type?.value || ''}
+                            className={defaultIdentifiers.includes(item.type) ? 'no-arrow' : ''}
                             onChange={(e) => {
                                 const selectedType = identifierOptions.find((opt) => opt.value === e.target.value);
                                 const selectedSystem = item?.system

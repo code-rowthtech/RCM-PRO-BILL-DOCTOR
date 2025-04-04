@@ -7,21 +7,29 @@ import { encryptMessage } from '../../../../cryptoUtils';
 import { FiUploadCloud } from 'react-icons/fi';
 import { handleUpload } from '../../../../helpers/HandleUpload';
 import us from '../../../../assets/images/flags/us.jpg'
+import { useLocation, useSearchParams } from 'react-router-dom';
 
-const AddPatientDetails = () => {
+const AddPatientDetails = ({ setSubmissionType }) => {
 
     const dispatch = useDispatch();
     const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors, watch, getValues } = useForm();
     const patientStatus = watch('patientStatus'); // Watch selected option
     const [logo, setLogo] = useState(null);
+    const location = useLocation();
+
+    console.log(location.pathname, 'url');
+
     const [logoName, setLogoName] = useState('');
     const [deceasedDateTime, setDeceasedDateTime] = useState('');
     const logoFileInputRef = useRef(null);
     const [profileUploading, setProfileUploading] = useState(false);
     const [selectedDoctor, setSelectedDoctor] = useState(null);
-    const [submissionType, setSubmissionType] = useState(null);
+    const [showResponsibleTab, setShowResponsibleTab] = useState(true);
+    const [showReferringTab, setShowReferringTab] = useState(true);
+    // const [submissionType, setSubmissionType] = useState(null);
     const [age, setAge] = useState(null);
     const store = useSelector((state) => state);
+
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const doctorName = JSON.parse(sessionStorage.getItem('hyper_user'))?.name?.text;
     const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
@@ -198,6 +206,14 @@ const AddPatientDetails = () => {
         return `${years}.${months}`;
     };
 
+    const handleResponsibleChange = (e) => {
+        setShowResponsibleTab(e.target.value === 'true');
+    };
+
+    const handleReferringChange = (e) => {
+        setShowReferringTab(e.target.value === 'true');
+    };
+
     return (
         <div>
             <Form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
@@ -211,10 +227,38 @@ const AddPatientDetails = () => {
                                 id="firstName"
                                 type="text"
                                 placeholder="First Name"
-                                {...register('firstName', { required: 'First name is required' })}
+                                {...register('firstName', {
+                                    required: 'First name is required',
+                                    minLength: {
+                                        value: 3,
+                                        message: 'First name must be at least 3 characters',
+                                    },
+                                    pattern: {
+                                        value: /^[A-Za-z]{3,}$/, // At least 3 letters, no spaces or numbers
+                                        message: 'Only alphabets are allowed, minimum 3 characters',
+                                    },
+                                })}
+                                onInput={(e) => e.target.value = e.target.value.replace(/[^A-Za-z]/g, '')} // Prevent spaces/numbers while typing
                             />
                             {errors.firstName && (
                                 <span className="text-danger err-font">{errors.firstName.message}</span>
+                            )}
+                        </Form.Group>
+                    </div>
+                    <div className="col-md-3 col-12 mb-2">
+                        <Form.Group>
+                            <Form.Label htmlFor="middleName" className="mb-0">
+                                Middle Name
+                            </Form.Label>
+                            <Form.Control
+                                id="middleName"
+                                type="text"
+                                placeholder="Middle Name"
+                                {...register('middleName')}
+                                onInput={(e) => e.target.value = e.target.value.replace(/[^A-Za-z]/g, '')} // Prevent spaces/numbers while typing
+                            />
+                            {errors.middleName && (
+                                <span className="text-danger">{errors.middleName.message}</span>
                             )}
                         </Form.Group>
                     </div>
@@ -227,7 +271,18 @@ const AddPatientDetails = () => {
                                 id="lastName"
                                 type="text"
                                 placeholder="Last Name"
-                                {...register('lastName', { required: 'Last Name is required' })}
+                                {...register('lastName', {
+                                    required: 'Last Name is required',
+                                    minLength: {
+                                        value: 3,
+                                        message: 'Last name must be at least 3 characters',
+                                    },
+                                    pattern: {
+                                        value: /^[A-Za-z]{3,}$/, // At least 3 letters, no spaces or numbers
+                                        message: 'Only alphabets are allowed, minimum 3 characters',
+                                    },
+                                })}
+                                onInput={(e) => e.target.value = e.target.value.replace(/[^A-Za-z]/g, '')} // Prevent spaces/numbers while typing
                             />
                             {errors.lastName && (
                                 <span className="text-danger err-font">{errors.lastName.message}</span>
@@ -330,7 +385,7 @@ const AddPatientDetails = () => {
                                 {...register('dateOfBirth')}
                                 onChange={(e) => {
                                     const calculatedAge = calculateAge(e.target.value);
-                                    setValue('approxAge',calculatedAge);
+                                    setValue('approxAge', calculatedAge);
                                 }}
                                 max={new Date().toISOString().split('T')[0]} // Restricts future dates
                             />
@@ -372,7 +427,7 @@ const AddPatientDetails = () => {
                         </Form.Group>
                     </div>
                 </div>
-                <hr className="mt-0" />
+                <hr className="my-1" />
 
                 <div className="row">
                     <div className="col-md-3 col-12">
@@ -463,22 +518,7 @@ const AddPatientDetails = () => {
                             </Form.Select>
                         </Form.Group>
                     </div>
-                    <div className="col-md-3 col-12 mb-2">
-                        <Form.Group>
-                            <Form.Label htmlFor="middleName" className="mb-0">
-                                Middle Name
-                            </Form.Label>
-                            <Form.Control
-                                id="middleName"
-                                type="text"
-                                placeholder="Middle Name"
-                                {...register('middleName')}
-                            />
-                            {errors.middleName && (
-                                <span className="text-danger">{errors.middleName.message}</span>
-                            )}
-                        </Form.Group>
-                    </div>
+
                     <div className="col-md-3 col-12 mb-2">
                         <Form.Group>
                             <Form.Label className="mb-0">Suffix </Form.Label>
@@ -684,8 +724,27 @@ const AddPatientDetails = () => {
                             </Form.Select>
                         </Form.Group>
                     </div>
+                    <div className="col-md-3 col-12">
+                        <Form.Group>
+                            <Form.Label className="mb-0">Responsible Party</Form.Label>
+                            <Form.Select onChange={handleResponsibleChange} defaultValue="true">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </Form.Select>
+                        </Form.Group>
+                    </div>
+
+                    <div className="col-md-3 col-12">
+                        <Form.Group>
+                            <Form.Label className="mb-0">Referring Doctor</Form.Label>
+                            <Form.Select onChange={handleReferringChange} defaultValue="true">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </Form.Select>
+                        </Form.Group>
+                    </div>
                 </div>
-                <hr className="mt-2" />
+                <hr className="mt-1" />
                 <div className="row">
                     <div className="col-md-3 col-12 mb-2">
                         <Form.Group className="responnsible-party-select">
@@ -795,7 +854,11 @@ const AddPatientDetails = () => {
                         Clear
                     </Button>
                     <Button
-                        onClick={() => setSubmissionType('saveAndReset')}
+                        onClick={() => {
+                            if (location.pathname !== '/apps/patients/add-new-patient') {
+                                setSubmissionType('saveAndReset');
+                            }
+                        }}
                         disabled={
                             store?.createPatientsReducer?.loading ||
                             store?.updatePatientsReducer?.loading
@@ -806,7 +869,9 @@ const AddPatientDetails = () => {
                     </Button>
                     <Button
                         onClick={() => {
-                            setSubmissionType('saveAndNext');
+                            if (location.pathname !== '/apps/patients/add-new-patient') {
+                                setSubmissionType('saveAndNext');
+                            }
                         }}
                         disabled={
                             store?.createPatientsReducer?.loading ||

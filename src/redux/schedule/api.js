@@ -21,10 +21,9 @@ export function createScheduleApi(params: any): any {
 }
 export function updateScheduleApi(params: any): any {
     const { data } = params;
-    return api.put(URL.updateSchedule, data);
+    return api.update(URL.updateSchedule, data);
 }
 export function getScheduleApi(params: any): any {
     const { data } = params;
     return api.get(`${URL.getSchedule}?clinicId=${data?.clinicId}&page=${data?.page}&limit=${data?.limit}`);
-    
 }

@@ -14,3 +14,7 @@ export function getCityByStateApi(params: any): any {
 export function getStateByCountry(params: any): any {
     return api.get(URL.getStatedByCountry);
 }
+export function updateDoctorApi(params) {
+    const { data } = params
+    return api.create(URL.updateDoctor, data);
+}
