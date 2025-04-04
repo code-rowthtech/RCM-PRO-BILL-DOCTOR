@@ -1,18 +1,26 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { Button, Col, Form, InputGroup } from 'react-bootstrap'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, Col, Form, InputGroup } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
 import { createPatientsAction } from '../../../../redux/patients/actions';
 import { useForm } from 'react-hook-form';
 import { encryptMessage } from '../../../../cryptoUtils';
 import { FiUploadCloud } from 'react-icons/fi';
 import { handleUpload } from '../../../../helpers/HandleUpload';
-import us from '../../../../assets/images/flags/us.jpg'
+import us from '../../../../assets/images/flags/us.jpg';
 import { useLocation, useSearchParams } from 'react-router-dom';
 
-const AddPatientDetails = ({ setSubmissionType }) => {
-
+const AddPatientDetails = ({ setSubmissionType, setVisibleReffering, setVisibleResponsible }) => {
     const dispatch = useDispatch();
-    const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors, watch, getValues } = useForm();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        setValue,
+        reset,
+        clearErrors,
+        watch,
+        getValues,
+    } = useForm();
     const patientStatus = watch('patientStatus'); // Watch selected option
     const [logo, setLogo] = useState(null);
     const location = useLocation();
@@ -24,8 +32,6 @@ const AddPatientDetails = ({ setSubmissionType }) => {
     const logoFileInputRef = useRef(null);
     const [profileUploading, setProfileUploading] = useState(false);
     const [selectedDoctor, setSelectedDoctor] = useState(null);
-    const [showResponsibleTab, setShowResponsibleTab] = useState(true);
-    const [showReferringTab, setShowReferringTab] = useState(true);
     // const [submissionType, setSubmissionType] = useState(null);
     const [age, setAge] = useState(null);
     const store = useSelector((state) => state);
@@ -36,7 +42,7 @@ const AddPatientDetails = ({ setSubmissionType }) => {
 
     // Function to calculate approximate age from date of birth
     const calculateApproxAge = (dob) => {
-        if (!dob) return "";
+        if (!dob) return '';
         const birthDate = new Date(dob);
         const today = new Date();
         let age = today.getFullYear() - birthDate.getFullYear();
@@ -50,12 +56,12 @@ const AddPatientDetails = ({ setSubmissionType }) => {
     };
 
     // Watch for dateOfBirth changes
-    const dateOfBirth = watch("dateOfBirth");
+    const dateOfBirth = watch('dateOfBirth');
 
     useEffect(() => {
         if (dateOfBirth) {
             const approxAge = calculateApproxAge(dateOfBirth);
-            setValue("approxAge", approxAge);  // Dynamically update approxAge
+            setValue('approxAge', approxAge); // Dynamically update approxAge
         }
     }, [dateOfBirth, setValue]);
 
@@ -67,18 +73,17 @@ const AddPatientDetails = ({ setSubmissionType }) => {
             setLogoName(selectedFile?.name);
             clearErrors('profileImage');
         } catch (error) {
-            console.error("File upload failed", error);
+            console.error('File upload failed', error);
         }
     };
 
     useEffect(() => {
-        setValue("primaryProvider", doctorName);
+        setValue('primaryProvider', doctorName);
     }, [doctorName, setValue]);
 
     const onSubmit = (data) => {
-
         const payload = {
-            resourceType: "Patient",
+            resourceType: 'Patient',
             active: true,
             photo: [
                 {
@@ -87,8 +92,8 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                     data: logo?.data || null,
                     hash: logo?.hash || null,
                     title: logoName || null,
-                    creation: new Date()
-                }
+                    creation: new Date(),
+                },
             ],
             gender: data?.gender || '',
             birthDate: data?.dateOfBirth || '',
@@ -207,11 +212,19 @@ const AddPatientDetails = ({ setSubmissionType }) => {
     };
 
     const handleResponsibleChange = (e) => {
-        setShowResponsibleTab(e.target.value === 'true');
+        if (e === 'true') {
+            setVisibleResponsible(true);
+        } else {
+            setVisibleResponsible(false);
+        }
     };
 
     const handleReferringChange = (e) => {
-        setShowReferringTab(e.target.value === 'true');
+        if (e === 'true') {
+            setVisibleReffering(true);
+        } else {
+            setVisibleReffering(false);
+        }
     };
 
     return (
@@ -238,7 +251,7 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                                         message: 'Only alphabets are allowed, minimum 3 characters',
                                     },
                                 })}
-                                onInput={(e) => e.target.value = e.target.value.replace(/[^A-Za-z]/g, '')} // Prevent spaces/numbers while typing
+                                onInput={(e) => (e.target.value = e.target.value.replace(/[^A-Za-z]/g, ''))} // Prevent spaces/numbers while typing
                             />
                             {errors.firstName && (
                                 <span className="text-danger err-font">{errors.firstName.message}</span>
@@ -255,11 +268,9 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                                 type="text"
                                 placeholder="Middle Name"
                                 {...register('middleName')}
-                                onInput={(e) => e.target.value = e.target.value.replace(/[^A-Za-z]/g, '')} // Prevent spaces/numbers while typing
+                                onInput={(e) => (e.target.value = e.target.value.replace(/[^A-Za-z]/g, ''))} // Prevent spaces/numbers while typing
                             />
-                            {errors.middleName && (
-                                <span className="text-danger">{errors.middleName.message}</span>
-                            )}
+                            {errors.middleName && <span className="text-danger">{errors.middleName.message}</span>}
                         </Form.Group>
                     </div>
                     <div className="col-md-3 col-12">
@@ -282,11 +293,9 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                                         message: 'Only alphabets are allowed, minimum 3 characters',
                                     },
                                 })}
-                                onInput={(e) => e.target.value = e.target.value.replace(/[^A-Za-z]/g, '')} // Prevent spaces/numbers while typing
+                                onInput={(e) => (e.target.value = e.target.value.replace(/[^A-Za-z]/g, ''))} // Prevent spaces/numbers while typing
                             />
-                            {errors.lastName && (
-                                <span className="text-danger err-font">{errors.lastName.message}</span>
-                            )}
+                            {errors.lastName && <span className="text-danger err-font">{errors.lastName.message}</span>}
                         </Form.Group>
                     </div>
 
@@ -309,18 +318,17 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                                             required: 'Cell Phone is required',
                                             pattern: {
                                                 value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                message: 'Contact must be in the format (XXX)XXX-XXXX'
+                                                message: 'Contact must be in the format (XXX)XXX-XXXX',
                                             },
                                             maxLength: {
                                                 value: 13,
-                                                message: 'Contact must not exceed 13 digits'
+                                                message: 'Contact must not exceed 13 digits',
                                             },
                                             minLength: {
                                                 value: 13,
-                                                message: 'Contact must not be less than 13 digits'
-                                            }
+                                                message: 'Contact must not be less than 13 digits',
+                                            },
                                         })}
-
                                         onChange={(e) => {
                                             let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
                                             if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
@@ -372,9 +380,7 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                                     },
                                 })}
                             />
-                            {errors.email && (
-                                <span className="text-danger err-font">{errors.email.message}</span>
-                            )}
+                            {errors.email && <span className="text-danger err-font">{errors.email.message}</span>}
                         </Form.Group>
                     </div>
                     <Col md={3} className="mb-2">
@@ -394,11 +400,7 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                     <Col md={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Approx age (if DOB is unknown)</Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="Approx. age"
-                                {...register('approxAge')}
-                            />
+                            <Form.Control type="text" placeholder="Approx. age" {...register('approxAge')} />
                         </Form.Group>
                     </Col>
                     <div className="col-md-3 col-12">
@@ -421,9 +423,7 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                                 <option value="other">Other</option>
                                 <option value="unknown">Unknown</option>
                             </Form.Select>
-                            {errors.gender && (
-                                <span className="text-danger">{errors.gender.message}</span>
-                            )}
+                            {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
                         </Form.Group>
                     </div>
                 </div>
@@ -473,13 +473,10 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                             <div
                                 onClick={() => logoFileInputRef.current.click()}
                                 style={{ height: '30px' }}
-                                className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'
-                                    }`}>
-                                {logoName
-                                    ? logoName
-                                    : profileUploading
-                                        ? 'Uploading...'
-                                        : 'Upload Photo'}
+                                className={`custom-file-upload justify-content-between cursor-pointer ${
+                                    logoName || profileUploading ? '' : 'custom-form-fields'
+                                }`}>
+                                {logoName ? logoName : profileUploading ? 'Uploading...' : 'Upload Photo'}
                                 <p className="mb-0">
                                     <FiUploadCloud />
                                 </p>
@@ -493,9 +490,7 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                                 ref={logoFileInputRef}
                                 onChange={handleFileChange}
                             />
-                            {errors.profileImage && (
-                                <span className="text-danger">{errors.profileImage.message}</span>
-                            )}
+                            {errors.profileImage && <span className="text-danger">{errors.profileImage.message}</span>}
                         </div>
                     </div>
                     <div className="col-md-3 col-12 mb-2">
@@ -523,9 +518,7 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                         <Form.Group>
                             <Form.Label className="mb-0">Suffix </Form.Label>
                             <Form.Control type="text" placeholder="Suffix" {...register('suffix')} />
-                            {errors.suffix && (
-                                <span className="text-danger">{errors.suffix.message}</span>
-                            )}
+                            {errors.suffix && <span className="text-danger">{errors.suffix.message}</span>}
                         </Form.Group>
                     </div>
                     <div className="col-md-3 col-12">
@@ -554,26 +547,20 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                                     <Form.Control
                                         type="tel"
                                         style={{ height: '30px!important' }}
-                                        {...register(
-                                            'homePhone',
-                                            {
-                                                pattern: {
-                                                    value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                    message:
-                                                        'Contact must be in the format (XXX)XXX-XXXX',
-                                                },
-                                                maxLength: {
-                                                    value: 13,
-                                                    message: 'Contact must not exceed 13 digits',
-                                                },
-                                                minLength: {
-                                                    value: 13,
-                                                    message:
-                                                        'Contact must not be less than 13 digits',
-                                                },
-                                            }
-
-                                        )}
+                                        {...register('homePhone', {
+                                            pattern: {
+                                                value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                message: 'Contact must be in the format (XXX)XXX-XXXX',
+                                            },
+                                            maxLength: {
+                                                value: 13,
+                                                message: 'Contact must not exceed 13 digits',
+                                            },
+                                            minLength: {
+                                                value: 13,
+                                                message: 'Contact must not be less than 13 digits',
+                                            },
+                                        })}
                                         onChange={(e) => {
                                             let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
                                             if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
@@ -632,25 +619,20 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                                     <Form.Control
                                         type="tel"
                                         style={{ height: '30px!important' }}
-                                        {...register(
-                                            'officePhone',
-                                            {
-                                                pattern: {
-                                                    value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                    message:
-                                                        'Contact must be in the format (XXX)XXX-XXXX',
-                                                },
-                                                maxLength: {
-                                                    value: 13,
-                                                    message: 'Contact must not exceed 13 digits',
-                                                },
-                                                minLength: {
-                                                    value: 13,
-                                                    message:
-                                                        'Contact must not be less than 13 digits',
-                                                },
-                                            }
-                                        )}
+                                        {...register('officePhone', {
+                                            pattern: {
+                                                value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                message: 'Contact must be in the format (XXX)XXX-XXXX',
+                                            },
+                                            maxLength: {
+                                                value: 13,
+                                                message: 'Contact must not exceed 13 digits',
+                                            },
+                                            minLength: {
+                                                value: 13,
+                                                message: 'Contact must not be less than 13 digits',
+                                            },
+                                        })}
                                         onChange={(e) => {
                                             let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
                                             if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
@@ -702,9 +684,7 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                                 <option value="Other">Other</option>
                             </Form.Select>
                             {errors.preferredCommunication && (
-                                <span className="text-danger">
-                                    {errors.preferredCommunication.message}
-                                </span>
+                                <span className="text-danger">{errors.preferredCommunication.message}</span>
                             )}
                         </Form.Group>
                     </div>
@@ -712,9 +692,7 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                     <div className="col-md-3 col-12">
                         <Form.Group>
                             <Form.Label className="mb-0">Reminder Language</Form.Label>
-                            <Form.Select
-                                {...register('reminderLanguage')}
-                                data-has-value={!!watch('reminderLanguage')}>
+                            <Form.Select {...register('reminderLanguage')} data-has-value={!!watch('reminderLanguage')}>
                                 <option value="" hidden>
                                     Select
                                 </option>
@@ -727,7 +705,7 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                     <div className="col-md-3 col-12">
                         <Form.Group>
                             <Form.Label className="mb-0">Responsible Party</Form.Label>
-                            <Form.Select onChange={handleResponsibleChange} defaultValue="true">
+                            <Form.Select onChange={(e) => handleResponsibleChange(e.target.value)}>
                                 <option value="true">Yes</option>
                                 <option value="false">No</option>
                             </Form.Select>
@@ -737,7 +715,7 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                     <div className="col-md-3 col-12">
                         <Form.Group>
                             <Form.Label className="mb-0">Referring Doctor</Form.Label>
-                            <Form.Select onChange={handleReferringChange} defaultValue="true">
+                            <Form.Select onChange={(e) =>handleReferringChange(e.target.value)}>
                                 <option value="true">Yes</option>
                                 <option value="false">No</option>
                             </Form.Select>
@@ -753,7 +731,7 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                                 type="text"
                                 placeholder={doctorName}
                                 value={doctorName}
-                                {...register('selectedDoctor',)}
+                                {...register('selectedDoctor')}
                                 data-has-value={!!watch('selectedDoctor')}
                             />
                         </Form.Group>
@@ -786,9 +764,7 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                                 </option>
                                 <option value="Cash">Cash</option>
                                 <option value="Insurance">Insurance</option>
-                                <option value="Insurance Out of Network">
-                                    Insurance Out of Network
-                                </option>
+                                <option value="Insurance Out of Network">Insurance Out of Network</option>
                                 <option value="Auto Accident">Auto Accident</option>
                                 <option value="Worker's Comp">Worker's Comp</option>
                                 <option value="Other">Other</option>
@@ -824,19 +800,13 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                                 placeholder="Follow Up Date"
                                 {...register('followupDate')}
                             />
-                            {errors.followupDate && (
-                                <span className="text-danger">{errors.followupDate.message}</span>
-                            )}
+                            {errors.followupDate && <span className="text-danger">{errors.followupDate.message}</span>}
                         </Form.Group>
                     </div>
                     <div className="col-md-3 col-12">
                         <Form.Group>
                             <Form.Label className="mb-0">Follow Up Reason</Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="Follow Up Reason"
-                                {...register('followupReason')}
-                            />
+                            <Form.Control type="text" placeholder="Follow Up Reason" {...register('followupReason')} />
                         </Form.Group>
                     </div>
                 </div>
@@ -859,10 +829,7 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                                 setSubmissionType('saveAndReset');
                             }
                         }}
-                        disabled={
-                            store?.createPatientsReducer?.loading ||
-                            store?.updatePatientsReducer?.loading
-                        }
+                        disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading}
                         className="custom-buttons "
                         type="submit">
                         Save & Add Another
@@ -873,10 +840,7 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                                 setSubmissionType('saveAndNext');
                             }
                         }}
-                        disabled={
-                            store?.createPatientsReducer?.loading ||
-                            store?.updatePatientsReducer?.loading
-                        }
+                        disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading}
                         className="custom-buttons "
                         type="submit">
                         Save & Continue Editing
@@ -893,9 +857,8 @@ const AddPatientDetails = ({ setSubmissionType }) => {
                                     </Button> */}
                 </div>
             </Form>
-
         </div>
-    )
-}
+    );
+};
 
-export default AddPatientDetails
+export default AddPatientDetails;

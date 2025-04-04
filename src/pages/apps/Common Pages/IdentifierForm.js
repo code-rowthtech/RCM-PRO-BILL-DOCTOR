@@ -193,6 +193,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                             placeholder="Document Number"
                             value={item.number}
                             onChange={(e) => handleChange(index, 'number', e.target.value)}
+                            maxLength={10}
                         />
                     </Col>
                     <Col className="mb-2 position-relative">

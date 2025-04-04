@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Col, Form } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import AddressForm from '../Common Pages/AddressForm';
-import TelecomFrom from '../Common Pages/TelecomFrom';
+import AddressForm from '../../Common Pages/AddressForm';
+import TelecomFrom from '../../Common Pages/TelecomForm';
 import { useDispatch, useSelector } from 'react-redux';
-import { encryptMessage } from '../../../cryptoUtils';
-import { createResponsiblePartyAction } from '../../../redux/actions';
-import { dataList } from '../../../utils/DataSets/relations.data';
+import { encryptMessage } from "../../../../cryptoUtils";
+import { createResponsiblePartyAction } from '../../../../redux/actions';
+import { dataList } from '../../../../utils/DataSets/relations.data';
 import Select from 'react-select';
 
 

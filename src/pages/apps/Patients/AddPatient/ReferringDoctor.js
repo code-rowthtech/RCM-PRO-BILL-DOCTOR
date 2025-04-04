@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Button, Col, Form, Row, InputGroup } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { getStatesByCountryAction, getCitiesAction, addReferringDoctorAction, stateEmptydAction } from '../../../redux/actions';
-import us from '../../../assets/images/flags/us.jpg';
-import { encryptMessage } from '../../../cryptoUtils';
-import AddressForm from '../Common Pages/AddressForm';
+import { getStatesByCountryAction, getCitiesAction, createReferringDoctorAction, stateEmptydAction } from '../../../../redux/actions';
+import us from '../../../../assets/images/flags/us.jpg'
+import { encryptMessage } from "../../../../cryptoUtils";
+import AddressForm from '../../Common Pages/AddressForm';
 
 const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
     const store = useSelector((state) => state);
@@ -94,7 +94,7 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
                 },
             ],
         };
-        dispatch(addReferringDoctorAction({ key: encryptMessage(payload) }));
+        dispatch(createReferringDoctorAction({ key: encryptMessage(payload) }));
         console.log("payload",payload)
     };
 

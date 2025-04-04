@@ -1,32 +1,39 @@
-import React, { useEffect, useState } from "react";
-import { Button, Col, Form, Row, InputGroup, Table } from "react-bootstrap";
-import { useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import us from '../../../../assets/images/flags/us.jpg'
-import { encryptMessage } from "../../../../cryptoUtils";
-import { resetUpdateAction, updatePatientsAction } from "../../../../redux/actions";
+import React, { useEffect, useState } from 'react';
+import { Button, Col, Form, Row, InputGroup, Table } from 'react-bootstrap';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import us from '../../../../assets/images/flags/us.jpg';
+import { encryptMessage } from '../../../../cryptoUtils';
+import { resetUpdateAction, updatePatientsAction } from '../../../../redux/actions';
 import IdentifierForm from '../../Common Pages/IdentifierForm';
 import AddressForm from '../../Common Pages/AddressForm';
-import { genderIdentityOptions } from "../../../../utils/DataSets/genderIdentities";
-import { sexParameterOptions } from "../../../../utils/DataSets/SexParameterforClinicalUse";
-import { personalPronounsOptions } from "../../../../utils/DataSets/personalPronouns";
-import { maritalStatusOptions } from "../../../../utils/DataSets/maritalStatus";
-import { sexAssignedAtBirthOptions } from "../../../../utils/DataSets/sex";
-import { raceOptions } from "../../../../utils/DataSets/race.data";
-import { ethnicityOptions } from "../../../../utils/DataSets/enthnicity.data";
-import { tribalEntitiesOptions } from "../../../../utils/DataSets/tribalEntities";
-import { dataList } from "../../../../utils/DataSets/relations.data";
+import { genderIdentityOptions } from '../../../../utils/DataSets/genderIdentities';
+import { sexParameterOptions } from '../../../../utils/DataSets/SexParameterforClinicalUse';
+import { personalPronounsOptions } from '../../../../utils/DataSets/personalPronouns';
+import { maritalStatusOptions } from '../../../../utils/DataSets/maritalStatus';
+import { sexAssignedAtBirthOptions } from '../../../../utils/DataSets/sex';
+import { raceOptions } from '../../../../utils/DataSets/race.data';
+import { ethnicityOptions } from '../../../../utils/DataSets/enthnicity.data';
+import { tribalEntitiesOptions } from '../../../../utils/DataSets/tribalEntities';
+import { dataList } from '../../../../utils/DataSets/relations.data';
 import Select from 'react-select';
 
-
-const AddDemographics = ({ patientId }) => {
+const AddDemographics = ({ patientId, setActiveTab, setVisibleReffering }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
-    const { register, handleSubmit, formState: { errors }, setValue, clearErrors, reset, getValues } = useForm();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        setValue,
+        clearErrors,
+        reset,
+        getValues,
+    } = useForm();
     const [employerLongitude, setEmployerLongitude] = useState(null);
     const [employerLatitude, setEmployerLatitude] = useState(null);
     const [employerFocused, setEmployerFocused] = useState(false);
@@ -42,10 +49,9 @@ const AddDemographics = ({ patientId }) => {
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
 
-
     // const patientDetails = store?.getPatientByIdReducer;
     const patientDetails = store?.getPatientsByIdReducer?.data?.patient || [];
-    console.log(patientDetails, '0987654321234567890')
+    console.log(patientDetails, '0987654321234567890');
 
     const formattedEthnicityOptions = ethnicityOptions.map((ethnicity) => ({
         value: ethnicity, // Code as the value
@@ -113,7 +119,17 @@ const AddDemographics = ({ patientId }) => {
         let finalIdentifiers = [];
         identifiers.forEach((element) => {
             const identifierData = {
-                type: element?.type?.code,
+                type: {
+                    coding: [
+                        {
+                            system: element?.type?.value,
+                            code: element?.type?.code,
+                            display: element?.type?.label,
+                        },
+                    ],
+                    text: element?.type?.label,
+                },
+
                 system: element?.type?.value,
                 value: element?.number,
                 issuingAuthority: element?.issuingAuthority,
@@ -130,7 +146,7 @@ const AddDemographics = ({ patientId }) => {
                     code: selectedSexOption?.value,
                     display: selectedSexOption?.label,
                     system: selectedSexOption?.system,
-                }
+                },
             ],
             genderIdentity: [
                 {
@@ -237,7 +253,7 @@ const AddDemographics = ({ patientId }) => {
                 occupation: data?.occupation,
                 workLocation: {
                     address: {
-                        line: data?.employerAddress,
+                        line: [data?.employerAddress],
                         city: data?.employerCity,
                         state: data?.employerStateName,
                         postalCode: data?.employerZip,
@@ -247,15 +263,15 @@ const AddDemographics = ({ patientId }) => {
             },
             identifier: finalIdentifiers,
             address: demographicAddresses,
-            ...(data?.notes && { notes: data.notes })
+            ...(data?.notes && { notes: data.notes }),
         };
-        dispatch(updatePatientsAction({ key: encryptMessage(payload) }))
-        console.log(payload, 'payload')
+        dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
+        console.log(payload, 'payload');
     };
     useEffect(() => {
-
         if (updateSuccess === 200) {
-            dispatch(resetUpdateAction())
+            dispatch(resetUpdateAction());
+            // setActiveTab('Insurances'); // Go to Responsible tab if allowed
         }
     }, [updateSuccess]);
 
@@ -264,16 +280,11 @@ const AddDemographics = ({ patientId }) => {
             <Form className="mt-1" onSubmit={handleSubmit(onSubmit)}>
                 <IdentifierForm
                     defaultIdentifiers={[
-                        {
-                            label: 'National Provider Identifier (NPI)',
-                            value: 'http://hl7.org/fhir/sid/us-npi',
-                            code: 'NPI',
-                        },
+                        { label: 'Social Security Number (SSN)', value: 'http://hl7.org/fhir/sid/us-ssn', code: 'SSN' },
                     ]}
                     identifiers={identifiers}
                     setIdentifiers={setIdentifiers}
                 />
-
                 <hr className="mt-0" />
                 <Row className="pb-2">
                     <Col sm={3}>
@@ -344,7 +355,7 @@ const AddDemographics = ({ patientId }) => {
                             <Form.Select {...register('race')}>
                                 <option value="">Select Race</option>
                                 {raceOptions.map((race) => (
-                                    <option key={race.code} value={race.code} className='text-capitalize'>
+                                    <option key={race.code} value={race.code} className="text-capitalize">
                                         {race.display}
                                     </option>
                                 ))}
@@ -710,10 +721,11 @@ const AddDemographics = ({ patientId }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
-                                                        ? 'd-none'
-                                                        : ''
-                                                        }`}>
+                                                    className={`scroll-container hover-bg-change ${
+                                                        searchedEmployerLocations?.length === 0 || !employerFocused
+                                                            ? 'd-none'
+                                                            : ''
+                                                    }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
