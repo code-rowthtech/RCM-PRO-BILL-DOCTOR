@@ -62,10 +62,10 @@ const Responsible = ({ patientId, activeTab, setActiveTab }) => {
         if (createResponse === 201) {
             if (submissionType === 'saveAndNext') {
                 reset(); // Reset the form
-                setActiveTab('referringDoctor');
+                setActiveTab('Insurances');
             } else if (submissionType === 'saveAndReset') {
                 reset();
-                setActiveTab('personalDetails');
+                setActiveTab('Patient Details');
             }
         }
     }, [createResponse]);

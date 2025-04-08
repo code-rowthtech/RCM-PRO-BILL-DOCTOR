@@ -45,6 +45,8 @@ import FilterDropdown from './FilterDropdown';
 import Drug from './DrugIntraction/Drug';
 import CQIs from './CQIs/CQIs';
 import LabRequest from './LabRequest/LabRequest';
+import ResponsibleParty from './ResponsibleParty';
+import RefferingDoctor from './RefferingDoctor';
 
 const NewPatient = () => {
     const dispatch = useDispatch();
@@ -53,7 +55,6 @@ const NewPatient = () => {
     const {
         handleSubmit,
         formState: { errors },
-
     } = useForm();
     const [isClinicalReviewExpanded, setIsClinicalReviewExpanded] = useState(false);
     const [isRunning, setIsRunning] = useState(false);
@@ -64,11 +65,11 @@ const NewPatient = () => {
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const primaryProvider = JSON.parse(sessionStorage.getItem('hyper_user'))?.name?.text;
-    console.log(primaryProvider, 'primaryProvider')
+    console.log(primaryProvider, 'primaryProvider');
     const store = useSelector((state) => state);
     const patientsDataById = store?.getPatientsByIdReducer?.data?.data || [];
 
-    console.log(patientsDataById, 'patientsDataByIdpatientsDataById')
+    console.log(patientsDataById, 'patientsDataByIdpatientsDataById');
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
     const [profilePhoto, setProfilePhoto] = useState(profileDummy);
     const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -82,11 +83,10 @@ const NewPatient = () => {
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
 
-
     useEffect(() => {
         const data = {
             id: id,
-        }
+        };
         if (id) {
             dispatch(getPatientsByIdAction(data));
         }
@@ -99,9 +99,10 @@ const NewPatient = () => {
             setLogo(null);
             setLogoName('');
             setIsCameraOpen(false);
+            setSelectedMainTab('Demographics')
+            
         }
     }, [updateSuccess, id, dispatch]); // Ensure dependencies are correctly set
-
 
     const handleMainTabChange = (tab) => {
         setSelectedMainTab(tab);
@@ -125,9 +126,8 @@ const NewPatient = () => {
     const tabMappings = {
         'Patient Info': { mainTab: 'Patient Details', section: 'patient' },
         'Drug Interactions': { mainTab: 'Drug Interactions', section: 'drug' },
-        'CQIs': { mainTab: 'CQIs', section: 'CQIs' },
-        'Lab Request': { mainTab: 'Lab Request', section: 'Lab Request' }
-
+        CQIs: { mainTab: 'CQIs', section: 'CQIs' },
+        'Lab Request': { mainTab: 'Lab Request', section: 'Lab Request' },
     };
 
     const handleChartTabChange = (tab) => {
@@ -137,7 +137,6 @@ const NewPatient = () => {
             setVisibleSection(mapping.section);
         }
     };
-
 
     const handleClinicalReviewToggle = () => {
         setIsClinicalReviewExpanded(!isClinicalReviewExpanded);
@@ -275,11 +274,11 @@ const NewPatient = () => {
             ...(logo?.url === null
                 ? {}
                 : {
-                    photo: {
-                        url: logo?.url?.split('?')[0] || patientsDataById?.patientChartPhoto?.url,
-                        title: logoName,
-                    },
-                }),
+                      photo: {
+                          url: logo?.url?.split('?')[0] || patientsDataById?.patientChartPhoto?.url,
+                          title: logoName,
+                      },
+                  }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
         // console.log(payload, 'payloadpayload')
@@ -292,13 +291,12 @@ const NewPatient = () => {
                     <div className="row">
                         {/* Main Content */}
                         <div className={isSidebarCollapsed ? 'col-11' : 'col-10'}>
-
                             <div class="accordion border-none custom-shadow rounded-1" id="accordionExample">
                                 <div class="accordion-item collapsed border-0">
-                                    <h2 class="accordion-header mt-0" >
+                                    <h2 class="accordion-header mt-0">
                                         <button
                                             className="accordion-button collapsed py-1 bg-white"
-                                            style={{ border: "#000", height: "43px" }}
+                                            style={{ border: '#000', height: '43px' }}
                                             type="button"
                                             data-bs-toggle="collapse"
                                             data-bs-target="#collapseOne"
@@ -324,9 +322,9 @@ const NewPatient = () => {
                                                     className="pe-2 text-nowrap fw-bold fs-6">
                                                     <span>
                                                         {patientsDataById?.birthDate
-                                                            ? new Date(
-                                                                patientsDataById.birthDate
-                                                            ).toLocaleDateString('en-GB')
+                                                            ? new Date(patientsDataById.birthDate).toLocaleDateString(
+                                                                  'en-GB'
+                                                              )
                                                             : 'N/A'}
                                                     </span>
                                                 </p>
@@ -340,8 +338,13 @@ const NewPatient = () => {
                                             </div>
                                         </button>
                                     </h2>
-                                    <div id="collapseOne" class="accordion-collapse collapse " data-bs-parent="#accordionExample">
-                                        <div class="accordion-body  p-0 bg-white pb-1" style={{ borderBottomLeftRadius: '5px', borderBottomRightRadius: '5px' }}>
+                                    <div
+                                        id="collapseOne"
+                                        class="accordion-collapse collapse "
+                                        data-bs-parent="#accordionExample">
+                                        <div
+                                            class="accordion-body  p-0 bg-white pb-1"
+                                            style={{ borderBottomLeftRadius: '5px', borderBottomRightRadius: '5px' }}>
                                             <div className="p-1">
                                                 <Row>
                                                     <Col sm={2} className="ps-0 pt-1">
@@ -373,8 +376,8 @@ const NewPatient = () => {
                                                                             logo?.url
                                                                                 ? logo.url.split('?')[0]
                                                                                 : patientsDataById?.photo?.[0]?.url
-                                                                                    ? patientsDataById?.photo?.[0]?.url
-                                                                                    : profilePhoto
+                                                                                ? patientsDataById?.photo?.[0]?.url
+                                                                                : profilePhoto
                                                                         }
                                                                         alt="Patient Profile"
                                                                         className="img-fluid rounded"
@@ -388,9 +391,14 @@ const NewPatient = () => {
 
                                                                 {!isCameraOpen && (
                                                                     <BiEdit
-                                                                        className={`position-absolute fs-4 text-primary ${uploading ? 'd-none' : ''
-                                                                            }`}
-                                                                        style={{ bottom: '-5px', right: '-9px', cursor: 'pointer' }}
+                                                                        className={`position-absolute fs-4 text-primary ${
+                                                                            uploading ? 'd-none' : ''
+                                                                        }`}
+                                                                        style={{
+                                                                            bottom: '-5px',
+                                                                            right: '-9px',
+                                                                            cursor: 'pointer',
+                                                                        }}
                                                                         onClick={openCamera}
                                                                     />
                                                                 )}
@@ -403,7 +411,9 @@ const NewPatient = () => {
                                                                             className="custom-buttons">
                                                                             <TbCapture className="text-white fs-5" />{' '}
                                                                         </Button>
-                                                                        <Button onClick={stopCamera} className="custom-buttons">
+                                                                        <Button
+                                                                            onClick={stopCamera}
+                                                                            className="custom-buttons">
                                                                             <IoClose className="text-white fs-5" />
                                                                         </Button>
                                                                     </div>
@@ -424,13 +434,14 @@ const NewPatient = () => {
 
                                                     <Col sm={8}>
                                                         <Row className="pt-1">
-
                                                             <Col sm={6} className="p-0">
                                                                 <div className="row">
                                                                     <div className="col-12 mx-1 ">
                                                                         <div className="row">
                                                                             <div className="col-3">
-                                                                                <span className="fw-bold fs-6">Patients ID:</span>
+                                                                                <span className="fw-bold fs-6">
+                                                                                    Patients ID:
+                                                                                </span>
                                                                             </div>
                                                                             <div className="col-9">
                                                                                 <span
@@ -452,7 +463,8 @@ const NewPatient = () => {
                                                                                 <span
                                                                                     className="ps-2 fs-6"
                                                                                     style={{ fontWeight: 600 }}>
-                                                                                    {patientsDataById?.telecom?.[1]?.value || 'N/A    '}
+                                                                                    {patientsDataById?.telecom?.[1]
+                                                                                        ?.value || 'N/A    '}
                                                                                 </span>
                                                                             </div>
                                                                         </div>
@@ -468,7 +480,8 @@ const NewPatient = () => {
                                                                                 <span
                                                                                     className="ps-2 fs-6"
                                                                                     style={{ fontWeight: 600 }}>
-                                                                                    {patientsDataById?.telecom?.[3]?.value || 'N/A'}
+                                                                                    {patientsDataById?.telecom?.[3]
+                                                                                        ?.value || 'N/A'}
                                                                                 </span>
                                                                             </div>
                                                                         </div>
@@ -485,13 +498,14 @@ const NewPatient = () => {
                                                                                     className="ps-2 fs-6"
                                                                                     style={{ fontWeight: 600 }}>
                                                                                     {patientsDataById?.address?.address
-                                                                                        ? patientsDataById.address.address.length >
-                                                                                            30
+                                                                                        ? patientsDataById.address
+                                                                                              .address.length > 30
                                                                                             ? patientsDataById.address.address.slice(
-                                                                                                0,
-                                                                                                30
-                                                                                            ) + '...'
-                                                                                            : patientsDataById.address.address
+                                                                                                  0,
+                                                                                                  30
+                                                                                              ) + '...'
+                                                                                            : patientsDataById.address
+                                                                                                  .address
                                                                                         : 'N/A'}
                                                                                 </span>
                                                                             </div>
@@ -520,7 +534,9 @@ const NewPatient = () => {
                                                                     <div className="col-12 mx-1 ">
                                                                         <div className="row">
                                                                             <div className="col-5">
-                                                                                <span className="fw-bold fs-6">Date Added:</span>
+                                                                                <span className="fw-bold fs-6">
+                                                                                    Date Added:
+                                                                                </span>
                                                                             </div>
                                                                             <div className="col-7">
                                                                                 <span
@@ -528,8 +544,8 @@ const NewPatient = () => {
                                                                                     style={{ fontWeight: 600 }}>
                                                                                     {patientsDataById?.createdAt
                                                                                         ? new Date(
-                                                                                            patientsDataById.createdAt
-                                                                                        ).toLocaleDateString('en-GB')
+                                                                                              patientsDataById.createdAt
+                                                                                          ).toLocaleDateString('en-GB')
                                                                                         : 'N/A'}
                                                                                 </span>
                                                                             </div>
@@ -546,7 +562,8 @@ const NewPatient = () => {
                                                                                 <span
                                                                                     className="ps-2 fs-6"
                                                                                     style={{ fontWeight: 600 }}>
-                                                                                    {patientsDataById?.lastApptDate || 'N/A'}
+                                                                                    {patientsDataById?.lastApptDate ||
+                                                                                        'N/A'}
                                                                                 </span>
                                                                             </div>
                                                                         </div>
@@ -562,7 +579,8 @@ const NewPatient = () => {
                                                                                 <span
                                                                                     className="ps-2 fs-6"
                                                                                     style={{ fontWeight: 600 }}>
-                                                                                    {patientsDataById?.nextApptDate || 'N/A'}
+                                                                                    {patientsDataById?.nextApptDate ||
+                                                                                        'N/A'}
                                                                                 </span>
                                                                             </div>
                                                                         </div>
@@ -585,8 +603,8 @@ const NewPatient = () => {
                                                                 {isRunning
                                                                     ? `Pause (${formatTime(timeLeft)})`
                                                                     : timeLeft > 0
-                                                                        ? `Resume (${formatTime(timeLeft)})`
-                                                                        : 'Start Session'}
+                                                                    ? `Resume (${formatTime(timeLeft)})`
+                                                                    : 'Start Session'}
                                                             </Button>
 
                                                             <Button
@@ -624,13 +642,20 @@ const NewPatient = () => {
                             {/* Patient Details Section */}
                             {visibleSection === 'patient' && (
                                 <div className="mt-2">
-                                    <Card className="px-2" style={{ height: isOpen ? "64.4vh" : "80.3vh", transition: "height 0.3s ease-in-out" }}>
+                                    <Card
+                                        className="px-2"
+                                        style={{
+                                            height: isOpen ? '64.4vh' : '80.3vh',
+                                            transition: 'height 0.3s ease-in-out',
+                                        }}>
                                         <div className="d-flex justify-content-between pt-2 px-2">
                                             <div style={{ borderBottom: '2px solid grey' }}>
                                                 <ul className="nav nav-underline">
                                                     {[
                                                         'Patient Details',
                                                         'Demographics',
+                                                        'ResponsibleParty',
+                                                        'RefferingDoctor',
                                                         'Insurances',
                                                         'Eligibility',
                                                         'Authorizations',
@@ -640,10 +665,11 @@ const NewPatient = () => {
                                                     ].map((tab) => (
                                                         <li className="nav-item" key={tab}>
                                                             <a
-                                                                className={`nav-link me-3 pb-0 tab-font-family ${selectedMainTab === tab
-                                                                    ? 'active text-primary'
-                                                                    : 'text-black'
-                                                                    }`}
+                                                                className={`nav-link me-3 pb-0 tab-font-family ${
+                                                                    selectedMainTab === tab
+                                                                        ? 'active text-primary'
+                                                                        : 'text-black'
+                                                                }`}
                                                                 onClick={() => handleMainTabChange(tab)}
                                                                 style={{ cursor: 'pointer', fontWeight: 600 }}>
                                                                 {tab}
@@ -666,12 +692,12 @@ const NewPatient = () => {
                                             </div>
                                         </div>
 
-                                        <div
-                                            className="px-2 scroll-container"
-                                            style={{ overflow: 'auto' }}>
+                                        <div className="px-2 scroll-container" style={{ overflow: 'auto' }}>
                                             {selectedMainTab === 'Patient Details' && <PatientDetails />}
                                             {selectedMainTab === 'Demographics' && <Demographics />}
                                             {selectedMainTab === 'Insurances' && <Insurances />}
+                                            {selectedMainTab === 'ResponsibleParty' && <p>In progress... </p>}
+                                            {selectedMainTab === 'RefferingDoctor' && <p>In progress...</p> }
                                             {selectedMainTab === 'Eligibility' && <p>In Progress...</p>}
                                             {selectedMainTab === 'Authorizations' && <p>In Progress...</p>}
                                             {selectedMainTab === 'Vital Status' && <VitalStatus />}
@@ -716,10 +742,11 @@ const NewPatient = () => {
                                                     ].map((subTab) => (
                                                         <li className="nav-item" key={subTab}>
                                                             <a
-                                                                className={`nav-link me-2 pb-0 tab-font-family ${selectedSubTab === subTab
-                                                                    ? 'active text-primary'
-                                                                    : 'text-black'
-                                                                    }`}
+                                                                className={`nav-link me-2 pb-0 tab-font-family ${
+                                                                    selectedSubTab === subTab
+                                                                        ? 'active text-primary'
+                                                                        : 'text-black'
+                                                                }`}
                                                                 onClick={() => handleSubTabChange(subTab)}
                                                                 style={{ cursor: 'pointer', fontWeight: 600 }}>
                                                                 {subTab}
@@ -836,10 +863,11 @@ const NewPatient = () => {
                                                     <div key={index} className="ms-0">
                                                         <p
                                                             className={`patient-menu-item text-black mb-0 ps-2 pe-2 border-bottom py-1 
-                                                                         ${isSidebarCollapsed
-                                                                    ? 'text-center fw-bold'
-                                                                    : 'd-flex justify-content-between align-items-center'
-                                                                }`}
+                                                                         ${
+                                                                             isSidebarCollapsed
+                                                                                 ? 'text-center fw-bold'
+                                                                                 : 'd-flex justify-content-between align-items-center'
+                                                                         }`}
                                                             onClick={handleClinicalReviewToggle}
                                                             style={{
                                                                 cursor: 'pointer',
@@ -865,10 +893,11 @@ const NewPatient = () => {
                                                             </span>
                                                             {!isSidebarCollapsed && (
                                                                 <i
-                                                                    className={`bi ${isClinicalReviewExpanded
-                                                                        ? 'bi-chevron-up'
-                                                                        : 'bi-chevron-down'
-                                                                        }`}></i>
+                                                                    className={`bi ${
+                                                                        isClinicalReviewExpanded
+                                                                            ? 'bi-chevron-up'
+                                                                            : 'bi-chevron-down'
+                                                                    }`}></i>
                                                             )}
                                                         </p>
                                                         {isClinicalReviewExpanded && (
@@ -977,8 +1006,9 @@ const NewPatient = () => {
                             {modalTabs.map((modalTab) => (
                                 <li className="nav-item" key={modalTab}>
                                     <a
-                                        className={`nav-link text-black me-2 ${activeModalTab === modalTab ? 'active fw-bold' : ''
-                                            }`}
+                                        className={`nav-link text-black me-2 ${
+                                            activeModalTab === modalTab ? 'active fw-bold' : ''
+                                        }`}
                                         onClick={() => handleModalTabClick(modalTab)}
                                         style={{ cursor: 'pointer' }}>
                                         {modalTab}

@@ -23,15 +23,18 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
         { line: [''], city: '', state: '', postalCode: '', country: 'USA' },
     ]);
     const [submissionType, setSubmissionType] = useState(null);
-    const createResponseReferring = store?.addReferringDoctorReducer?.data?.status;
+    const createResponseReferring = store?.createReferringDoctorReducer?.data?.status;
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    
+
     useEffect(() => {
             if (createResponseReferring === 201) {
                 if (submissionType === 'saveAndNext') {
                     reset(); // Reset the form
-                    setActiveTab('insurance');
+                    setActiveTab('ResponsibleParty'); // Move to the next tab
                 } else if (submissionType === 'saveAndReset') {
                     reset();
-                    setActiveTab('personalDetails');
+                    setActiveTab('Patient Details');
                 }
             }
         }, [createResponseReferring]);
@@ -55,11 +58,19 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
         const payload = {
             patientId: patientId,
             type: 'Referring',
+            clinicId : clinicId,
             identifier: [
                 {
-                    system: 'http://hl7.org/fhir/sid/us-npi',
+                    system: '',
                     value: data.npiNumber,
-                    type: 'NPI',
+                    type: {
+                    coding: [{
+                        system: '',
+                        code: '',
+                        display: '',
+                    }],
+                    text: '',
+                },
                 },
             ],
             name: {
@@ -97,6 +108,7 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
         dispatch(createReferringDoctorAction({ key: encryptMessage(payload) }));
         console.log("payload",payload)
     };
+
 
     return (
         <Form className="mt-2" onSubmit={handleSubmit(onSubmit)}>

@@ -329,6 +329,22 @@ const PatientDetails = () => {
                                 )}
                             </Form.Group>
                         </div>
+                        <div className="col-md-3 col-12 mb-2">
+                            <Form.Group>
+                                <Form.Label htmlFor="middleName" className="mb-0">
+                                    Middle Name
+                                </Form.Label>
+                                <Form.Control
+                                    id="middleName"
+                                    type="text"
+                                    placeholder="Middle Name"
+                                    {...register('middleName')}
+                                />
+                                {errors.middleName && (
+                                    <span className="text-danger">{errors.middleName.message}</span>
+                                )}
+                            </Form.Group>
+                        </div>
                         <div className="col-md-3 col-12">
                             <Form.Group>
                                 <Form.Label htmlFor="lastName" className="mb-0">
@@ -493,10 +509,42 @@ const PatientDetails = () => {
                     <hr className="mt-0" />
 
                     <div className="row">
+                     
+                        <div className="col-md-3 col-12">
+                            <div className="mb-2 d-flex flex-column position-relative">
+                                <Form.Label className="mb-0">Patient Photo</Form.Label>
+                                <div
+                                    onClick={() => logoFileInputRef.current.click()}
+                                    style={{ height: '30px' }}
+                                    className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'
+                                        }`}>
+                                    {logoName
+                                        ? logoName
+                                        : profileUploading
+                                            ? 'Uploading...'
+                                            : 'Upload Photo'}
+                                    <p className="mb-0">
+                                        <FiUploadCloud />
+                                    </p>
+                                </div>
+                                <Form.Control
+                                    type="file"
+                                    className="d-none "
+                                    style={{ height: '30px!important' }}
+                                    {...register('profileImage', {})}
+                                    accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
+                                    ref={logoFileInputRef}
+                                    onChange={handleFileChange}
+                                />
+                                {errors.profileImage && (
+                                    <span className="text-danger">{errors.profileImage.message}</span>
+                                )}
+                            </div>
+                        </div>
                         <div className="col-md-3 col-12">
                             <Form.Group>
                                 <Form.Label htmlFor="patientstatus" className="mb-0">
-                                    Patient Status
+                                     Status
                                 </Form.Label>
                                 <Form.Select
                                     as="select" // Use 'select' to make it a dropdown
@@ -530,37 +578,6 @@ const PatientDetails = () => {
                                 </Form.Group>
                             </div>
                         )}
-                        <div className="col-md-3 col-12">
-                            <div className="mb-2 d-flex flex-column position-relative">
-                                <Form.Label className="mb-0">Patient Photo</Form.Label>
-                                <div
-                                    onClick={() => logoFileInputRef.current.click()}
-                                    style={{ height: '30px' }}
-                                    className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'
-                                        }`}>
-                                    {logoName
-                                        ? logoName
-                                        : profileUploading
-                                            ? 'Uploading...'
-                                            : 'Upload Photo'}
-                                    <p className="mb-0">
-                                        <FiUploadCloud />
-                                    </p>
-                                </div>
-                                <Form.Control
-                                    type="file"
-                                    className="d-none "
-                                    style={{ height: '30px!important' }}
-                                    {...register('profileImage', {})}
-                                    accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
-                                    ref={logoFileInputRef}
-                                    onChange={handleFileChange}
-                                />
-                                {errors.profileImage && (
-                                    <span className="text-danger">{errors.profileImage.message}</span>
-                                )}
-                            </div>
-                        </div>
                         <div className="col-md-3 col-12 mb-2">
                             <Form.Group>
                                 <Form.Label htmlFor="title" className="mb-0">
@@ -579,44 +596,6 @@ const PatientDetails = () => {
                                     <option value="Dr.">Dr.</option>
                                     <option value="Other">Other</option>
                                 </Form.Select>
-                            </Form.Group>
-                        </div>
-                        <div className="col-md-3 col-12 mb-2">
-                            <Form.Group>
-                                <Form.Label htmlFor="middleName" className="mb-0">
-                                    Middle Name
-                                </Form.Label>
-                                <Form.Control
-                                    id="middleName"
-                                    type="text"
-                                    placeholder="Middle Name"
-                                    {...register('middleName')}
-                                />
-                                {errors.middleName && (
-                                    <span className="text-danger">{errors.middleName.message}</span>
-                                )}
-                            </Form.Group>
-                        </div>
-                        <div className="col-md-3 col-12 mb-2">
-                            <Form.Group>
-                                <Form.Label className="mb-0">Suffix </Form.Label>
-                                <Form.Control type="text" placeholder="Suffix" {...register('suffix')} />
-                                {errors.suffix && (
-                                    <span className="text-danger">{errors.suffix.message}</span>
-                                )}
-                            </Form.Group>
-                        </div>
-                        <div className="col-md-3 col-12">
-                            <Form.Group>
-                                <Form.Label className="mb-0">Previous Birth Name </Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Previous Birth Name"
-                                    {...register('previousBirthName')}
-                                />
-                                {errors.previousBirthName && (
-                                    <span className="text-danger">{errors.previousBirthName.message}</span>
-                                )}
                             </Form.Group>
                         </div>
                         <div className="col-md-3 col-12 mb-2">
@@ -682,6 +661,16 @@ const PatientDetails = () => {
                                 </div>
                             </Form.Group>
                         </div>
+                        {/* <div className="col-md-3 col-12 mb-2">
+                            <Form.Group>
+                                <Form.Label className="mb-0">Suffix </Form.Label>
+                                <Form.Control type="text" placeholder="Suffix" {...register('suffix')} />
+                                {errors.suffix && (
+                                    <span className="text-danger">{errors.suffix.message}</span>
+                                )}
+                            </Form.Group>
+                        </div> */}
+                    
                         <div className="col-md-3 col-12">
                             <Form.Group>
                                 <Form.Label className="mb-0">Alternate Email</Form.Label>
@@ -697,6 +686,8 @@ const PatientDetails = () => {
                                 />
                             </Form.Group>
                         </div>
+                     
+                     
                         <div className="col-md-3 col-12">
                             <Form.Group className="mb-1 position-relative">
                                 <Form.Label className="mb-0">Office Phone</Form.Label>
@@ -758,6 +749,19 @@ const PatientDetails = () => {
                                 <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
                                     <img src={us} alt="country code flag" width={20} />
                                 </div>
+                            </Form.Group>
+                        </div>
+                        <div className="col-md-3 col-12">
+                            <Form.Group>
+                                <Form.Label className="mb-0">Previous Birth Name </Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Previous Birth Name"
+                                    {...register('previousBirthName')}
+                                />
+                                {errors.previousBirthName && (
+                                    <span className="text-danger">{errors.previousBirthName.message}</span>
+                                )}
                             </Form.Group>
                         </div>
                         <div className="col-md-3 col-12">
