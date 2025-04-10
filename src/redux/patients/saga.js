@@ -130,7 +130,7 @@ function* createReferringDoctorFunction(data) {
         });
         const response = yield call(createReferringDoctorApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 200) {
+        if (response.status === 201) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: PatientsActionTypes.CREATE_REFERRING_DOCTOR_SUCCESS,
@@ -159,7 +159,7 @@ function* createResponsiblePartyFunction(data) {
         });
         const response = yield call(createResponsiblePartyApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 200) {
+        if (response.status === 201) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_SUCCESS,

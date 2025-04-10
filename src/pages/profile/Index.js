@@ -10,18 +10,18 @@ import { getStatesByCountryAction } from '../../redux/actions';
 const Index = () => {
     const dispatch = useDispatch(); // Initialize dispatch for Redux actions
     const [activeTab, setActiveTab] = useState('personalDetails'); // Manage active tab state
-useEffect(()=>{
-dispatch(getStatesByCountryAction())
-},[dispatch])
+    useEffect(() => {
+        dispatch(getStatesByCountryAction());
+    }, [dispatch]);
 
     const handleTabChange = (tab) => {
         setActiveTab(tab);
     };
 
     return (
-        <div className='pt-1 pb-2'>
+        <div className="pt-1 pb-2">
             <div className=" mt-2">
-                <Card className='px-3 py-1' style={{height:'87vh'}}>
+                <Card className=" scroll-container" style={{ height: '82vh', overflow: 'scroll',padding: '10px' }}>
                     <div className="row">
                         {/* <div>
                             <p className="fw-bold">PROFILE</p>
@@ -36,10 +36,8 @@ dispatch(getStatesByCountryAction())
                                 ].map((tab) => (
                                     <li className="nav-item" key={tab.id}>
                                         <button
-                                            className={`text-black nav-link ${activeTab === tab.id ? 'active' : ''
-                                                }`}
-                                            onClick={() => handleTabChange(tab.id)}
-                                        >
+                                            className={`text-black nav-link ${activeTab === tab.id ? 'active' : ''}`}
+                                            onClick={() => handleTabChange(tab.id)}>
                                             {tab.label}
                                         </button>
                                     </li>
@@ -49,10 +47,11 @@ dispatch(getStatesByCountryAction())
                         <div>
                             {activeTab === 'personalDetails' && <PersonalDetails />}
                             {activeTab === 'professionalInformation' && <ProfessionalInformation />}
-                            {activeTab === "qualifications" && <DoctorQualifications
-                            //  docId={docId} setActiveTab={setActiveTab} 
-                             />}
-
+                            {activeTab === 'qualifications' && (
+                                <DoctorQualifications
+                                //  docId={docId} setActiveTab={setActiveTab}
+                                />
+                            )}
 
                             {activeTab === 'documents' && <Documents />}
                         </div>

@@ -1,32 +1,39 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Col, Form, InputGroup } from 'react-bootstrap';
+import { Button, Col, Form, InputGroup, Spinner } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { createPatientsAction } from '../../../../redux/patients/actions';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { encryptMessage } from '../../../../cryptoUtils';
+import { FaPlusCircle, FaMinusCircle } from 'react-icons/fa';
 import { FiUploadCloud } from 'react-icons/fi';
 import { handleUpload } from '../../../../helpers/HandleUpload';
 import us from '../../../../assets/images/flags/us.jpg';
 import { useLocation, useSearchParams } from 'react-router-dom';
 
-const AddPatientDetails = ({ setSubmissionType, setVisibleReffering, setVisibleResponsible }) => {
+const AddPatientDetails = ({
+    setSubmissionType,
+    setVisibleReffering,
+    setVisibleResponsible,
+    visibleResponsible,
+    visibleReferring,
+}) => {
     const dispatch = useDispatch();
     const {
         register,
         handleSubmit,
         formState: { errors },
         setValue,
+        control,
         reset,
         clearErrors,
         watch,
         getValues,
     } = useForm();
+    const [searchParams] = useSearchParams();
+    const id = searchParams.get('updateid');
     const patientStatus = watch('patientStatus'); // Watch selected option
     const [logo, setLogo] = useState(null);
     const location = useLocation();
-
-    console.log(location.pathname, 'url');
-
     const [logoName, setLogoName] = useState('');
     const [deceasedDateTime, setDeceasedDateTime] = useState('');
     const logoFileInputRef = useRef(null);
@@ -45,14 +52,10 @@ const AddPatientDetails = ({ setSubmissionType, setVisibleReffering, setVisibleR
         if (!dob) return '';
         const birthDate = new Date(dob);
         const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
 
-        // Adjust age if birthday hasn't occurred yet this year
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-        return age;
+        const ageInMilliseconds = today - birthDate;
+        const ageInYears = ageInMilliseconds / (1000 * 60 * 60 * 24 * 365.25); // More accurate with leap years
+        return ageInYears.toFixed(1); // Keep one decimal place
     };
 
     // Watch for dateOfBirth changes
@@ -61,9 +64,11 @@ const AddPatientDetails = ({ setSubmissionType, setVisibleReffering, setVisibleR
     useEffect(() => {
         if (dateOfBirth) {
             const approxAge = calculateApproxAge(dateOfBirth);
-            setValue('approxAge', approxAge); // Dynamically update approxAge
+            if (approxAge !== getValues('approxAge')) {
+                setValue('approxAge', approxAge);
+            }
         }
-    }, [dateOfBirth, setValue]);
+    }, [dateOfBirth, setValue, getValues]);
 
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];
@@ -72,14 +77,78 @@ const AddPatientDetails = ({ setSubmissionType, setVisibleReffering, setVisibleR
             setLogo(url);
             setLogoName(selectedFile?.name);
             clearErrors('profileImage');
-        } catch (error) {
-            console.error('File upload failed', error);
-        }
+        } catch (error) {}
     };
 
     useEffect(() => {
         setValue('primaryProvider', doctorName);
     }, [doctorName, setValue]);
+    const [showCellPhone, setShowCellPhone] = useState(false);
+    const [showOfficePhone, setShowOfficePhone] = useState(false);
+    const [showAltEmail, setShowAltEmail] = useState(false);
+    const formatPhone = (value) => {
+        let rawValue = value.replace(/\D/g, '');
+        if (rawValue.length > 10) rawValue = rawValue.slice(0, 10);
+        return rawValue.replace(/(\d{1,3})(\d{0,3})(\d{0,4})/, (match, p1, p2, p3) => {
+            if (p3) return `(${p1})${p2}-${p3}`;
+            if (p2) return `(${p1})${p2}`;
+            return `(${p1}`;
+        });
+    };
+    const renderPhoneField = (label, name, iconToggle) => (
+        <div className="col-md-3 col-12 mb-2 ">
+            <Form.Group className="mb-1 position-relative p">
+                <Form.Label className="mb-0 d-flex justify-content-start gap-1 align-items-center">
+                    {label}
+                    {iconToggle}
+                </Form.Label>
+                <InputGroup>
+                    <InputGroup.Text className="ps-3 pe-1 fw-bold text-black" style={{ height: '30px' }}>
+                        &nbsp;&nbsp;+1
+                    </InputGroup.Text>
+                    <Controller
+                        name={name}
+                        control={control}
+                        rules={
+                            !id
+                                ? {
+                                      pattern: {
+                                          value: /^\(\d{3}\)\d{3}-\d{4}$/,
+                                          message: 'Format must be (XXX)XXX-XXXX',
+                                      },
+                                      maxLength: { value: 13, message: 'Max 13 characters' },
+                                      minLength: { value: 13, message: 'Min 13 characters' },
+                                  }
+                                : {}
+                        }
+                        render={({ field: { onChange, value, ref } }) => (
+                            <Form.Control
+                                type="tel"
+                                style={{ height: '30px' }}
+                                placeholder="(XXX)XXX-XXXX"
+                                maxLength={14}
+                                value={value || ''}
+                                onChange={(e) => {
+                                    const formatted = formatPhone(e.target.value);
+                                    onChange(formatted);
+                                    clearErrors(name);
+                                }}
+                                onKeyPress={(e) => {
+                                    if (!/[0-9]/.test(e.key)) e.preventDefault();
+                                }}
+                                ref={ref}
+                            />
+                        )}
+                    />
+                </InputGroup>
+                <div className="position-absolute" style={{ top: '48%', left: '1%' }}>
+                    <img src={us} alt="country code flag" width={20} />
+                </div>
+            </Form.Group>
+        </div>
+    );
+
+    const maxInputsReached = showCellPhone && showOfficePhone;
 
     const onSubmit = (data) => {
         const payload = {
@@ -109,6 +178,8 @@ const AddPatientDetails = ({ setSubmissionType, setVisibleReffering, setVisibleR
             medicationHistoryConsent: data?.medicationHistoryConsent || false,
             doctorId: doctorId,
             clinicId: clinicId,
+            responsibleParty: visibleResponsible, // Convert string to boolean
+            refferingDoctor: visibleReferring,
 
             notes: data?.notes || '',
         };
@@ -182,7 +253,7 @@ const AddPatientDetails = ({ setSubmissionType, setVisibleReffering, setVisibleR
         reset();
         setLogoName(null);
         setLogo(null);
-        // console.log(payload, 'Final Payload ');
+        console.log(payload, 'Final Payload ');
     };
 
     const calculateAge = (dob) => {
@@ -298,91 +369,86 @@ const AddPatientDetails = ({ setSubmissionType, setVisibleReffering, setVisibleR
                             {errors.lastName && <span className="text-danger err-font">{errors.lastName.message}</span>}
                         </Form.Group>
                     </div>
+                    {renderPhoneField(
+                        'Home Phone',
+                        'homePhone',
+                        !maxInputsReached && (
+                            <span
+                                className=" uil-plus-circle plusicon cursor-pointer"
+                                onClick={() => {
+                                    if (!showCellPhone) setShowCellPhone(true);
+                                    else if (!showOfficePhone) setShowOfficePhone(true);
+                                }}
+                            />
+                        )
+                    )}
 
-                    <div className="col-md-3 col-12">
-                        <Form.Group className="mb-1 position-relative">
-                            <Form.Label className="mb-0">
-                                Cell Phone <span className="text-danger">*</span>
-                            </Form.Label>
-                            <Form.Group>
-                                <InputGroup>
-                                    <InputGroup.Text
-                                        className="ps-3 pe-1 fw-bold text-black"
-                                        style={{ height: '30px' }}>
-                                        &nbsp;&nbsp;+1
-                                    </InputGroup.Text>
-                                    <Form.Control
-                                        type="tel"
-                                        style={{ height: '30px!important' }}
-                                        {...register('cellPhone', {
-                                            required: 'Cell Phone is required',
-                                            pattern: {
-                                                value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                message: 'Contact must be in the format (XXX)XXX-XXXX',
-                                            },
-                                            maxLength: {
-                                                value: 13,
-                                                message: 'Contact must not exceed 13 digits',
-                                            },
-                                            minLength: {
-                                                value: 13,
-                                                message: 'Contact must not be less than 13 digits',
-                                            },
-                                        })}
-                                        onChange={(e) => {
-                                            let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
-                                            if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
-                                            const formattedValue = rawValue.replace(
-                                                /(\d{1,3})(\d{0,3})(\d{0,4})/,
-                                                (match, p1, p2, p3) => {
-                                                    if (p3) return `(${p1})${p2}-${p3}`;
-                                                    if (p2) return `(${p1})${p2}`;
-                                                    return `(${p1}`;
-                                                }
-                                            ); // Format dynamically as (XXX)XXX-XXXX
-                                            e.target.value = formattedValue; // Update input value
-                                            clearErrors('cellPhone'); // Clear validation errors
-                                        }}
-                                        placeholder="(XXX)XXX-XXXX"
-                                        maxLength={14}
-                                        onKeyPress={(event) => {
-                                            // Only allow numeric characters (0-9)
-                                            if (!/[0-9]/.test(event.key)) {
-                                                event.preventDefault();
-                                            }
-                                        }}
-                                    />
-                                </InputGroup>
-                                {errors.cellPhone && (
-                                    <span className="text-danger err-font">{errors.cellPhone.message}</span>
-                                )}
-                            </Form.Group>
+                    {showCellPhone &&
+                        renderPhoneField(
+                            'Cell Phone',
+                            'cellPhone',
+                            <span
+                                className=" uil-minus-circle minusicon text-danger cursor-pointer"
+                                onClick={() => setShowCellPhone(false)}
+                            />
+                        )}
 
-                            <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
-                                <img src={us} alt="country code flag" width={20} />
-                            </div>
-                        </Form.Group>
-                    </div>
+                    {showOfficePhone &&
+                        renderPhoneField(
+                            'Office Phone',
+                            'officePhone',
+                            <span
+                                className=" uil-minus-circle minusicon text-danger cursor-pointer"
+                                onClick={() => setShowOfficePhone(false)}
+                            />
+                        )}
 
                     <div className="col-md-3 col-12 mb-2">
                         <Form.Group>
-                            <Form.Label htmlFor="email" className="mb-0">
-                                Email ID <span className="text-danger">*</span>
+                            <Form.Label className="mb-0 d-flex justify-content-start gap-1 align-items-center">
+                                Email ID
+                                {!showAltEmail && (
+                                    <span
+                                        className=" uil-plus-circle plusicon cursor-pointer"
+                                        onClick={() => setShowAltEmail(true)}
+                                    />
+                                )}
                             </Form.Label>
                             <Form.Control
                                 type="email"
                                 placeholder="Email ID"
                                 {...register('email', {
-                                    required: 'Email ID is required',
                                     pattern: {
                                         value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
                                         message: 'Invalid email address',
                                     },
                                 })}
                             />
-                            {errors.email && <span className="text-danger err-font">{errors.email.message}</span>}
                         </Form.Group>
                     </div>
+                    {showAltEmail && (
+                        <div className="col-md-3 col-12 mb-2">
+                            <Form.Group>
+                                <Form.Label className="mb-0 d-flex justify-content-between align-items-center">
+                                    Alternate Email
+                                    <span
+                                        onClick={() => setShowAltEmail(false)}
+                                        className=" uil-minus-circle minusicon text-danger cursor-pointer"></span>
+                                </Form.Label>
+                                <Form.Control
+                                    type="email"
+                                    placeholder="Alternate Email ID"
+                                    {...register('alternateEmail', {
+                                        pattern: {
+                                            value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+                                            message: 'Invalid email address',
+                                        },
+                                    })}
+                                />
+                            </Form.Group>
+                        </div>
+                    )}
+
                     <Col md={3} className="mb-2">
                         <Form.Group>
                             <Form.Label className="mb-0">Date of Birth</Form.Label>
@@ -534,64 +600,8 @@ const AddPatientDetails = ({ setSubmissionType, setVisibleReffering, setVisibleR
                             )}
                         </Form.Group>
                     </div>
-                    <div className="col-md-3 col-12 mb-2">
-                        <Form.Group className="mb-1 position-relative">
-                            <Form.Label className="mb-0">Home Phone</Form.Label>
-                            <Form.Group>
-                                <InputGroup>
-                                    <InputGroup.Text
-                                        className="ps-3 pe-1 fw-bold text-black"
-                                        style={{ height: '30px' }}>
-                                        &nbsp;&nbsp;+1
-                                    </InputGroup.Text>
-                                    <Form.Control
-                                        type="tel"
-                                        style={{ height: '30px!important' }}
-                                        {...register('homePhone', {
-                                            pattern: {
-                                                value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                message: 'Contact must be in the format (XXX)XXX-XXXX',
-                                            },
-                                            maxLength: {
-                                                value: 13,
-                                                message: 'Contact must not exceed 13 digits',
-                                            },
-                                            minLength: {
-                                                value: 13,
-                                                message: 'Contact must not be less than 13 digits',
-                                            },
-                                        })}
-                                        onChange={(e) => {
-                                            let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
-                                            if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
-                                            const formattedValue = rawValue.replace(
-                                                /(\d{1,3})(\d{0,3})(\d{0,4})/,
-                                                (match, p1, p2, p3) => {
-                                                    if (p3) return `(${p1})${p2}-${p3}`;
-                                                    if (p2) return `(${p1})${p2}`;
-                                                    return `(${p1}`;
-                                                }
-                                            ); // Format dynamically as (XXX)XXX-XXXX
-                                            e.target.value = formattedValue; // Update input value
-                                            clearErrors('homePhone'); // Clear validation errors
-                                        }}
-                                        placeholder="(XXX)XXX-XXXX"
-                                        maxLength={14}
-                                        onKeyPress={(event) => {
-                                            // Only allow numeric characters (0-9)
-                                            if (!/[0-9]/.test(event.key)) {
-                                                event.preventDefault();
-                                            }
-                                        }}
-                                    />
-                                </InputGroup>
-                            </Form.Group>
-                            <div className="position-absolute" style={{ top: '48%', left: '1%' }}>
-                                <img src={us} alt="country code flag" width={20} />
-                            </div>
-                        </Form.Group>
-                    </div>
-                    <div className="col-md-3 col-12">
+
+                    {/* <div className="col-md-3 col-12">
                         <Form.Group>
                             <Form.Label className="mb-0">Alternate Email</Form.Label>
                             <Form.Control
@@ -605,65 +615,8 @@ const AddPatientDetails = ({ setSubmissionType, setVisibleReffering, setVisibleR
                                 })}
                             />
                         </Form.Group>
-                    </div>
-                    <div className="col-md-3 col-12">
-                        <Form.Group className="mb-1 position-relative">
-                            <Form.Label className="mb-0">Office Phone</Form.Label>
-                            <Form.Group>
-                                <InputGroup>
-                                    <InputGroup.Text
-                                        className="ps-3 pe-1 fw-bold text-black"
-                                        style={{ height: '30px' }}>
-                                        &nbsp;&nbsp;+1
-                                    </InputGroup.Text>
-                                    <Form.Control
-                                        type="tel"
-                                        style={{ height: '30px!important' }}
-                                        {...register('officePhone', {
-                                            pattern: {
-                                                value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                message: 'Contact must be in the format (XXX)XXX-XXXX',
-                                            },
-                                            maxLength: {
-                                                value: 13,
-                                                message: 'Contact must not exceed 13 digits',
-                                            },
-                                            minLength: {
-                                                value: 13,
-                                                message: 'Contact must not be less than 13 digits',
-                                            },
-                                        })}
-                                        onChange={(e) => {
-                                            let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
-                                            if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
-                                            const formattedValue = rawValue.replace(
-                                                /(\d{1,3})(\d{0,3})(\d{0,4})/,
-                                                (match, p1, p2, p3) => {
-                                                    if (p3) return `(${p1})${p2}-${p3}`;
-                                                    if (p2) return `(${p1})${p2}`;
-                                                    return `(${p1}`;
-                                                }
-                                            ); // Format dynamically as (XXX)XXX-XXXX
-                                            e.target.value = formattedValue; // Update input value
-                                            clearErrors('officePhone'); // Clear validation errors
-                                        }}
-                                        placeholder="(XXX)XXX-XXXX"
-                                        maxLength={14}
-                                        onKeyPress={(event) => {
-                                            // Only allow numeric characters (0-9)
-                                            if (!/[0-9]/.test(event.key)) {
-                                                event.preventDefault();
-                                            }
-                                        }}
-                                    />
-                                </InputGroup>
-                            </Form.Group>
+                    </div> */}
 
-                            <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
-                                <img src={us} alt="country code flag" width={20} />
-                            </div>
-                        </Form.Group>
-                    </div>
                     <div className="col-md-3 col-12">
                         <Form.Group>
                             <Form.Label className="mb-0">Preferred Communication</Form.Label>
@@ -715,7 +668,7 @@ const AddPatientDetails = ({ setSubmissionType, setVisibleReffering, setVisibleR
                     <div className="col-md-3 col-12">
                         <Form.Group>
                             <Form.Label className="mb-0">Referring Doctor</Form.Label>
-                            <Form.Select onChange={(e) =>handleReferringChange(e.target.value)}>
+                            <Form.Select onChange={(e) => handleReferringChange(e.target.value)}>
                                 <option value="true">Yes</option>
                                 <option value="false">No</option>
                             </Form.Select>
@@ -829,7 +782,7 @@ const AddPatientDetails = ({ setSubmissionType, setVisibleReffering, setVisibleR
                                 setSubmissionType('saveAndReset');
                             }
                         }}
-                        disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading}
+                        disabled={store?.createPatientsReducer?.loading}
                         className="custom-buttons "
                         type="submit">
                         Save & Add Another
@@ -840,21 +793,16 @@ const AddPatientDetails = ({ setSubmissionType, setVisibleReffering, setVisibleR
                                 setSubmissionType('saveAndNext');
                             }
                         }}
-                        disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading}
+                        disabled={store?.createPatientsReducer?.loading}
                         className="custom-buttons "
+                        style={{ width: '200px' }}
                         type="submit">
-                        Save & Continue Editing
+                        {store?.createPatientsReducer?.loading ? (
+                            <Spinner color="white" className="spinner-border-sm" />
+                        ) : (
+                            'Save & Continue Editing'
+                        )}
                     </Button>
-                    {/* <Button
-                                        onClick={() => setSubmissionType('saveOnly')}
-                                        disabled={
-                                            store?.createPatientsReducer?.loading ||
-                                            store?.updatePatientsReducer?.loading
-                                        }
-                                        className="custom-buttons "
-                                        type="submit">
-                                        Save
-                                    </Button> */}
                 </div>
             </Form>
         </div>

@@ -113,19 +113,19 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         if (doctorDetails) {
             if (doctorDetails) {
                 // Set qualifications data
-                const updatedIdentifiers = doctorDetails?.identifier?.map((item, index) => ({
-                    expiry: item?.expirationDate ? new Date(item?.expirationDate).toISOString().split('T')[0] : '',
-                    file: item?.documents?.[0],
-                    issuingAuthority: item?.issuingAuthority,
-                    number: item?.value,
-                    system: '',
-                    type: {
-                        code: item?.sliceName,
-                        label: item?.identifierType,
-                        value: item?.system,
-                    }
-                }));
-                setIdentifiers(updatedIdentifiers);
+                // const updatedIdentifiers = doctorDetails?.identifier?.map((item, index) => ({
+                //     expiry: item?.expirationDate ? new Date(item?.expirationDate).toISOString().split('T')[0] : '',
+                //     file: item?.documents?.[0],
+                //     issuingAuthority: item?.issuingAuthority,
+                //     number: item?.value,
+                //     system: '',
+                //     type: {
+                //         code: item?.sliceName,
+                //         label: item?.identifierType,
+                //         value: item?.system,
+                //     }
+                // }));
+                // setIdentifiers(updatedIdentifiers);
                 setValue('specialist', doctorDetails?.specialties?.[0])
             }
         }

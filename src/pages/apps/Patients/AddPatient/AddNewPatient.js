@@ -101,6 +101,8 @@ const AddNewPatient = () => {
                         {activeTab === 'Patient Details' && (
                             <AddPatientDetails
                                 setVisibleReffering={setVisibleReffering}
+                                visibleResponsible={visibleResponsible}
+                                visibleReferring={visibleReffering}
                                 setVisibleResponsible={setVisibleResponsible}
                             />
                         )}

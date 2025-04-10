@@ -82,11 +82,15 @@ select {
     background-color: #e8f0fe !important;
     border: 0px !important;
 }
+.plusicon {
+    color: #6169d0;
+}
 
 .form-control:focus,
 .form-select:focus {
     color: black !important;
 }
+
 
 .form-control[data-has-value='true'],
 .form-select[data-has-value='true'] {

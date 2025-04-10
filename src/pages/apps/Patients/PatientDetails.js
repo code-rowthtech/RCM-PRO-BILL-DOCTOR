@@ -1,20 +1,27 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap'
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap';
 import { useSearchParams } from 'react-router-dom';
 import { getPatientsByIdAction, resetUpdateAction, updatePatientsAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { FiUploadCloud } from 'react-icons/fi';
-import { handleUpload } from "../../../helpers/HandleUpload";
+import { handleUpload } from '../../../helpers/HandleUpload';
 import Spinner from '../../../constants/Spinner';
-import us from '../../../assets/images/flags/us.jpg'
-
+import us from '../../../assets/images/flags/us.jpg';
 
 const PatientDetails = () => {
-
     const dispatch = useDispatch();
-    const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors, watch, getValues } = useForm();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        setValue,
+        reset,
+        clearErrors,
+        watch,
+        getValues,
+    } = useForm();
 
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
@@ -27,18 +34,18 @@ const PatientDetails = () => {
     const [submissionType, setSubmissionType] = useState(null);
     const [deceasedDateTime, setDeceasedDateTime] = useState('');
     const [profileUploading, setProfileUploading] = useState(false);
-    const doctorName = JSON.parse(sessionStorage.getItem('hyper_user'))?.name?.text
+    const doctorName = JSON.parse(sessionStorage.getItem('hyper_user'))?.name?.text;
     // const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.userId
 
     const patientsDataById = store?.getPatientsByIdReducer?.data?.data;
-    console.log(patientsDataById, 'data0987654321')
+    console.log(patientsDataById, 'data0987654321');
 
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
 
     useEffect(() => {
         const data = {
             id: id,
-        }
+        };
         if (id) {
             dispatch(getPatientsByIdAction(data));
         }
@@ -47,19 +54,18 @@ const PatientDetails = () => {
     useEffect(() => {
         const data = {
             id: id,
-        }
+        };
         if (updateSuccess === 200) {
             dispatch(getPatientsByIdAction({ key: encryptMessage(data) }));
-            dispatch(resetUpdateAction())
+            dispatch(resetUpdateAction());
         }
     }, [updateSuccess]);
 
     useEffect(() => {
-        setValue("primaryProvider", doctorName);
+        setValue('primaryProvider', doctorName);
     }, [doctorName, setValue]);
 
     useEffect(() => {
-
         if (patientsDataById) {
             setValue('patientStatus', patientsDataById?.patientStatus);
             setValue('firstName', patientsDataById?.name?.[0]?.given?.[0]);
@@ -70,28 +76,43 @@ const PatientDetails = () => {
             setValue('title', patientsDataById?.title);
             setValue('birthName', patientsDataById?.birthName);
             setValue('gender', patientsDataById?.gender);
-            setValue('dateOfBirth', patientsDataById?.birthDate ? new Date(patientsDataById?.birthDate)?.toISOString().split('T')[0] : '')
+            setValue(
+                'dateOfBirth',
+                patientsDataById?.birthDate ? new Date(patientsDataById?.birthDate)?.toISOString().split('T')[0] : ''
+            );
 
             setValue('suffix', patientsDataById?.name?.[0]?.suffix?.[0]);
-            setValue('title', patientsDataById?.name[0]?.prefix[0] || '')
-            setValue('homePhone', patientsDataById?.telecom?.[0]?.value
-                ? patientsDataById?.telecom?.[0]?.value.replace(/\D/g, '')
-                    .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                        p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
-                    )
-                : '');
-            setValue('cellPhone', patientsDataById?.telecom?.[1]?.value
-                ? patientsDataById?.telecom?.[1]?.value.replace(/\D/g, '')
-                    .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                        p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
-                    )
-                : '');
-            setValue('officePhone', patientsDataById?.telecom?.[2]?.value
-                ? patientsDataById?.telecom?.[2]?.value.replace(/\D/g, '')
-                    .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                        p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
-                    )
-                : '');
+            setValue('title', patientsDataById?.name[0]?.prefix[0] || '');
+            setValue(
+                'homePhone',
+                patientsDataById?.telecom?.[0]?.value
+                    ? patientsDataById?.telecom?.[0]?.value
+                          .replace(/\D/g, '')
+                          .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                              p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
+                          )
+                    : ''
+            );
+            setValue(
+                'cellPhone',
+                patientsDataById?.telecom?.[1]?.value
+                    ? patientsDataById?.telecom?.[1]?.value
+                          .replace(/\D/g, '')
+                          .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                              p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
+                          )
+                    : ''
+            );
+            setValue(
+                'officePhone',
+                patientsDataById?.telecom?.[2]?.value
+                    ? patientsDataById?.telecom?.[2]?.value
+                          .replace(/\D/g, '')
+                          .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                              p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
+                          )
+                    : ''
+            );
             setValue('email', patientsDataById?.telecom?.[3]?.value);
             setValue('alternateEmail', patientsDataById?.telecom?.[4]?.value);
             setValue('preferredCommunication', patientsDataById?.preferredCommunication);
@@ -109,9 +130,7 @@ const PatientDetails = () => {
             setLogo(patientsDataById?.photo?.[0]?.url);
             setLogoName(patientsDataById?.photo?.[0]?.title);
         }
-
-
-    }, [patientsDataById])
+    }, [patientsDataById]);
 
     const onSubmit = (data) => {
         const payload = {
@@ -128,6 +147,7 @@ const PatientDetails = () => {
             preferredCommunication: data?.preferredCommunication || '',
             reminderLanguage: data?.reminderLanguage || '',
             patientStatus: data?.patientStatus || '',
+
             // doctorId: doctorId || '', // Ensure _id of selected doctor is sent
         };
 
@@ -144,7 +164,6 @@ const PatientDetails = () => {
             },
         ];
         if (data?.previousBirthName) {
-
             payload.name.push({
                 use: 'old',
                 text: data.previousBirthName,
@@ -213,54 +232,16 @@ const PatientDetails = () => {
             }
         }
 
-        dispatch(updatePatientsAction({ key: encryptMessage(payload) }))
-        console.log(payload, 'main')
+        dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
+        console.log(payload, 'main');
     };
-    // const onSubmit = (data) => {
-    //     const payload = {
-    //         id: id,
-    //         ...(selectedDoctor ? { primaryProvider: selectedDoctor?.value } : {}),
-    //         ...(data?.patientStatus ? { status: data?.patientStatus } : {}),
-    //         ...(data?.title ? { title: data?.title } : {}),
-    //         ...(data?.firstName ? { firstName: data?.firstName } : {}),
-    //         ...(data?.middleName ? { middleName: data?.middleName } : {}),
-    //         ...(data?.lastName ? { lastName: data?.lastName } : {}),
-    //         ...(data?.birthName ? { birthName: data?.birthName } : {}),
-    //         ...(data?.dateOfBirth ? { dateOfBirth: data?.dateOfBirth } : {}),
-    //         ...(data?.suffix ? { suffix: data?.suffix } : {}),
-    //         ...(logo?.url === null
-    //             ? {}
-    //             : {
-    //                 patientChartPhoto: {
-    //                     url: logo?.url?.split('?')[0] || patientsDataById?.patientChartPhoto?.url,
-    //                     fileName: logoName
-    //                 }
-    //             }),
-    //         ...(data?.homePhone ? { homePhone: data?.homePhone?.replace(/\D/g, '') } : {}),
-    //         ...(data?.cellPhone ? { cellPhone: data?.cellPhone?.replace(/\D/g, '') } : {}),
-    //         ...(data?.officePhone ? { officePhone: data?.officePhone?.replace(/\D/g, '') } : {}),
-    //         ...(data?.email ? { email: data?.email } : {}),
-    //         ...(data?.alternateEmail ? { alternativeEmail: data?.alternateEmail } : {}),
-    //         ...(data?.preferredCommunication ? { preferredCommunication: data?.preferredCommunication } : {}),
-    //         ...(data?.reminderLanguage ? { reminderLanguage: data?.reminderLanguage } : {}),
-    //         ...(data?.medicationHistoryConsent ? { medicationHistoryConsent: data?.medicationHistoryConsent === 'true' ? true : false } : {}),
-    //         ...(data?.paymentProfile ? { paymentProfile: data?.paymentProfile } : {}),
-    //         ...(data?.patientCopayAmount ? { patientCopayAmount: data?.patientCopayAmount } : {}),
-    //         ...(data?.followupDate ? { followupDate: data?.followupDate } : {}),
-    //         ...(data?.followupReason ? { followupReason: data?.followupReason } : {}),
-
-    //     }
-    //     dispatch(updatePatientsAction({ key: encryptMessage(payload) }))
-    //     console.log(payload, 'payload')
-    // }
-
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];
         try {
             const url = await handleUpload(selectedFile, setProfileUploading);
             setLogo(url);
             setLogoName(selectedFile?.name);
-            clearErrors('profileImage')
+            clearErrors('profileImage');
         } catch (error) {
             // console.error('Error during file upload:', error);
         }
@@ -298,7 +279,6 @@ const PatientDetails = () => {
                 <div className="d-flex justify-content-center align-items-center" style={{ height: '50vh' }}>
                     <Spinner />
                 </div>
-
             ) : (
                 <Form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
                     <div className="row mt-md-3">
@@ -322,7 +302,7 @@ const PatientDetails = () => {
                                             message: 'Only alphabets are allowed, minimum 3 characters',
                                         },
                                     })}
-                                    onInput={(e) => e.target.value = e.target.value.replace(/[^A-Za-z]/g, '')} // Prevent spaces/numbers while typing
+                                    onInput={(e) => (e.target.value = e.target.value.replace(/[^A-Za-z]/g, ''))} // Prevent spaces/numbers while typing
                                 />
                                 {errors.firstName && (
                                     <span className="text-danger err-font">{errors.firstName.message}</span>
@@ -340,9 +320,7 @@ const PatientDetails = () => {
                                     placeholder="Middle Name"
                                     {...register('middleName')}
                                 />
-                                {errors.middleName && (
-                                    <span className="text-danger">{errors.middleName.message}</span>
-                                )}
+                                {errors.middleName && <span className="text-danger">{errors.middleName.message}</span>}
                             </Form.Group>
                         </div>
                         <div className="col-md-3 col-12">
@@ -365,14 +343,69 @@ const PatientDetails = () => {
                                             message: 'Only alphabets are allowed, minimum 3 characters',
                                         },
                                     })}
-                                    onInput={(e) => e.target.value = e.target.value.replace(/[^A-Za-z]/g, '')} // Prevent spaces/numbers while typing
+                                    onInput={(e) => (e.target.value = e.target.value.replace(/[^A-Za-z]/g, ''))} // Prevent spaces/numbers while typing
                                 />
                                 {errors.lastName && (
                                     <span className="text-danger err-font">{errors.lastName.message}</span>
                                 )}
                             </Form.Group>
                         </div>
-
+                        <div className="col-md-3 col-12 mb-2">
+                            <Form.Group className="mb-1 position-relative">
+                                <Form.Label className="mb-0">Home Phone</Form.Label>
+                                <Form.Group>
+                                    <InputGroup>
+                                        <InputGroup.Text className="p-0 px-1 d-flex align-items-center justify-content-center fs-6 gap-1 fw-bold text-black">
+                                            <img src={us} alt="country code flag" width={16} />
+                                            +1
+                                        </InputGroup.Text>
+                                        <Form.Control
+                                            type="tel"
+                                            style={{ height: '30px!important' }}
+                                            {...register('homePhone', {
+                                                pattern: {
+                                                    value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                    message: 'Contact must be in the format (XXX)XXX-XXXX',
+                                                },
+                                                maxLength: {
+                                                    value: 13,
+                                                    message: 'Contact must not exceed 13 digits',
+                                                },
+                                                minLength: {
+                                                    value: 13,
+                                                    message: 'Contact must not be less than 13 digits',
+                                                },
+                                            })}
+                                            onChange={(e) => {
+                                                let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
+                                                if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
+                                                const formattedValue = rawValue.replace(
+                                                    /(\d{1,3})(\d{0,3})(\d{0,4})/,
+                                                    (match, p1, p2, p3) => {
+                                                        if (p3) return `(${p1})${p2}-${p3}`;
+                                                        if (p2) return `(${p1})${p2}`;
+                                                        return `(${p1}`;
+                                                    }
+                                                ); // Format dynamically as (XXX)XXX-XXXX
+                                                e.target.value = formattedValue; // Update input value
+                                                clearErrors('homePhone'); // Clear validation errors
+                                            }}
+                                            placeholder="(XXX)XXX-XXXX"
+                                            maxLength={14}
+                                            onKeyPress={(event) => {
+                                                // Only allow numeric characters (0-9)
+                                                if (!/[0-9]/.test(event.key)) {
+                                                    event.preventDefault();
+                                                }
+                                            }}
+                                        />
+                                    </InputGroup>
+                                </Form.Group>
+                                {/* <div className="position-absolute" style={{ top: '48%', left: '1%' }}>
+                                    <img src={us} alt="country code flag" width={20} />
+                                </div> */}
+                            </Form.Group>
+                        </div>
                         <div className="col-md-3 col-12">
                             <Form.Group className="mb-1 position-relative">
                                 <Form.Label className="mb-0">
@@ -380,33 +413,27 @@ const PatientDetails = () => {
                                 </Form.Label>
                                 <Form.Group>
                                     <InputGroup>
-                                        <InputGroup.Text
-                                            className="ps-3 pe-1 fw-bold text-black"
-                                            style={{ height: '30px' }}>
-                                            &nbsp;&nbsp;+1
+                                        <InputGroup.Text className="p-0 px-1 d-flex align-items-center justify-content-center fs-6 gap-1 fw-bold text-black">
+                                            <img src={us} alt="country code flag" width={16} />
+                                            +1
                                         </InputGroup.Text>
                                         <Form.Control
                                             type="tel"
                                             style={{ height: '30px!important' }}
-                                            {...register(
-                                                'cellPhone',
-                                                {
-                                                    pattern: {
-                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                        message:
-                                                            'Contact must be in the format (XXX)XXX-XXXX',
-                                                    },
-                                                    maxLength: {
-                                                        value: 13,
-                                                        message: 'Contact must not exceed 13 digits',
-                                                    },
-                                                    minLength: {
-                                                        value: 13,
-                                                        message:
-                                                            'Contact must not be less than 13 digits',
-                                                    },
-                                                }
-                                            )}
+                                            {...register('cellPhone', {
+                                                pattern: {
+                                                    value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                    message: 'Contact must be in the format (XXX)XXX-XXXX',
+                                                },
+                                                maxLength: {
+                                                    value: 13,
+                                                    message: 'Contact must not exceed 13 digits',
+                                                },
+                                                minLength: {
+                                                    value: 13,
+                                                    message: 'Contact must not be less than 13 digits',
+                                                },
+                                            })}
                                             onChange={(e) => {
                                                 let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
                                                 if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
@@ -432,13 +459,69 @@ const PatientDetails = () => {
                                         />
                                     </InputGroup>
                                 </Form.Group>
-
+                                {/* 
                                 <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
                                     <img src={us} alt="country code flag" width={20} />
-                                </div>
+                                </div> */}
                             </Form.Group>
                         </div>
+                        <div className="col-md-3 col-12">
+                            <Form.Group className="mb-1 position-relative">
+                                <Form.Label className="mb-0">Office Phone</Form.Label>
+                                <Form.Group>
+                                    <InputGroup>
+                                        <InputGroup.Text className="p-0 px-1 d-flex align-items-center justify-content-center fs-6 gap-1 fw-bold text-black">
+                                            <img src={us} alt="country code flag" width={16} />
+                                            +1
+                                        </InputGroup.Text>
+                                        <Form.Control
+                                            type="tel"
+                                            style={{ height: '30px!important' }}
+                                            {...register('officePhone', {
+                                                pattern: {
+                                                    value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                    message: 'Contact must be in the format (XXX)XXX-XXXX',
+                                                },
+                                                maxLength: {
+                                                    value: 13,
+                                                    message: 'Contact must not exceed 13 digits',
+                                                },
+                                                minLength: {
+                                                    value: 13,
+                                                    message: 'Contact must not be less than 13 digits',
+                                                },
+                                            })}
+                                            onChange={(e) => {
+                                                let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
+                                                if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
+                                                const formattedValue = rawValue.replace(
+                                                    /(\d{1,3})(\d{0,3})(\d{0,4})/,
+                                                    (match, p1, p2, p3) => {
+                                                        if (p3) return `(${p1})${p2}-${p3}`;
+                                                        if (p2) return `(${p1})${p2}`;
+                                                        return `(${p1}`;
+                                                    }
+                                                ); // Format dynamically as (XXX)XXX-XXXX
+                                                e.target.value = formattedValue; // Update input value
+                                                clearErrors('officePhone'); // Clear validation errors
+                                            }}
+                                            placeholder="(XXX)XXX-XXXX"
+                                            maxLength={14}
+                                            onKeyPress={(event) => {
+                                                // Only allow numeric characters (0-9)
+                                                if (!/[0-9]/.test(event.key)) {
+                                                    event.preventDefault();
+                                                }
+                                            }}
+                                        />
+                                    </InputGroup>
+                                </Form.Group>
 
+                                {/* <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
+                                    <img src={us} alt="country code flag" width={20} />
+                                </div> */}
+                            </Form.Group>
+                        </div>
                         <div className="col-md-3 col-12 mb-2">
                             <Form.Group>
                                 <Form.Label htmlFor="email" className="mb-0">
@@ -473,11 +556,7 @@ const PatientDetails = () => {
                         <Col md={3}>
                             <Form.Group>
                                 <Form.Label className="mb-0">Approx age (if DOB is unknown)</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Approx. age"
-                                    {...register('approxAge')}
-                                />
+                                <Form.Control type="text" placeholder="Approx. age" {...register('approxAge')} />
                             </Form.Group>
                         </Col>
                         <div className="col-md-3 col-12">
@@ -500,29 +579,23 @@ const PatientDetails = () => {
                                     <option value="other">Other</option>
                                     <option value="unknown">Unknown</option>
                                 </Form.Select>
-                                {errors.gender && (
-                                    <span className="text-danger">{errors.gender.message}</span>
-                                )}
+                                {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
                             </Form.Group>
                         </div>
                     </div>
                     <hr className="mt-0" />
 
                     <div className="row">
-                     
                         <div className="col-md-3 col-12">
                             <div className="mb-2 d-flex flex-column position-relative">
                                 <Form.Label className="mb-0">Patient Photo</Form.Label>
                                 <div
                                     onClick={() => logoFileInputRef.current.click()}
                                     style={{ height: '30px' }}
-                                    className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'
-                                        }`}>
-                                    {logoName
-                                        ? logoName
-                                        : profileUploading
-                                            ? 'Uploading...'
-                                            : 'Upload Photo'}
+                                    className={`custom-file-upload justify-content-between cursor-pointer ${
+                                        logoName || profileUploading ? '' : 'custom-form-fields'
+                                    }`}>
+                                    {logoName ? logoName : profileUploading ? 'Uploading...' : 'Upload Photo'}
                                     <p className="mb-0">
                                         <FiUploadCloud />
                                     </p>
@@ -544,7 +617,7 @@ const PatientDetails = () => {
                         <div className="col-md-3 col-12">
                             <Form.Group>
                                 <Form.Label htmlFor="patientstatus" className="mb-0">
-                                     Status
+                                    Status
                                 </Form.Label>
                                 <Form.Select
                                     as="select" // Use 'select' to make it a dropdown
@@ -598,69 +671,7 @@ const PatientDetails = () => {
                                 </Form.Select>
                             </Form.Group>
                         </div>
-                        <div className="col-md-3 col-12 mb-2">
-                            <Form.Group className="mb-1 position-relative">
-                                <Form.Label className="mb-0">Home Phone</Form.Label>
-                                <Form.Group>
-                                    <InputGroup>
-                                        <InputGroup.Text
-                                            className="ps-3 pe-1 fw-bold text-black"
-                                            style={{ height: '30px' }}>
-                                            &nbsp;&nbsp;+1
-                                        </InputGroup.Text>
-                                        <Form.Control
-                                            type="tel"
-                                            style={{ height: '30px!important' }}
-                                            {...register(
-                                                'homePhone',
-                                                {
-                                                    pattern: {
-                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                        message:
-                                                            'Contact must be in the format (XXX)XXX-XXXX',
-                                                    },
-                                                    maxLength: {
-                                                        value: 13,
-                                                        message: 'Contact must not exceed 13 digits',
-                                                    },
-                                                    minLength: {
-                                                        value: 13,
-                                                        message:
-                                                            'Contact must not be less than 13 digits',
-                                                    },
-                                                }
 
-                                            )}
-                                            onChange={(e) => {
-                                                let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
-                                                if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
-                                                const formattedValue = rawValue.replace(
-                                                    /(\d{1,3})(\d{0,3})(\d{0,4})/,
-                                                    (match, p1, p2, p3) => {
-                                                        if (p3) return `(${p1})${p2}-${p3}`;
-                                                        if (p2) return `(${p1})${p2}`;
-                                                        return `(${p1}`;
-                                                    }
-                                                ); // Format dynamically as (XXX)XXX-XXXX
-                                                e.target.value = formattedValue; // Update input value
-                                                clearErrors('homePhone'); // Clear validation errors
-                                            }}
-                                            placeholder="(XXX)XXX-XXXX"
-                                            maxLength={14}
-                                            onKeyPress={(event) => {
-                                                // Only allow numeric characters (0-9)
-                                                if (!/[0-9]/.test(event.key)) {
-                                                    event.preventDefault();
-                                                }
-                                            }}
-                                        />
-                                    </InputGroup>
-                                </Form.Group>
-                                <div className="position-absolute" style={{ top: '48%', left: '1%' }}>
-                                    <img src={us} alt="country code flag" width={20} />
-                                </div>
-                            </Form.Group>
-                        </div>
                         {/* <div className="col-md-3 col-12 mb-2">
                             <Form.Group>
                                 <Form.Label className="mb-0">Suffix </Form.Label>
@@ -670,7 +681,7 @@ const PatientDetails = () => {
                                 )}
                             </Form.Group>
                         </div> */}
-                    
+
                         <div className="col-md-3 col-12">
                             <Form.Group>
                                 <Form.Label className="mb-0">Alternate Email</Form.Label>
@@ -686,71 +697,7 @@ const PatientDetails = () => {
                                 />
                             </Form.Group>
                         </div>
-                     
-                     
-                        <div className="col-md-3 col-12">
-                            <Form.Group className="mb-1 position-relative">
-                                <Form.Label className="mb-0">Office Phone</Form.Label>
-                                <Form.Group>
-                                    <InputGroup>
-                                        <InputGroup.Text
-                                            className="ps-3 pe-1 fw-bold text-black"
-                                            style={{ height: '30px' }}>
-                                            &nbsp;&nbsp;+1
-                                        </InputGroup.Text>
-                                        <Form.Control
-                                            type="tel"
-                                            style={{ height: '30px!important' }}
-                                            {...register(
-                                                'officePhone',
-                                                {
-                                                    pattern: {
-                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                        message:
-                                                            'Contact must be in the format (XXX)XXX-XXXX',
-                                                    },
-                                                    maxLength: {
-                                                        value: 13,
-                                                        message: 'Contact must not exceed 13 digits',
-                                                    },
-                                                    minLength: {
-                                                        value: 13,
-                                                        message:
-                                                            'Contact must not be less than 13 digits',
-                                                    },
-                                                }
-                                            )}
-                                            onChange={(e) => {
-                                                let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
-                                                if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
-                                                const formattedValue = rawValue.replace(
-                                                    /(\d{1,3})(\d{0,3})(\d{0,4})/,
-                                                    (match, p1, p2, p3) => {
-                                                        if (p3) return `(${p1})${p2}-${p3}`;
-                                                        if (p2) return `(${p1})${p2}`;
-                                                        return `(${p1}`;
-                                                    }
-                                                ); // Format dynamically as (XXX)XXX-XXXX
-                                                e.target.value = formattedValue; // Update input value
-                                                clearErrors('officePhone'); // Clear validation errors
-                                            }}
-                                            placeholder="(XXX)XXX-XXXX"
-                                            maxLength={14}
-                                            onKeyPress={(event) => {
-                                                // Only allow numeric characters (0-9)
-                                                if (!/[0-9]/.test(event.key)) {
-                                                    event.preventDefault();
-                                                }
-                                            }}
-                                        />
-                                    </InputGroup>
-                                </Form.Group>
 
-                                <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
-                                    <img src={us} alt="country code flag" width={20} />
-                                </div>
-                            </Form.Group>
-                        </div>
                         <div className="col-md-3 col-12">
                             <Form.Group>
                                 <Form.Label className="mb-0">Previous Birth Name </Form.Label>
@@ -784,9 +731,7 @@ const PatientDetails = () => {
                                     <option value="Other">Other</option>
                                 </Form.Select>
                                 {errors.preferredCommunication && (
-                                    <span className="text-danger">
-                                        {errors.preferredCommunication.message}
-                                    </span>
+                                    <span className="text-danger">{errors.preferredCommunication.message}</span>
                                 )}
                             </Form.Group>
                         </div>
@@ -816,7 +761,7 @@ const PatientDetails = () => {
                                     type="text"
                                     placeholder={doctorName}
                                     value={doctorName}
-                                    {...register('selectedDoctor',)}
+                                    {...register('selectedDoctor')}
                                     data-has-value={!!watch('selectedDoctor')}
                                 />
                             </Form.Group>
@@ -849,9 +794,7 @@ const PatientDetails = () => {
                                     </option>
                                     <option value="Cash">Cash</option>
                                     <option value="Insurance">Insurance</option>
-                                    <option value="Insurance Out of Network">
-                                        Insurance Out of Network
-                                    </option>
+                                    <option value="Insurance Out of Network">Insurance Out of Network</option>
                                     <option value="Auto Accident">Auto Accident</option>
                                     <option value="Worker's Comp">Worker's Comp</option>
                                     <option value="Other">Other</option>
@@ -906,25 +849,25 @@ const PatientDetails = () => {
 
                     {/* Buttons */}
                     <div className="d-flex gap-2 justify-content-end mb-2 mt-md-2">
-
                         <Button
                             onClick={() => {
                                 setSubmissionType('saveAndNext');
                             }}
-                            // disabled={
-                            //     store?.createPatientsReducer?.loading ||
-                            //     store?.updatePatientsReducer?.loading
-                            // }
+                            disabled={store?.updatePatientsReducer?.loading}
                             className="custom-buttons "
+                            style={{ width: '70px' }}
                             type="submit">
-                            Update
+                            {store?.updatePatientsReducer?.loading ? (
+                                <Spinner color="white" className="spinner-border-sm"/>
+                            ) : (
+                                '  Update'
+                            )}
                         </Button>
-
                     </div>
                 </Form>
             )}
         </div>
-    )
-}
+    );
+};
 
-export default PatientDetails
+export default PatientDetails;

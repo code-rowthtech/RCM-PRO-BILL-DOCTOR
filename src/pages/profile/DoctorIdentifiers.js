@@ -140,8 +140,9 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
     };
     useEffect(() => {
         if (doctorDetails) {
-            const identifiersWithoutState = doctorDetails?.identifier?.filter(item => !item?.licenseState) || [];
-            const identifiersWithState = doctorDetails?.identifier?.filter(item => item?.licenseState) || [];
+            const identifiersWithState = doctorDetails?.identifier?.filter(item => item?.hasOwnProperty('licenseState')) || [];
+            const identifiersWithoutState = doctorDetails?.identifier?.filter(item => !item?.hasOwnProperty('licenseState')) || [];
+ 
             // Set qualifications data
             const updatedIdentifiers = identifiersWithoutState?.map((item, index) => ({
                 expiry: item?.expiry ? new Date(item?.expiry).toISOString().split('T')[0] : '',

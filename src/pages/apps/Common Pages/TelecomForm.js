@@ -106,7 +106,7 @@ const TelecomFrom = ({constantContact,setConstantContact}) => {
                         </Col>
                     </Row>
 
-                    {constantContact.map((item, index) => (
+                    {constantContact?.map((item, index) => (
                         <Row key={index} className="mb-2">
                             <Col sm={4}>
                                 <Form.Select
@@ -130,7 +130,8 @@ const TelecomFrom = ({constantContact,setConstantContact}) => {
                                 {item.system === 'phone' ? (
                                     <InputGroup className="position-relative">
                                         {/* Country Code Prefix */}
-                                        <InputGroup.Text className="ps-4 p-0 pe-1 fw-bold text-black">
+                                        <InputGroup.Text className="p-0 px-1 d-flex align-items-center justify-content-center fs-6 gap-1 fw-bold text-black">
+                                            <img src={us} alt="country code flag" width={16} />
                                             +1
                                         </InputGroup.Text>
 
@@ -147,7 +148,7 @@ const TelecomFrom = ({constantContact,setConstantContact}) => {
                                             style={{ paddingLeft: '40px' }}
                                         />
                                         {/* Flag Icon */}
-                                        <div
+                                        {/* <div
                                             className="position-absolute"
                                             style={{
                                                 left: '10px',
@@ -155,7 +156,7 @@ const TelecomFrom = ({constantContact,setConstantContact}) => {
                                                 transform: 'translateY(-50%)',
                                             }}>
                                             <img src={us} alt="flag" width={20} />
-                                        </div>
+                                        </div> */}
                                     </InputGroup>
                                 ) : (
                                     <Form.Control

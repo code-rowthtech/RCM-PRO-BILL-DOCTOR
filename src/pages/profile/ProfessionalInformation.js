@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Col, Form, Row } from 'react-bootstrap';
+import { Button, Col, Form, Row, Spinner } from 'react-bootstrap';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { getDoctorsAction, updateDoctorAction } from '../../redux/doctors/actions';
 import { useDispatch, useSelector } from 'react-redux';
@@ -42,6 +42,9 @@ const ProfessionalInformation = () => {
     const dispatch = useDispatch();
     const [taxonmy, setTaxonomy] = useState(null);
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
+    const updateLoading = store?.UpdateDoctorsReducer?.loading;
+
+    console.log(doctorDetails, 'doctorDetails');
 
     const updateId = store?.getDoctorsReducer?.data?.result?._id;
     console.log(doctorDetails, '123456789');
@@ -205,25 +208,17 @@ const ProfessionalInformation = () => {
         console.log(payload, 'payload');
         dispatch(updateDoctorAction({ key: encryptMessage(payload) }));
     };
-
     useEffect(() => {
         if (doctorDetails) {
-            // Set qualifications data
-            const updatedQualifications = doctorDetails?.qualification?.map((item, index) => ({
-                id: index + 1,
-                degreeName: {
-                    code: item?.code?.code,
-                    display: item?.code?.display,
-                    definition: item?.code?.display,
-                    system: item?.code?.system,
-                },
-                specialties: item?.specialties?.[0] || 'N/A',
-                degreeFile: item?.documents?.[0] || null, // Use the first document if available
-                issuerOrganisation: item?.issuer || '', // Use the issuer reference if available
+            const updatedTaxonomyCodes = doctorDetails?.taxonomy?.map((item, index) => ({
+                type: item?.type || '',
+                displayName: item?.displayName || '',
+                code: { code: item?.code, grouping: item?.Grouping, classification: item?.Classification } || {},
+                state: item?.state || '',
+                licenseNumber: item?.licenseNumber || '',
+                status: item?.status === true ? 'active' : 'inactive' || '',
             }));
-            setTaxonomyCodesList(doctorDetails?.taxonomy || []);
-            setQualifications(updatedQualifications);
-            setValue('specialist', doctorDetails?.specialties?.[0]);
+            setTaxonomyCodesList(updatedTaxonomyCodes);
         }
     }, [doctorDetails, setValue]);
 
@@ -273,119 +268,130 @@ const ProfessionalInformation = () => {
     return (
         <div className="container-fluid px-0">
             <Form onSubmit={handleSubmit(submitData)}>
-                <Row>
-                    <Col sm={12}>
-                        <DoctorIdentifierForm
-                            defaultIdentifiers={defaultIdentifiers}
-                            defaultLicensure={defaultLicensure}
-                            identifiers={identifiers}
-                            setIdentifiers={setIdentifiers}
-                            licensure={licensure}
-                            setLicensure={setLicensure}
-                        />
-                    </Col>
-                </Row>
-                <hr />
-                <Row>
-                    <Col sm={12}>
-                        <h5>
-                            Taxonomy Codes
-                            <span
-                                className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
-                                onClick={addTaxonomyCode}></span>
-                        </h5>
-                    </Col>
-                    {taxonomyCodesList?.map((data, index) => (
-                        <Row key={index} className="mb-2">
-                            <Col sm={3}>
-                                <Form.Label className="mb-0">Code</Form.Label>
-                                <AsyncSelect
-                                    loadOptions={loadTaxonomyOptions}
-                                    defaultOptions={formattedTaxonomyOptions.slice(0, 10)}
-                                    isSearchable
-                                    className="basic-single"
-                                    classNamePrefix="select"
-                                    placeholder="&nbsp; Select"
-                                    value={formattedTaxonomyOptions.find((opt) => opt.value === data.code)}
-                                    onChange={(selected) => handleTaxonomyChange(selected, index)}
-                                    styles={{
-                                        control: (provided) => ({
-                                            ...provided,
-                                            height: '30px',
-                                            minHeight: '30px',
-                                            border: '0px',
-                                        }),
-                                        placeholder: (provided) => ({
-                                            ...provided,
-                                            fontWeight: 'bold',
-                                            fontSize: '12px',
-                                            paddingBottom: '5px',
-                                        }),
-                                    }}
+                {store?.getDoctorsReducer?.loading ? (
+                    <div className="d-flex justify-content-center align-items-center" style={{ height: '75vh' }}>
+                        <Spinner />
+                    </div>
+                ) : (
+                    <>
+                        <Row>
+                            <Col sm={12}>
+                                <DoctorIdentifierForm
+                                    defaultIdentifiers={defaultIdentifiers}
+                                    defaultLicensure={defaultLicensure}
+                                    identifiers={identifiers}
+                                    setIdentifiers={setIdentifiers}
+                                    licensure={licensure}
+                                    setLicensure={setLicensure}
                                 />
                             </Col>
+                        </Row>
+                        <hr />
+                        <Row>
+                            <Col sm={12}>
+                                <h5>
+                                    Taxonomy Codes
+                                    <span
+                                        className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
+                                        onClick={addTaxonomyCode}></span>
+                                </h5>
+                            </Col>
+                            {taxonomyCodesList?.map((data, index) => (
+                                <Row key={index} className="mb-2">
+                                    <Col sm={3}>
+                                        <Form.Label className="mb-0">Code</Form.Label>
+                                        <AsyncSelect
+                                            loadOptions={loadTaxonomyOptions}
+                                            defaultOptions={formattedTaxonomyOptions.slice(0, 10)}
+                                            isSearchable
+                                            className="basic-single"
+                                            classNamePrefix="select"
+                                            placeholder="&nbsp; Select"
+                                            value={
+                                                formattedTaxonomyOptions.find((opt) => opt.value === data.code) ||
+                                                formattedTaxonomyOptions.find(
+                                                    (opt) => opt.value.code === data.code.code
+                                                )
+                                            }
+                                            onChange={(selected) => handleTaxonomyChange(selected, index)}
+                                            styles={{
+                                                control: (provided) => ({
+                                                    ...provided,
+                                                    height: '30px',
+                                                    minHeight: '30px',
+                                                    border: '0px',
+                                                }),
+                                                placeholder: (provided) => ({
+                                                    ...provided,
+                                                    fontWeight: 'bold',
+                                                    fontSize: '12px',
+                                                    paddingBottom: '5px',
+                                                }),
+                                            }}
+                                        />
+                                    </Col>
 
-                            <Col sm={3}>
-                                <Form.Label className="mb-0">License Number</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="License Number"
-                                    value={data.licenseNumber}
-                                    onChange={(e) => {
-                                        const updatedList = [...taxonomyCodesList];
-                                        updatedList[index].licenseNumber = e.target.value.toUpperCase();
-                                        setTaxonomyCodesList(updatedList);
-                                    }}
-                                    maxLength={10}
-                                />
-                            </Col>
-                            <Col sm={3}>
-                                <Form.Label className="mb-0">Type</Form.Label>
-                                <Form.Select
-                                    value={data.type}
-                                    onChange={(e) => {
-                                        const updatedList = [...taxonomyCodesList];
-                                        updatedList[index].type = e.target.value;
-                                        setTaxonomyCodesList(updatedList);
-                                    }}>
-                                    <option value="">Select</option>
-                                    <option value="primary">Primary</option>
-                                    <option value="secondary">Secondary</option>
-                                </Form.Select>
-                            </Col>
-                            <Col sm={3}>
-                                <Form.Label className="mb-0">State</Form.Label>
-                                <Form.Select
-                                    value={data.state}
-                                    onChange={(e) => {
-                                        const updatedList = [...taxonomyCodesList];
-                                        updatedList[index].state = e.target.value;
-                                        setTaxonomyCodesList(updatedList);
-                                    }}>
-                                    <option value="">Select State</option>
-                                    {statesData?.map((state, idx) => (
-                                        <option key={idx} value={state?.name}>
-                                            {state?.name}
-                                        </option>
-                                    ))}
-                                </Form.Select>
-                            </Col>
-                            <Col sm={3}>
-                                <Form.Label className="mb-0">Status</Form.Label>
-                                <Form.Select
-                                    value={data.status}
-                                    onChange={(e) => {
-                                        const updatedList = [...taxonomyCodesList];
-                                        updatedList[index].status = e.target.value;
-                                        setTaxonomyCodesList(updatedList);
-                                    }}>
-                                    <option value="" hidden>
-                                        Select Status
-                                    </option>
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                </Form.Select>
-                                {index > 0 && (
+                                    <Col sm={3}>
+                                        <Form.Label className="mb-0">License Number</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="License Number"
+                                            value={data.licenseNumber}
+                                            onChange={(e) => {
+                                                const updatedList = [...taxonomyCodesList];
+                                                updatedList[index].licenseNumber = e.target.value.toUpperCase();
+                                                setTaxonomyCodesList(updatedList);
+                                            }}
+                                            maxLength={10}
+                                        />
+                                    </Col>
+                                    <Col sm={3}>
+                                        <Form.Label className="mb-0">Type</Form.Label>
+                                        <Form.Select
+                                            value={data.type}
+                                            onChange={(e) => {
+                                                const updatedList = [...taxonomyCodesList];
+                                                updatedList[index].type = e.target.value;
+                                                setTaxonomyCodesList(updatedList);
+                                            }}>
+                                            <option value="">Select</option>
+                                            <option value="primary">Primary</option>
+                                            <option value="secondary">Secondary</option>
+                                        </Form.Select>
+                                    </Col>
+                                    <Col sm={3}>
+                                        <Form.Label className="mb-0">State</Form.Label>
+                                        <Form.Select
+                                            value={data.state}
+                                            onChange={(e) => {
+                                                const updatedList = [...taxonomyCodesList];
+                                                updatedList[index].state = e.target.value;
+                                                setTaxonomyCodesList(updatedList);
+                                            }}>
+                                            <option value="">Select State</option>
+                                            {statesData?.map((state, idx) => (
+                                                <option key={idx} value={state?.name}>
+                                                    {state?.name}
+                                                </option>
+                                            ))}
+                                        </Form.Select>
+                                    </Col>
+                                    <Col sm={3}>
+                                        <Form.Label className="mb-0">Status</Form.Label>
+                                        <Form.Select
+                                            value={data.status}
+                                            onChange={(e) => {
+                                                const updatedList = [...taxonomyCodesList];
+                                                updatedList[index].status = e.target.value;
+                                                setTaxonomyCodesList(updatedList);
+                                            }}>
+                                            <option value="" hidden>
+                                                Select Status
+                                            </option>
+                                            <option value="active">Active</option>
+                                            <option value="inactive">Inactive</option>
+                                        </Form.Select>
+                                        {/* {index > 0 && (
                                     <span
                                         className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
                                         style={{ right: '-2%', top: '12%' }}
@@ -395,22 +401,28 @@ const ProfessionalInformation = () => {
                                         }}>
                                         <CiCircleMinus />
                                     </span>
-                                )}
-                            </Col>
-                            {taxonomyCodesList?.length >= 1 && index < taxonomyCodesList?.length - 1 && (
-                                <hr className="mt-2" />
-                            )}
+                                )} */}
+                                    </Col>
+                                    {taxonomyCodesList?.length >= 1 && index < taxonomyCodesList?.length - 1 && (
+                                        <hr className="mt-2" />
+                                    )}
+                                </Row>
+                            ))}
                         </Row>
-                    ))}
-                </Row>
 
-                <div className="d-flex justify-content-end gap-2 my-1">
-                    <Button className="cancel-button">Cancel</Button>
+                        <div className="d-flex justify-content-end gap-2 my-1">
+                            <Button className="cancel-button">Cancel</Button>
 
-                    <Button className="custom-buttons" type="submit">
-                        Update
-                    </Button>
-                </div>
+                            <Button
+                                className="custom-buttons"
+                                style={{ width: '70px' }}
+                                type="submit"
+                                disabled={updateLoading}>
+                                {updateLoading ? <Spinner color="white" className="spinner-border-sm" /> : 'Update'}
+                            </Button>
+                        </div>
+                    </>
+                )}
             </Form>
         </div>
     );

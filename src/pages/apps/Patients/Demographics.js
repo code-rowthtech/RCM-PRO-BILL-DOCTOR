@@ -1,25 +1,30 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Button, Card, Col, Form, Modal, Row, InputGroup, Table } from "react-bootstrap";
-import { useForm } from "react-hook-form";
-import { FiUploadCloud } from "react-icons/fi";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import us from '../../../assets/images/flags/us.jpg'
-import { encryptMessage } from "../../../cryptoUtils";
-import { getCities2Action, getCities3Action, getCitiesAction, getStatesByCountryAction, updatePatientsAction } from "../../../redux/actions";
-import IdentifierForm from "../Common Pages/IdentifierForm";
-import { genderIdentityOptions } from "../../../utils/DataSets/genderIdentities";
-import { sexParameterOptions } from "../../../utils/DataSets/SexParameterforClinicalUse";
-import { personalPronounsOptions } from "../../../utils/DataSets/personalPronouns";
-import { maritalStatusOptions } from "../../../utils/DataSets/maritalStatus";
-import { raceOptions } from "../../../utils/DataSets/race.data";
-import { sexAssignedAtBirthOptions } from "../../../utils/DataSets/sex";
-import { ethnicityOptions } from "../../../utils/DataSets/enthnicity.data";
-import { tribalEntitiesOptions } from "../../../utils/DataSets/tribalEntities";
-import { dataList } from "../../../utils/DataSets/relations.data";
-import AddressForm from "../Common Pages/AddressForm";
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, Card, Col, Form, Modal, Row, InputGroup, Table,Spinner } from 'react-bootstrap';
+import { useForm } from 'react-hook-form';
+import { FiUploadCloud } from 'react-icons/fi';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import us from '../../../assets/images/flags/us.jpg';
+import { encryptMessage } from '../../../cryptoUtils';
+import {
+    getCities2Action,
+    getCities3Action,
+    getCitiesAction,
+    getStatesByCountryAction,
+    updatePatientsAction,
+} from '../../../redux/actions';
+import IdentifierForm from '../Common Pages/IdentifierForm';
+import { genderIdentityOptions } from '../../../utils/DataSets/genderIdentities';
+import { sexParameterOptions } from '../../../utils/DataSets/SexParameterforClinicalUse';
+import { personalPronounsOptions } from '../../../utils/DataSets/personalPronouns';
+import { maritalStatusOptions } from '../../../utils/DataSets/maritalStatus';
+import { raceOptions } from '../../../utils/DataSets/race.data';
+import { sexAssignedAtBirthOptions } from '../../../utils/DataSets/sex';
+import { ethnicityOptions } from '../../../utils/DataSets/enthnicity.data';
+import { tribalEntitiesOptions } from '../../../utils/DataSets/tribalEntities';
+import { dataList } from '../../../utils/DataSets/relations.data';
+import AddressForm from '../Common Pages/AddressForm';
 import Select from 'react-select';
-
 
 const calculateAge = (dob) => {
     const birthDate = new Date(dob);
@@ -47,14 +52,22 @@ const calculateAge = (dob) => {
     return `${years}.${months}`;
 };
 
-
 const Demographics = ({ patientId }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
-    const { register, handleSubmit, formState: { errors }, setValue, clearErrors, watch, getValues, reset } = useForm();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        setValue,
+        clearErrors,
+        watch,
+        getValues,
+        reset,
+    } = useForm();
     const [age, setAge] = useState(null);
     const [longitude, setLongitude] = useState(null);
     const [latitude, setLatitude] = useState(null);
@@ -84,129 +97,229 @@ const Demographics = ({ patientId }) => {
         { type: 'physical', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
 
-
-
     // const patientDetails = store?.getPatientByIdReducer;
-    const patientDetails = store?.getPatientsByIdReducer?.data?.patient || [];
-    console.log(patientDetails,'0987654321234567890')
+    const patientDetails = store?.getPatientsByIdReducer?.data?.data || [];
+    console.log(patientDetails, '0987654321234567890');
+
     useEffect(() => {
         if (age) {
-            setValue('approxAge', age)
+            setValue('approxAge', age);
         }
-    }, [age])
+    }, [age]);
     useEffect(() => {
         dispatch(getStatesByCountryAction());
-    }, [dispatch])
+    }, [dispatch]);
     useEffect(() => {
         if (primaryCitySearch) {
-            setValue('primaryCity', cities1 && cities1.find((data) => data?.name === primaryCitySearch)?.name)
+            setValue('primaryCity', cities1 && cities1.find((data) => data?.name === primaryCitySearch)?.name);
         }
         if (mailingCitySearch) {
-            setValue('mailingCity', cities2 && cities2.find((data) => data?.name === mailingCitySearch)?.name)
+            setValue('mailingCity', cities2 && cities2.find((data) => data?.name === mailingCitySearch)?.name);
         }
         if (employerCitySearch) {
-            setValue('employerCity', cities3 && cities3.find((data) => data?.name === employerCitySearch)?.name)
+            setValue('employerCity', cities3 && cities3.find((data) => data?.name === employerCitySearch)?.name);
         }
-    }, [primaryCitySearch, cities1, mailingCitySearch, cities2, employerCitySearch, cities3])
-
+    }, [primaryCitySearch, cities1, mailingCitySearch, cities2, employerCitySearch, cities3]);
+    const formatPhoneNumber = (phone) => {
+        if (!phone) return '';
+        const cleaned = phone.replace(/\D/g, '');
+        const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+        if (match) {
+            return `(${match[1]})${match[2]}-${match[3]}`;
+        }
+        return phone; // fallback if not 10 digits
+    };
     useEffect(() => {
         if (patientDetails && statesData) {
-            setValue('race', patientDetails?.race)
-            setValue('raceSubcategories', patientDetails?.raceSubcategories)
-            setValue('sex', patientDetails?.sex)
-            setValue('genderIdentity', patientDetails?.genderIdentity)
-            setValue('sexualOrientation', patientDetails?.sexualOrientation)
-            setValue('patientStudentStatus', patientDetails?.patientStudentStatus)
-            setValue('nationalIdNumber', patientDetails?.nationalIdNumber)
-            setValue('preferredLanguage', patientDetails?.preferredLanguage)
-            setValue('dateOfBirth', patientDetails?.dateOfBirth ? new Date(patientDetails?.dateOfBirth)?.toISOString().split('T')[0] : '')
-            setValue('approxAge', patientDetails?.approxAge)
-            setValue('ethnicity', patientDetails?.ethnicity)
-            setValue('notes', patientDetails?.notes)
-            setValue('maritalStatus', patientDetails?.maritalStatus)
-            setValue('epsdtServices', patientDetails?.epsdtServices)
-            setValue('epsdtReferralCondition', patientDetails?.epsdtReferralCondition)
-            // Employer details
-            setValue('emergencyContactName', patientDetails?.emergencyContactName)
-            setValue('emergencyContactPhone', patientDetails?.emergencyContactPhone ? patientDetails?.emergencyContactPhone.replace(/\D/g, '')
-                .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                    p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
-                )
-                : '');
-            setValue('emergencyContactRelation', patientDetails?.emergencyContactRelation)
-            setValue('employerName', patientDetails?.employerName)
-            setValue('employerPhone', patientDetails?.employerPhone ? patientDetails?.employerPhone.replace(/\D/g, '')
-                .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                    p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
-                )
-                : '');
-            setValue('employerTimeZone', patientDetails?.employerAddress?.timeZone)
-            setValue('employerAddress', patientDetails?.employerAddress?.address);
-            setValue('employerStreet', patientDetails?.employerAddress?.street)
-            setValue('employerZip', patientDetails?.employerAddress?.zip)
-            setEmployerLatitude(patientDetails?.employerAddress?.latitude);
-            setEmployerLongitude(patientDetails?.employerAddress?.longitude);
-            // primary address
-            setValue('primaryAddress', patientDetails?.address?.address);
-            setValue('primaryTimeZone', patientDetails?.address?.timeZone);
-            setValue('primaryStreet', patientDetails?.address?.street);
-            setValue('primaryZip', patientDetails?.address?.zip);
-            setLatitude(patientDetails?.address?.latitude);
-            setLongitude(patientDetails?.address?.longitude);
-            // secondary address
-            setValue('mailingAddress', patientDetails?.mailingAddress?.address);
-            setValue('mailingTimeZone', patientDetails?.mailingAddress?.timeZone)
-            setValue('mailingStreet', patientDetails?.mailingAddress?.street)
-            setValue('mailingZip', patientDetails?.mailingAddress?.zip)
-            setMailingLatitude(patientDetails?.mailingAddress?.latitude);
-            setMailingLongitude(patientDetails?.mailingAddress?.longitude);
+            setValue('race', patientDetails?.race?.[0]?.display || '');
+            setValue('raceSubcategories', patientDetails?.raceSubcategories);
+            setValue('sex', patientDetails?.birthSex?.[0]?.value || '');
+            setValue('genderIdentity', patientDetails?.genderIdentity?.[0]?.code || '');
+            setValue('sexParameter', patientDetails?.sexParameterForClinicalUse?.[0]?.code || '');
+            setValue('personalPronouns', patientDetails?.personalPronouns?.[0]?.code || '');
+            setValue('patientStudentStatus', patientDetails?.patientStudentStatus);
+            setValue('nationalIdNumber', patientDetails?.nationalIdNumber);
+            setValue('preferredLanguage', patientDetails?.communication?.[0]?.language?.coding?.[0]?.code || '');
+            // setValue('trible', patientDetails?.trible?.[0]?.code || '');
+            // setValue('ethnicity', patientDetails?.ethnicity?.[0]?.value || '');
+            setEth(patientDetails?.ethnicity);
+            setTri(patientDetails?.tribalAffiliation);
+            setValue('notes', patientDetails?.notes);
+            setValue('maritalStatus', patientDetails?.maritalStatus?.[0]?.display || '');
+            setValue('epsdtServices', patientDetails?.epsdtServices);
+            setValue('epsdtReferralCondition', patientDetails?.epsdtReferralCondition);
+
+            // ✅ Emergency Contact Fix
+            setValue('emergencyContactName', patientDetails?.contact?.[0]?.relationship?.[0]?.text || '');
+            setValue('emergencyContactPhone', formatPhoneNumber(patientDetails?.contact?.[1]?.telecom?.[0]?.value));
+            // setValue('emergencyContactRelation', patientDetails?.contact?.[0]?.relationship?.[0]?.text || '');
+            setRela(patientDetails?.contact?.[0]?.relationship?.[0]?.coding);
+
+            // ✅ Employer Details Fix
+            setValue('employerName', patientDetails?.employerDetails?.employerName || '');
+            setValue('employmentStatus', patientDetails?.employerDetails?.employmentStatus || '');
+            setValue('occupation', patientDetails?.employerDetails?.occupation || '');
+
+            // ✅ Employer Address Fix
+            setValue('employerCity', patientDetails?.employerDetails?.workLocation?.address?.city || '');
+            setValue('employerStateName', patientDetails?.employerDetails?.workLocation?.address?.state || '');
+            setValue('employerZip', patientDetails?.employerDetails?.workLocation?.address?.postalCode || '');
+            setValue('employerPhone', formatPhoneNumber(patientDetails?.employerDetails?.employerPhone || ''));
+            setValue('employerAddress', patientDetails?.employerDetails?.workLocation?.address?.line || '');
+            const defaultIdentifiers = patientDetails?.identifier?.map((data, index) => ({
+                expiry: data?.expiry ? new Date(data.expiry).toISOString().split('T')[0] : '',
+                file: data?.file?.[0],
+                issuingAuthority: data?.issuingAuthority,
+                number: data?.value,
+                system: data?.system,
+                type: {
+                    label: data?.type?.coding?.[0]?.display,
+                    value: data?.type?.coding?.[0]?.system,
+                    code: data?.type?.coding?.[0]?.code,
+                },
+            }));
+            setIdentifiers(defaultIdentifiers || []);
+            // setIdentifiers(patientDetails?.identifier || []);
+
+            // setDemographicAddresses(patientDetails?.address || []);
+            const newAddresses = patientDetails?.address?.map((addr) => ({
+                type: addr.type || '', // Make sure type is included
+                use: addr.use || '',
+                line: addr.line && Array.isArray(addr.line) ? addr.line : [''],
+                city: addr.city || '',
+                state: addr.state || '',
+                postalCode: addr.postalCode || '',
+                country: addr.country || 'US',
+            })) || [{ type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }];
+            setDemographicAddresses(newAddresses);
+            if (statesData?.states) {
+                newAddresses.forEach((address) => {
+                    const state = statesData.states.find((s) => s.name === address.state);
+                    if (!state) return;
+                    if (address.type === 'physical') {
+                        dispatch(
+                            getCitiesAction({
+                                state_code: state.id,
+                                name: address.city,
+                                limit: 25,
+                                skip: '',
+                            })
+                        );
+                    } else if (address.type === 'postal') {
+                        dispatch(
+                            getCities2Action({
+                                state_code: state.id,
+                                name: address.city,
+                                limit: 25,
+                                skip: '',
+                            })
+                        );
+                    } else {
+                        dispatch(
+                            getCities3Action({
+                                state_code: state.id,
+                                name: address.city,
+                                limit: 25,
+                                skip: '',
+                            })
+                        );
+                    }
+                });
+            }
         }
-    }, [patientDetails]);
+    }, [patientDetails, statesData]);
     useEffect(() => {
         if (statesData?.states?.length > 0 && patientDetails) {
             if (patientDetails?.address?.state) {
-                setValue('primaryStateName', patientDetails?.address?.state)
-                const stateCity1 = statesData?.states?.find((data) => data?.state_code === patientDetails?.address?.state)?.id
-                dispatch(getCitiesAction({ state_code: stateCity1, name: patientDetails?.address?.city || '', limit: 25, skip: '' }))
+                setValue('primaryStateName', patientDetails?.address?.state);
+                const stateCity1 = statesData?.states?.find(
+                    (data) => data?.state_code === patientDetails?.address?.state
+                )?.id;
+                dispatch(
+                    getCitiesAction({
+                        state_code: stateCity1,
+                        name: patientDetails?.address?.city || '',
+                        limit: 25,
+                        skip: '',
+                    })
+                );
             }
             if (patientDetails?.mailingAddress?.state) {
-                setValue('mailingStateName', patientDetails?.mailingAddress?.state)
-                const stateCity2 = statesData?.states?.find((data) => data?.state_code === patientDetails?.mailingAddress?.state)?.id
-                dispatch(getCities2Action({ state_code: stateCity2, name: patientDetails?.mailingAddress?.city || '', limit: 25, skip: '' }))
+                setValue('mailingStateName', patientDetails?.mailingAddress?.state);
+                const stateCity2 = statesData?.states?.find(
+                    (data) => data?.state_code === patientDetails?.mailingAddress?.state
+                )?.id;
+                dispatch(
+                    getCities2Action({
+                        state_code: stateCity2,
+                        name: patientDetails?.mailingAddress?.city || '',
+                        limit: 25,
+                        skip: '',
+                    })
+                );
             }
             if (patientDetails?.employerAddress?.state) {
-                setValue('employerStateName', patientDetails?.employerAddress?.state)
-                const stateCity3 = statesData?.states?.find((data) => data?.state_code === patientDetails?.employerAddress?.state)?.id
-                dispatch(getCities3Action({ state_code: stateCity3, name: patientDetails?.employerAddress?.city || '', limit: 25, skip: '' }))
+                setValue('employerStateName', patientDetails?.employerAddress?.state);
+                const stateCity3 = statesData?.states?.find(
+                    (data) => data?.state_code === patientDetails?.employerAddress?.state
+                )?.id;
+                dispatch(
+                    getCities3Action({
+                        state_code: stateCity3,
+                        name: patientDetails?.employerAddress?.city || '',
+                        limit: 25,
+                        skip: '',
+                    })
+                );
             }
         }
-    }, [statesData, patientDetails])
+    }, [statesData, patientDetails]);
     const handleStateSelection = (code, data) => {
         if (data === 'primary') {
-            const stateCity1 = statesData?.states?.find((data) => data?.state_code === code)?.id
-            dispatch(getCitiesAction({ state_code: stateCity1, name: primaryCitySearch ? primaryCitySearch : '', limit: 25, skip: '' }))
+            const stateCity1 = statesData?.states?.find((data) => data?.state_code === code)?.id;
+            dispatch(
+                getCitiesAction({
+                    state_code: stateCity1,
+                    name: primaryCitySearch ? primaryCitySearch : '',
+                    limit: 25,
+                    skip: '',
+                })
+            );
         }
         if (data === 'mailing') {
-            const stateCity2 = statesData?.states?.find((data) => data?.state_code === code)?.id
-            dispatch(getCities2Action({ state_code: stateCity2, name: mailingCitySearch ? mailingCitySearch : '', limit: 25, skip: '' }))
+            const stateCity2 = statesData?.states?.find((data) => data?.state_code === code)?.id;
+            dispatch(
+                getCities2Action({
+                    state_code: stateCity2,
+                    name: mailingCitySearch ? mailingCitySearch : '',
+                    limit: 25,
+                    skip: '',
+                })
+            );
         }
         if (data === 'employer') {
-            const stateCity3 = statesData?.states?.find((data) => data?.state_code === code)?.id
-            dispatch(getCities3Action({ state_code: stateCity3, name: employerCitySearch ? employerCitySearch : '', limit: 25, skip: '' }))
+            const stateCity3 = statesData?.states?.find((data) => data?.state_code === code)?.id;
+            dispatch(
+                getCities3Action({
+                    state_code: stateCity3,
+                    name: employerCitySearch ? employerCitySearch : '',
+                    limit: 25,
+                    skip: '',
+                })
+            );
         }
-    }
+    };
     useEffect(() => {
         if (cities1?.length > 0 && patientDetails?.address?.city) {
-            setPrimaryCitySearch(patientDetails?.address?.city)
+            setPrimaryCitySearch(patientDetails?.address?.city);
         }
         if (cities2?.length > 0 && patientDetails?.mailingAddress?.city) {
-            setMailingCitySearch(patientDetails?.mailingAddress?.city)
+            setMailingCitySearch(patientDetails?.mailingAddress?.city);
         }
         if (cities3?.length > 0 && patientDetails?.employerAddress?.city) {
-            setEmployerCitySearch(patientDetails?.employerAddress?.city)
+            setEmployerCitySearch(patientDetails?.employerAddress?.city);
         }
-    }, [cities1, cities2, cities3, patientDetails])
-
+    }, [cities1, cities2, cities3, patientDetails]);
 
     const onSubmit = (data) => {
         const selectedGenderIdentity = genderIdentityOptions.find((option) => option.value === data.genderIdentity);
@@ -227,11 +340,13 @@ const Demographics = ({ patientId }) => {
                 use: 'official',
                 system: element?.type?.value || element?.system,
                 type: {
-                    coding: [{
-                        system: element?.type?.value || element?.system,
-                        code: element?.type?.code || element?.type?.coding?.[0]?.code,
-                        display: element?.type?.label || element?.type?.coding?.[0]?.display,
-                    }],
+                    coding: [
+                        {
+                            system: element?.type?.value || element?.system,
+                            code: element?.type?.code || element?.type?.coding?.[0]?.code,
+                            display: element?.type?.label || element?.type?.coding?.[0]?.display,
+                        },
+                    ],
                     text: element?.type?.label || element?.type?.coding?.[0]?.display,
                 },
                 issuingAuthority: element?.issuingAuthority,
@@ -246,7 +361,7 @@ const Demographics = ({ patientId }) => {
                     code: selectedSexOption?.value,
                     display: selectedSexOption?.label,
                     system: selectedSexOption?.system,
-                }
+                },
             ],
 
             genderIdentity: [
@@ -342,7 +457,8 @@ const Demographics = ({ patientId }) => {
                         {
                             coding: [rela], //code:'I" , system:url, display:'Ins Company
                             text: data?.emergencyContactName,
-                        }],
+                        },
+                    ],
                     telecom: [
                         {
                             system: 'phone',
@@ -375,13 +491,14 @@ const Demographics = ({ patientId }) => {
         console.log('Payload:', payload);
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
-   
 
     const getGeolocation = (e) => {
         const addressToSearch = e.target.value;
         async function fetchGeocodeData(location) {
             const apiKey = '2a77840d874f4c35848e37042ce7c8ed';
-            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
+            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
+                location
+            )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
 
             try {
                 const response = await fetch(url);
@@ -391,26 +508,26 @@ const Demographics = ({ patientId }) => {
                 const data = await response.json();
                 return data;
             } catch (error) {
-                console.error("Failed to fetch geocode data:", error);
+                console.error('Failed to fetch geocode data:', error);
                 return null;
             }
         }
-        fetchGeocodeData(addressToSearch)
-            .then((data) => {
-                if (data) {
-                    setSearchedLocations(data?.results);
-                } else {
-                    console.log("No data returned.");
-                }
-            });
-    }
-
+        fetchGeocodeData(addressToSearch).then((data) => {
+            if (data) {
+                setSearchedLocations(data?.results);
+            } else {
+                console.log('No data returned.');
+            }
+        });
+    };
 
     const getEmployerGeolocation = (e) => {
         const addressToSearch = e.target.value;
         async function fetchGeocodeData(location) {
             const apiKey = '2a77840d874f4c35848e37042ce7c8ed';
-            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
+            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
+                location
+            )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
 
             try {
                 const response = await fetch(url);
@@ -420,19 +537,18 @@ const Demographics = ({ patientId }) => {
                 const data = await response.json();
                 return data;
             } catch (error) {
-                console.error("Failed to fetch geocode data:", error);
+                console.error('Failed to fetch geocode data:', error);
                 return null;
             }
         }
-        fetchGeocodeData(addressToSearch)
-            .then((data) => {
-                if (data) {
-                    setSearchedEmployerLocations(data?.results);
-                } else {
-                    console.log("No data returned.");
-                }
-            });
-    }
+        fetchGeocodeData(addressToSearch).then((data) => {
+            if (data) {
+                setSearchedEmployerLocations(data?.results);
+            } else {
+                console.log('No data returned.');
+            }
+        });
+    };
 
     const formattedEthnicityOptions = ethnicityOptions.map((ethnicity) => ({
         value: ethnicity, // Code as the value
@@ -456,9 +572,15 @@ const Demographics = ({ patientId }) => {
     const handleTribalChange = (selectedOption) => {
         setTri(selectedOption ? selectedOption.value : '');
     };
-    const selectedEthnicityOption = formattedEthnicityOptions.find((option) => option?.value?.code === eth?.[0]?.code) || formattedEthnicityOptions.find((option) => option?.value?.display === eth);
-    const selectedTribleOption = formattedTribleOptions.find((option) => option?.value?.code == tri?.[0]?.code) || formattedTribleOptions.find((option) => option?.value?.code == tri);
-    const selectedRelationOption = relationshipOption.find((option) => option?.value?.code === rela?.[0]?.code) || relationshipOption.find((option) => option?.value?.display === rela?.[0]?.coding?.[0]?.display);
+    const selectedEthnicityOption =
+        formattedEthnicityOptions.find((option) => option?.value?.code === eth?.[0]?.code) ||
+        formattedEthnicityOptions.find((option) => option?.value?.display === eth);
+    const selectedTribleOption =
+        formattedTribleOptions.find((option) => option?.value?.code == tri?.[0]?.code) ||
+        formattedTribleOptions.find((option) => option?.value?.code == tri);
+    const selectedRelationOption =
+        relationshipOption.find((option) => option?.value?.code === rela?.[0]?.code) ||
+        relationshipOption.find((option) => option?.value?.display === rela?.[0]?.coding?.[0]?.display);
     return (
         <>
             <Form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
@@ -472,7 +594,7 @@ const Demographics = ({ patientId }) => {
                     ]}
                     identifiers={identifiers}
                     setIdentifiers={setIdentifiers}
-                // onChange={(data) => console.log('Updated Identifiers:', data)}
+                    // onChange={(data) => console.log('Updated Identifiers:', data)}
                 />
 
                 <hr className="mt-0" />
@@ -545,7 +667,7 @@ const Demographics = ({ patientId }) => {
                             <Form.Select {...register('race')}>
                                 <option value="">Select Race</option>
                                 {raceOptions.map((race) => (
-                                    <option key={race.code} value={race.display} className='text-capitalize'>
+                                    <option key={race.code} value={race.display} className="text-capitalize">
                                         {race.display}
                                     </option>
                                 ))}
@@ -565,9 +687,7 @@ const Demographics = ({ patientId }) => {
                                 // value={
                                 // formattedEthnicityOptions.find((option) => option?.value?.display === eth||option?.value?.display === eth?.display) || null
                                 // } // Show selected value
-                                value={
-                                    selectedEthnicityOption
-                                }
+                                value={selectedEthnicityOption}
                                 onChange={handleEthnicityChange}
                                 // onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
@@ -616,9 +736,7 @@ const Demographics = ({ patientId }) => {
                                 className="basic-single"
                                 classNamePrefix="select"
                                 // value={formattedTribleOptions.find((option) => option?.value?.display === tri) || null} // Show selected value
-                                value={
-                                    selectedTribleOption
-                                }
+                                value={selectedTribleOption}
                                 placeholder="&nbsp; Select "
                                 onChange={handleTribalChange}
                                 // onMenuOpen={() => console.log('Dropdown Opened')}
@@ -684,11 +802,10 @@ const Demographics = ({ patientId }) => {
                             <Form.Label className="mb-0">Emergency Contact Phone </Form.Label>
                             <Form.Group>
                                 <InputGroup>
-                                    <InputGroup.Text
-                                        className="ps-3 pe-1 fw-bold text-black"
-                                        style={{ height: '33px' }}>
-                                        &nbsp;+1
-                                    </InputGroup.Text>{' '}
+                                <InputGroup.Text className="p-0 px-1 d-flex align-items-center justify-content-center fs-6 gap-1 fw-bold text-black">
+                                            <img src={us} alt="country code flag" width={16} />
+                                            +1
+                                        </InputGroup.Text>
                                     {/* This is the prefix */}
                                     <Form.Control
                                         type="tel"
@@ -733,9 +850,9 @@ const Demographics = ({ patientId }) => {
                                 </InputGroup>
                             </Form.Group>
 
-                            <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
+                            {/* <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
                                 <img src={us} alt="country code flag" width={20} />
-                            </div>
+                            </div> */}
                         </Form.Group>
                     </Col>
                     <Col sm={3}>
@@ -748,9 +865,7 @@ const Demographics = ({ patientId }) => {
                                 classNamePrefix="select"
                                 placeholder="&nbsp; Select "
                                 // value={relationshipOption.find((option) => option?.value?.display === rela) || null} // Show selected value
-                                value={
-                                    selectedRelationOption
-                                }
+                                value={selectedRelationOption}
                                 onChange={handleRelationChange}
                                 // onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
@@ -798,11 +913,10 @@ const Demographics = ({ patientId }) => {
                                             <Form.Label className="mb-0">Employer Phone </Form.Label>
                                             <Form.Group>
                                                 <InputGroup>
-                                                    <InputGroup.Text
-                                                        className="ps-3 pe-1 fw-bold text-black"
-                                                        style={{ height: '33px' }}>
-                                                        &nbsp;+1
-                                                    </InputGroup.Text>{' '}
+                                                <InputGroup.Text className="p-0 px-1 d-flex align-items-center justify-content-center fs-6 gap-1 fw-bold text-black">
+                                            <img src={us} alt="country code flag" width={16} />
+                                            +1
+                                        </InputGroup.Text>
                                                     {/* This is the prefix */}
                                                     <Form.Control
                                                         type="tel"
@@ -850,10 +964,10 @@ const Demographics = ({ patientId }) => {
                                                     )}
                                                 </InputGroup>
                                             </Form.Group>
-
+{/* 
                                             <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
                                                 <img src={us} alt="country code flag" width={20} />
-                                            </div>
+                                            </div> */}
                                         </Form.Group>
                                     </Col>
                                     <Col sm={3}>
@@ -926,10 +1040,11 @@ const Demographics = ({ patientId }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
-                                                        ? 'd-none'
-                                                        : ''
-                                                        }`}>
+                                                    className={`scroll-container hover-bg-change ${
+                                                        searchedEmployerLocations?.length === 0 || !employerFocused
+                                                            ? 'd-none'
+                                                            : ''
+                                                    }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
@@ -1070,16 +1185,18 @@ const Demographics = ({ patientId }) => {
                         <Button
                             className="custom-buttons btn-height"
                             disabled={store?.updatePatientsReducer?.loading}
+                            style={{width:'70px'}}
                             type="submit">
-                            Save
+                            {store?.updatePatientsReducer?.loading ? (
+                                <Spinner color="white" className="spinner-border-sm" />
+                            ) : (
+                                '  Update'
+                            )}
                         </Button>
                     </Col>
                 </Row>
             </Form>
-
         </>
-
-
     );
 };
 

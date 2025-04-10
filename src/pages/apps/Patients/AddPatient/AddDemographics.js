@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Col, Form, Row, InputGroup, Table } from 'react-bootstrap';
+import { Button, Col, Form, Row, InputGroup, Table, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -878,8 +878,13 @@ const AddDemographics = ({ patientId, setActiveTab, setVisibleReffering }) => {
                         }}
                         disabled={store?.updatePatientsReducer?.loading}
                         className="custom-buttons"
+                        style={{width: '200px'}}
                         type="submit">
-                        Save & Continue Editing
+                        {store?.updatePatientsReducer?.loading ? (
+                            <Spinner color="white" className="spinner-border-sm" />
+                        ) : (
+                            'Save & Continue Editing'
+                        )}{' '}
                     </Button>
                 </div>
             </Form>

@@ -19,6 +19,7 @@ const formatDisplayValue = (value) => {
     });
 };
 const DoctorAddress = ({ addresses, setAddresses }) => {
+    console.log('addresses', addresses);
     const [activeAddressIndex, setActiveAddressIndex] = useState(null);
     const [addressFocused, setAddressFocused] = useState(false);
     const [searchedLocations, setSearchedLocations] = useState([]);
@@ -28,10 +29,11 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
     const id = searchParams.get('id');
     const updateId = id?.replace(/^check/, '');
     const store = useSelector((state) => state);
-    const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
+    const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const statesData = store?.getStatesReducer?.data;
 
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
+    console.log('cities1', cities1);
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
     const [selectedLocation, setSelectedLocation] = useState(null);
@@ -408,14 +410,14 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                                     handleAddressChange(index, 'postalCode', e.target.value);
                                 }}
                             />
-                            {addresses.length > 1 && index !== 0 && (
+                            {/* {addresses.length > 1 && index !== 0 && (
                                 <span
                                     className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
                                     style={{ right: '-2%', top: '50%' }}
                                     onClick={() => removeAddress(index)}>
                                     <CiCircleMinus />
                                 </span>
-                            )}
+                            )} */}
                             {errors.postalCode && <span className="text-danger">{errors.postalCode.message}</span>}
                         </Form.Group>
                     </Col>
@@ -447,7 +449,7 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                         </InputGroup>
                     </Col>
                     <Col sm={3} style={{ height: 'fit-content' }}>
-                        <Form.Group className="mb-0">
+                        <Form.Group className="mb-0 position-relative">
                             <Form.Label className="mb-0">Fax</Form.Label>
                             <Form.Control
                                 type="text"
@@ -462,7 +464,7 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                             {addresses.length > 1 && index !== 0 && (
                                 <span
                                     className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                    style={{ right: '-2%', top: '50%' }}
+                                    style={{ right: '-5%', top: '50%' }}
                                     onClick={() => removeAddress(index)}>
                                     <CiCircleMinus />
                                 </span>

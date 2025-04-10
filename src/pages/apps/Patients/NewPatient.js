@@ -24,6 +24,7 @@ import { IoClose } from 'react-icons/io5';
 import { useForm } from 'react-hook-form';
 import { MdMedicalInformation } from 'react-icons/md';
 import { MdOutlinePreview } from 'react-icons/md';
+import { LuCalendarClock } from 'react-icons/lu';
 import { AiOutlineInteraction } from 'react-icons/ai';
 import { FaUserDoctor } from 'react-icons/fa6';
 import { TbReportSearch } from 'react-icons/tb';
@@ -44,9 +45,11 @@ import AllergyList from './TaskTabs/AllergyList';
 import FilterDropdown from './FilterDropdown';
 import Drug from './DrugIntraction/Drug';
 import CQIs from './CQIs/CQIs';
+import AppointmentList from './AppointmentsListShow/Appointment';
 import LabRequest from './LabRequest/LabRequest';
 import ResponsibleParty from './ResponsibleParty';
 import RefferingDoctor from './RefferingDoctor';
+// import Encounter from './CQIs/ViewInformationTabs/Encounter';
 
 const NewPatient = () => {
     const dispatch = useDispatch();
@@ -99,8 +102,7 @@ const NewPatient = () => {
             setLogo(null);
             setLogoName('');
             setIsCameraOpen(false);
-            setSelectedMainTab('Demographics')
-            
+            setSelectedMainTab('Demographics');
         }
     }, [updateSuccess, id, dispatch]); // Ensure dependencies are correctly set
 
@@ -119,12 +121,13 @@ const NewPatient = () => {
     };
 
     const handleTabClick = (tab) => {
-        console.log({ tab });
+        console.log(tab,'huygtfcdfxfdcghjkjlk');
 
         setSelectedSubTab(tab);
     };
     const tabMappings = {
         'Patient Info': { mainTab: 'Patient Details', section: 'patient' },
+        Appointments: { mainTab: 'Appointments', section: 'appointments' },
         'Drug Interactions': { mainTab: 'Drug Interactions', section: 'drug' },
         CQIs: { mainTab: 'CQIs', section: 'CQIs' },
         'Lab Request': { mainTab: 'Lab Request', section: 'Lab Request' },
@@ -151,6 +154,8 @@ const NewPatient = () => {
     };
     const patientMenuItems = [
         { label: 'Patient Info', icon: <MdMedicalInformation /> },
+        { label: 'Appointments', icon: <LuCalendarClock /> },
+        // {label: 'Encounter', icon: <TbHeartRateMonitor />},
         {
             label: 'Clinical Review',
             icon: <MdOutlinePreview />,
@@ -205,6 +210,7 @@ const NewPatient = () => {
 
     const modalTabs = [
         'Appointments',
+        // 'Encounter',
         'Billing',
         'Eligibility',
         'Vitals',
@@ -497,15 +503,27 @@ const NewPatient = () => {
                                                                                 <span
                                                                                     className="ps-2 fs-6"
                                                                                     style={{ fontWeight: 600 }}>
-                                                                                    {patientsDataById?.address?.address
-                                                                                        ? patientsDataById.address
-                                                                                              .address.length > 30
-                                                                                            ? patientsDataById.address.address.slice(
-                                                                                                  0,
-                                                                                                  30
-                                                                                              ) + '...'
-                                                                                            : patientsDataById.address
-                                                                                                  .address
+                                                                                    {patientsDataById?.address?.[0]
+                                                                                        ?.city ||
+                                                                                    patientsDataById?.address?.[0]
+                                                                                        ?.state
+                                                                                        ? `${
+                                                                                              patientsDataById
+                                                                                                  ?.address?.[0]
+                                                                                                  ?.city || ''
+                                                                                          }${
+                                                                                              patientsDataById
+                                                                                                  ?.address?.[0]
+                                                                                                  ?.city &&
+                                                                                              patientsDataById
+                                                                                                  ?.address?.[0]?.state
+                                                                                                  ? ', '
+                                                                                                  : ''
+                                                                                          }${
+                                                                                              patientsDataById
+                                                                                                  ?.address?.[0]
+                                                                                                  ?.state || ''
+                                                                                          }`
                                                                                         : 'N/A'}
                                                                                 </span>
                                                                             </div>
@@ -659,9 +677,9 @@ const NewPatient = () => {
                                                         'Insurances',
                                                         'Eligibility',
                                                         'Authorizations',
-                                                        'Vital Status',
-                                                        'Balance',
-                                                        'Payment',
+                                                        // 'Vital Status',
+                                                        // 'Balance',
+                                                        // 'Payment',
                                                     ].map((tab) => (
                                                         <li className="nav-item" key={tab}>
                                                             <a
@@ -696,8 +714,8 @@ const NewPatient = () => {
                                             {selectedMainTab === 'Patient Details' && <PatientDetails />}
                                             {selectedMainTab === 'Demographics' && <Demographics />}
                                             {selectedMainTab === 'Insurances' && <Insurances />}
-                                            {selectedMainTab === 'ResponsibleParty' && <p>In progress... </p>}
-                                            {selectedMainTab === 'RefferingDoctor' && <p>In progress...</p> }
+                                            {selectedMainTab === 'ResponsibleParty' && <ResponsibleParty />}
+                                            {selectedMainTab === 'RefferingDoctor' && <RefferingDoctor />}
                                             {selectedMainTab === 'Eligibility' && <p>In Progress...</p>}
                                             {selectedMainTab === 'Authorizations' && <p>In Progress...</p>}
                                             {selectedMainTab === 'Vital Status' && <VitalStatus />}
@@ -815,6 +833,17 @@ const NewPatient = () => {
                                     <CQIs />
                                 </>
                             )}
+                            {/* Appointment section */}
+                            {visibleSection === 'appointments' && (
+                                <>
+                                    <AppointmentList />
+                                </>
+                            )}
+                             {/* {visibleSection === 'encounter' && (
+                                <>
+                                    <Encounter />
+                                </>
+                            )} */}
                             {/* Lab Request section */}
                             {visibleSection === 'Lab Request' && (
                                 <>
