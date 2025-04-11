@@ -44,12 +44,59 @@ const FutureAppointment = () => {
       chartNumber: "P-002",
       name: [{ text: "Jane Smith" }],
       telecom: [{}, { value: "987-654-3210" }],
+      birthDate: "1985-05-15",
+      appointment: [
+        {
+          date: "2025-04-16",
+          time: "11:00 AM",
+          status: "Scheduled",
+        },
+      ],
+      address: [
+        {
+          use: "home",
+          line: ["456 Elm St"],
+          city: "Los Angeles",
+          state: "CA",
+          postalCode: "90001",
+          country: "USA",
+          },
+      ],
+      appointmentStatus: "Scheduled",
+      billingStatus: "Pending",
+      office: "Main Office",
+      examRoom: "Room 102",
+      reason: "Follow-up Visit",
     },
     {
       _id: "3",
       chartNumber: "P-003",
       name: [{ text: "Emily Johnson" }],
       telecom: [{}, { value: "456-789-1234" }],
+      birthDate: "1990-02-20",
+      appointment: [
+        {
+          date: "2025-04-17",
+          time: "09:00 AM",
+          status: "Scheduled",
+        },
+      ],
+      address: [
+        {
+          use: "home",
+          line: ["789 Oak St"],
+          city: "Chicago",
+          state: "IL",
+          postalCode: "60001",
+          country: "USA",
+
+    }
+      ],
+      appointmentStatus: "Scheduled",
+      billingStatus: "Pending",
+      office: "Main Office",
+      examRoom: "Room 103",
+      reason: "New Patient Visit",
     },
   ];
 
