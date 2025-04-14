@@ -293,14 +293,14 @@ const PatientDetails = () => {
                                     placeholder="First Name"
                                     {...register('firstName', {
                                         required: 'First name is required',
-                                        minLength: {
-                                            value: 3,
-                                            message: 'First name must be at least 3 characters',
-                                        },
-                                        pattern: {
-                                            value: /^[A-Za-z]{3,}$/, // At least 3 letters, no spaces or numbers
-                                            message: 'Only alphabets are allowed, minimum 3 characters',
-                                        },
+                                        // minLength: {
+                                        //     value: 3,
+                                        //     message: 'First name must be at least 3 characters',
+                                        // },
+                                        // pattern: {
+                                        //     value: /^[A-Za-z]{3,}$/, // At least 3 letters, no spaces or numbers
+                                        //     message: 'Only alphabets are allowed, minimum 3 characters',
+                                        // },
                                     })}
                                     onInput={(e) => (e.target.value = e.target.value.replace(/[^A-Za-z]/g, ''))} // Prevent spaces/numbers while typing
                                 />
@@ -544,10 +544,12 @@ const PatientDetails = () => {
                                 <Form.Label className="mb-0">Date of Birth</Form.Label>
                                 <Form.Control
                                     type="date"
+                                    data-has-value={!!watch('dateOfBirth')}
                                     {...register('dateOfBirth')}
                                     onChange={(e) => {
-                                        const calculatedAge = calculateAge(e.target.value);
-                                        setAge(calculatedAge);
+                                        const dob = e.target.value;
+                                        const calculatedAge = calculateAge(dob);
+                                        setValue('approxAge', calculatedAge); // update the form field
                                     }}
                                     max={new Date().toISOString().split('T')[0]} // Restricts future dates
                                 />
@@ -570,8 +572,11 @@ const PatientDetails = () => {
                                         'gender'
                                         //  { required: 'Gender is required' }
                                     )}
-                                    data-has-value={!!watch('gender')}>
-                                    <option value="" hidden>
+                                    data-has-value={!!watch('gender')}
+                                     defaultValue=""
+                                     className = "form-select"
+                                    >
+                                    <option value="" disabled  >
                                         Select
                                     </option>
                                     <option value="male">Male</option>
@@ -583,7 +588,7 @@ const PatientDetails = () => {
                             </Form.Group>
                         </div>
                     </div>
-                    <hr className="mt-0" />
+                    <hr className="mt-2" />
 
                     <div className="row">
                         <div className="col-md-3 col-12">

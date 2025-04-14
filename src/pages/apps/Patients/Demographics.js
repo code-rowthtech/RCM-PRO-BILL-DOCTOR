@@ -151,7 +151,7 @@ const Demographics = ({ patientId }) => {
 
             // ✅ Emergency Contact Fix
             setValue('emergencyContactName', patientDetails?.contact?.[0]?.relationship?.[0]?.text || '');
-            setValue('emergencyContactPhone', formatPhoneNumber(patientDetails?.contact?.[1]?.telecom?.[0]?.value));
+            setValue('emergencyContactPhone', formatPhoneNumber(patientDetails?.contact?.[0]?.telecom?.[0]?.value));
             // setValue('emergencyContactRelation', patientDetails?.contact?.[0]?.relationship?.[0]?.text || '');
             setRela(patientDetails?.contact?.[0]?.relationship?.[0]?.coding);
 

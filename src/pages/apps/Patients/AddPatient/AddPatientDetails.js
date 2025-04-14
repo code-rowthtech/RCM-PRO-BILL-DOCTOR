@@ -313,14 +313,14 @@ const AddPatientDetails = ({
                                 placeholder="First Name"
                                 {...register('firstName', {
                                     required: 'First name is required',
-                                    minLength: {
-                                        value: 3,
-                                        message: 'First name must be at least 3 characters',
-                                    },
-                                    pattern: {
-                                        value: /^[A-Za-z]{3,}$/, // At least 3 letters, no spaces or numbers
-                                        message: 'Only alphabets are allowed, minimum 3 characters',
-                                    },
+                                    // minLength: {
+                                    //     value: 3,
+                                    //     message: 'First name must be at least 3 characters',
+                                    // },
+                                    // pattern: {
+                                    //     value: /^[A-Za-z]{3,}$/, // At least 3 letters, no spaces or numbers
+                                    //     message: 'Only alphabets are allowed, minimum 3 characters',
+                                    // },
                                 })}
                                 onInput={(e) => (e.target.value = e.target.value.replace(/[^A-Za-z]/g, ''))} // Prevent spaces/numbers while typing
                             />

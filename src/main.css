@@ -47,13 +47,6 @@ select {
     padding: 0% !important;
 }
 
-.form-label {
-    color: black;
-    font-weight: 500 !important;
-    opacity: 0.4;
-    font-size: 13px !important;
-}
-
 .nav-underline .nav-link:hover {
     border-bottom-color: none !important;
 }

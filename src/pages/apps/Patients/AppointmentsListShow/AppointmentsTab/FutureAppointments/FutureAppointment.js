@@ -63,7 +63,7 @@ const FutureAppointment = () => {
           },
       ],
       appointmentStatus: "Scheduled",
-      billingStatus: "Pending",
+      billingStatus: "Pending", 
       office: "Main Office",
       examRoom: "Room 102",
       reason: "Follow-up Visit",
