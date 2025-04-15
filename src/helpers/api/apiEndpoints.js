@@ -74,4 +74,5 @@ export const getAllAppointments = '/api/v1/doctor/getPatientsByAppointments';
 export const getPractitionerAvailability ='/api/v1/practitioner/appointment/practitionerAvailability';
 export const getAppointmentDetails ='/api/v1/practitioner/appointment/details';
 export const updateAppointmentDetails='/api/v1/practitioner/appointment/update';
+export const getAppointmentByPateintProvider = '/api/v1/practitioner/appointment/by-patient-provider'
 

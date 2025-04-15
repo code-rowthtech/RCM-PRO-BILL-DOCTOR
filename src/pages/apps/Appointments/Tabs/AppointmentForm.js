@@ -501,7 +501,7 @@ const AppointmentForm = ({ Id }) => {
                                 <option value="" hidden>
                                     Status
                                 </option>
-                                <option value="Scheduled">Scheduled</option>
+                                <option value="scheduled">Scheduled</option>
                                 <option value="Completed">Completed</option>
                                 <option value="Cancelled">Cancelled</option>
                                 <option value="Rescheduled">Rescheduled</option>

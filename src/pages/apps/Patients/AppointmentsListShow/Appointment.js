@@ -1,78 +1,87 @@
-import React, { useState } from 'react';
-import { Button, Card } from 'react-bootstrap';
-import { FaArrowLeftLong } from 'react-icons/fa6';
-import FutureAppointment from './AppointmentsTab/FutureAppointments/FutureAppointment';
-import PastAppointment from './AppointmentsTab/PastAppointments/PastAppointment';
+import React, { useEffect, useState } from 'react';
+import { Button, Card, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { FiPrinter } from 'react-icons/fi';
+import { useDispatch } from 'react-redux';
+import { FiSun, FiClock, FiCalendar } from 'react-icons/fi'; // ⬅️ Icons
 
-const Appointment = () => {
+import HistoryAppointment from './AppointmentsTab/HistoryAppointments/HistoryAppointment';
+import TodayAppointment from './AppointmentsTab/TodayAppointments/TodayAppointment';
+import { getAppointmentByPatientProviderAction } from '../../../../redux/actions';
+import UpcomingAppointment from './AppointmentsTab/UpcomingAppointment/UpcoimngAppointment';
+
+const Appointment = (id) => {
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('Future Appointment');
+    const dispatch = useDispatch();
+    const [activeTab, setActiveTab] = useState('Today');
+    const [search, setSearch] = useState('');
+
+    const patientId = id?.Id;
+    const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
 
     const handleMainTabChange = (tab) => {
         setActiveTab(tab);
+    };
+
+    useEffect(() => {
+        const status = activeTab.toLowerCase(); // 'today', 'upcoming', 'history'
+        const payload = {
+            subject: patientId,
+            doctorId: doctorId,
+            status,
+            search
+        };
+        dispatch(getAppointmentByPatientProviderAction(payload));
+    }, [dispatch, activeTab, search, patientId, doctorId]);
+
+    // Icon mapping for tabs
+    const tabIcons = {
+        Today: <FiSun className="me-1" />,
+        Upcoming: <FiClock className="me-1" />,
+        History: <FiCalendar className="me-1" />
     };
 
     return (
         <div className="mt-2">
             <Card className="px-2" style={{ height: '70vh' }}>
                 <div className="pt-2 px-2">
-                    <div className="d-flex justify-content-between">
-                        <h4>Appointments</h4>
-                        <Button className="cancel-button" onClick={() => navigate(-1)}>
-                            Back
-                        </Button>
-                    </div>
-                    <div className="d-flex justify-content-between">
-                        <div style={{ borderBottom: '2px solid grey' }}>
-                            <ul className="nav nav-underline">
-                                {['Future Appointment', 'Past Appointment'].map((tab) => (
-                                    <li className="nav-item" key={tab}>
-                                        <a
-                                            className={`nav-link me-3 pb-0 tab-font-family ${
-                                                activeTab === tab
-                                                    ? 'active text-primary fw-bold'
-                                                    : 'text-secondary fw-semibold'
-                                            }`}
-                                            onClick={() => handleMainTabChange(tab)}
-                                            style={{ cursor: 'pointer' }}>
-                                            {tab}
-                                        </a>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+                    <div className="d-flex justify-content-between align-items-center">
+                        <ul className="nav nav-underline">
+                            {['Today', 'Upcoming', 'History'].map((tab) => (
+                                <li className="nav-item" key={tab}>
+                                    <a
+                                        className={`nav-link me-3 pb-0 tab-font-family d-flex align-items-center ${
+                                            activeTab === tab
+                                                ? 'active text-primary fw-bold'
+                                                : 'text-secondary fw-semibold'
+                                        }`}
+                                        onClick={() => handleMainTabChange(tab)}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        {tabIcons[tab]} {tab}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+
+                        <Form.Control
+                            type="text"
+                            placeholder="Search..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            style={{
+                                width: '250px',
+                                borderRadius: '8px',
+                                padding: '6px 12px',
+                                fontSize: '14px'
+                            }}
+                        />
                     </div>
 
                     {/* Main Content Section */}
-                    <div className="d-flex justify-content-between align-items-center mb-2">
-                        <h5 className="mb-0">{activeTab}</h5>
-                        {activeTab === 'Future Appointment' && (
-                            <button className="custom-buttons text-white">
-                                <span className='me-1'><FiPrinter /></span>
-                                Print Future Appointments</button>
-
-                        )}
-                        {activeTab === 'Past Appointment' && (
-                            <button className="custom-buttons text-white">
-                              <span className='me-1'><FiPrinter /></span> 
-                                Print History
-                            </button>
-                        )}
-                    </div>
-
                     <div className="mt-2 scroll-container" style={{ height: '65vh', overflow: 'auto' }}>
-                        {activeTab === 'Future Appointment' && (
-                            <div>
-                                <FutureAppointment />
-                            </div>
-                        )}
-                        {activeTab === 'Past Appointment' && (
-                            <div>
-                                <PastAppointment />
-                            </div>
-                        )}
+                        {activeTab === 'Today' && <TodayAppointment  isHistory={false}  />}
+                        {activeTab === 'Upcoming' && <UpcomingAppointment   isHistory={false} />}
+                        {activeTab === 'History' && <HistoryAppointment  isHistory={true}  />}
                     </div>
                 </div>
             </Card>
@@ -81,3 +90,4 @@ const Appointment = () => {
 };
 
 export default Appointment;
+

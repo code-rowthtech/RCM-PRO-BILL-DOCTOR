@@ -49,7 +49,6 @@ import AppointmentList from './AppointmentsListShow/Appointment';
 import LabRequest from './LabRequest/LabRequest';
 import ResponsibleParty from './ResponsibleParty';
 import RefferingDoctor from './RefferingDoctor';
-// import Encounter from './CQIs/ViewInformationTabs/Encounter';
 
 const NewPatient = () => {
     const dispatch = useDispatch();
@@ -80,9 +79,13 @@ const NewPatient = () => {
     const canvasRef = useRef(null);
     const [logoName, setLogoName] = useState('');
     const [logo, setLogo] = useState(null);
-    const [selectedMainTab, setSelectedMainTab] = useState('Patient Details');
+    const [selectedMainTab, setSelectedMainTab] = useState('Patient Info');
+    console.log(selectedMainTab,'selectedmaintab')
     const [selectedSubTab, setSelectedSubTab] = useState('Assign Task');
+    console.log({ selectedSubTab });
     const [visibleSection, setVisibleSection] = useState('patient'); // Default section
+    const [encounterTab, setEncounterTab] = useState('encounter');
+    const [encounterModal, setEncounterModal] = useState(false);
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -116,20 +119,27 @@ const NewPatient = () => {
         setVisibleSection('task'); // Show Task Section, Hide Patient Section
     };
 
+    const handleEncounterTabs = () => {
+        setEncounterModal(true);
+        // setEncounterTab(tab);
+        // setVisibleSection('encounter'); // Show Encounter Section, Hide Patient Section
+    };
+    console.log({ visibleSection });
     const handleSidebarToggle = () => {
         setSidebarCollapsed(!isSidebarCollapsed);
     };
 
     const handleTabClick = (tab) => {
-        console.log(tab,'huygtfcdfxfdcghjkjlk');
+        console.log(tab, 'huygtfcdfxfdcghjkjlk');
 
         setSelectedSubTab(tab);
     };
     const tabMappings = {
-        'Patient Info': { mainTab: 'Patient Details', section: 'patient' },
-        Appointments: { mainTab: 'Appointments', section: 'appointments' },
+        'Patient Info': { mainTab: 'Patient Info', section: 'patient' },
+        'Appointments': { mainTab: 'Appointments', section: 'appointments' },
+        // Encounter: { mainTab: 'Encounter', section: 'encounter' },
         'Drug Interactions': { mainTab: 'Drug Interactions', section: 'drug' },
-        CQIs: { mainTab: 'CQIs', section: 'CQIs' },
+        'CQIs': { mainTab: 'CQIs', section: 'CQIs' },
         'Lab Request': { mainTab: 'Lab Request', section: 'Lab Request' },
     };
 
@@ -144,7 +154,7 @@ const NewPatient = () => {
     const handleClinicalReviewToggle = () => {
         setIsClinicalReviewExpanded(!isClinicalReviewExpanded);
         setVisibleSection('task');
-        // setSelectedMainTab("Patient Details")
+        // setSelectedMainTab("Patient Info")
     };
     // console.log(setVisibleSection, 'setVisibleSection')
     const [isClinicalReviewExpandedData, setIsClinicalReviewExpandedData] = useState(false);
@@ -155,7 +165,6 @@ const NewPatient = () => {
     const patientMenuItems = [
         { label: 'Patient Info', icon: <MdMedicalInformation /> },
         { label: 'Appointments', icon: <LuCalendarClock /> },
-        // {label: 'Encounter', icon: <TbHeartRateMonitor />},
         {
             label: 'Clinical Review',
             icon: <MdOutlinePreview />,
@@ -163,7 +172,7 @@ const NewPatient = () => {
                 { label: 'Assign Task', icon: <FiPlus /> },
                 { label: 'Problem List', icon: <FiPlus /> },
                 { label: 'Allergy List', icon: <FiPlus /> },
-                { label: 'Drug Medication', icon: <FiPlus /> },
+                // { label: 'Drug Medication', icon: <FiPlus /> },
                 { label: 'Medication List', icon: <FiPlus /> },
             ],
         },
@@ -632,6 +641,12 @@ const NewPatient = () => {
                                                             >
                                                                 Add Appointment
                                                             </Button>
+                                                            <Button
+                                                                className="text-black text-nowrap bg-white mt-1 fs-6 d-flex align-items-center justify-content-center w-100"
+                                                                style={{ height: '30px', borderRadius: '10px' }}
+                                                                onClick={handleEncounterTabs}>
+                                                                Add Encounter
+                                                            </Button>
                                                             <div className="mt-2 d-flex gap-2  justify-content-end">
                                                                 <HiOutlinePrinter className="fs-3 text-black" />
                                                                 <LiaReceiptSolid className="fs-3 text-black" />
@@ -657,7 +672,7 @@ const NewPatient = () => {
                               
                             </div> */}
 
-                            {/* Patient Details Section */}
+                            {/* Patient Info Section */}
                             {visibleSection === 'patient' && (
                                 <div className="mt-2">
                                     <Card
@@ -670,7 +685,7 @@ const NewPatient = () => {
                                             <div style={{ borderBottom: '2px solid grey' }}>
                                                 <ul className="nav nav-underline">
                                                     {[
-                                                        'Patient Details',
+                                                        'Patient Info',
                                                         'Demographics',
                                                         'ResponsibleParty',
                                                         'RefferingDoctor',
@@ -711,7 +726,7 @@ const NewPatient = () => {
                                         </div>
 
                                         <div className="px-2 scroll-container" style={{ overflow: 'auto' }}>
-                                            {selectedMainTab === 'Patient Details' && <PatientDetails />}
+                                            {selectedMainTab === 'Patient Info' && <PatientDetails />}
                                             {selectedMainTab === 'Demographics' && <Demographics />}
                                             {selectedMainTab === 'Insurances' && <Insurances />}
                                             {selectedMainTab === 'ResponsibleParty' && <ResponsibleParty />}
@@ -726,6 +741,22 @@ const NewPatient = () => {
                                 </div>
                             )}
 
+                            {/* {visibleSection === 'encounter' && (
+                                <div className="mt-2">
+                                    <Card className="px-2">
+                                        <div className="d-flex justify-content-between pt-2 px-2">
+                                            <h4>Encounter</h4>
+                                            <div className="">
+                                                <Button
+                                                    className="cancel-button"
+                                                    onClick={() => setVisibleSection('patient')}>
+                                                    Back
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </Card>
+                                </div>
+                            )} */}
                             {/* Task Section */}
                             {visibleSection === 'task' && (
                                 <div className="mt-2">
@@ -755,7 +786,7 @@ const NewPatient = () => {
                                                         'Assign Task',
                                                         'Problem List',
                                                         'Allergy List',
-                                                        'Drug Medication',
+                                                        // 'Drug Medication',
                                                         'Medication List',
                                                     ].map((subTab) => (
                                                         <li className="nav-item" key={subTab}>
@@ -810,9 +841,9 @@ const NewPatient = () => {
                                             {selectedSubTab === 'Assign Task' && <AssignTask />}
                                             {selectedSubTab === 'Problem List' && <ProblemList />}
                                             {selectedSubTab === 'Allergy List' && <AllergyList />}
-                                            {selectedSubTab === 'Drug Medication' && (
+                                            {/* {selectedSubTab === 'Drug Medication' && (
                                                 <p>Drug Medication In Progress...</p>
-                                            )}
+                                            )} */}
                                             {selectedSubTab === 'Medication List' && (
                                                 <p>Medication List In Progress...</p>
                                             )}
@@ -827,6 +858,7 @@ const NewPatient = () => {
                                     <Drug />
                                 </>
                             )}
+
                             {/* CQIs section */}
                             {visibleSection === 'CQIs' && (
                                 <>
@@ -836,14 +868,10 @@ const NewPatient = () => {
                             {/* Appointment section */}
                             {visibleSection === 'appointments' && (
                                 <>
-                                    <AppointmentList />
+                                    <AppointmentList Id={id}  />
                                 </>
                             )}
-                             {/* {visibleSection === 'encounter' && (
-                                <>
-                                    <Encounter />
-                                </>
-                            )} */}
+
                             {/* Lab Request section */}
                             {visibleSection === 'Lab Request' && (
                                 <>
@@ -990,8 +1018,8 @@ const NewPatient = () => {
                                                         style={{
                                                             cursor: 'pointer',
                                                             backgroundColor:
-                                                                selectedSubTab === item.label
-                                                                    ? '#f8f9fa'
+                                                            selectedMainTab === item.label
+                                                                    ? '#E8F0FE'
                                                                     : 'transparent',
                                                             fontWeight:
                                                                 selectedSubTab === item.label ? 'bold' : 'normal',
@@ -1056,6 +1084,16 @@ const NewPatient = () => {
                             {activeModalTab === 'Mu Helper' && <p>Mu Helper Content In Progress...</p>}
                         </div>
                     </div>
+                </Modal.Body>
+            </Modal>
+
+            <Modal show={encounterModal} onHide={() => setEncounterModal(false)} fullscreen>
+                <Modal.Header closeButton>
+                    <Modal.Title>Full Encounter Modal</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <h4>This takes up the whole screen!</h4>
+                    <p>You can add forms, tables, whatever here.</p>
                 </Modal.Body>
             </Modal>
         </>
