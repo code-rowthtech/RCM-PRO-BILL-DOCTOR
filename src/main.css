@@ -47,13 +47,6 @@ select {
     padding: 0% !important;
 }
 
-.form-label {
-    color: black;
-    font-weight: 500 !important;
-    opacity: 0.4;
-    font-size: 13px !important;
-}
-
 .nav-underline .nav-link:hover {
     border-bottom-color: none !important;
 }
@@ -82,11 +75,15 @@ select {
     background-color: #e8f0fe !important;
     border: 0px !important;
 }
+.plusicon {
+    color: #6169d0;
+}
 
 .form-control:focus,
 .form-select:focus {
     color: black !important;
 }
+
 
 .form-control[data-has-value='true'],
 .form-select[data-has-value='true'] {
@@ -162,15 +159,19 @@ table {
     color: #007bff;
 }
 
+
 .patient-item {
     color: white;
 }
 
-.patient-item:hover,
-.active-patient-item {
+.patient-item:hover {
     background-color: #f5f5f5;
     color: black;
     transition: background-color 0.3s ease;
+}
+.patient-item:active {
+    background-color: white !important;
+    color: black !important;
 }
 
 .nav-underline .nav-link.active {

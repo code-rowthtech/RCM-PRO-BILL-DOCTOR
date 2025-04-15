@@ -12,7 +12,7 @@ import { createPatientsReducer, createReferringDoctorReducer, createResponsibleP
 import { getSubscriptionsReducer } from './subscriptions/reducers';
 import { createHolidayScheduleReducer, createScheduleReducer, deleteHolidayScheduleReducer, getHolidayScheduleReducer, getScheduleReducer, updateScheduleReducer } from './schedule/reducers';
 import { createVitalsReducer, getVitalsByPatientIdReducer, getVitalsReducer, updateVitalsReducer } from './vitals/reducers';
-import { createAppointmentsReducer, getAllAppointmentsReducer, getAppointmentDetailsReducer, getAppointmentsReducer, getPractitionerAvailabilityReducer, updateAppointmentDetailsReducer } from './appointments/reducers';
+import { createAppointmentsReducer, getAllAppointmentsReducer, getAppointmentByPatientProviderReducer, getAppointmentDetailsReducer, getAppointmentsReducer, getPractitionerAvailabilityReducer, updateAppointmentDetailsReducer } from './appointments/reducers';
 import { createAllergyReducer, createProblemReducer, createTaskReducer, getAllergiesOfAPatientReducer, getAllergyDetailsReducer, getClinicEmployeesReducer, getPatientAppointmentsReducer, getPatientProblemsReducer, getProblemDetailsReducer, getSearchCodesReducer, getTaskDetailsReducer, getTaskReducer, updateAllergyReducer, updateProblemReducer, updateTaskReducer } from './clinicNotes/reducers';
 
 export default (combineReducers({
@@ -27,7 +27,7 @@ export default (combineReducers({
     getSubscriptionsReducer,
     createHolidayScheduleReducer, getHolidayScheduleReducer, deleteHolidayScheduleReducer, createScheduleReducer, getScheduleReducer, updateScheduleReducer,
     createVitalsReducer, updateVitalsReducer, getVitalsReducer, getVitalsByPatientIdReducer,
-    createAppointmentsReducer, getAppointmentsReducer, getAllAppointmentsReducer,
+    createAppointmentsReducer, getAppointmentsReducer, getAllAppointmentsReducer,getAppointmentByPatientProviderReducer,
     getClinicEmployeesReducer, createTaskReducer, getTaskReducer, updateTaskReducer, getTaskDetailsReducer,
     createProblemReducer, getPatientProblemsReducer, updateProblemReducer, getProblemDetailsReducer, getSearchCodesReducer, getPatientAppointmentsReducer, getPractitionerAvailabilityReducer,
     getAppointmentDetailsReducer, updateAppointmentDetailsReducer,

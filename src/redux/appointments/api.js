@@ -32,3 +32,8 @@ export function updateAppointmentDetailsApi(params: any): any {
     const { data } = params;
     return api.update(URL.updateAppointmentDetails, data);
 }
+
+export function getAppointmentByPateintProviderApi(parmas: any): any{
+    const { data } = parmas;
+    return api.get(URL.getAppointmentByPateintProvider, data);
+}

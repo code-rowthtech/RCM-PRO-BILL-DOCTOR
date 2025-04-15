@@ -18,7 +18,7 @@ import { encryptMessage } from '../../../../cryptoUtils';
 import { FaPlus } from 'react-icons/fa';
 import AddPatientDetails from '../../Patients/AddPatient/AddPatientDetails';
 import { appointmentTypeOptions } from '../../../../utils/DataSets/apppointmenttype.data';
-import Select from 'react-select';
+import AsyncSelect from 'react-select/async';
 import { appointmentReasonOptions } from '../../../../utils/DataSets/appointmentreason.data';
 
 const AppointmentForm = ({ Id }) => {
@@ -281,9 +281,22 @@ const AppointmentForm = ({ Id }) => {
         setAppointmentReason(selectedOption ? selectedOption.value : '');
     };
     const selectedReasonOption =
-        formattedReasonOptions.find((option) => option?.value?.display === appointmentReason?.text) ||
-        formattedReasonOptions.find((option) => option?.display === appointmentReason) ||
-        formattedReasonOptions.find((option) => option?.display === appointmentDetails?.reason?.[0]?.coding?.[0]?.display);
+    formattedReasonOptions.find((option) => option?.value?.display === appointmentReason?.text) ||
+    formattedReasonOptions.find((option) => option?.display === appointmentReason);
+    const loadReasonOptions = (inputValue, callback) => {
+        // If there's no search input, show only the first 10 options
+        if (!inputValue) {
+            callback(formattedReasonOptions.slice(0, 10));
+            return;
+        }
+    
+        // Filter options based on search input
+        const filteredOptions = formattedReasonOptions.filter((option) =>
+            option.label.toLowerCase().includes(inputValue.toLowerCase())
+        );
+    
+        callback(filteredOptions.slice(0, 20)); // Return up to 20 results on search
+    };
 
     return (
         <div>
@@ -420,17 +433,13 @@ const AppointmentForm = ({ Id }) => {
                     <Col sm={6}>
                         <Form.Group>
                             <Form.Label className="mb-0">Reason</Form.Label>
-                            <Select
-                                options={formattedReasonOptions} // Use the formatted array
+                            <AsyncSelect
+                                loadOptions={loadReasonOptions}
+                                defaultOptions={formattedReasonOptions.slice(0, 10)} // Show first 10 options initially
                                 isSearchable
                                 className="basic-single"
                                 classNamePrefix="select"
-                                placeholder="&nbsp; Select "
-                                // value={
-                                //     formattedReasonOptions.find(
-                                //         (option) => option?.value?.display === appointmentReason?.display
-                                //     ) || null
-                                // } // Show selected value
+                                placeholder="&nbsp; Select"
                                 value={selectedReasonOption}
                                 onChange={handleReasonChange}
                                 styles={{
@@ -492,7 +501,7 @@ const AppointmentForm = ({ Id }) => {
                                 <option value="" hidden>
                                     Status
                                 </option>
-                                <option value="Scheduled">Scheduled</option>
+                                <option value="scheduled">Scheduled</option>
                                 <option value="Completed">Completed</option>
                                 <option value="Cancelled">Cancelled</option>
                                 <option value="Rescheduled">Rescheduled</option>

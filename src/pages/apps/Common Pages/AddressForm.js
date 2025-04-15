@@ -294,7 +294,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                     </Col>
 
                     <Col sm={3}>
-                        <Form.Group className="mb-2">
+                        <Form.Group className="mb-2 position-relative">
                             <Form.Label className="mb-1">Postal Code</Form.Label>
                             <Form.Control
                                 type="text"
@@ -318,7 +318,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             {addresses.length > 1 && index !== 0 && (
                                 <span
                                     className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
-                                    style={{ marginTop: '-27px', right: '1.2vw' }}
+                                    style={{ right: '0%', top: '50%' }}
                                     onClick={() => removeAddress(index)}>
                                     <CiCircleMinus />
                                 </span>

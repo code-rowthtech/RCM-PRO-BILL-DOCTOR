@@ -101,6 +101,8 @@ const AddNewPatient = () => {
                         {activeTab === 'Patient Details' && (
                             <AddPatientDetails
                                 setVisibleReffering={setVisibleReffering}
+                                visibleResponsible={visibleResponsible}
+                                visibleReferring={visibleReffering}
                                 setVisibleResponsible={setVisibleResponsible}
                             />
                         )}
@@ -111,8 +113,8 @@ const AddNewPatient = () => {
                             />
                         )}
                         {activeTab === 'Insurances' && <AddInsurance patientId={patientId} />}
-                        {activeTab === 'RefferingDoctor' && <AddRefferingDoctor patientId={patientId} />}
-                        {activeTab === 'ResponsibleParty' && <AddResponsibleParty patientId={patientId} />}
+                        {activeTab === 'RefferingDoctor' && <AddRefferingDoctor patientId={patientId}  setActiveTab={setActiveTab}/>}
+                        {activeTab === 'ResponsibleParty' && <AddResponsibleParty patientId={patientId} setActiveTab={setActiveTab } />}
                         {activeTab === 'Eligibility' && <p>In Progress...</p>}
                         {activeTab === 'Authorizations' && <p>In Progress...</p>}
                         {activeTab === 'Vital Status' && <p>In Progress...</p>}

@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Col, Form } from 'react-bootstrap';
+import { Button, Col, Form, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import AddressForm from '../../Common Pages/AddressForm';
 import TelecomFrom from '../../Common Pages/TelecomForm';
 import { useDispatch, useSelector } from 'react-redux';
-import { encryptMessage } from "../../../../cryptoUtils";
+import { encryptMessage } from '../../../../cryptoUtils';
 import { createResponsiblePartyAction } from '../../../../redux/actions';
 import { dataList } from '../../../../utils/DataSets/relations.data';
 import Select from 'react-select';
-
 
 const Responsible = ({ patientId, activeTab, setActiveTab }) => {
     const store = useSelector((state) => state);
@@ -18,9 +17,7 @@ const Responsible = ({ patientId, activeTab, setActiveTab }) => {
     const [responsibleAddresses, setResponsibleAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
-    const [responsibleTelecom, setResponsibleTelecom] = useState([
-        { system: '', value: '', use: '' },
-    ]);
+    const [responsibleTelecom, setResponsibleTelecom] = useState([{ system: '', value: '', use: '' }]);
     const createResponse = store?.createResponsiblePartyReducer?.data?.status;
     const {
         register,
@@ -57,15 +54,15 @@ const Responsible = ({ patientId, activeTab, setActiveTab }) => {
         dispatch(createResponsiblePartyAction({ key: encryptMessage(payload) }));
         console.log(payload, 'payload');
     };
-   
+
     useEffect(() => {
         if (createResponse === 201) {
             if (submissionType === 'saveAndNext') {
                 reset(); // Reset the form
-                setActiveTab('referringDoctor');
+                setActiveTab('Insurances');
             } else if (submissionType === 'saveAndReset') {
                 reset();
-                setActiveTab('personalDetails');
+                setActiveTab('Patient Details');
             }
         }
     }, [createResponse]);
@@ -75,7 +72,7 @@ const Responsible = ({ patientId, activeTab, setActiveTab }) => {
     }));
     const [rela, setRela] = useState(null);
     const handleRelationChange = (selectedOption) => {
-        setRela( selectedOption ? selectedOption.value : '');
+        setRela(selectedOption ? selectedOption.value : '');
     };
     return (
         <>
@@ -130,12 +127,17 @@ const Responsible = ({ patientId, activeTab, setActiveTab }) => {
                             </Form.Label>
                             <Form.Control
                                 type="date"
+                                max={new Date().toISOString().split('T')[0]} // today's date in YYYY-MM-DD
                                 placeholder="Date of Birth"
-                                {...register('dateOfBirth', { required: 'This field is required' })}
+                                {...register('dateOfBirth', {
+                                    required: 'This field is required',
+                                    validate: (value) =>
+                                        new Date(value) <= new Date() || 'Date cannot be in the future',
+                                })}
                             />
                             {errors.dateOfBirth && <span className="text-danger">{errors.dateOfBirth.message}</span>}
                         </div>
-                        <Col sm={3} className='mb-2'>
+                        <Col sm={3} className="mb-2">
                             <Form.Group>
                                 <Form.Label className="mb-0">Emergency Contact Relation</Form.Label>
                                 <Select
@@ -146,9 +148,8 @@ const Responsible = ({ patientId, activeTab, setActiveTab }) => {
                                     placeholder="&nbsp; Select "
                                     onChange={handleRelationChange}
                                     value={
-                                        relationshipOption.find(
-                                            (option) => option?.value?.display === rela?.display
-                                        ) || null
+                                        relationshipOption.find((option) => option?.value?.display === rela?.display) ||
+                                        null
                                     } // Show selected value
                                     styles={{
                                         control: (provided) => ({
@@ -171,7 +172,7 @@ const Responsible = ({ patientId, activeTab, setActiveTab }) => {
                     <hr />
                     <AddressForm addresses={responsibleAddresses} setAddresses={setResponsibleAddresses} />
                     <hr />
-                    <TelecomFrom  constantContact={responsibleTelecom} setConstantContact={setResponsibleTelecom} />
+                    <TelecomFrom constantContact={responsibleTelecom} setConstantContact={setResponsibleTelecom} />
                 </div>
                 <div className="d-flex gap-2 justify-content-end mb-2 mt-md-4">
                     <Button className="cancel-button" onClick={() => reset()}>
@@ -189,10 +190,15 @@ const Responsible = ({ patientId, activeTab, setActiveTab }) => {
                         onClick={() => {
                             setSubmissionType('saveAndNext');
                         }}
-                        disabled={store?.updatePatientsReducer?.loading}
+                        disabled={store?.createResponsiblePartyReducer?.loading}
                         className="custom-buttons"
+                        style={{ width: '200px' }}
                         type="submit">
-                        Save & Continue Editing
+                        {store?.createResponsiblePartyReducer?.loading ? (
+                            <Spinner color="white" className="spinner-border-sm" />
+                        ) : (
+                            'Save & Continue Editing'
+                        )}
                     </Button>
                 </div>
             </Form>

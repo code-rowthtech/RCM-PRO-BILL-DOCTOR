@@ -24,6 +24,7 @@ import { IoClose } from 'react-icons/io5';
 import { useForm } from 'react-hook-form';
 import { MdMedicalInformation } from 'react-icons/md';
 import { MdOutlinePreview } from 'react-icons/md';
+import { LuCalendarClock } from 'react-icons/lu';
 import { AiOutlineInteraction } from 'react-icons/ai';
 import { FaUserDoctor } from 'react-icons/fa6';
 import { TbReportSearch } from 'react-icons/tb';
@@ -44,7 +45,10 @@ import AllergyList from './TaskTabs/AllergyList';
 import FilterDropdown from './FilterDropdown';
 import Drug from './DrugIntraction/Drug';
 import CQIs from './CQIs/CQIs';
+import AppointmentList from './AppointmentsListShow/Appointment';
 import LabRequest from './LabRequest/LabRequest';
+import ResponsibleParty from './ResponsibleParty';
+import RefferingDoctor from './RefferingDoctor';
 
 const NewPatient = () => {
     const dispatch = useDispatch();
@@ -53,7 +57,6 @@ const NewPatient = () => {
     const {
         handleSubmit,
         formState: { errors },
-
     } = useForm();
     const [isClinicalReviewExpanded, setIsClinicalReviewExpanded] = useState(false);
     const [isRunning, setIsRunning] = useState(false);
@@ -64,11 +67,11 @@ const NewPatient = () => {
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const primaryProvider = JSON.parse(sessionStorage.getItem('hyper_user'))?.name?.text;
-    console.log(primaryProvider, 'primaryProvider')
+    console.log(primaryProvider, 'primaryProvider');
     const store = useSelector((state) => state);
     const patientsDataById = store?.getPatientsByIdReducer?.data?.data || [];
 
-    console.log(patientsDataById, 'patientsDataByIdpatientsDataById')
+    console.log(patientsDataById, 'patientsDataByIdpatientsDataById');
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
     const [profilePhoto, setProfilePhoto] = useState(profileDummy);
     const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -76,17 +79,20 @@ const NewPatient = () => {
     const canvasRef = useRef(null);
     const [logoName, setLogoName] = useState('');
     const [logo, setLogo] = useState(null);
-    const [selectedMainTab, setSelectedMainTab] = useState('Patient Details');
+    const [selectedMainTab, setSelectedMainTab] = useState('Patient Info');
+    console.log(selectedMainTab,'selectedmaintab')
     const [selectedSubTab, setSelectedSubTab] = useState('Assign Task');
+    console.log({ selectedSubTab });
     const [visibleSection, setVisibleSection] = useState('patient'); // Default section
+    const [encounterTab, setEncounterTab] = useState('encounter');
+    const [encounterModal, setEncounterModal] = useState(false);
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
-
 
     useEffect(() => {
         const data = {
             id: id,
-        }
+        };
         if (id) {
             dispatch(getPatientsByIdAction(data));
         }
@@ -99,9 +105,9 @@ const NewPatient = () => {
             setLogo(null);
             setLogoName('');
             setIsCameraOpen(false);
+            setSelectedMainTab('Demographics');
         }
     }, [updateSuccess, id, dispatch]); // Ensure dependencies are correctly set
-
 
     const handleMainTabChange = (tab) => {
         setSelectedMainTab(tab);
@@ -113,21 +119,28 @@ const NewPatient = () => {
         setVisibleSection('task'); // Show Task Section, Hide Patient Section
     };
 
+    const handleEncounterTabs = () => {
+        setEncounterModal(true);
+        // setEncounterTab(tab);
+        // setVisibleSection('encounter'); // Show Encounter Section, Hide Patient Section
+    };
+    console.log({ visibleSection });
     const handleSidebarToggle = () => {
         setSidebarCollapsed(!isSidebarCollapsed);
     };
 
     const handleTabClick = (tab) => {
-        console.log({ tab });
+        console.log(tab, 'huygtfcdfxfdcghjkjlk');
 
         setSelectedSubTab(tab);
     };
     const tabMappings = {
-        'Patient Info': { mainTab: 'Patient Details', section: 'patient' },
+        'Patient Info': { mainTab: 'Patient Info', section: 'patient' },
+        'Appointments': { mainTab: 'Appointments', section: 'appointments' },
+        // Encounter: { mainTab: 'Encounter', section: 'encounter' },
         'Drug Interactions': { mainTab: 'Drug Interactions', section: 'drug' },
         'CQIs': { mainTab: 'CQIs', section: 'CQIs' },
-        'Lab Request': { mainTab: 'Lab Request', section: 'Lab Request' }
-
+        'Lab Request': { mainTab: 'Lab Request', section: 'Lab Request' },
     };
 
     const handleChartTabChange = (tab) => {
@@ -138,11 +151,10 @@ const NewPatient = () => {
         }
     };
 
-
     const handleClinicalReviewToggle = () => {
         setIsClinicalReviewExpanded(!isClinicalReviewExpanded);
         setVisibleSection('task');
-        // setSelectedMainTab("Patient Details")
+        // setSelectedMainTab("Patient Info")
     };
     // console.log(setVisibleSection, 'setVisibleSection')
     const [isClinicalReviewExpandedData, setIsClinicalReviewExpandedData] = useState(false);
@@ -152,6 +164,7 @@ const NewPatient = () => {
     };
     const patientMenuItems = [
         { label: 'Patient Info', icon: <MdMedicalInformation /> },
+        { label: 'Appointments', icon: <LuCalendarClock /> },
         {
             label: 'Clinical Review',
             icon: <MdOutlinePreview />,
@@ -159,7 +172,7 @@ const NewPatient = () => {
                 { label: 'Assign Task', icon: <FiPlus /> },
                 { label: 'Problem List', icon: <FiPlus /> },
                 { label: 'Allergy List', icon: <FiPlus /> },
-                { label: 'Drug Medication', icon: <FiPlus /> },
+                // { label: 'Drug Medication', icon: <FiPlus /> },
                 { label: 'Medication List', icon: <FiPlus /> },
             ],
         },
@@ -206,6 +219,7 @@ const NewPatient = () => {
 
     const modalTabs = [
         'Appointments',
+        // 'Encounter',
         'Billing',
         'Eligibility',
         'Vitals',
@@ -275,11 +289,11 @@ const NewPatient = () => {
             ...(logo?.url === null
                 ? {}
                 : {
-                    photo: {
-                        url: logo?.url?.split('?')[0] || patientsDataById?.patientChartPhoto?.url,
-                        title: logoName,
-                    },
-                }),
+                      photo: {
+                          url: logo?.url?.split('?')[0] || patientsDataById?.patientChartPhoto?.url,
+                          title: logoName,
+                      },
+                  }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
         // console.log(payload, 'payloadpayload')
@@ -292,13 +306,12 @@ const NewPatient = () => {
                     <div className="row">
                         {/* Main Content */}
                         <div className={isSidebarCollapsed ? 'col-11' : 'col-10'}>
-
                             <div class="accordion border-none custom-shadow rounded-1" id="accordionExample">
                                 <div class="accordion-item collapsed border-0">
-                                    <h2 class="accordion-header mt-0" >
+                                    <h2 class="accordion-header mt-0">
                                         <button
                                             className="accordion-button collapsed py-1 bg-white"
-                                            style={{ border: "#000", height: "43px" }}
+                                            style={{ border: '#000', height: '43px' }}
                                             type="button"
                                             data-bs-toggle="collapse"
                                             data-bs-target="#collapseOne"
@@ -324,9 +337,9 @@ const NewPatient = () => {
                                                     className="pe-2 text-nowrap fw-bold fs-6">
                                                     <span>
                                                         {patientsDataById?.birthDate
-                                                            ? new Date(
-                                                                patientsDataById.birthDate
-                                                            ).toLocaleDateString('en-GB')
+                                                            ? new Date(patientsDataById.birthDate).toLocaleDateString(
+                                                                  'en-GB'
+                                                              )
                                                             : 'N/A'}
                                                     </span>
                                                 </p>
@@ -340,8 +353,13 @@ const NewPatient = () => {
                                             </div>
                                         </button>
                                     </h2>
-                                    <div id="collapseOne" class="accordion-collapse collapse " data-bs-parent="#accordionExample">
-                                        <div class="accordion-body  p-0 bg-white pb-1" style={{ borderBottomLeftRadius: '5px', borderBottomRightRadius: '5px' }}>
+                                    <div
+                                        id="collapseOne"
+                                        class="accordion-collapse collapse "
+                                        data-bs-parent="#accordionExample">
+                                        <div
+                                            class="accordion-body  p-0 bg-white pb-1"
+                                            style={{ borderBottomLeftRadius: '5px', borderBottomRightRadius: '5px' }}>
                                             <div className="p-1">
                                                 <Row>
                                                     <Col sm={2} className="ps-0 pt-1">
@@ -373,8 +391,8 @@ const NewPatient = () => {
                                                                             logo?.url
                                                                                 ? logo.url.split('?')[0]
                                                                                 : patientsDataById?.photo?.[0]?.url
-                                                                                    ? patientsDataById?.photo?.[0]?.url
-                                                                                    : profilePhoto
+                                                                                ? patientsDataById?.photo?.[0]?.url
+                                                                                : profilePhoto
                                                                         }
                                                                         alt="Patient Profile"
                                                                         className="img-fluid rounded"
@@ -388,9 +406,14 @@ const NewPatient = () => {
 
                                                                 {!isCameraOpen && (
                                                                     <BiEdit
-                                                                        className={`position-absolute fs-4 text-primary ${uploading ? 'd-none' : ''
-                                                                            }`}
-                                                                        style={{ bottom: '-5px', right: '-9px', cursor: 'pointer' }}
+                                                                        className={`position-absolute fs-4 text-primary ${
+                                                                            uploading ? 'd-none' : ''
+                                                                        }`}
+                                                                        style={{
+                                                                            bottom: '-5px',
+                                                                            right: '-9px',
+                                                                            cursor: 'pointer',
+                                                                        }}
                                                                         onClick={openCamera}
                                                                     />
                                                                 )}
@@ -403,7 +426,9 @@ const NewPatient = () => {
                                                                             className="custom-buttons">
                                                                             <TbCapture className="text-white fs-5" />{' '}
                                                                         </Button>
-                                                                        <Button onClick={stopCamera} className="custom-buttons">
+                                                                        <Button
+                                                                            onClick={stopCamera}
+                                                                            className="custom-buttons">
                                                                             <IoClose className="text-white fs-5" />
                                                                         </Button>
                                                                     </div>
@@ -424,13 +449,14 @@ const NewPatient = () => {
 
                                                     <Col sm={8}>
                                                         <Row className="pt-1">
-
                                                             <Col sm={6} className="p-0">
                                                                 <div className="row">
                                                                     <div className="col-12 mx-1 ">
                                                                         <div className="row">
                                                                             <div className="col-3">
-                                                                                <span className="fw-bold fs-6">Patients ID:</span>
+                                                                                <span className="fw-bold fs-6">
+                                                                                    Patients ID:
+                                                                                </span>
                                                                             </div>
                                                                             <div className="col-9">
                                                                                 <span
@@ -452,7 +478,8 @@ const NewPatient = () => {
                                                                                 <span
                                                                                     className="ps-2 fs-6"
                                                                                     style={{ fontWeight: 600 }}>
-                                                                                    {patientsDataById?.telecom?.[1]?.value || 'N/A    '}
+                                                                                    {patientsDataById?.telecom?.[1]
+                                                                                        ?.value || 'N/A    '}
                                                                                 </span>
                                                                             </div>
                                                                         </div>
@@ -468,7 +495,8 @@ const NewPatient = () => {
                                                                                 <span
                                                                                     className="ps-2 fs-6"
                                                                                     style={{ fontWeight: 600 }}>
-                                                                                    {patientsDataById?.telecom?.[3]?.value || 'N/A'}
+                                                                                    {patientsDataById?.telecom?.[3]
+                                                                                        ?.value || 'N/A'}
                                                                                 </span>
                                                                             </div>
                                                                         </div>
@@ -484,14 +512,27 @@ const NewPatient = () => {
                                                                                 <span
                                                                                     className="ps-2 fs-6"
                                                                                     style={{ fontWeight: 600 }}>
-                                                                                    {patientsDataById?.address?.address
-                                                                                        ? patientsDataById.address.address.length >
-                                                                                            30
-                                                                                            ? patientsDataById.address.address.slice(
-                                                                                                0,
-                                                                                                30
-                                                                                            ) + '...'
-                                                                                            : patientsDataById.address.address
+                                                                                    {patientsDataById?.address?.[0]
+                                                                                        ?.city ||
+                                                                                    patientsDataById?.address?.[0]
+                                                                                        ?.state
+                                                                                        ? `${
+                                                                                              patientsDataById
+                                                                                                  ?.address?.[0]
+                                                                                                  ?.city || ''
+                                                                                          }${
+                                                                                              patientsDataById
+                                                                                                  ?.address?.[0]
+                                                                                                  ?.city &&
+                                                                                              patientsDataById
+                                                                                                  ?.address?.[0]?.state
+                                                                                                  ? ', '
+                                                                                                  : ''
+                                                                                          }${
+                                                                                              patientsDataById
+                                                                                                  ?.address?.[0]
+                                                                                                  ?.state || ''
+                                                                                          }`
                                                                                         : 'N/A'}
                                                                                 </span>
                                                                             </div>
@@ -520,7 +561,9 @@ const NewPatient = () => {
                                                                     <div className="col-12 mx-1 ">
                                                                         <div className="row">
                                                                             <div className="col-5">
-                                                                                <span className="fw-bold fs-6">Date Added:</span>
+                                                                                <span className="fw-bold fs-6">
+                                                                                    Date Added:
+                                                                                </span>
                                                                             </div>
                                                                             <div className="col-7">
                                                                                 <span
@@ -528,8 +571,8 @@ const NewPatient = () => {
                                                                                     style={{ fontWeight: 600 }}>
                                                                                     {patientsDataById?.createdAt
                                                                                         ? new Date(
-                                                                                            patientsDataById.createdAt
-                                                                                        ).toLocaleDateString('en-GB')
+                                                                                              patientsDataById.createdAt
+                                                                                          ).toLocaleDateString('en-GB')
                                                                                         : 'N/A'}
                                                                                 </span>
                                                                             </div>
@@ -546,7 +589,8 @@ const NewPatient = () => {
                                                                                 <span
                                                                                     className="ps-2 fs-6"
                                                                                     style={{ fontWeight: 600 }}>
-                                                                                    {patientsDataById?.lastApptDate || 'N/A'}
+                                                                                    {patientsDataById?.lastApptDate ||
+                                                                                        'N/A'}
                                                                                 </span>
                                                                             </div>
                                                                         </div>
@@ -562,7 +606,8 @@ const NewPatient = () => {
                                                                                 <span
                                                                                     className="ps-2 fs-6"
                                                                                     style={{ fontWeight: 600 }}>
-                                                                                    {patientsDataById?.nextApptDate || 'N/A'}
+                                                                                    {patientsDataById?.nextApptDate ||
+                                                                                        'N/A'}
                                                                                 </span>
                                                                             </div>
                                                                         </div>
@@ -585,8 +630,8 @@ const NewPatient = () => {
                                                                 {isRunning
                                                                     ? `Pause (${formatTime(timeLeft)})`
                                                                     : timeLeft > 0
-                                                                        ? `Resume (${formatTime(timeLeft)})`
-                                                                        : 'Start Session'}
+                                                                    ? `Resume (${formatTime(timeLeft)})`
+                                                                    : 'Start Session'}
                                                             </Button>
 
                                                             <Button
@@ -595,6 +640,12 @@ const NewPatient = () => {
                                                                 onClick={handleShow} // Open modal on button click
                                                             >
                                                                 Add Appointment
+                                                            </Button>
+                                                            <Button
+                                                                className="text-black text-nowrap bg-white mt-1 fs-6 d-flex align-items-center justify-content-center w-100"
+                                                                style={{ height: '30px', borderRadius: '10px' }}
+                                                                onClick={handleEncounterTabs}>
+                                                                Add Encounter
                                                             </Button>
                                                             <div className="mt-2 d-flex gap-2  justify-content-end">
                                                                 <HiOutlinePrinter className="fs-3 text-black" />
@@ -621,29 +672,37 @@ const NewPatient = () => {
                               
                             </div> */}
 
-                            {/* Patient Details Section */}
+                            {/* Patient Info Section */}
                             {visibleSection === 'patient' && (
                                 <div className="mt-2">
-                                    <Card className="px-2" style={{ height: isOpen ? "64.4vh" : "80.3vh", transition: "height 0.3s ease-in-out" }}>
+                                    <Card
+                                        className="px-2"
+                                        style={{
+                                            height: isOpen ? '64.4vh' : '80.3vh',
+                                            transition: 'height 0.3s ease-in-out',
+                                        }}>
                                         <div className="d-flex justify-content-between pt-2 px-2">
                                             <div style={{ borderBottom: '2px solid grey' }}>
                                                 <ul className="nav nav-underline">
                                                     {[
-                                                        'Patient Details',
+                                                        'Patient Info',
                                                         'Demographics',
+                                                        'ResponsibleParty',
+                                                        'RefferingDoctor',
                                                         'Insurances',
                                                         'Eligibility',
                                                         'Authorizations',
-                                                        'Vital Status',
-                                                        'Balance',
-                                                        'Payment',
+                                                        // 'Vital Status',
+                                                        // 'Balance',
+                                                        // 'Payment',
                                                     ].map((tab) => (
                                                         <li className="nav-item" key={tab}>
                                                             <a
-                                                                className={`nav-link me-3 pb-0 tab-font-family ${selectedMainTab === tab
-                                                                    ? 'active text-primary'
-                                                                    : 'text-black'
-                                                                    }`}
+                                                                className={`nav-link me-3 pb-0 tab-font-family ${
+                                                                    selectedMainTab === tab
+                                                                        ? 'active text-primary'
+                                                                        : 'text-black'
+                                                                }`}
                                                                 onClick={() => handleMainTabChange(tab)}
                                                                 style={{ cursor: 'pointer', fontWeight: 600 }}>
                                                                 {tab}
@@ -666,12 +725,12 @@ const NewPatient = () => {
                                             </div>
                                         </div>
 
-                                        <div
-                                            className="px-2 scroll-container"
-                                            style={{ overflow: 'auto' }}>
-                                            {selectedMainTab === 'Patient Details' && <PatientDetails />}
+                                        <div className="px-2 scroll-container" style={{ overflow: 'auto' }}>
+                                            {selectedMainTab === 'Patient Info' && <PatientDetails />}
                                             {selectedMainTab === 'Demographics' && <Demographics />}
                                             {selectedMainTab === 'Insurances' && <Insurances />}
+                                            {selectedMainTab === 'ResponsibleParty' && <ResponsibleParty />}
+                                            {selectedMainTab === 'RefferingDoctor' && <RefferingDoctor />}
                                             {selectedMainTab === 'Eligibility' && <p>In Progress...</p>}
                                             {selectedMainTab === 'Authorizations' && <p>In Progress...</p>}
                                             {selectedMainTab === 'Vital Status' && <VitalStatus />}
@@ -682,6 +741,22 @@ const NewPatient = () => {
                                 </div>
                             )}
 
+                            {/* {visibleSection === 'encounter' && (
+                                <div className="mt-2">
+                                    <Card className="px-2">
+                                        <div className="d-flex justify-content-between pt-2 px-2">
+                                            <h4>Encounter</h4>
+                                            <div className="">
+                                                <Button
+                                                    className="cancel-button"
+                                                    onClick={() => setVisibleSection('patient')}>
+                                                    Back
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </Card>
+                                </div>
+                            )} */}
                             {/* Task Section */}
                             {visibleSection === 'task' && (
                                 <div className="mt-2">
@@ -711,15 +786,16 @@ const NewPatient = () => {
                                                         'Assign Task',
                                                         'Problem List',
                                                         'Allergy List',
-                                                        'Drug Medication',
+                                                        // 'Drug Medication',
                                                         'Medication List',
                                                     ].map((subTab) => (
                                                         <li className="nav-item" key={subTab}>
                                                             <a
-                                                                className={`nav-link me-2 pb-0 tab-font-family ${selectedSubTab === subTab
-                                                                    ? 'active text-primary'
-                                                                    : 'text-black'
-                                                                    }`}
+                                                                className={`nav-link me-2 pb-0 tab-font-family ${
+                                                                    selectedSubTab === subTab
+                                                                        ? 'active text-primary'
+                                                                        : 'text-black'
+                                                                }`}
                                                                 onClick={() => handleSubTabChange(subTab)}
                                                                 style={{ cursor: 'pointer', fontWeight: 600 }}>
                                                                 {subTab}
@@ -765,9 +841,9 @@ const NewPatient = () => {
                                             {selectedSubTab === 'Assign Task' && <AssignTask />}
                                             {selectedSubTab === 'Problem List' && <ProblemList />}
                                             {selectedSubTab === 'Allergy List' && <AllergyList />}
-                                            {selectedSubTab === 'Drug Medication' && (
+                                            {/* {selectedSubTab === 'Drug Medication' && (
                                                 <p>Drug Medication In Progress...</p>
-                                            )}
+                                            )} */}
                                             {selectedSubTab === 'Medication List' && (
                                                 <p>Medication List In Progress...</p>
                                             )}
@@ -782,12 +858,20 @@ const NewPatient = () => {
                                     <Drug />
                                 </>
                             )}
+
                             {/* CQIs section */}
                             {visibleSection === 'CQIs' && (
                                 <>
                                     <CQIs />
                                 </>
                             )}
+                            {/* Appointment section */}
+                            {visibleSection === 'appointments' && (
+                                <>
+                                    <AppointmentList Id={id}  />
+                                </>
+                            )}
+
                             {/* Lab Request section */}
                             {visibleSection === 'Lab Request' && (
                                 <>
@@ -836,10 +920,11 @@ const NewPatient = () => {
                                                     <div key={index} className="ms-0">
                                                         <p
                                                             className={`patient-menu-item text-black mb-0 ps-2 pe-2 border-bottom py-1 
-                                                                         ${isSidebarCollapsed
-                                                                    ? 'text-center fw-bold'
-                                                                    : 'd-flex justify-content-between align-items-center'
-                                                                }`}
+                                                                         ${
+                                                                             isSidebarCollapsed
+                                                                                 ? 'text-center fw-bold'
+                                                                                 : 'd-flex justify-content-between align-items-center'
+                                                                         }`}
                                                             onClick={handleClinicalReviewToggle}
                                                             style={{
                                                                 cursor: 'pointer',
@@ -865,10 +950,11 @@ const NewPatient = () => {
                                                             </span>
                                                             {!isSidebarCollapsed && (
                                                                 <i
-                                                                    className={`bi ${isClinicalReviewExpanded
-                                                                        ? 'bi-chevron-up'
-                                                                        : 'bi-chevron-down'
-                                                                        }`}></i>
+                                                                    className={`bi ${
+                                                                        isClinicalReviewExpanded
+                                                                            ? 'bi-chevron-up'
+                                                                            : 'bi-chevron-down'
+                                                                    }`}></i>
                                                             )}
                                                         </p>
                                                         {isClinicalReviewExpanded && (
@@ -932,8 +1018,8 @@ const NewPatient = () => {
                                                         style={{
                                                             cursor: 'pointer',
                                                             backgroundColor:
-                                                                selectedSubTab === item.label
-                                                                    ? '#f8f9fa'
+                                                            selectedMainTab === item.label
+                                                                    ? '#E8F0FE'
                                                                     : 'transparent',
                                                             fontWeight:
                                                                 selectedSubTab === item.label ? 'bold' : 'normal',
@@ -977,8 +1063,9 @@ const NewPatient = () => {
                             {modalTabs.map((modalTab) => (
                                 <li className="nav-item" key={modalTab}>
                                     <a
-                                        className={`nav-link text-black me-2 ${activeModalTab === modalTab ? 'active fw-bold' : ''
-                                            }`}
+                                        className={`nav-link text-black me-2 ${
+                                            activeModalTab === modalTab ? 'active fw-bold' : ''
+                                        }`}
                                         onClick={() => handleModalTabClick(modalTab)}
                                         style={{ cursor: 'pointer' }}>
                                         {modalTab}
@@ -997,6 +1084,16 @@ const NewPatient = () => {
                             {activeModalTab === 'Mu Helper' && <p>Mu Helper Content In Progress...</p>}
                         </div>
                     </div>
+                </Modal.Body>
+            </Modal>
+
+            <Modal show={encounterModal} onHide={() => setEncounterModal(false)} fullscreen>
+                <Modal.Header closeButton>
+                    <Modal.Title>Full Encounter Modal</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <h4>This takes up the whole screen!</h4>
+                    <p>You can add forms, tables, whatever here.</p>
                 </Modal.Body>
             </Modal>
         </>

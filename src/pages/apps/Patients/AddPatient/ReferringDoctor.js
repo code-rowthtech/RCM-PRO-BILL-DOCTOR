@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Col, Form, Row, InputGroup } from 'react-bootstrap';
+import { Button, Col, Form, Row, InputGroup, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { getStatesByCountryAction, getCitiesAction, createReferringDoctorAction, stateEmptydAction } from '../../../../redux/actions';
-import us from '../../../../assets/images/flags/us.jpg'
-import { encryptMessage } from "../../../../cryptoUtils";
+import {
+    getStatesByCountryAction,
+    getCitiesAction,
+    createReferringDoctorAction,
+    stateEmptydAction,
+} from '../../../../redux/actions';
+import us from '../../../../assets/images/flags/us.jpg';
+import { encryptMessage } from '../../../../cryptoUtils';
 import AddressForm from '../../Common Pages/AddressForm';
 
 const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
@@ -23,18 +28,20 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
         { line: [''], city: '', state: '', postalCode: '', country: 'USA' },
     ]);
     const [submissionType, setSubmissionType] = useState(null);
-    const createResponseReferring = store?.addReferringDoctorReducer?.data?.status;
+    const createResponseReferring = store?.createReferringDoctorReducer?.data?.status;
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+
     useEffect(() => {
-            if (createResponseReferring === 201) {
-                if (submissionType === 'saveAndNext') {
-                    reset(); // Reset the form
-                    setActiveTab('insurance');
-                } else if (submissionType === 'saveAndReset') {
-                    reset();
-                    setActiveTab('personalDetails');
-                }
+        if (createResponseReferring === 201) {
+            if (submissionType === 'saveAndNext') {
+                reset(); // Reset the form
+                setActiveTab('ResponsibleParty'); // Move to the next tab
+            } else if (submissionType === 'saveAndReset') {
+                reset();
+                setActiveTab('Patient Details');
             }
-        }, [createResponseReferring]);
+        }
+    }, [createResponseReferring]);
     const primaryState = watch('primaryStateName');
     const primaryCitySearch = watch('primaryCity');
 
@@ -55,11 +62,21 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
         const payload = {
             patientId: patientId,
             type: 'Referring',
+            clinicId: clinicId,
             identifier: [
                 {
-                    system: 'http://hl7.org/fhir/sid/us-npi',
+                    system: '',
                     value: data.npiNumber,
-                    type: 'NPI',
+                    type: {
+                        coding: [
+                            {
+                                system: '',
+                                code: '',
+                                display: '',
+                            },
+                        ],
+                        text: '',
+                    },
                 },
             ],
             name: {
@@ -95,7 +112,7 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
             ],
         };
         dispatch(createReferringDoctorAction({ key: encryptMessage(payload) }));
-        console.log("payload",payload)
+        console.log('payload', payload);
     };
 
     return (
@@ -165,8 +182,9 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
                             Phone <span className="text-danger">*</span>
                         </Form.Label>
                         <InputGroup>
-                            <InputGroup.Text className="ps-3 pe-1 fw-bold text-black" style={{ height: '33px' }}>
-                                &nbsp;+1
+                            <InputGroup.Text className="p-0 px-1 d-flex align-items-center justify-content-center fs-6 gap-1 fw-bold text-black">
+                                <img src={us} alt="country code flag" width={16} />
+                                +1
                             </InputGroup.Text>
                             <Form.Control
                                 type="tel"
@@ -185,11 +203,11 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
                                 placeholder="(XXX)XXX-XXXX"
                             />
                         </InputGroup>
-                        <div
+                        {/* <div
                             className="position-absolute"
                             style={{ top: '54%', left: '1%', transform: 'translateY(-16%)' }}>
                             <img src={us} alt="country code flag" width={20} />
-                        </div>
+                        </div> */}
                         {errors.phone && <span className="text-danger">{errors.phone.message}</span>}
                     </Form.Group>
                 </Col>
@@ -198,27 +216,30 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
             <AddressForm addresses={referringDoctorAddress} setAddresses={setReferringDoctorAddress} />
             <Row className="mt-2">
                 <div className="d-flex gap-2 justify-content-end mb-2 mt-md-4">
-                    <Button
-                        className="cancel-button"
-                        onClick={() => reset()}
-                    >
+                    <Button className="cancel-button" onClick={() => reset()}>
                         Clear
                     </Button>
-                    <Button className="custom-buttons" type="submit"
-                     onClick={() => {
-                        setSubmissionType('saveAndReset');
-                    }}>
-                        
+                    <Button
+                        className="custom-buttons"
+                        type="submit"
+                        onClick={() => {
+                            setSubmissionType('saveAndReset');
+                        }}>
                         Save & Add Another
                     </Button>
                     <Button
                         onClick={() => {
                             setSubmissionType('saveAndNext');
                         }}
-                        // disabled={store?.updatePatientsReducer?.loading
+                        disabled={store?.createReferringDoctorReducer?.loading}
                         className="custom-buttons"
+                        style={{ width: '200px' }}
                         type="submit">
-                        Save & Continue Editing
+                        {store?.createReferringDoctorReducer?.loading ? (
+                            <Spinner color="white" className="spinner-border-sm" />
+                        ) : (
+                            'Save & Continue Editing'
+                        )}
                     </Button>
                 </div>
             </Row>
