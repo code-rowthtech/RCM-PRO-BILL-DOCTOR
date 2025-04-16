@@ -96,6 +96,7 @@ const AppointmentCalendar = () => {
 
     const handleEventClick = (event) => {
         setShow(true);
+        console.log(event, 'eventevent')
         setSelectedEvent(event);
     };
     const closeModal = () => {
@@ -105,6 +106,7 @@ const AppointmentCalendar = () => {
     const [appModal, setAppModal] = useState(false)
     const closeAppModal = () => {
         setAppModal(false);
+        setShow(false);
         setSelectedEvent(null);
     }
     return (
@@ -168,7 +170,7 @@ const AppointmentCalendar = () => {
                 <Modal.Body>
                     <Row className="border-bottom mb-1 pb-2">
                         <Col sm={11} className='text-center'>
-                            <h4>{selectedEvent ? "Appointment Details" : "Create New Appointment"}</h4>
+                            <h4>{selectedEvent ? "Update Appointment Details" : "Create New Appointment"}</h4>
                         </Col>
                         <Col sm={1}>
                             <IoMdClose className="fs-4 cursor-pointer" onClick={closeAppModal} />

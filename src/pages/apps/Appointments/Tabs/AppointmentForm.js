@@ -21,12 +21,12 @@ import { appointmentTypeOptions } from '../../../../utils/DataSets/apppointmentt
 import AsyncSelect from 'react-select/async';
 import { appointmentReasonOptions } from '../../../../utils/DataSets/appointmentreason.data';
 
-const AppointmentForm = ({ Id ,appointmentId }) => {
-    console.log(Id,'appoinmentid')
+const AppointmentForm = ({ Id, appointmentId }) => {
+    console.log(Id, 'appoinmentid', appointmentId)
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
-    const id = Id?Id:searchParams.get('id');
+    const id = Id ? Id : searchParams.get('id');
 
     // console.log(id, 'iddddddddddddddd')
     const store = useSelector((state) => state);
@@ -73,13 +73,13 @@ const AppointmentForm = ({ Id ,appointmentId }) => {
         }
     };
 
-   
+
     useEffect(() => {
         const data = {
-            id: id,
+            id: appointmentId ? appointmentId : id,
         };
         dispatch(getAppointmentDetailsAction(data));
-    }, [dispatch]);
+    }, [dispatch, appointmentId]);
 
     const handlePlusIconClick = () => {
         setShowModal(true);
@@ -205,7 +205,7 @@ const AppointmentForm = ({ Id ,appointmentId }) => {
             setValue('consultationRoom', appointmentDetails?.examRoom);
             setValue('status', appointmentDetails?.status);
             // setValue('patient', appointmentDetails?.subject?._id);
-            setSelectedOption( appointmentDetails?.subject?._id)
+            setSelectedOption(appointmentDetails?.subject?._id)
             setValue('appointmentType', appointmentDetails?.appointmentType?.coding?.[0]?.display);
             setAppointmentReason(appointmentDetails?.reason?.[0]?.coding?.[0]);
             setValue('scheduled', appointmentDetails?.start ? new Date(appointmentDetails?.start).toISOString().split('T')[0] : '');
@@ -242,7 +242,7 @@ const AppointmentForm = ({ Id ,appointmentId }) => {
         const endDateTime = new Date(startDateTime.getTime() + data.duration * 60000);
 
         const payload = {
-            ...(id && { id }), // Include `id` only if it exists (update case)
+            ...(id ? { id } : { id: appointmentId }),
             subject: data?.patient,
             ...(id ? {} : { clinicId }), // Exclude `clinicId` in update case
             // doctor: doctorId,
@@ -265,7 +265,7 @@ const AppointmentForm = ({ Id ,appointmentId }) => {
         };
 
         // Dispatch update if `id` exists, otherwise create a new one
-        if (id) {
+        if (id || appointmentId) {
             dispatch(updateAppointmentDetailsAction({ key: encryptMessage(payload) }));
             console.log(payload, 'payloaddddd')
         } else {
@@ -283,20 +283,20 @@ const AppointmentForm = ({ Id ,appointmentId }) => {
         setAppointmentReason(selectedOption ? selectedOption.value : '');
     };
     const selectedReasonOption =
-    formattedReasonOptions.find((option) => option?.value?.code  === appointmentReason?.code ) ||
-    formattedReasonOptions.find((option) => option?.display === appointmentReason);
+        formattedReasonOptions.find((option) => option?.value?.code === appointmentReason?.code) ||
+        formattedReasonOptions.find((option) => option?.display === appointmentReason);
     const loadReasonOptions = (inputValue, callback) => {
         // If there's no search input, show only the first 10 options
         if (!inputValue) {
             callback(formattedReasonOptions.slice(0, 10));
             return;
         }
-    
+
         // Filter options based on search input
         const filteredOptions = formattedReasonOptions.filter((option) =>
             option.label.toLowerCase().includes(inputValue.toLowerCase())
         );
-    
+
         callback(filteredOptions.slice(0, 20)); // Return up to 20 results on search
     };
 
@@ -396,11 +396,11 @@ const AppointmentForm = ({ Id ,appointmentId }) => {
                                 data-has-value={!!selectedDate}
                                 {...register("scheduled", { required: "Scheduled date is required" })}
                             />
-                            {errors?.scheduled && (
+                            {/* {errors?.scheduled && (
                                 <p className="text-danger mb-0" style={{ fontSize: "10px" }}>
                                     {errors?.scheduled?.message}
                                 </p>
-                            )}
+                            )} */}
                         </Form.Group>
                         <Form.Group className="mb-1" style={{ width: '100px' }}>
                             <Form.Label className="mb-0">
@@ -471,10 +471,10 @@ const AppointmentForm = ({ Id ,appointmentId }) => {
                                 <option value="" hidden>
                                     Select Consultation Room
                                 </option>
-                                <option value="1">Room 1</option>
-                                <option value="2">Room 2</option>
-                                <option value="3">Room 3</option>
-                                <option value="4">Room 4</option>
+                                <option value="Room 1">Room 1</option>
+                                <option value="Room 2">Room 2</option>
+                                {/* <option value="3">Room 3</option> */}
+                                {/* <option value="4">Room 4</option> */}
                             </Form.Select>
                             {/* {errors.appointmentType && <p className="text-danger err-font">{errors.consultationRoom.message}</p>} */}
                         </Form.Group>
@@ -503,18 +503,18 @@ const AppointmentForm = ({ Id ,appointmentId }) => {
                                 <option value="" hidden>
                                     Status
                                 </option>
-                                <option value="scheduled">Scheduled</option>
-                                <option value="Completed">Completed</option>
-                                <option value="Cancelled">Cancelled</option>
-                                <option value="Rescheduled">Rescheduled</option>
-                                <option value="Noshow">No-Show</option>  {/* Fixed typo */}
-                                <option value="Arrived">Arrived</option>
-                                <option value="Checkedin">Checked In</option>
-                                <option value="Checkedinonline">Checked In Online</option>
-                                <option value="Inroom">In Room</option>
-                                <option value="Insession">In Session</option>
-                                <option value="Confirmed">Confirmed</option>
-                                <option value="Notconfirmed">Not Confirmed</option>
+                                <option value="proposed">Proposed</option>
+                                <option value="pending">Pending</option>
+                                <option value="booked">Booked</option>
+                                <option value="arrived">Arrived</option>
+                                <option value="fulfilled">Fulfilled</option>  
+                                <option value="cancelled">Cancelled</option>
+                                <option value="noshow">No Show</option>
+                                <option value="entered-in-error">Entered in error</option>
+                                <option value="checked-in">Checked In</option>
+                                <option value="entered-in-error">Waitlisted</option>
+                                {/* <option value="Checkedinonline">Checked In Online</option> */}
+                                {/* <option value="Notconfirmed">Not Confirmed</option> */}
                             </Form.Select>
                         </Form.Group>
 
