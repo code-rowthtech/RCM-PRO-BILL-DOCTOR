@@ -8,6 +8,7 @@ import { FiEdit, FiFileText, FiFilter } from 'react-icons/fi';
 import { getAppointmentsAction } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import Spinner from '../../../constants/Spinner';
+import AppointmentCalendar from './AppointmentCalendar';
 
 // Define the types for each order item
 type OrderListItems = {
@@ -236,13 +237,22 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                 Appointments
                                             </a>
                                         </li>
-                                        <li className="nav-item ms-3">
+                                        {/* <li className="nav-item ms-3">
                                             <a
                                                 className={classNames("nav-link fw-bold text-black", { active: activeTab === 'transactions', 'fw-bold': activeTab === 'transactions' })}
                                                 href="#"
                                                 onClick={() => setActiveTab('transactions')}
                                             >
                                                 Appointments History
+                                            </a>
+                                        </li> */}
+                                        <li className="nav-item ms-3">
+                                            <a
+                                                className={classNames("nav-link fw-bold text-black", { active: activeTab === 'appointmentCalendar', 'fw-bold': activeTab === 'appointmentCalendar' })}
+                                                href="#"
+                                                onClick={() => setActiveTab('appointmentCalendar')}
+                                            >
+                                                Appointment Calendar
                                             </a>
                                         </li>
                                     </ul>
@@ -282,7 +292,11 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                             {activeTab === 'appointments' ? (
                                 <AppointmentsList patientsData={patientsData} />
                             ) : (
-                                <AppointmentsTransactionList patientsData={patientsData} />
+                                // <AppointmentsTransactionList patientsData={patientsData} />
+                                <AppointmentCalendar patientsData={patientsData} 
+                                // selectedDoctor={selectedDoctor?.value} 
+                                />
+
                             )}
                         </Card.Body>
                     </Card>
@@ -293,3 +307,4 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
 };
 
 export default Appointments;
+
