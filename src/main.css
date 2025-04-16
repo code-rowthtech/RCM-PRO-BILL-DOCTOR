@@ -178,6 +178,13 @@ table {
     /* border-bottom-color: #727CF5!important; */
     border-bottom: 3px solid #727CF5 !important;
 }
+.schedule-status-select {
+    border: 1px solid rgba(0, 0, 0, 0.335) !important;
+    padding: 1px 5px !important;
+    color: black !important;
+    background-color: white !important;
+    width: 8vw !important;
+}
 
 .scroll-container {
     overflow: auto;

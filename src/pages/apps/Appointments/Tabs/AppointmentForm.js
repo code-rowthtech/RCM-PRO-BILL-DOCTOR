@@ -21,11 +21,13 @@ import { appointmentTypeOptions } from '../../../../utils/DataSets/apppointmentt
 import AsyncSelect from 'react-select/async';
 import { appointmentReasonOptions } from '../../../../utils/DataSets/appointmentreason.data';
 
-const AppointmentForm = ({ Id }) => {
+const AppointmentForm = ({ Id ,appointmentId }) => {
+    console.log(Id,'appoinmentid')
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
-    const id = searchParams.get('id');
+    const id = Id?Id:searchParams.get('id');
+
     // console.log(id, 'iddddddddddddddd')
     const store = useSelector((state) => state);
     const createResponse = store?.createPatientsReducer?.data?.status;
@@ -71,12 +73,11 @@ const AppointmentForm = ({ Id }) => {
         }
     };
 
+   
     useEffect(() => {
-
         const data = {
             id: id,
         };
-
         dispatch(getAppointmentDetailsAction(data));
     }, [dispatch]);
 
@@ -203,9 +204,10 @@ const AppointmentForm = ({ Id }) => {
             setValue('minutesDuration', appointmentDetails?.minutesDuration);
             setValue('consultationRoom', appointmentDetails?.examRoom);
             setValue('status', appointmentDetails?.status);
-            setValue('patient', appointmentDetails?.subject?._id);
+            // setValue('patient', appointmentDetails?.subject?._id);
+            setSelectedOption( appointmentDetails?.subject?._id)
             setValue('appointmentType', appointmentDetails?.appointmentType?.coding?.[0]?.display);
-
+            setAppointmentReason(appointmentDetails?.reason?.[0]?.coding?.[0]);
             setValue('scheduled', appointmentDetails?.start ? new Date(appointmentDetails?.start).toISOString().split('T')[0] : '');
             setValue('startTime', appointmentDetails?.start ? new Date(appointmentDetails?.start).toISOString().split('T')[1].slice(0, 5) : '');
         }
@@ -281,7 +283,7 @@ const AppointmentForm = ({ Id }) => {
         setAppointmentReason(selectedOption ? selectedOption.value : '');
     };
     const selectedReasonOption =
-    formattedReasonOptions.find((option) => option?.value?.display === appointmentReason?.text) ||
+    formattedReasonOptions.find((option) => option?.value?.code  === appointmentReason?.code ) ||
     formattedReasonOptions.find((option) => option?.display === appointmentReason);
     const loadReasonOptions = (inputValue, callback) => {
         // If there's no search input, show only the first 10 options
