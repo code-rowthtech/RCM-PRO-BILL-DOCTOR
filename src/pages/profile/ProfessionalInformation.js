@@ -264,7 +264,9 @@ const ProfessionalInformation = () => {
         );
         callback(filteredOptions.slice(0, 20)); // Return up to 20 results on search
     };
-
+    const removeTaxonomyItem = (index) => {
+        setTaxonomyCodesList((prev) => prev.filter((_, i) => i !== index));
+    };
     return (
         <div className="container-fluid px-0">
             <Form onSubmit={handleSubmit(submitData)}>
@@ -348,7 +350,7 @@ const ProfessionalInformation = () => {
                                     <Col sm={3}>
                                         <Form.Label className="mb-0">Type</Form.Label>
                                         <Form.Select
-                                            value={data.type}
+                                            value={data.type || 'primary'}
                                             onChange={(e) => {
                                                 const updatedList = [...taxonomyCodesList];
                                                 updatedList[index].type = e.target.value;
@@ -376,7 +378,7 @@ const ProfessionalInformation = () => {
                                             ))}
                                         </Form.Select>
                                     </Col>
-                                    <Col sm={3}>
+                                    <Col sm={3} className="position-relative">
                                         <Form.Label className="mb-0">Status</Form.Label>
                                         <Form.Select
                                             value={data.status}
@@ -391,18 +393,18 @@ const ProfessionalInformation = () => {
                                             <option value="active">Active</option>
                                             <option value="inactive">Inactive</option>
                                         </Form.Select>
-                                        {/* {index > 0 && (
-                                    <span
-                                        className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                        style={{ right: '-2%', top: '12%' }}
-                                        onClick={() => {
-                                            const updatedList = taxonomyCodesList.filter((_, i) => i !== index);
-                                            setTaxonomyCodesList(updatedList);
-                                        }}>
-                                        <CiCircleMinus />
-                                    </span>
-                                )} */}
+
+                                        {/* Minus icon, aligned to the right */}
+                                        {index > 0 && (
+                                            <span
+                                                className="text-danger cursor-pointer fs-5 fw-bold position-absolute"
+                                                style={{ right: '-5px', top: '50%',  }}
+                                                onClick={() => removeTaxonomyItem(index)}>
+                                                <CiCircleMinus />
+                                            </span>
+                                        )}
                                     </Col>
+
                                     {taxonomyCodesList?.length >= 1 && index < taxonomyCodesList?.length - 1 && (
                                         <hr className="mt-2" />
                                     )}
