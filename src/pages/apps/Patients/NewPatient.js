@@ -49,6 +49,7 @@ import AppointmentList from './AppointmentsListShow/Appointment';
 import LabRequest from './LabRequest/LabRequest';
 import ResponsibleParty from './ResponsibleParty';
 import RefferingDoctor from './RefferingDoctor';
+import { FaRegCopy } from 'react-icons/fa';
 
 const NewPatient = () => {
     const dispatch = useDispatch();
@@ -80,7 +81,7 @@ const NewPatient = () => {
     const [logoName, setLogoName] = useState('');
     const [logo, setLogo] = useState(null);
     const [selectedMainTab, setSelectedMainTab] = useState('Patient Info');
-    console.log(selectedMainTab,'selectedmaintab')
+    console.log(selectedMainTab, 'selectedmaintab');
     const [selectedSubTab, setSelectedSubTab] = useState('Assign Task');
     console.log({ selectedSubTab });
     const [visibleSection, setVisibleSection] = useState('patient'); // Default section
@@ -136,10 +137,10 @@ const NewPatient = () => {
     };
     const tabMappings = {
         'Patient Info': { mainTab: 'Patient Info', section: 'patient' },
-        'Appointments': { mainTab: 'Appointments', section: 'appointments' },
+        Appointments: { mainTab: 'Appointments', section: 'appointments' },
         // Encounter: { mainTab: 'Encounter', section: 'encounter' },
         'Drug Interactions': { mainTab: 'Drug Interactions', section: 'drug' },
-        'CQIs': { mainTab: 'CQIs', section: 'CQIs' },
+        CQIs: { mainTab: 'CQIs', section: 'CQIs' },
         'Lab Request': { mainTab: 'Lab Request', section: 'Lab Request' },
     };
 
@@ -305,7 +306,7 @@ const NewPatient = () => {
                 <div className="container-fluid px-0 mt-2 pt-0">
                     <div className="row">
                         {/* Main Content */}
-                        <div className={isSidebarCollapsed ? 'col-11' : 'col-10'}>
+                        <div className={isSidebarCollapsed ? 'col-11 px-0' : 'col-10 px-0'}>
                             <div class="accordion border-none custom-shadow rounded-1" id="accordionExample">
                                 <div class="accordion-item collapsed border-0">
                                     <h2 class="accordion-header mt-0">
@@ -343,12 +344,17 @@ const NewPatient = () => {
                                                             : 'N/A'}
                                                     </span>
                                                 </p>
-                                                <p className="text-nowrap fs-6 fw-bold">
+                                                <p
+                                                    className="text-nowrap fs-6 fw-bold pe-2"
+                                                    style={{ borderRight: '1px solid black' }}>
                                                     <span>
                                                         {patientsDataById?.approxAge != null
                                                             ? patientsDataById.approxAge + ' years old'
                                                             : '-'}
                                                     </span>
+                                                </p>
+                                                <p className="text-nowrap fs-6 fw-bold">
+                                                    <span>{patientsDataById?.telecom?.[3]?.value || 'N/A'}</span>
                                                 </p>
                                             </div>
                                         </button>
@@ -474,13 +480,27 @@ const NewPatient = () => {
                                                                                     <MdPhone className="fs-5 text-primary" />
                                                                                 </span>
                                                                             </div>
-                                                                            <div className="col-9">
+                                                                            <div className="col-9 d-flex align-items-center">
                                                                                 <span
-                                                                                    className="ps-2 fs-6"
+                                                                                    className="ps-2 fs-6 me-2"
                                                                                     style={{ fontWeight: 600 }}>
                                                                                     {patientsDataById?.telecom?.[1]
-                                                                                        ?.value || 'N/A    '}
+                                                                                        ?.value || 'N/A'}
                                                                                 </span>
+                                                                                {patientsDataById?.telecom?.[1]
+                                                                                    ?.value && (
+                                                                                    <FaRegCopy
+                                                                                        className="text-primary cursor-pointer"
+                                                                                        onClick={() =>
+                                                                                            navigator.clipboard.writeText(
+                                                                                                patientsDataById
+                                                                                                    .telecom[1].value
+                                                                                            )
+                                                                                        }
+                                                                                        title="Copy to clipboard"
+                                                                                        style={{ fontSize: '10px' }}
+                                                                                    />
+                                                                                )}
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -491,13 +511,42 @@ const NewPatient = () => {
                                                                                     <MdOutlineMarkEmailUnread className="fs-5 text-primary" />
                                                                                 </span>
                                                                             </div>
-                                                                            <div className="col-9">
-                                                                                <span
-                                                                                    className="ps-2 fs-6"
-                                                                                    style={{ fontWeight: 600 }}>
-                                                                                    {patientsDataById?.telecom?.[3]
-                                                                                        ?.value || 'N/A'}
-                                                                                </span>
+                                                                            <div className="col-9 d-flex align-items-center">
+                                                                                {patientsDataById?.telecom?.[3]
+                                                                                    ?.value ? (
+                                                                                    <>
+                                                                                        <a
+                                                                                            href={`https://mail.google.com/mail/?view=cm&fs=1&to=${patientsDataById.telecom[3].value}`}
+                                                                                            target="_blank"
+                                                                                            rel="noopener noreferrer"
+                                                                                            className="ps-2 fs-6 me-2 text-decoration-none text-dark"
+                                                                                            style={{ fontWeight: 600 }}
+                                                                                            title="Send email via Gmail">
+                                                                                            {
+                                                                                                patientsDataById
+                                                                                                    .telecom[3].value
+                                                                                            }
+                                                                                        </a>
+                                                                                        <FaRegCopy
+                                                                                            className="text-primary cursor-pointer"
+                                                                                            onClick={() =>
+                                                                                                navigator.clipboard.writeText(
+                                                                                                    patientsDataById
+                                                                                                        .telecom[3]
+                                                                                                        .value
+                                                                                                )
+                                                                                            }
+                                                                                            title="Copy to clipboard"
+                                                                                            style={{ fontSize: '10px' }}
+                                                                                        />
+                                                                                    </>
+                                                                                ) : (
+                                                                                    <span
+                                                                                        className="ps-2 fs-6 me-2"
+                                                                                        style={{ fontWeight: 600 }}>
+                                                                                        N/A
+                                                                                    </span>
+                                                                                )}
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -692,13 +741,13 @@ const NewPatient = () => {
                                                         'Insurances',
                                                         'Eligibility',
                                                         'Authorizations',
-                                                        // 'Vital Status',
+                                                        'Vital Status',
                                                         // 'Balance',
                                                         // 'Payment',
                                                     ].map((tab) => (
                                                         <li className="nav-item" key={tab}>
                                                             <a
-                                                                className={`nav-link me-3 pb-0 tab-font-family ${
+                                                                className={`nav-link me-0 p-1 pb-0 tab-font-family ${
                                                                     selectedMainTab === tab
                                                                         ? 'active text-primary'
                                                                         : 'text-black'
@@ -868,7 +917,7 @@ const NewPatient = () => {
                             {/* Appointment section */}
                             {visibleSection === 'appointments' && (
                                 <>
-                                    <AppointmentList Id={id}  />
+                                    <AppointmentList Id={id} />
                                 </>
                             )}
 
@@ -881,7 +930,7 @@ const NewPatient = () => {
                         </div>
 
                         {/* Sidebar */}
-                        <div className={isSidebarCollapsed ? 'col-1 ' : 'col-2'}>
+                        <div className={isSidebarCollapsed ? 'col-1' : 'col-2'}>
                             <div
                                 className="patient-menu-container bg-white mt-0"
                                 style={{
@@ -1018,7 +1067,7 @@ const NewPatient = () => {
                                                         style={{
                                                             cursor: 'pointer',
                                                             backgroundColor:
-                                                            selectedMainTab === item.label
+                                                                selectedMainTab === item.label
                                                                     ? '#E8F0FE'
                                                                     : 'transparent',
                                                             fontWeight:

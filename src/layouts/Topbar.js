@@ -173,7 +173,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                     {(layoutType === layoutConstants.LAYOUT_VERTICAL || layoutType === layoutConstants.LAYOUT_FULL) && (
                         <>
                         <div className='d-flex align-items-center col-auto'>
-                            <button className="button-menu-mobile open-left ps-3" onClick={handleLeftMenuCallBack} style={{paddingTop:"3.2rem"}}>
+                            <button className="button-menu-mobile open-left ps-0" onClick={handleLeftMenuCallBack} style={{paddingTop:"3.2rem"}}>
                                 {/* <i className="mdi mdi-menu" /> */}
                                 <img src={CloseIcon} alt='' style={{width:"75%",height:"75%",objectFit:"contain"}}/>
                             </button>

@@ -19,8 +19,6 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         clearErrors,
     } = useForm();
     const store = useSelector((state) => state);
-    console.log(identifiers, 'identifiersidentifiers')
-
     const [identifierDocument, setIdentifierDocument] = useState(false); // Fixed typo
     const [constantIdentifiers, setConstantIdentifiers] = useState([]);
     const doctorDetails = store?.getDoctorsReducer?.data?.result
@@ -53,19 +51,18 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
     ];
 
     useEffect(() => {
-        if (identifiers.length === 0) {
-            setIdentifiers(
-                defaultIdentifiers.map((type) => ({
-                    type,
-                    number: '',
-                    file: null,
-                    expiry: '',
-                    issuingAuthority: '',
-                    system: '',
-                }))
-            );
+        if (identifiers.length === 0 && defaultIdentifiers.length > 0) {
+            const newIdentifiers = defaultIdentifiers.map((type) => ({
+                type,
+                number: '',
+                file: null,
+                expiry: '',
+                issuingAuthority: '',
+                system: '',
+            }));
+            setIdentifiers(newIdentifiers);
         }
-    }, [defaultIdentifiers, setIdentifiers, identifiers.length]);
+    }, [defaultIdentifiers, identifiers.length]);
 
     useEffect(() => {
         onChange?.(identifiers);
@@ -130,7 +127,6 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
             }
         }
     }, [doctorDetails])
-    console.log({ identifiers })
     return (
         <>
             <Row>
