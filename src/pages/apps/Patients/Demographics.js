@@ -99,7 +99,6 @@ const Demographics = ({ patientId }) => {
 
     // const patientDetails = store?.getPatientByIdReducer;
     const patientDetails = store?.getPatientsByIdReducer?.data?.data || [];
-    console.log(patientDetails, '0987654321234567890');
 
     useEffect(() => {
         if (age) {

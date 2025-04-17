@@ -20,27 +20,22 @@ import AddPatientDetails from '../../Patients/AddPatient/AddPatientDetails';
 import { appointmentTypeOptions } from '../../../../utils/DataSets/apppointmenttype.data';
 import AsyncSelect from 'react-select/async';
 import { appointmentReasonOptions } from '../../../../utils/DataSets/appointmentreason.data';
+import Spinner from '../../../../constants/Spinner';
 
-const AppointmentForm = ({ Id, appointmentId }) => {
-    console.log(Id, 'appoinmentid', appointmentId)
+const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const id = Id ? Id : searchParams.get('id');
-
-    // console.log(id, 'iddddddddddddddd')
     const store = useSelector((state) => state);
     const createResponse = store?.createPatientsReducer?.data?.status;
-    // console.log(createResponse, 'createResponseStatus');
     const createPatientResponse = store?.createPatientsReducer?.data?.patient;
     const [submissionType, setSubmissionType] = useState(null);
     const [age, setAge] = useState(null);
     const [patientId, setPatientId] = useState(null);
-    const [createAppointmentType, setCreateAppointmentType] = useState(null)
+    const [createAppointmentType, setCreateAppointmentType] = useState(null);
     const createAppointmentResponse = store?.createAppointmentsReducer?.data?.status;
     const appointmentDetails = store?.getAppointmentDetailsReducer?.data?.appointment;
-    console.log(appointmentDetails, 'appointmentDetails')
-    // console.log(createAppointmentResponse, 'createAppointmentResponse')
     const [search, setSearch] = useState('');
     const [skip, setSkip] = useState(1);
     const [logoName, setLogoName] = useState('');
@@ -57,11 +52,10 @@ const AppointmentForm = ({ Id, appointmentId }) => {
     useEffect(() => {
         if (createAppointmentResponse === 200 && createAppointmentType === 'back') {
             reset();
-            navigate('/apps/appointments/list')
+            navigate('/apps/appointments/list');
         } else if (createAppointmentResponse === 200 && createAppointmentType === 'save') {
-
         }
-    }, [createAppointmentType, createAppointmentResponse])
+    }, [createAppointmentType, createAppointmentResponse]);
 
     const handleSelectChange = (e) => {
         const value = e.target.value;
@@ -72,7 +66,6 @@ const AppointmentForm = ({ Id, appointmentId }) => {
             setSelectedOption(value);
         }
     };
-
 
     useEffect(() => {
         const data = {
@@ -156,7 +149,37 @@ const AppointmentForm = ({ Id, appointmentId }) => {
     useEffect(() => {
         setValue('primaryProvider', doctorName);
     }, [doctorName, setValue]);
+    const formatTime = (isoDateString) => {
+        if (!isoDateString) return '';
+        const date = new Date(isoDateString);
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${hours}:${minutes}`;
+    };
+    const getTodayDate = () => {
+        const today = new Date();
+        return today.toISOString().split('T')[0]; // Format YYYY-MM-DD
+    };
+    const getDefaultTime = () => {
+        return '10:00'; // Default Start Time
+    };
 
+    useEffect(() => {
+        if (selectedSlot && calendarView === 'month') {
+            const date = new Date(selectedSlot?.slots);
+            const localDateString = date.toLocaleDateString('en-CA'); // returns YYYY-MM-DD in local time
+            setValue('scheduled', localDateString);
+        } else if (calendarView !== 'month' && selectedSlot) {
+            const date = new Date(selectedSlot?.start);
+            const localDateString = date.toLocaleDateString('en-CA'); // returns YYYY-MM-DD in local time
+            setValue('scheduled', localDateString);
+            setValue('startTime', formatTime(selectedSlot?.start));
+        } else {
+            setValue('scheduled', getTodayDate());
+            setValue('startTime', getDefaultTime());
+            setValue('duration', '30');
+        }
+    }, [selectedSlot, setValue, calendarView]);
     useEffect(() => {
         const data = {
             doctorId: doctorId,
@@ -164,20 +187,18 @@ const AppointmentForm = ({ Id, appointmentId }) => {
             limit: 10,
             search: search,
         };
-        dispatch(getPatientsAction((data)));
+        dispatch(getPatientsAction(data));
     }, [dispatch, skip, search]);
 
-    const selectedDate = watch("scheduled"); // Watch the selected date field
+    const selectedDate = watch('scheduled'); // Watch the selected date field
 
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-    const availabilityResponse = store?.getPractitionerAvailabilityReducer?.data
-    // console.log(availabilityResponse, 'availabilityResponseavailabilityResponse')
+    const availabilityResponse = store?.getPractitionerAvailabilityReducer?.data;
     useEffect(() => {
         if (selectedDate) {
             const data = { date: selectedDate };
 
-            dispatch(getPractitionerAvailabilityAction(data))
-
+            dispatch(getPractitionerAvailabilityAction(data));
         }
     }, [dispatch, selectedDate]);
 
@@ -185,12 +206,8 @@ const AppointmentForm = ({ Id, appointmentId }) => {
         if (availabilityResponse?.available === false) {
             setShowConfirmationModal(true);
         }
-    }, [availabilityResponse])
-
+    }, [availabilityResponse]);
     const patientsData = store?.getPatientsReducer?.data?.data || [];
-    // console.log(patientsData, 'patientsDatapatientsDatapatientsDatapatientsData')
-    // const patientsList =store?.getPatientsReducer?.data
-    // console.log(patientsData, 'patientsData')
 
     useEffect(() => {
         if (createResponse === 201) {
@@ -199,21 +216,26 @@ const AppointmentForm = ({ Id, appointmentId }) => {
     }, [createResponse]);
 
     useEffect(() => {
-
         if (appointmentDetails && patientsData?.length > 0) {
             setValue('minutesDuration', appointmentDetails?.minutesDuration);
             setValue('consultationRoom', appointmentDetails?.examRoom);
             setValue('status', appointmentDetails?.status);
             // setValue('patient', appointmentDetails?.subject?._id);
-            setSelectedOption(appointmentDetails?.subject?._id)
+            setSelectedOption(appointmentDetails?.subject?._id);
             setValue('appointmentType', appointmentDetails?.appointmentType?.coding?.[0]?.display);
             setAppointmentReason(appointmentDetails?.reason?.[0]?.coding?.[0]);
-            setValue('scheduled', appointmentDetails?.start ? new Date(appointmentDetails?.start).toISOString().split('T')[0] : '');
-            setValue('startTime', appointmentDetails?.start ? new Date(appointmentDetails?.start).toISOString().split('T')[1].slice(0, 5) : '');
+            setValue(
+                'scheduled',
+                appointmentDetails?.start ? new Date(appointmentDetails?.start).toISOString().split('T')[0] : ''
+            );
+            setValue(
+                'startTime',
+                appointmentDetails?.start
+                    ? new Date(appointmentDetails?.start).toISOString().split('T')[1].slice(0, 5)
+                    : ''
+            );
         }
-
-
-    }, [appointmentDetails, patientsData])
+    }, [appointmentDetails, patientsData]);
 
     useEffect(() => {
         if (id) {
@@ -225,7 +247,6 @@ const AppointmentForm = ({ Id, appointmentId }) => {
     }, [id]);
 
     const onSubmit = (data) => {
-
         const selectedAppointmentType = appointmentTypeOptions.find((option) => option.show === data.appointmentType);
         const appointmentTypePayload = {
             coding: [
@@ -267,7 +288,6 @@ const AppointmentForm = ({ Id, appointmentId }) => {
         // Dispatch update if `id` exists, otherwise create a new one
         if (id || appointmentId) {
             dispatch(updateAppointmentDetailsAction({ key: encryptMessage(payload) }));
-            console.log(payload, 'payloaddddd')
         } else {
             dispatch(createAppointmentsAction({ key: encryptMessage(payload) }));
         }
@@ -317,7 +337,7 @@ const AppointmentForm = ({ Id, appointmentId }) => {
                                     onChange={handleSelectChange}
                                     data-has-value={!!selectedOption}
                                     disabled={id}>
-                                    <option value="" hidden >
+                                    <option value="" hidden>
                                         Select Patient
                                     </option>
                                     {patientsData?.map((patient) => (
@@ -333,11 +353,7 @@ const AppointmentForm = ({ Id, appointmentId }) => {
                                     </InputGroup.Text>
                                 )}
                             </InputGroup>
-                            {errors?.patient && (
-                                <p className="text-danger mb-0 err-font" >
-                                    {errors?.patient?.message}
-                                </p>
-                            )}
+                            {errors?.patient && <p className="text-danger mb-0 err-font">{errors?.patient?.message}</p>}
                         </Form.Group>
                     </Col>
                     <Col sm={6}>
@@ -369,7 +385,9 @@ const AppointmentForm = ({ Id, appointmentId }) => {
                     </Col> */}
                     <Col sm={6}>
                         <Form.Group className="mb-1" controlId="appointmentType">
-                            <Form.Label className="mb-0">Appointment Type{!id && <span className="text-danger">*</span>}</Form.Label>
+                            <Form.Label className="mb-0">
+                                Appointment Type{!id && <span className="text-danger">*</span>}
+                            </Form.Label>
                             <Form.Select
                                 className="form-select"
                                 {...register('appointmentType', { required: 'Appointment Type is required' })}
@@ -383,18 +401,20 @@ const AppointmentForm = ({ Id, appointmentId }) => {
                                     </option>
                                 ))}
                             </Form.Select>
-                            {errors.appointmentType && <p className="text-danger err-font">{errors.appointmentType.message}</p>}
+                            {errors.appointmentType && (
+                                <p className="text-danger err-font">{errors.appointmentType.message}</p>
+                            )}
                         </Form.Group>
                     </Col>
                     <Col sm={6} className="d-flex gap-2">
-                        <Form.Group className="mb-1" style={{ width: "150px" }}>
+                        <Form.Group className="mb-1" style={{ width: '150px' }}>
                             <Form.Label className="mb-0">
                                 Scheduled{!id && <span className="text-danger">*</span>}
                             </Form.Label>
                             <Form.Control
                                 type="date"
                                 data-has-value={!!selectedDate}
-                                {...register("scheduled", { required: "Scheduled date is required" })}
+                                {...register('scheduled', { required: 'Scheduled date is required' })}
                             />
                             {/* {errors?.scheduled && (
                                 <p className="text-danger mb-0" style={{ fontSize: "10px" }}>
@@ -507,7 +527,7 @@ const AppointmentForm = ({ Id, appointmentId }) => {
                                 <option value="pending">Pending</option>
                                 <option value="booked">Booked</option>
                                 <option value="arrived">Arrived</option>
-                                <option value="fulfilled">Fulfilled</option>  
+                                <option value="fulfilled">Fulfilled</option>
                                 <option value="cancelled">Cancelled</option>
                                 <option value="noshow">No Show</option>
                                 <option value="entered-in-error">Entered in error</option>
@@ -517,22 +537,37 @@ const AppointmentForm = ({ Id, appointmentId }) => {
                                 {/* <option value="Notconfirmed">Not Confirmed</option> */}
                             </Form.Select>
                         </Form.Group>
-
                     </Col>
                 </Row>
                 <Row>
                     <Col sm={12} className="d-flex justify-content-end my-2 gap-2">
-                        {!id && <Button className="custom-buttons" onClick={() => reset()}>
-                            Delete
-                        </Button>
-                        }
-                        {!id &&
-                            <Button type="submit" onClick={() => setCreateAppointmentType('back')} className="custom-buttons">
+                        {!id && (
+                            <Button className="custom-buttons" onClick={() => reset()}>
+                                Delete
+                            </Button>
+                        )}
+                        {!id && (
+                            <Button
+                                type="submit"
+                                onClick={() => setCreateAppointmentType('back')}
+                                className="custom-buttons">
                                 Save and close
                             </Button>
-                        }
-                        <Button type="submit" onClick={() => setCreateAppointmentType('save')} className="custom-buttons">
-                            {!id ? 'Save' : 'Update'}
+                        )}
+                        <Button
+                            className="custom-buttons"
+                            type="submit"
+                            style={{width:'55px'}}
+                            disabled={
+                                store?.createAppointmentsReducer?.loading ||
+                                store?.updateAppointmentDetailsReducer?.loading
+                            }>
+                            {store?.createAppointmentsReducer?.loading ||
+                            store?.updateAppointmentDetailsReducer?.loading ? (
+                                <Spinner color="white" className="spinner-border-sm" />
+                            ):(
+                                id ? 'Update': 'Save'
+                            )}
                         </Button>
                         {/* <Button className="custom-buttons">Cancel</Button> */}
                     </Col>
@@ -559,40 +594,45 @@ const AppointmentForm = ({ Id, appointmentId }) => {
                             <ul className="nav nav-underline">
                                 <li className="nav-item">
                                     <button
-                                        className={`text-black nav-link fw-medium ${activeTab === 'personalDetails' ? 'active fw-bold' : ''
-                                            }`}
+                                        className={`text-black nav-link fw-medium ${
+                                            activeTab === 'personalDetails' ? 'active fw-bold' : ''
+                                        }`}
                                         onClick={() => handleTabChange('personalDetails')}>
                                         Personal Details
                                     </button>
                                 </li>
                                 <li className="nav-item">
                                     <button
-                                        className={`text-black nav-link fw-medium ${activeTab === 'demographicDetails' ? 'active fw-bold' : ''
-                                            }`}
+                                        className={`text-black nav-link fw-medium ${
+                                            activeTab === 'demographicDetails' ? 'active fw-bold' : ''
+                                        }`}
                                         onClick={() => handleTabChange('demographicDetails')}>
                                         Demographic
                                     </button>
                                 </li>
                                 <li className="nav-item">
                                     <button
-                                        className={`text-black nav-link fw-medium ${activeTab === 'referringDoctor' ? 'active fw-bold' : ''
-                                            }`}
+                                        className={`text-black nav-link fw-medium ${
+                                            activeTab === 'referringDoctor' ? 'active fw-bold' : ''
+                                        }`}
                                         onClick={() => handleTabChange('referringDoctor')}>
                                         Referring Doctor
                                     </button>
                                 </li>
                                 <li className="nav-item">
                                     <button
-                                        className={`text-black nav-link fw-medium ${activeTab === 'responsible' ? 'active fw-bold' : ''
-                                            }`}
+                                        className={`text-black nav-link fw-medium ${
+                                            activeTab === 'responsible' ? 'active fw-bold' : ''
+                                        }`}
                                         onClick={() => handleTabChange('responsible')}>
                                         Responsible party
                                     </button>
                                 </li>
                                 <li className="nav-item">
                                     <button
-                                        className={`text-black nav-link fw-medium ${activeTab === 'insurance' ? 'active fw-bold' : ''
-                                            }`}
+                                        className={`text-black nav-link fw-medium ${
+                                            activeTab === 'insurance' ? 'active fw-bold' : ''
+                                        }`}
                                         onClick={() => handleTabChange('insurance')}>
                                         Insurance
                                     </button>
@@ -609,7 +649,9 @@ const AppointmentForm = ({ Id, appointmentId }) => {
                     </div>
 
                     <div className="px-2">
-                        {activeTab === 'personalDetails' && <AddPatientDetails patientId={patientId} setSubmissionType={setSubmissionType} />}
+                        {activeTab === 'personalDetails' && (
+                            <AddPatientDetails patientId={patientId} setSubmissionType={setSubmissionType} />
+                        )}
                         {activeTab === 'responsible' && <p>responsible</p>}
                         {activeTab === 'insurance' && <p>insurance...</p>}
                         {activeTab === 'demographicDetails' && <AddDemographics patientId={patientId} />}
@@ -619,28 +661,30 @@ const AppointmentForm = ({ Id, appointmentId }) => {
             </Modal>
 
             {/* Confirmation Modal */}
-            <Modal show={showConfirmationModal} onHide={() => { setShowConfirmationModal(false); setValue("scheduled", ""); }} centered>
+            <Modal
+                show={showConfirmationModal}
+                onHide={() => {
+                    setShowConfirmationModal(false);
+                    setValue('scheduled', '');
+                }}
+                centered>
                 <Modal.Body>
-                    <div className='text-center'>
+                    <div className="text-center">
                         <h4>Confirmation Needed</h4>
-
                     </div>
-                    <div className='text-center mt-4'>
-                        <p>
-                            Doctor is on holiday. Are you sure you want to create an appointment?
-                        </p>
+                    <div className="text-center mt-4">
+                        <p>Doctor is on holiday. Are you sure you want to create an appointment?</p>
                     </div>
-                    <div className='d-flex justify-content-center gap-2 mt-4 mb-1'>
+                    <div className="d-flex justify-content-center gap-2 mt-4 mb-1">
                         <Button
-                            className='cancel-button'
+                            className="cancel-button"
                             onClick={() => {
                                 setShowConfirmationModal(false);
-                                setValue("scheduled", ""); // Reset the selected date
-                            }}
-                        >
+                                setValue('scheduled', ''); // Reset the selected date
+                            }}>
                             Cancel
                         </Button>
-                        <Button className='custom-buttons' onClick={() => setShowConfirmationModal(false)}>
+                        <Button className="custom-buttons" onClick={() => setShowConfirmationModal(false)}>
                             Proceed
                         </Button>
                     </div>

@@ -196,10 +196,10 @@ const Report = () => {
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowModal(false)}>
+                    {/* <Button variant="secondary" onClick={() => setShowModal(false)} className='cancel-button'>
                         Cancel
-                    </Button>
-                    <Button variant="primary" onClick={handleSubmit}>
+                    </Button> */}
+                    <Button variant="primary" onClick={handleSubmit} className='custom-buttons'>
                         Save
                     </Button>
                 </Modal.Footer>

@@ -28,7 +28,7 @@ const DoctorQualifications = () => {
         { id: 1, degreeName: '', degreeFile: null, issuerOrganisation: '' },
     ]);
     const degreeFileInputRef = useRef(null);
-    const documentsFileInputRef = useRef(null);
+    const documentsFileInputRefs = useRef([]);
     const [documents, setDocuments] = useState([
         { name: '', number: '', issuingAuthority: '', document: null, note: '' },
     ]);
@@ -146,16 +146,6 @@ const DoctorQualifications = () => {
         );
         setDocuments(updatedDocuments);
     };
-
-    // const handleFileChangeDocuments = (index, event) => {
-    //     const file = event.target.files[0];
-    //     if (file) {
-    //         const updatedDocs = [...documents];
-    //         updatedDocs[index].document = file;
-    //         setDocuments(updatedDocs);
-    //     }
-    // };
-
     const handleFileChangeDocuments = async (index, event) => {
         const file = event.target.files[0];
         try {
@@ -164,7 +154,12 @@ const DoctorQualifications = () => {
             handleDocumentsChange(index, 'document', { url: url?.url, fileName });
         } catch (error) {}
     };
-
+    const removeDocument = (indexToRemove) => {
+        if (documents.length > 1) {
+            const updated = documents.filter((_, index) => index !== indexToRemove);
+            setDocuments(updated);
+        }
+    };
     return (
         <>
             {/* <div className="container-fluid"> */}
@@ -226,29 +221,32 @@ const DoctorQualifications = () => {
                                                 <div className="mb-1 d-flex flex-column position-relative">
                                                     <Form.Label className="mb-0">Degree</Form.Label>
                                                     <div
-                                                        onClick={() => degreeFileInputRef.current.click()}
+                                                        onClick={() =>
+                                                            document.getElementById(`degree-upload-${index}`).click()
+                                                        }
                                                         className={`custom-file-upload justify-content-between cursor-pointer form-control ${
-                                                            qualification.degreeName || qualification.degreeFile
-                                                                ? ''
-                                                                : 'custom-form-fields'
+                                                            qualification.degreeFile ? '' : 'custom-form-fields'
                                                         }`}>
                                                         {degreeUploading
                                                             ? 'Uploading...'
                                                             : qualification.degreeFile?.fileName
-                                                            ? qualification.degreeFile.fileName
+                                                            ? qualification.degreeFile.fileName.length > 30
+                                                                ? qualification.degreeFile.fileName.slice(0, 30) + '...'
+                                                                : qualification.degreeFile.fileName
                                                             : 'Upload Degree'}
                                                         <p className="mb-0">
                                                             <FiUploadCloud />
                                                         </p>
                                                     </div>
                                                     <Form.Control
+                                                        id={`degree-upload-${index}`}
                                                         type="file"
                                                         className="d-none"
-                                                        ref={degreeFileInputRef}
                                                         onChange={(event) => handleFileChangeDegree(index, event)}
                                                     />
                                                 </div>
                                             </div>
+
                                             <div className="col-md-4 col-12">
                                                 <Form.Group className="mb-1">
                                                     <Form.Label className="mb-0">Issuer Organisation</Form.Label>
@@ -286,133 +284,106 @@ const DoctorQualifications = () => {
                         </Row>
                         <hr />
                         <Row>
-                            <Col sm={12}>
-                                <Row>
-                                    <h5>
-                                        Other Documents
-                                        <span
-                                            className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
-                                            onClick={addDocuments}></span>
-                                    </h5>
-                                    {documents?.map((data, index) => (
-                                        <>
-                                            <Row key={index}>
-                                                <div className="col-md-3 col-12">
-                                                    <Form.Group className="mb-1">
-                                                        <Form.Label className="mb-0">Document Name</Form.Label>
-                                                        <Form.Control
-                                                            type="text"
-                                                            value={data?.name || ''}
-                                                            {...register(`documentName[${index}]`)}
-                                                            onChange={(e) =>
-                                                                handleDocumentsChange(index, 'name', e.target.value)
-                                                            }
-                                                            placeholder="Enter Document Name"
-                                                        />
-                                                    </Form.Group>
-                                                </div>
-                                                <div className="col-md-3 col-12">
-                                                    <div className="mb-1 d-flex flex-column position-relative">
-                                                        <Form.Label className="mb-0">Document Number</Form.Label>
-                                                        <Form.Control
-                                                            type="text"
-                                                            value={data?.number}
-                                                            {...register(`documentNumber[${index}]`)}
-                                                            onChange={(e) =>
-                                                                handleDocumentsChange(index, 'number', e.target.value)
-                                                            }
-                                                            placeholder="Enter Document Number"
-                                                        />
+                                <Col sm={12}>
+                                    <Row>
+                                        <h5>
+                                            Other Documents
+                                            <span
+                                                className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
+                                                onClick={addDocuments}
+                                            ></span>
+                                        </h5>
+                                        {documents?.map((data, index) => (
+                                            <>
+                                                <Row key={data.id} >
+                                                    <div className="col-md-3 col-12">
+                                                        <Form.Group className="mb-1">
+                                                            <Form.Label className="mb-0">Document Name</Form.Label>
+                                                            <Form.Control
+                                                                type="text"
+                                                                value={data?.name}
+                                                                // {...register(`documentName[${index}]`)}
+                                                                onChange={(e) => handleDocumentsChange(index, 'name', e.target.value)}
+                                                                placeholder="Enter Document Name"
+                                                            />
+                                                        </Form.Group>
                                                     </div>
-                                                </div>
-                                                <div className="col-md-3 col-12">
-                                                    <Form.Group className="mb-1">
-                                                        <Form.Label className="mb-0">Issuing Authority</Form.Label>
-                                                        <Form.Control
-                                                            type="text"
-                                                            value={data?.issuingAuthority || ''}
-                                                            {...register(`issuingAuthority[${index}]`)}
-                                                            onChange={(e) =>
-                                                                handleDocumentsChange(
-                                                                    index,
-                                                                    'issuingAuthority',
-                                                                    e.target.value
-                                                                )
-                                                            }
-                                                            // value={data.issuerOrganisation}
-                                                            // onChange={(e) => handledataChange(index, 'issuerOrganisation', e.target.value)}
-                                                            placeholder="Enter Issuing Authority"
-                                                        />
-                                                    </Form.Group>
-                                                </div>
-                                                {/* <div className="col-md-3 col-12">
-                                                    <Form.Group className="mb-1">
-                                                        <Form.Label className="mb-0">Status</Form.Label>
-                                                        <Form.Select
-                                                            {...register(`status[${index}]`)}
-                                                            onChange={(e) => handleDocumentsChange(index, 'status', e.target.value === 'active' ? true : false)}>
-                                                            <option value="" hidden>Select Status</option>
-                                                            <option value="active">Active</option>
-                                                            <option value="inactive">Inactive</option>
-                                                        </Form.Select>
-                                                    </Form.Group>
-                                                </div> */}
-                                                <div className="col-md-3 col-12">
-                                                    <div className="mb-1 d-flex flex-column position-relative">
-                                                        <Form.Label className="mb-0">Document</Form.Label>
-                                                        <div
-                                                            onClick={() => documentsFileInputRef.current.click()}
-                                                            className={`custom-file-upload justify-content-between cursor-pointer form-control ${
-                                                                data.degreeName || data.degreeFile
-                                                                    ? ''
-                                                                    : 'custom-form-fields'
-                                                            }`}>
-                                                            {documentUploading
-                                                                ? 'Uploading...'
-                                                                : data.degreeFile?.fileName
-                                                                ? data.degreeFile.fileName
-                                                                : 'Upload Degree'}
-                                                            <p className="mb-0">
-                                                                <FiUploadCloud />
-                                                            </p>
+                                                    <div className="col-md-3 col-12">
+                                                        <div className="mb-1 d-flex flex-column position-relative">
+                                                            <Form.Label className="mb-0">Document Number</Form.Label>
+                                                            <Form.Control
+                                                                type="text"
+                                                                value={data?.number}
+                                                                // {...register(`documentNumber[${index}]`)}
+                                                                onChange={(e) => handleDocumentsChange(index, 'number', e.target.value)}
+                                                                placeholder="Enter Document Number"
+                                                            />
                                                         </div>
-                                                        <Form.Control
-                                                            type="file"
-                                                            {...register(`document[${index}]`)}
-                                                            className="d-none"
-                                                            // id={`fileInput-documents-${index}`}
-                                                            ref={documentsFileInputRef}
-                                                            onChange={(event) =>
-                                                                handleFileChangeDocuments(index, event)
-                                                            }
-                                                        />
                                                     </div>
-                                                </div>
-                                                <div className="col-md-3 col-12">
-                                                    <Form.Group className="mb-1">
-                                                        <Form.Label className="mb-0">Note</Form.Label>
-                                                        <Form.Control
-                                                            as="textarea"
-                                                            value={data?.note}
-                                                            {...register(`note[${index}]`)}
-                                                            onChange={(e) =>
-                                                                handleDocumentsChange(index, 'note', e.target.value)
-                                                            }
-                                                            // value={qualification.issuerOrganisation}
-                                                            // onChange={(e) => handleQualificationChange(index, 'issuerOrganisation', e.target.value)}
-                                                            placeholder="Enter Note"
-                                                        />
-                                                    </Form.Group>
-                                                </div>
-                                                {documents?.length > 1 && index < documents.length - 1 && (
-                                                    <hr className="mt-2" />
-                                                )}
-                                            </Row>
-                                        </>
-                                    ))}
-                                </Row>
-                            </Col>
-                        </Row>
+                                                    <div className="col-md-3 col-12">
+                                                        <Form.Group className="mb-1">
+                                                            <Form.Label className="mb-0">Issuing Authority</Form.Label>
+                                                            <Form.Control
+                                                                type="text"
+                                                                value={data?.issuingAuthority}
+                                                                // {...register(`issuingAuthority[${index}]`)}
+                                                                onChange={(e) => handleDocumentsChange(index, 'issuingAuthority', e.target.value)}
+                                                                placeholder="Enter Issuing Authority"
+                                                            />
+                                                        </Form.Group>
+                                                    </div>
+
+                                                    <div className="col-md-3 col-12">
+                                                        <div className="mb-1 d-flex flex-column position-relative">
+                                                            <Form.Label className="mb-0">Document</Form.Label>
+                                                            <div
+                                                                onClick={() => document.getElementById(`documents-file-input-${index}`).click()}
+                                                                // onClick={() => documentsFileInputRef.current.click()}
+                                                                className={`custom-file-upload justify-content-between cursor-pointer form-control ${data?.document?.fileName || data.degreeFile ? '' : 'custom-form-fields'}`}
+                                                            >
+                                                                {documentUploading ? 'Uploading...' : data?.document?.fileName.length>30 ? data?.document.fileName.slice(0,30) + '...' : 'Upload document'}
+                                                                <p className="mb-0">
+                                                                    <FiUploadCloud />
+                                                                </p>
+                                                            </div>
+                                                            <Form.Control
+                                                                type="file"
+                                                                // {...register(`document[${index}]`)}
+                                                                className="d-none"
+                                                                id={`documents-file-input-${index}`}
+                                                                // ref={documentsFileInputRef}
+                                                                onChange={(event) => handleFileChangeDocuments(index, event)}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-3 col-12">
+                                                        <Form.Group className="mb-1">
+                                                            <Form.Label className="mb-0">Note</Form.Label>
+                                                            <Form.Control
+                                                                as='textarea'
+                                                                value={data?.note}
+                                                                // {...register(`note[${index}]`)}
+                                                                onChange={(e) => handleDocumentsChange(index, 'note', e.target.value)}
+                                                                placeholder="Enter Note"
+                                                            />
+                                                        </Form.Group>
+                                                    </div>
+                                                    {index > 0 && (
+                                                        <div className="col-3 d-flex align-items-center">
+                                                            <span
+                                                                className="text-danger cursor-pointer fs-5 fw-bold"
+                                                                onClick={() => removeDocument(index)}>
+                                                                <CiCircleMinus />
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                    {documents?.length > 1 && index < documents.length - 1 && <hr className="mt-2" />}
+                                                </Row>
+                                            </>
+                                        ))}
+                                    </Row>
+                                </Col>
+                            </Row>
 
                         <div className="d-flex justify-content-end gap-2 mt-1">
                             <Button className="cancel-button">Cancel</Button>

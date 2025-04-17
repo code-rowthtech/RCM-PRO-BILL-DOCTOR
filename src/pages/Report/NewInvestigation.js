@@ -15,7 +15,7 @@ const NewInvestigation = () => {
                     <div className="d-flex justify-content-between">
                         <p style={{ fontWeight: 600, textTransform: 'uppercase' }}>New Investigation report</p>
                         <div>
-                            <Button variant="secondary" onClick={() => navigate(-1)}>Back</Button>
+                            <Button variant="secondary"className='cancel-button' onClick={() => navigate(-1)}>Back</Button>
                         </div>
                     </div>
 
@@ -93,8 +93,8 @@ const NewInvestigation = () => {
                                     </Form.Group>
                                 </div>
                                 <div className='d-flex justify-content-end gap-2 mt-1'> 
-                                    <Button variant='secondary'>Cancel</Button>
-                                    <Button>Save</Button>
+                                    <Button variant='secondary' className='cancel-button'>Cancel</Button>
+                                    <Button className='custom-buttons'>Save</Button>
                                 </div>
                              
                             </div>

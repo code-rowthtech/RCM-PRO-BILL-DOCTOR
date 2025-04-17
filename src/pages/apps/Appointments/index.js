@@ -4,11 +4,12 @@ import { Button, Card, Col, Row, Table } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
 import { FormInput } from '../../../components';
-import { FiEdit, FiFileText, FiFilter } from 'react-icons/fi';
+import { FiArchive, FiClock, FiEdit, FiFileText, FiFilter, FiSun } from 'react-icons/fi';
 import { getAppointmentsAction } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import Spinner from '../../../constants/Spinner';
 import AppointmentCalendar from './AppointmentCalendar';
+import { useForm } from 'react-hook-form';
 
 // Define the types for each order item
 type OrderListItems = {
@@ -212,13 +213,27 @@ const AppointmentsTransactionList = ({ patientsData }: OrderListProps): React$El
 
 // Main Appointments Component
 const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> }): React$Element<React$FragmentType> => {
-    const [activeTab, setActiveTab] = useState('appointments');
-
-    const navigate = useNavigate();
+    const {
+        register,
+        formState: { errors },
+        setValue,
+        clearErrors,
+    } = useForm();
     const goto = () => {
         navigate("/apps/appointments/appointmentCalendar");
     };
-
+    const store = useSelector((state) => state);
+    const dispatch = useDispatch();
+    const [activeTab, setActiveTab] = useState('appointments');
+    const [appointmentPeriod, setAppointmentPeriod] = useState('today');
+    const navigate = useNavigate();
+    const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    useEffect(() => {
+        if (activeTab === 'appointments') {
+            dispatch(getAppointmentsAction({ clinicId: clinicId, doctorId: doctorId, status: appointmentPeriod }));
+        }
+    }, [dispatch, appointmentPeriod, activeTab]);
     return (
         <>
             <Row className="mt-2">
@@ -286,6 +301,41 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                         </Col>
                                     </Row>
                                 </Col>
+                                {activeTab === 'appointments' &&
+                                    <Col md={12} className='mt-2'>
+                                        <div className="time-period-tabs">
+                                            <ul className="nav nav-pills">
+                                                <li className="nav-item">
+                                                    <button
+                                                        className={`nav-link ${appointmentPeriod === 'today' ? 'active' : 'text-black'}`}
+                                                        onClick={() => setAppointmentPeriod('today')}
+                                                    >
+                                                        <FiSun className="me-1" />
+                                                        Today
+                                                    </button>
+                                                </li>
+                                                <li className="nav-item ms-2">
+                                                    <button
+                                                        className={`nav-link ${appointmentPeriod === 'upcoming' ? 'active' : 'text-black'}`}
+                                                        onClick={() => setAppointmentPeriod('upcoming')}
+                                                    >
+                                                        <FiClock className="me-1" />
+                                                        Upcoming
+                                                    </button>
+                                                </li>
+                                                <li className="nav-item ms-2">
+                                                    <button
+                                                        className={`nav-link ${appointmentPeriod === 'history' ? 'active' : 'text-black'}`}
+                                                        onClick={() => setAppointmentPeriod('history')}
+                                                    >
+                                                        <FiArchive className="me-1" />
+                                                        History
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </Col>
+                                }
                             </Row>
 
                             {/* Render table based on active tab */}
