@@ -20,7 +20,6 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const allergyDetails = store?.getAllergyDetailsReducer?.data?.allergy;
-    console.log(allergyDetails, 'Allergy Details');
 
     useEffect(() => {
         setValue('allergyType', allergyDetails?.allergyType);
@@ -46,7 +45,6 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
     
             dispatch(updateAllergyAction({ key: encryptMessage(payload) }));
             // reset();
-            console.log(payload, 'Update Payload');
         };
 
     return (

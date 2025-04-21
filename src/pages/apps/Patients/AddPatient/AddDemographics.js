@@ -51,8 +51,6 @@ const AddDemographics = ({ patientId, setActiveTab, setVisibleReffering }) => {
 
     // const patientDetails = store?.getPatientByIdReducer;
     const patientDetails = store?.getPatientsByIdReducer?.data?.patient || [];
-    console.log(patientDetails, '0987654321234567890');
-
     const formattedEthnicityOptions = ethnicityOptions.map((ethnicity) => ({
         value: ethnicity, // Code as the value
         label: ethnicity.display, // Display text as the label
@@ -115,7 +113,6 @@ const AddDemographics = ({ patientId, setActiveTab, setVisibleReffering }) => {
         const selectedMaritalStatus = maritalStatusOptions.find((option) => option.show === data.maritalStatus);
         const selectedRaceOption = raceOptions.find((option) => option.code === data.race);
         const selectedSexOption = sexAssignedAtBirthOptions.find((option) => option.value === data.sex);
-        console.log(data, 'dattaaa');
         let finalIdentifiers = [];
         identifiers.forEach((element) => {
             const identifierData = {
@@ -266,7 +263,6 @@ const AddDemographics = ({ patientId, setActiveTab, setVisibleReffering }) => {
             ...(data?.notes && { notes: data.notes }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'payload');
     };
     useEffect(() => {
         if (updateSuccess === 200) {

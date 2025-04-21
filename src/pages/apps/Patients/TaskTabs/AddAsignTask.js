@@ -27,11 +27,7 @@ const AddAsignTask = () => {
     const [logo, setLogo] = useState(null);
     const [logoName, setLogoName] = useState('');
     const [profileUploading, setProfileUploading] = useState(false);
-
     const logoFileInputRef = useRef(null);
-
-    console.log(patientsData, 'patientsData');
-
     useEffect(() => {
         dispatch(getClinicEmployeesAction({ clinicId: clinicId }));
     }, [dispatch]);
@@ -84,7 +80,6 @@ const AddAsignTask = () => {
 
         dispatch(createTaskAction({ key: encryptMessage(payload) }));
         reset();
-        // console.log(payload, 'Final Payload');
     };
 
     return (

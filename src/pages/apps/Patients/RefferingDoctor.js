@@ -149,7 +149,6 @@ const ReferringDoctor = ({ activeTab, setActiveTab }) => {
             // ],
         };
         dispatch(createReferringDoctorAction({ key: encryptMessage(payload) }));
-        console.log('payload', payload);
     };
 
     return (

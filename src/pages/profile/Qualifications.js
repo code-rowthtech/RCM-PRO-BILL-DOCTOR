@@ -97,7 +97,6 @@ const DoctorQualifications = () => {
             qualification: qualificationData,
             otherDocuments: documents,
         };
-        console.log(payload, 'payload');
         dispatch(updateDoctorAction({ key: encryptMessage(payload) }));
     };
     useEffect(() => {

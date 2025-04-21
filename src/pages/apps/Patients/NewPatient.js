@@ -68,11 +68,9 @@ const NewPatient = () => {
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const primaryProvider = JSON.parse(sessionStorage.getItem('hyper_user'))?.name?.text;
-    console.log(primaryProvider, 'primaryProvider');
     const store = useSelector((state) => state);
     const patientsDataById = store?.getPatientsByIdReducer?.data?.data || [];
 
-    console.log(patientsDataById, 'patientsDataByIdpatientsDataById');
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
     const [profilePhoto, setProfilePhoto] = useState(profileDummy);
     const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -81,9 +79,7 @@ const NewPatient = () => {
     const [logoName, setLogoName] = useState('');
     const [logo, setLogo] = useState(null);
     const [selectedMainTab, setSelectedMainTab] = useState('Patient Info');
-    console.log(selectedMainTab, 'selectedmaintab');
     const [selectedSubTab, setSelectedSubTab] = useState('Assign Task');
-    console.log({ selectedSubTab });
     const [visibleSection, setVisibleSection] = useState('patient'); // Default section
     const [encounterTab, setEncounterTab] = useState('encounter');
     const [encounterModal, setEncounterModal] = useState(false);
@@ -125,14 +121,11 @@ const NewPatient = () => {
         // setEncounterTab(tab);
         // setVisibleSection('encounter'); // Show Encounter Section, Hide Patient Section
     };
-    console.log({ visibleSection });
     const handleSidebarToggle = () => {
         setSidebarCollapsed(!isSidebarCollapsed);
     };
 
     const handleTabClick = (tab) => {
-        console.log(tab, 'huygtfcdfxfdcghjkjlk');
-
         setSelectedSubTab(tab);
     };
     const tabMappings = {
@@ -157,7 +150,6 @@ const NewPatient = () => {
         setVisibleSection('task');
         // setSelectedMainTab("Patient Info")
     };
-    // console.log(setVisibleSection, 'setVisibleSection')
     const [isClinicalReviewExpandedData, setIsClinicalReviewExpandedData] = useState(false);
 
     const handleToggle = () => {
@@ -297,7 +289,6 @@ const NewPatient = () => {
                   }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
-        // console.log(payload, 'payloadpayload')
     };
 
     return (
@@ -484,17 +475,17 @@ const NewPatient = () => {
                                                                                 <span
                                                                                     className="ps-2 fs-6 me-2"
                                                                                     style={{ fontWeight: 600 }}>
-                                                                                    {patientsDataById?.telecom?.[1]
+                                                                                    {patientsDataById?.telecom?.[0]
                                                                                         ?.value || 'N/A'}
                                                                                 </span>
-                                                                                {patientsDataById?.telecom?.[1]
+                                                                                {patientsDataById?.telecom?.[0]
                                                                                     ?.value && (
                                                                                     <FaRegCopy
                                                                                         className="text-primary cursor-pointer"
                                                                                         onClick={() =>
                                                                                             navigator.clipboard.writeText(
                                                                                                 patientsDataById
-                                                                                                    .telecom[1].value
+                                                                                                    .telecom[0].value
                                                                                             )
                                                                                         }
                                                                                         title="Copy to clipboard"
@@ -727,7 +718,7 @@ const NewPatient = () => {
                                     <Card
                                         className="px-2"
                                         style={{
-                                            height: isOpen ? '64.4vh' : '80.3vh',
+                                            height: isOpen ? '60.4vh' : '80.3vh',
                                             transition: 'height 0.3s ease-in-out',
                                         }}>
                                         <div className="d-flex justify-content-between pt-2 px-2">

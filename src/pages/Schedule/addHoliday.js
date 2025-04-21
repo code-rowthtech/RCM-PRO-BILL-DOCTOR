@@ -14,7 +14,6 @@ const AddHoliday = () => {
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
     const user = JSON.parse(sessionStorage.getItem('hyper_user'));
-    // console.log(user,'user')
     const doctorName = user?.name?.text;
 
     const {
@@ -33,7 +32,6 @@ const AddHoliday = () => {
             fromDate: data.fromDate,
             toDate: data.tillDate,
         };
-        // console.log(payload,'payloadddddddd')
         dispatch(createHolidayScheduleAction({ key: encryptMessage(payload) }));
     };
     const createResponse = store?.createHolidayScheduleReducer?.data?.status;

@@ -52,7 +52,6 @@ const Responsible = ({ patientId, activeTab, setActiveTab }) => {
             telecom: responsibleTelecom,
         };
         dispatch(createResponsiblePartyAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'payload');
     };
 
     useEffect(() => {

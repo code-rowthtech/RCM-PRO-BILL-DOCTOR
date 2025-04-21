@@ -76,13 +76,9 @@ const ResetPassword = (): React$Element<any> => {
      * handle form submission
      */
     const onSubmit = (formData) => {
-        // console.log(formData['password'])
         dispatch(forgotPasswordChange({ token: token, newPassword: formData['password'] }));
     };
     const navigate = useNavigate();
-
-    // console.log(decryptMessage(changePasswordSuccess), '34567977568768')
-    // console.log(changePasswordSuccess, 'changePasswordSuccesschangePasswordSuccesschangePasswordSuccesschangePasswordSuccesschangePasswordSuccess')
     useEffect(() => {
 
         if (changePasswordSuccess) {

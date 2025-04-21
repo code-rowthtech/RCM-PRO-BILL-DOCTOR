@@ -26,7 +26,6 @@ function* login({ payload }) {
         }
         const response = yield call(loginApi, encryptedPayload);
         const user = JSON.parse(decryptMessage(response?.data?.data));
-        console.log(user,'user')
         const userData = {
             name: user?.name,
             lastName: user?.lastName,
@@ -80,7 +79,6 @@ function* signup({ payload: { fullname, email, password } }) {
 }
 
 function* forgotPassword({ payload }) {
-    // console.log(payload, 'dhsfnvdhfsdhfbvhd')
     try {
         const encryptedPayload = {
             key: encryptMessage(payload)

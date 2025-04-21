@@ -7,6 +7,7 @@ import { createScheduleAction, getScheduleAction, updateScheduleAction } from '.
 import { encryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 import { updateSchedule } from '../../helpers/api/apiEndpoints';
+
 // import {
 //   createScheduleAction,
 //   getDoctorsListAction,
@@ -22,10 +23,9 @@ const ScheduleTab = () => {
     const [name, setName] = useState('');
     const scheduleList = store?.getScheduleReducer?.data?.data || [];
     const scheduleData = store?.getScheduleReducer?.data?.schedule || [];
-    console.log(store?.getScheduleReducer?.data?.schedule, 'scheduleList32322');
     const isLoading = store?.getScheduleReducer?.loading;
     const user = JSON.parse(sessionStorage.getItem('hyper_user'));
-    // console.log(user,'user')
+   
     const doctorName = user?.name?.text;
     const doctorId = user?.doctorId;
 
@@ -199,7 +199,6 @@ const ScheduleTab = () => {
             dispatch(createScheduleAction(payload)); // Send payload directly
         }
 
-        // console.log(payload, 'payload');
     };
 
     const [days, setDays] = useState([
@@ -275,7 +274,6 @@ const ScheduleTab = () => {
                             placeholder="Enter Per Patient Time"
                             {...register('perPatientTime', { required: 'Per Patient Time is required' })}
                             // onChange={(e) => {
-                            //     console.log("Selected Time:", e.target.value);
                             //     setTime(e.target.value);
                             // }}
                         />
@@ -283,122 +281,131 @@ const ScheduleTab = () => {
                     </Form.Group>
                 </Col>
             </Row>
-
-            <Table striped className="mt-2">
-                <thead>
-                    <tr>
-                        <th className="text-white">Available On</th>
-                        <th>
-                            <table className="schedule-table" style={{ width: '100%' }}>
-                                <thead>
-                                    <tr className="text-white">
-                                        <th style={{ width: '40%' }} className="pe-1">
-                                            Available From
-                                        </th>
-                                        <th style={{ width: '40%' }} className="ps-1">
-                                            Available To
-                                        </th>
-                                        <th style={{ width: '20%' }}>Action</th>
-                                    </tr>
-                                </thead>
-                            </table>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {/* Loading State */}
-                    {store?.getPractitionerTimingsReducer?.loading ? (
+            <div className="slot-scroll-wrapper">
+                <Table striped className="table mt-2">
+                    <thead>
                         <tr>
-                            <td className="text-center" colSpan={2}>
-                                <Spinner />
-                            </td>
+                            <th className="text-white" style={{ width: '50%' }}>
+                                Available On
+                            </th>
+                            <th style={{ width: '50%' }}>
+                                <table className="schedule-table" style={{ width: '100%' }}>
+                                    <thead>
+                                        <tr className="text-white">
+                                            <th style={{ width: '33%' }} className="pe-1">
+                                                Available From
+                                            </th>
+                                            <th style={{ width: '33%' }} className="ps-1">
+                                                Available To
+                                            </th>
+                                            <th style={{ width: '33%' }}>Action</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </th>
                         </tr>
-                    ) : (
-                        days?.map((day, dayIndex) => (
-                            <tr key={dayIndex}>
-                                <td>
-                                    {/* Day Name */}
-                                    <input className="form-control" type="text" value={day?.day} readOnly />
-                                </td>
-                                <td>
-                                    {/* Slot Table for Each Day */}
-                                    <table className="schedule-table" style={{ width: '100%' }}>
-                                        <tbody>
-                                            {day?.slots?.map((slot, slotIndex) => (
-                                                <tr key={slotIndex}>
-                                                    <td style={{ width: '40%' }} className="text-black pe-1">
-                                                        {/* <input
-                              className="form-control"
-                              type="time"
-                              defaultValue={slot?.startTime}
-                            /> */}
-                                                        <input
-                                                            className="form-control"
-                                                            type="time"
-                                                            value={slot.startTime || ''}
-                                                            onChange={(e) => {
-                                                                const value = e.target.value;
-                                                                setDays((prevDays) => {
-                                                                    const updatedDays = [...prevDays];
-                                                                    updatedDays[dayIndex].slots[slotIndex].startTime =
-                                                                        value;
-                                                                    return updatedDays;
-                                                                });
-                                                            }}
-                                                        />
-                                                    </td>
-                                                    <td style={{ width: '40%' }} className="ps-1">
-                                                        {/* <input
-                              className="form-control"
-                              type="time"
-                              defaultValue={slot?.endTime}
-                            // value={slot?.endTime}
-                            /> */}
-                                                        <input
-                                                            className="form-control"
-                                                            type="time"
-                                                            value={slot.endTime || ''}
-                                                            onChange={(e) => {
-                                                                const value = e.target.value;
-                                                                setDays((prevDays) => {
-                                                                    const updatedDays = [...prevDays];
-                                                                    updatedDays[dayIndex].slots[slotIndex].endTime =
-                                                                        value;
-                                                                    return updatedDays;
-                                                                });
-                                                            }}
-                                                        />
-                                                    </td>
-                                                    <td style={{ width: '20%' }}>
-                                                        <span
-                                                            className="uil-plus-circle plusicon fw-bold cursor-pointer"
-                                                            onClick={() => handleAddSlots(dayIndex, slotIndex)}></span>
-                                                        {day.slots.length > 1 && (
-                                                            <span
-                                                                className="uil-minus-circle minusicon fw-bold cursor-pointer ms-2"
-                                                                onClick={() =>
-                                                                    handleRemoveSlot(dayIndex, slotIndex)
-                                                                }></span>
-                                                        )}
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                    </thead>
+                    <tbody>
+                        {store?.getPractitionerTimingsReducer?.loading ? (
+                            <tr>
+                                <td className="text-center" colSpan={2}>
+                                    <Spinner />
                                 </td>
                             </tr>
-                        ))
-                    )}
-                </tbody>
-            </Table>
-            <div className="d-flex justify-content-end">
+                        ) : (
+                            days?.map((day, dayIndex) => (
+                                <tr key={dayIndex}>
+                                    <td>
+                                        <input className="form-control" type="text" value={day?.day} readOnly />
+                                    </td>
+                                    <td>
+                                        <table className="schedule-table" style={{ width: '100%' }}>
+                                            <tbody>
+                                                {day?.slots?.map((slot, slotIndex) => (
+                                                    <tr key={slotIndex}>
+                                                        <td className="text-black pe-1">
+                                                            <input
+                                                                className="form-control"
+                                                                type="time"
+                                                                value={slot.startTime || ''}
+                                                                onChange={(e) => {
+                                                                    const value = e.target.value;
+                                                                    setDays((prevDays) => {
+                                                                        const updatedDays = [...prevDays];
+                                                                        updatedDays[dayIndex].slots[
+                                                                            slotIndex
+                                                                        ].startTime = value;
+                                                                        return updatedDays;
+                                                                    });
+                                                                }}
+                                                            />
+                                                        </td>
+                                                        <td className="ps-1">
+                                                            <input
+                                                                className="form-control"
+                                                                type="time"
+                                                                value={slot.endTime || ''}
+                                                                onChange={(e) => {
+                                                                    const value = e.target.value;
+                                                                    setDays((prevDays) => {
+                                                                        const updatedDays = [...prevDays];
+                                                                        updatedDays[dayIndex].slots[slotIndex].endTime =
+                                                                            value;
+                                                                        return updatedDays;
+                                                                    });
+                                                                }}
+                                                            />
+                                                        </td>
+                                                        <td>
+                                                            <span
+                                                                className="uil-plus-circle plusicon"
+                                                                onClick={() =>
+                                                                    handleAddSlots(dayIndex, slotIndex)
+                                                                }></span>
+                                                            {day.slots.length > 1 && (
+                                                                <span
+                                                                    className="uil-minus-circle minusicon ms-2"
+                                                                    onClick={() =>
+                                                                        handleRemoveSlot(dayIndex, slotIndex)
+                                                                    }></span>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </Table>
+            </div>
+
+            <div className="d-flex justify-content-end mt-2">
                 {scheduleData?.length > 0 ? (
-                    <Button type="submit" className="custom-buttons" disabled={store?.updateScheduleReducer?.loading} style={{width:'150px'}}>
-                        {store?.updateScheduleReducer?.loading ? <Spinner className="spinner-border-sm" color="white" /> : 'Update Schedule'}
+                    <Button
+                        type="submit"
+                        className="custom-buttons"
+                        disabled={store?.updateScheduleReducer?.loading}
+                        style={{ width: '150px' }}>
+                        {store?.updateScheduleReducer?.loading ? (
+                            <Spinner className="spinner-border-sm" color="white" />
+                        ) : (
+                            'Update Schedule'
+                        )}
                     </Button>
                 ) : (
-                    <Button type="submit" className="custom-buttons" disabled={store?.createScheduleReducer?.loading} style={{width:'150px'}}>
-                        {store?.createScheduleReducer?.loading ? <Spinner className="spinner-border-sm" color="white" /> : 'Save Schedule'}
+                    <Button
+                        type="submit"
+                        className="custom-buttons"
+                        disabled={store?.createScheduleReducer?.loading}
+                        style={{ width: '150px' }}>
+                        {store?.createScheduleReducer?.loading ? (
+                            <Spinner className="spinner-border-sm" color="white" />
+                        ) : (
+                            'Save Schedule'
+                        )}
                     </Button>
                 )}
             </div>

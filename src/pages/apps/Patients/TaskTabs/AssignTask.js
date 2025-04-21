@@ -18,10 +18,7 @@ const AssignTask = () => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const taskData = store?.getTaskReducer?.data?.tasks || [];
-    console.log(taskData, 'taskData');
     const addTaskResponse = store?.createTaskReducer?.data?.status;
-    console.log({ addTaskResponse });
-
     useEffect(() => {
         const data = {
             assignedToId: '',
@@ -78,7 +75,6 @@ const AssignTask = () => {
     document.addEventListener('show.bs.offcanvas', (event) => {
         const button = event.relatedTarget; // Button that triggered the offcanvas
         const taskId = button?.getAttribute('data-task-id');
-        console.log('Task ID:', taskId);
         setTaskId(taskId);
     });
 

@@ -14,13 +14,11 @@ const VitalStatus = ({ patientId }) => {
     const [todayDate, setTodayDate] = useState(new Date());
     const [yesterdayDate, setYesterdayDate] = useState(new Date());
     const [previousVitals, setPreviousVitals] = useState();
-    console.log({ previousVitals })
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const patientVitals = store?.getVitalsByPatientIdReducer?.data?.vitals;
-    console.log(patientVitals, 'patientVitals')
     useEffect(() => {
         dispatch(getVitalsByPatientIdAction({ key: encryptMessage({ patientId: id }) }))
     }, [patientId, dispatch]);
@@ -70,7 +68,6 @@ const VitalStatus = ({ patientId }) => {
     };
 
     const handleSubmit = () => {
-        // console.log(todayVitals);
         const payload = {
             patientId: id,
             temperature: { value: todayVitals.temperature, unit: 'F' },

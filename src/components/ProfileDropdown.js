@@ -36,12 +36,10 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
     const user = JSON.parse(sessionStorage.getItem('hyper_user'));
     const userName = user?.name?.text || 'John Doe';
     // const changedLogo=sessionStorage.getItem('logo');
-    // console.log(changedLogo, 'changedLogo')
     const logo=JSON.parse(sessionStorage.getItem('hyper_user'))?.photo?.[0]?.url;
     const changedLogo=JSON.parse(sessionStorage.getItem('hyper_user'))?.logo?.[0]?.url;
-// console.log(changedLogo,'changedLogo')
     return (
-        <Dropdown show={dropdownOpen} onToggle={toggleDropdown}>
+        <Dropdown show={dropdownOpen} onToggle={toggleDropdown} className='m-0'>
             <Dropdown.Toggle
                 variant="link"
                 id="dropdown-profile"

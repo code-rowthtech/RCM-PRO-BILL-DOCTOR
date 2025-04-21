@@ -487,7 +487,6 @@ const Demographics = ({ patientId }) => {
             address: demographicAddresses,
             ...(data?.notes && { notes: data.notes }),
         };
-        console.log('Payload:', payload);
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
 
@@ -593,7 +592,6 @@ const Demographics = ({ patientId }) => {
                     ]}
                     identifiers={identifiers}
                     setIdentifiers={setIdentifiers}
-                    // onChange={(data) => console.log('Updated Identifiers:', data)}
                 />
 
                 <hr className="mt-0" />
@@ -688,7 +686,6 @@ const Demographics = ({ patientId }) => {
                                 // } // Show selected value
                                 value={selectedEthnicityOption}
                                 onChange={handleEthnicityChange}
-                                // onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
                                     control: (provided) => ({
                                         ...provided,
@@ -738,7 +735,6 @@ const Demographics = ({ patientId }) => {
                                 value={selectedTribleOption}
                                 placeholder="&nbsp; Select "
                                 onChange={handleTribalChange}
-                                // onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
                                     control: (provided) => ({
                                         ...provided,
@@ -866,7 +862,6 @@ const Demographics = ({ patientId }) => {
                                 // value={relationshipOption.find((option) => option?.value?.display === rela) || null} // Show selected value
                                 value={selectedRelationOption}
                                 onChange={handleRelationChange}
-                                // onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
                                     control: (provided) => ({
                                         ...provided,

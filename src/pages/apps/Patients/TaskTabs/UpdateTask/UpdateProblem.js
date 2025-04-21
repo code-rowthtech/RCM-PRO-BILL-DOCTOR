@@ -25,7 +25,6 @@ const UpdateProblem = ({ onCancel, problem }) => {
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const problemDetails = store?.getProblemDetailsReducer?.data?.problem;
-    console.log(problemDetails, 'Problem Details');
     const patientAppointments = store?.getPatientAppointmentsReducer?.data?.appointments;
     const allCodeICDs = store?.getSearchCodesReducer?.data?.codes || [];
 
@@ -126,7 +125,6 @@ const UpdateProblem = ({ onCancel, problem }) => {
 
         dispatch(updateProblemAction({ key: encryptMessage(payload) }));
         // reset();
-        console.log(payload, 'Final Payload');
     };
 
     return (

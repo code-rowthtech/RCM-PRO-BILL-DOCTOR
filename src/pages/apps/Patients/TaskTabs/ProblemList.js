@@ -22,7 +22,6 @@ const ProblemList = () => {
     const store = useSelector((state) => state);
     const problemList = store?.getPatientProblemsReducer?.data?.problems;
     const createResponse = store?.createProblemReducer?.data?.status;
-    console.log(createResponse, 'createResponse');
     useEffect(() => {
         if (createResponse === 201) {
             const data = {
@@ -33,8 +32,6 @@ const ProblemList = () => {
         }
     }, [createResponse]);
     // const ProblemId = store?.getPatientProblemsReducer?.data?.problems?._id;
-    console.log(problemList, 'Problem List');
-    // console.log(ProblemId, 'Problem Id');
 
     useEffect(() => {
         const data = {
@@ -163,7 +160,6 @@ const ProblemList = () => {
                                                                 id: data?._id,
                                                             };
                                                             dispatch(getProblemDetailsAction(requestData));
-                                                            console.log(requestData, 'Request Data');
                                                         }}
                                                     />
                                                     &nbsp;

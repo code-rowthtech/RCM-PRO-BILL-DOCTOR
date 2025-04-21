@@ -43,11 +43,7 @@ const ProfessionalInformation = () => {
     const [taxonmy, setTaxonomy] = useState(null);
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const updateLoading = store?.UpdateDoctorsReducer?.loading;
-
-    console.log(doctorDetails, 'doctorDetails');
-
     const updateId = store?.getDoctorsReducer?.data?.result?._id;
-    console.log(doctorDetails, '123456789');
     const statesData = store?.getStatesReducer?.data?.states;
 
     const [taxonomyCodesList, setTaxonomyCodesList] = useState([
@@ -205,7 +201,6 @@ const ProfessionalInformation = () => {
             identifier: [...finalIdentifiersData, ...finalLicensureData],
             taxonomy: taxonomyCodes,
         };
-        console.log(payload, 'payload');
         dispatch(updateDoctorAction({ key: encryptMessage(payload) }));
     };
     useEffect(() => {

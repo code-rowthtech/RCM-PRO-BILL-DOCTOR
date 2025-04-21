@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Col, Modal, Row } from 'react-bootstrap';
-import { Calendar, momentLocalizer } from 'react-big-calendar';
+import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { EVENTS } from '../Appointments/event';
@@ -15,7 +15,6 @@ const AppointmentCalendar = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [events, setEvents] = useState([]);
-    console.log(events, 'eventsevents')
     const store = useSelector((state) => state);
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     const [show, setShow] = useState(false);
@@ -96,7 +95,6 @@ const AppointmentCalendar = () => {
 
     const handleEventClick = (event) => {
         setShow(true);
-        console.log(event, 'eventevent')
         setSelectedEvent(event);
     };
     const closeModal = () => {
@@ -106,9 +104,60 @@ const AppointmentCalendar = () => {
     const [appModal, setAppModal] = useState(false)
     const closeAppModal = () => {
         setAppModal(false);
-        setShow(false);
         setSelectedEvent(null);
     }
+    const CustomToolbar = (toolbar) => {
+        const goToBack = () => {
+            toolbar.onNavigate('PREV');
+        };
+
+        const goToNext = () => {
+            toolbar.onNavigate('NEXT');
+        };
+
+        const goToToday = () => {
+            toolbar.onNavigate('TODAY');
+        };
+
+        const changeView = (view) => {
+            toolbar.onView(view);
+        };
+              return (
+                    <div className="rbc-toolbar">
+                        <span className="rbc-btn-group">
+                            <button type="button" onClick={goToBack}>Back</button>
+                            <button type="button" onClick={goToToday}>Today</button>
+                            <button type="button" onClick={goToNext}>Next</button>
+                        </span>
+        
+                        <span className="rbc-toolbar-label">{toolbar.label}</span>
+        
+                        <span className="rbc-btn-group">
+                            <button
+                                type="button"
+                                className={toolbar.view === Views.MONTH ? 'rbc-active' : ''}
+                                onClick={() => changeView(Views.MONTH)}
+                            >
+                                Month
+                            </button>
+                            <button
+                                type="button"
+                                className={toolbar.view === Views.WEEK ? 'rbc-active' : ''}
+                                onClick={() => changeView(Views.WEEK)}
+                            >
+                                Week
+                            </button>
+                            <button
+                                type="button"
+                                className={toolbar.view === Views.DAY ? 'rbc-active' : ''}
+                                onClick={() => changeView(Views.DAY)}
+                            >
+                                Day
+                            </button>
+                        </span>
+                    </div>
+                );
+            };
     return (
         <div className='background_Color pt-1 pb-2'>
             <div className='container-fluid px-4'>
@@ -136,6 +185,8 @@ const AppointmentCalendar = () => {
                                     }}
                                     components={{
                                         event: CustomEvent,
+                                        toolbar: CustomToolbar, // Use the custom toolbar
+
                                     }}
                                     onView={(view) => setCalendarView(view)} // <-- track view change
                                     view={calendarView} // optional if you want to programmatically set view
@@ -147,7 +198,7 @@ const AppointmentCalendar = () => {
 
                 </div>
             </div>
-            <Modal centered show={appModal} size='lg' onHide={closeAppModal}>
+            <Modal centered show={appModal} size='xl' onHide={closeAppModal}>
                 <Modal.Body>
                     <Row className="border-bottom mb-1 pb-2">
                         <Col sm={11} className='text-center'>
@@ -166,7 +217,7 @@ const AppointmentCalendar = () => {
                     ) : null}
                 </Modal.Body>
             </Modal>
-            <Modal centered show={show} size='lg' onHide={closeModal}>
+            <Modal centered show={show} size='xl' onHide={closeModal}>
                 <Modal.Body>
                     <Row className="border-bottom mb-1 pb-2">
                         <Col sm={11} className='text-center'>

@@ -7,20 +7,25 @@ import { useForm } from 'react-hook-form';
 import { updateAppointmentDetailsAction, getAppointmentByPatientProviderAction } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
 import AppointmentForm from '../../Appointments/Tabs/AppointmentForm';
+import { appointmentStatus } from '../../../../utils/DataSets/appointmentstatus';
+import Paginations from '../../../../helpers/Paginations';
 
 const AppointmentTable = ({ patientId, doctorId, status, search }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const appointments = store?.getAppointmentByPatientProviderReducer?.data?.appointments;
-    console.log(appointments, 'dataof appointment');
     const loading = store?.getAppointmentByPatientProviderReducer?.loading;
     const updateStatus = store?.updateAppointmentDetailsReducer?.data?.status;
     const [showModal, setShowModal] = useState(false); // Modal visibility state
-    const [appointmentId,setAppointmentId]=useState(null)
+    const [appointmentId, setAppointmentId] = useState(null);
     const handleClose = () => setShowModal(false);
     const [activeModalTab, setActiveModalTab] = useState('Appointments');
     const [cancelationPopupRow, setCancelationPopupRow] = useState(null);
     const [cancelationReason, setCancelationReason] = useState('');
+    const [selectedStatus, setSelectedStatus] = useState('')
+    const [skip, setSkip] = useState(1);
+    const [limit, setLimit] = useState(10);
+
     const { register, handleSubmit, reset } = useForm();
     // useEffect(() => {
     //     const payload = {
@@ -34,7 +39,7 @@ const AppointmentTable = ({ patientId, doctorId, status, search }) => {
 
     useEffect(() => {
         if (updateStatus === 200) {
-            dispatch(getAppointmentByPatientProviderAction({ subject: patientId, doctorId, status, search }));
+            dispatch(getAppointmentByPatientProviderAction({ subject: patientId, doctorId, status, search ,skip, limit }));
             setCancelationPopupRow(null);
             setCancelationReason('');
         }
@@ -57,13 +62,14 @@ const AppointmentTable = ({ patientId, doctorId, status, search }) => {
             id: cancelationPopupRow,
             cancellationReason: [
                 {
-                    coding: [{ system: '', code: cancelationReason, display: cancelationReason }],
+                    coding: [{ system: '', code: '', display: cancelationReason }],
                     text: cancelationReason,
                 },
             ],
-            status: 'Cancelled',
+            status: 'cancelled',
         };
-        dispatch(updateAppointmentDetailsAction({ key: encryptMessage(payload, patientId) }));
+        dispatch(updateAppointmentDetailsAction({ key: encryptMessage(payload) }));
+        
     };
     const modalTabs = [
         'Appointments',
@@ -78,6 +84,9 @@ const AppointmentTable = ({ patientId, doctorId, status, search }) => {
     ];
     const handleModalTabClick = (modalTabs) => {
         setActiveModalTab(modalTabs);
+    };
+    const handlePageChange = (pageNumber) => {
+        setSkip(pageNumber);
     };
 
     return (
@@ -112,88 +121,84 @@ const AppointmentTable = ({ patientId, doctorId, status, search }) => {
                             ) : (
                                 appointments?.map((data, index) => (
                                     <tr key={data._id}>
-                                        <td>{index + 1}</td>
-                                        <td className="position-relative">
-                                            {status !== 'history' ? (
-                                                <>
-                                                    <Form.Select
-                                                        defaultValue={data?.status}
-                                                        onChange={(e) => {
-                                                            const newStatus = e.target.value;
-                                                            if (newStatus === 'Cancelled') {
-                                                                setCancelationPopupRow(data?._id);
-                                                            } else {
-                                                                dispatch(
-                                                                    updateAppointmentDetailsAction({
-                                                                        key: encryptMessage({
-                                                                            id: data?._id,
-                                                                            status: newStatus,
-                                                                        }),
-                                                                    })
-                                                                );
-                                                                setCancelationPopupRow(null);
-                                                            }
-                                                        }}
-                                                        className="schedule-status-select">
-                                                        <option value="" hidden>
-                                                            Status
-                                                        </option>
-                                                        <option value="Scheduled">Scheduled</option>
-                                                        <option value="Completed">Completed</option>
-                                                        <option value="Cancelled">Cancelled</option>
-                                                        <option value="Rescheduled">Rescheduled</option>
-                                                        <option value="Noshow">No-Show</option>
-                                                        <option value="Arrived">Arrived</option>
-                                                        <option value="Checkedin">Checked In</option>
-                                                        <option value="Checkedinonline">Checked In Online</option>
-                                                        <option value="Inroom">In Room</option>
-                                                        <option value="Insession">In Session</option>
-                                                        <option value="Confirmed">Confirmed</option>
-                                                        <option value="Notconfirmed">Not Confirmed</option>
-                                                    </Form.Select>
+                                        <td>{index + 1}.</td>
+                                        <td className="text-capitalize position-relative">
+                                            <Form.Select
+                                                defaultValue={data?.status}
+                                                onChange={(e) => {
+                                                    setSelectedStatus(e.target.value);
+                                                    if (e.target.value === 'cancelled') {
+                                                        setCancelationPopupRow(data?._id); // or use data?._id if preferred
+                                                    } else {
+                                                        dispatch(
+                                                            updateAppointmentDetailsAction({
+                                                           
+                                                                key: encryptMessage({id: data?._id,status: e.target.value }),
+                                                            })
+                                                        );
+                                                        setCancelationPopupRow(null); // close popup if status changes again
+                                                    }
+                                                }}
+                                                className={`schedule-status-select
+                                         ${data?.status === 'pending' && 'pendingColor'}
+                                         ${data?.status === 'proposed' && 'proposedColor'}
+                                         ${data?.status === 'booked' && 'bookedColor'}
+                                         ${data?.status === 'arrived' && 'arrivedColor'}
+                                         ${data?.status === 'fulfilled' && 'fulfilledColor'}
+                                         ${data?.status === 'cancelled' && 'cancelledColor'}
 
-                                                    {cancelationPopupRow === data?._id && (
-                                                        <div
-                                                            className="position-absolute cancellation-popup border bg-white p-2"
-                                                            style={{
-                                                                left: '90%',
-                                                                top: '0%',
-                                                                width: '14vw',
-                                                                boxShadow:
-                                                                    '0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)',
-                                                                zIndex: 10,
-                                                            }}>
-                                                            <div className="text-end">
-                                                                <IoCloseCircleOutline
-                                                                    className="cursor-pointer"
-                                                                    onClick={() => setCancelationPopupRow(null)}
+                                         ${data?.status === 'noshow' && 'noshowColor'}
+                                         ${data?.status === 'entered-in-error' && 'enteredinerrorColor'}
+                                         ${data?.status === 'checked-in' && 'checkedinColor'}
+                                         ${data?.status === 'waitlist' && 'waitlistColor'}
+                                         `}>
+                                                {appointmentStatus?.map((data, index) => (
+                                                    <option value={data?.code} key={index}>
+                                                        {data?.display}
+                                                    </option>
+                                                ))}
+                                            </Form.Select>
+                                            {cancelationPopupRow === data?._id && (
+                                                <div
+                                                    className="position-absolute cancellation-popup border   bg-white"
+                                                    style={{
+                                                        left: '84%',
+                                                        top: '0%',
+                                                        width: '14vw',
+                                                        boxShadow:
+                                                            '0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)',
+                                                    }}>
+                                                    <p className="fs-4 px-2 mb-0 text-end ">
+                                                        <IoCloseCircleOutline
+                                                            onClick={() => {
+                                                                setCancelationPopupRow(null);
+                                                            }}
+                                                        />
+                                                    </p>
+                                                    <div className=" p-2 pt-0">
+                                                        <Form onSubmit={handleSubmit(submitWithReason)}>
+                                                            <Form.Group>
+                                                                <Form.Label>Cancelation Reason</Form.Label>
+                                                                <Form.Control
+                                                                    className="mb-2"
+                                                                    onChange={(e) =>
+                                                                        setCancelationReason(e.target.value)
+                                                                    }
+                                                                    type="text"
+                                                                    placeholder="Enter the cancellation reason"
                                                                 />
+                                                            </Form.Group>
+                                                            <div className="text-end d-flex justify-content-end">
+                                                                <Button
+                                                                    disabled={!cancelationReason}
+                                                                    className="custom-buttons"
+                                                                    type="submit">
+                                                                    Submit
+                                                                </Button>
                                                             </div>
-                                                            <Form onSubmit={handleSubmit(submitWithReason)}>
-                                                                <Form.Group>
-                                                                    <Form.Label>Cancelation Reason</Form.Label>
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        placeholder="Enter reason"
-                                                                        onChange={(e) =>
-                                                                            setCancelationReason(e.target.value)
-                                                                        }
-                                                                    />
-                                                                </Form.Group>
-                                                                <div className="text-end d-flex justify-content-end mt-2">
-                                                                    <Button
-                                                                        type="submit"
-                                                                        className="custom-buttons"
-                                                                        disabled={!cancelationReason}>
-                                                                        Submit
-                                                                    </Button>
-                                                                </div>
-                                                            </Form>
-                                                        </div>
-                                                    )}
-                                                </>
-                                            ) : (
-                                                <span>{data?.status || 'N/A'}</span>
+                                                        </Form>
+                                                    </div>
+                                                </div>
                                             )}
                                         </td>
                                         <td>
@@ -220,10 +225,13 @@ const AppointmentTable = ({ patientId, doctorId, status, search }) => {
                                                 : 'N/A'}
                                         </td>
                                         <td>
-                                            <FiEdit className="fs-4 cursor-pointer text-black" onClick={()=>{
-                                                   setShowModal(true)
-                                                   setAppointmentId(data?._id)
-                                            }} />
+                                            <FiEdit
+                                                className="fs-4 cursor-pointer text-black"
+                                                onClick={() => {
+                                                    setShowModal(true);
+                                                    setAppointmentId(data?._id);
+                                                }}
+                                            />
                                         </td>
                                     </tr>
                                 ))
@@ -231,6 +239,13 @@ const AppointmentTable = ({ patientId, doctorId, status, search }) => {
                         </tbody>
                     </Table>
                 </Col>
+                <Col className="mt-2 d-flex justify-content-end">
+                <Paginations
+                    currentPage={skip}
+                    totalPages={store?.getPatientsReducer?.data?.pagination?.totalPages}
+                    onPageChange={handlePageChange}
+                />
+            </Col>
             </Row>
             <Modal centered size="xl" show={showModal} onHide={handleClose}>
                 <Modal.Header closeButton>

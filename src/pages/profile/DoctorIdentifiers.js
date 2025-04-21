@@ -18,8 +18,6 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
     // const [searchParams] = useSearchParams();
     const [identifierDocument, setIdentifierDocument] = useState(false); // Fixed typo
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
-    console.log(doctorDetails, 'doctorDetails')
-
     const statesData = store?.getStatesReducer?.data?.states;
     const id = JSON.parse(localStorage.getItem('hyper_user'))?.userId;
     const updateId = id?.replace(/^check/, '');
