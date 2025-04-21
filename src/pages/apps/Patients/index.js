@@ -12,17 +12,19 @@ import Paginations from '../../../helpers/Paginations';
 const Patients = () => {
     const dispatch = useDispatch();
     const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+
     const store = useSelector((state) => state);
     const patientsData = store?.getPatientsReducer?.data?.data || [];
     const [skip, setSkip] = useState(1);
     const [search, setSearch] = useState('');
-    console.log(store?.getPatientsReducer, 'patientsData');
     useEffect(() => {
         const data = {
             doctorId: doctorId,
             page: skip,
             limit: 10,
             search: search,
+            clinicId: clinicId,
         };
         dispatch(getPatientsAction(data));
     }, [dispatch ,skip, search]);

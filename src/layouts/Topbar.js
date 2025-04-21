@@ -64,7 +64,6 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    // console.log(MENU_ITEMS, 'MENU_ITEMSMENU_ITEMS')
     const [isopen, setIsopen] = useState(false);
     const navbarCssClasses = navCssClasses || '';
     const containerCssClasses = !hideLogo ? 'container-fluid' : '';
@@ -150,8 +149,6 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         return 'Page Not Found';
     };
     const pageTitle = getPageTitle(pathToTitleMap, pathname, search);
-
-// console.log(location.pathname)
     return (
         <>
             <div className={classNames('navbar-custom ', navbarCssClasses)} style={{ backgroundColor: "#ffffff" }}>
@@ -179,7 +176,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                             </button>
                             {/* <h4 className=''>{pageTitle}</h4> */}
                         </div>
-                        <div className='d-flex gap-3 align-items-center col-11' style={{marginLeft:"-32px"}}>
+                        <div className='d-flex gap-3 align-items-center col-11' style={{marginLeft:'-40px'}}>
                             {MENU_ITEMS?.map((data,index) => (
                                 <p key={index} onClick={() => navigate(data?.url)} className='fs-5 mb-0 fw-bold cursor-pointer' style={{color:location.pathname===data?.url?'black':'rgba(116, 114, 114, 0.51)'}}>{data?.label}</p>
                             ))}

@@ -44,7 +44,6 @@ const Prescription = () => {
 
     const handleSelect = (patient) => {
         setSelectedPatient(patient);
-        console.log(`Selected Patient: ${patient}`);
         // Add additional logic if needed
     };
 

@@ -19,7 +19,6 @@ const formatDisplayValue = (value) => {
     });
 };
 const DoctorAddress = ({ addresses, setAddresses }) => {
-    console.log('addresses', addresses);
     const [activeAddressIndex, setActiveAddressIndex] = useState(null);
     const [addressFocused, setAddressFocused] = useState(false);
     const [searchedLocations, setSearchedLocations] = useState([]);
@@ -31,9 +30,7 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
     const store = useSelector((state) => state);
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const statesData = store?.getStatesReducer?.data;
-
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
-    console.log('cities1', cities1);
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
     const [selectedLocation, setSelectedLocation] = useState(null);

@@ -34,7 +34,6 @@ const AddBreak = () => {
             breakFrom: formatTime(data.breakFrom),
             breakTo: formatTime(data.breakTo),
         };
-        console.log(payload, "Payload");
         dispatch(createHolidayScheduleAction({ key: encryptMessage(payload) }));
     };
 

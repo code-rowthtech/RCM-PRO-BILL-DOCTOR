@@ -1,15 +1,26 @@
 // @flow
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Col, Row, Table } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
+import { Badge, Button, Card, Col, Form, Row, Table } from 'react-bootstrap';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames';
-import { FormInput } from '../../../components';
-import { FiArchive, FiClock, FiEdit, FiFileText, FiFilter, FiSun } from 'react-icons/fi';
-import { getAppointmentsAction } from '../../../redux/actions';
+import { patientsData } from './data';
+import { GrDocumentText } from 'react-icons/gr';
+import Dropdown from 'react-bootstrap/Dropdown';
+import { FiArchive, FiClock, FiFilter, FiSun } from 'react-icons/fi';
+import { IoCalendarOutline, IoCloseCircleOutline } from 'react-icons/io5';
 import { useDispatch, useSelector } from 'react-redux';
 import Spinner from '../../../constants/Spinner';
-import AppointmentCalendar from './AppointmentCalendar';
+import Select from 'react-select';
 import { useForm } from 'react-hook-form';
+import AppointmentCalendar from './AppointmentCalendar';
+import { FaCalendar, FaCalendarWeek, FaRegListAlt } from 'react-icons/fa';
+import { CiCalendar } from 'react-icons/ci';
+import { encryptMessage } from '../../../cryptoUtils';
+import { getAppointmentsAction, updateAppointmentDetailsAction } from '../../../redux/actions';
+import { appointmentStatus } from '../../../utils/DataSets/appointmentstatus';
+import Paginations from '../../../helpers/Paginations';
+const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
 
 // Define the types for each order item
 type OrderListItems = {
@@ -28,186 +39,239 @@ type OrderListProps = {
 };
 
 // Component for Appointments List Table
-const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React$FragmentType> => {
+const AppointmentsList = ({ patientsData, appointmentPeriod }: OrderListProps): React$Element<React$FragmentType> => {
+    const store = useSelector((state) => state);
     const dispatch = useDispatch();
-    const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
+    const [cancelationPopupRow, setCancelationPopupRow] = useState(null);
+    const [cancelationReason, setCancelationReason] = useState('');
+    const [skip, setSkip] = useState(1);
 
-    const store = useSelector((state) => state)
-    // const patientsAppointment = '' || [];
-    // console.log(patientsAppointment, '1234567890')
-    const patientsAppointmentData = store?.getAppointmentsReducer?.data?.appointments || [];
-    console.log(patientsAppointmentData, 'patientsAppointmentData')
+    const [selectedStatus, setSelectedStatus] = useState('');
+    const updateSuccess = store?.updateAppointmentDetailsReducer?.data?.status;
+    const {
+        register,
+        handleSubmit,
+        watch,
+        formState: { errors },
+        setValue,
+        reset,
+    } = useForm();
+    useEffect(() => {
+        if (updateSuccess === 200) {
+            dispatch(getAppointmentsAction({ clinicId: clinicId, status: appointmentPeriod, page: skip, limit: 10 }));
+            setCancelationPopupRow(null);
+            setCancelationReason('');
+        }
+    }, [updateSuccess]);
+    const formatTimeWithAmPm = (isoString) => {
+        if (!isoString) return '';
+        const date = new Date(isoString);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    };
 
     useEffect(() => {
-
-        const data = {
-            doctorId: doctorId,
-            clinicId: clinicId,
-            status: "upcoming"
+        const handleClickOutside = (e) => {
+            // Check if the click target is NOT inside the popup
+            if (!e.target.closest('.cancellation-popup') && cancelationPopupRow !== null) {
+                setCancelationPopupRow(null); // Close popup
+            }
         };
 
-        dispatch(getAppointmentsAction(data));
-    }, [dispatch]);
-
-
-    return (
-        <Table responsive className="table-centered table-nowrap mb-0">
-            <thead className="text-white">
-                <tr>
-                    <th className='text-white'>Sr.No.</th>
-                    <th className='text-white'>Patients Name</th>
-                    <th className='text-white'>Reason</th>
-                    <th className='text-white'>Start Time</th>
-                    {/* <th className='text-white'>Doctor</th> */}
-                    {/* <th className='text-white'>Doctor Department</th> */}
-                    <th className='text-white ' style={{ paddingRight: '70px' }}>Date</th>
-                    <th className='text-white '>Status</th>
-                    <th className='text-white '>Action</th>
-                </tr>
-            </thead>
-            {store?.getAppointmentsReducer?.loading ? (
-                <tr>
-                    <td className='text-center' colSpan={6}>
-                        <Spinner className=" my-5 " />
-                    </td>
-                </tr>
-            ) : (
-                <tbody>
-                    {patientsAppointmentData?.length === 0 ? (
-                        <tr>
-                            <td colSpan={6} className='text-center'>
-                                <h3 className='my-5 py-5'>No scheduled appointments.</h3>
-                            </td>
-                        </tr>
-                    ) : (
-                        patientsAppointmentData?.map((data, index) => (
-                            <tr key={index}>
-                                <td>{index + 1}</td>
-                                <td className='text-capitalize'>{data?.subject?.name?.[0]?.text} </td>
-                                <td className="text-capitalize" title={data?.reason?.[0]?.text}>
-                                    {data?.reason?.[0]?.text?.length > 40
-                                        ? `${data.reason[0].text.substring(0, 40)}...`
-                                        : data?.reason?.[0]?.text}
-                                </td>
-
-                                <td className='text-capitalize'>
-                                    {data?.start ? new Date(data.start).toLocaleTimeString('en-US', {
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        hour12: true
-                                    }) : '--'}
-                                </td>
-                                <td>
-                                    {data?.date
-                                        ? new Date(data?.date).toLocaleDateString("en-GB", {
-                                            day: "2-digit",
-                                            month: "2-digit",
-                                            year: "numeric",
-                                        })
-                                        : "N/A"}
-                                </td>
-                                <td><span className='px-2 fw-bold text-white bg-success rounded-2 fs-6'>{data?.status}</span></td>
-                                <td>
-                                    <Link to={`/apps/appointments/newAppointment?id=${data?._id}`} >
-                                        <FiEdit className="fs-4 ms-2 cursor-pointer text-black" />
-                                    </Link>
-                                </td>
-                            </tr>
-                        ))
-                    )}
-                </tbody>
-
-            )}
-        </Table>
-    );
-};
-
-// Component for Appointments Transaction Table
-const AppointmentsTransactionList = ({ patientsData }: OrderListProps): React$Element<React$FragmentType> => {
-
-    const dispatch = useDispatch();
-    const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
-
-    const store = useSelector((state) => state)
-
-    const patientsAppointmentData = store?.getAppointmentsReducer?.data?.appointments || [];
-    console.log(patientsAppointmentData, 'patientsAppointmentData')
-
-    useEffect(() => {
-
-        const data = {
-            doctorId: doctorId,
-            clinicId: clinicId,
-            status: "history"
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
         };
+    }, [cancelationPopupRow]);
 
-        dispatch(getAppointmentsAction(data));
-    }, [dispatch]);
+    const submitWithReason = (data) => {
+        const payload = {
+            id: cancelationPopupRow,
+            cancellationReason: [
+                {
+                    coding: [
+                        {
+                            system: '',
+                            code: '',
+                            display: cancelationReason,
+                        },
+                    ],
+                    text: cancelationReason, // use display text
+                },
+            ],
+            status: 'cancelled',
+        };
+        dispatch(
+            updateAppointmentDetailsAction({
+               
+                key: encryptMessage(payload),
+            })
+        );
+    };
+    const handlePageChange = (pageNumber) => {
+        setSkip(pageNumber);
+    };
     return (
-        <Table responsive className="table-centered table-nowrap mb-0">
-            <thead className="text-white">
-                <tr>
-                    <th className='text-white'>Sr.No.</th>
-                    <th className='text-white'>Patients Name</th>
-                    <th className='text-white'>Reason</th>
-                    <th className='text-white'>Start Time</th>
-                    {/* <th className='text-white'>Doctor</th> */}
-                    {/* <th className='text-white'>Doctor Department</th> */}
-                    <th className='text-white ' style={{ paddingRight: '70px' }}>Date</th>
-                    <th className='text-white '>Status</th>
-                </tr>
-            </thead>
-            {store?.getAppointmentsReducer?.loading ? (
-                <tr>
-                    <td className='text-center' colSpan={6}>
-                        <Spinner className=" my-5 " />
-                    </td>
-                </tr>
-            ) : (
-                <tbody>
-                    {patientsAppointmentData?.length === 0 ? (
+        <>
+            <Col sm={12}>
+                <Table
+                    responsive
+                    className="table-centered mb-0  rounded"
+                    style={{ height: appointmentsList?.length === 0 ? '75vh' : '' }}>
+                    <thead className="text-white">
                         <tr>
-                            <td colSpan={6} className='text-center'>
-                                <h3 className='my-5 py-5'>No appointment history.</h3>
-                            </td>
+                            <th className="text-white">Sr.No.</th>
+                            <th className="text-white">Status</th>
+                            <th className="text-white">Patient</th>
+                            <th className="text-white">Type</th>
+                            <th className="text-white">Time</th>
+                            <th className="text-white">Reason</th>
+                            <th className="text-white">Action</th>
                         </tr>
-                    ) : (
-                        patientsAppointmentData?.map((data, index) => (
-                            <tr key={index}>
-                                <td>{index + 1}</td>
-                                <td className='text-capitalize'>{data?.subject?.name?.[0]?.text} </td>
-                                <td className="text-capitalize" title={data?.reason?.[0]?.text}>
-                                    {data?.reason?.[0]?.text?.length > 40
-                                        ? `${data.reason[0].text.substring(0, 40)}...`
-                                        : data?.reason?.[0]?.text}
+                    </thead>
+                    <tbody className="">
+                        {store?.getAppointmentsReducer?.loading ? (
+                            <tr>
+                                <td colSpan={9} className="text-center">
+                                    <Spinner />
                                 </td>
-
-                                <td className='text-capitalize'>
-                                    {data?.start ? new Date(data.start).toLocaleTimeString('en-US', {
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        hour12: true
-                                    }) : '--'}
-                                </td>
-                                <td>
-                                    {data?.date
-                                        ? new Date(data?.date).toLocaleDateString("en-GB", {
-                                            day: "2-digit",
-                                            month: "2-digit",
-                                            year: "numeric",
-                                        })
-                                        : "N/A"}
-                                </td>
-
-                                <td><span className='px-2 fw-bold text-white bg-success rounded-2 fs-6'>{data?.status}</span></td>
                             </tr>
-                        ))
-                    )}
-                </tbody>
-            )}
-        </Table>
+                        ) : appointmentsList?.length === 0 ? (
+                            <tr>
+                                <td colSpan={9} className="text-center">
+                                    <h5>No Appointments Found</h5>
+                                </td>
+                            </tr>
+                        ) : (
+                            appointmentsList &&
+                            appointmentsList?.map((data, index) => (
+                                <tr key={index}>
+                                    <td>{index + 1}</td>
+                                    <td className="text-capitalize position-relative">
+                                        <Form.Select
+                                            defaultValue={data?.status}
+                                            onChange={(e) => {
+                                                setSelectedStatus(e.target.value);
+                                                if (e.target.value === 'cancelled') {
+                                                    setCancelationPopupRow(data?._id); // or use data?._id if preferred
+                                                } else {
+                                                    dispatch(
+                                                        updateAppointmentDetailsAction({
+                                                           
+                                                            key: encryptMessage({ id: data?._id, status: e.target.value }),
+                                                        })
+                                                    );
+                                                    setCancelationPopupRow(null); // close popup if status changes again
+                                                }
+                                            }}
+                                            className={`schedule-status-select
+                                         ${data?.status === 'pending' && 'pendingColor'}
+                                         ${data?.status === 'proposed' && 'proposedColor'}
+                                         ${data?.status === 'booked' && 'bookedColor'}
+                                         ${data?.status === 'arrived' && 'arrivedColor'}
+                                         ${data?.status === 'fulfilled' && 'fulfilledColor'}
+                                         ${data?.status === 'cancelled' && 'cancelledColor'}
+                                         ${data?.status === 'noshow' && 'noshowColor'}
+                                         ${data?.status === 'entered-in-error' && 'enteredinerrorColor'}
+                                         ${data?.status === 'checked-in' && 'checkedinColor'}
+                                         ${data?.status === 'waitlist' && 'waitlistColor'}
+                                         `}>
+                                            {appointmentStatus?.map((data, index) => (
+                                                <option value={data?.code} key={index}>
+                                                    {' '}
+                                                    {data?.display}
+                                                </option>
+                                            ))}
+                                        </Form.Select>
+                                        {cancelationPopupRow === data?._id && (
+                                            <div
+                                                className="position-absolute cancellation-popup border   bg-white"
+                                                style={{
+                                                    left: '84%',
+                                                    top: '0%',
+                                                    width: '14vw',
+                                                    boxShadow: '0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)',
+                                                }}>
+                                                <p className="fs-4 px-2 mb-0 text-end ">
+                                                    <IoCloseCircleOutline
+                                                        onClick={() => {
+                                                            setCancelationPopupRow(null);
+                                                        }}
+                                                    />
+                                                </p>
+                                                <div className=" p-2 pt-0">
+                                                    <Form onSubmit={handleSubmit(submitWithReason)}>
+                                                        <Form.Group>
+                                                            <Form.Label>Cancelation Reason</Form.Label>
+                                                            <Form.Control
+                                                                className="mb-2"
+                                                                onChange={(e) => setCancelationReason(e.target.value)}
+                                                                type="text"
+                                                                placeholder="Enter the cancellation reason"
+                                                            />
+                                                        </Form.Group>
+                                                        <div className="text-end">
+                                                            <Button
+                                                                disabled={!cancelationReason}
+                                                                className="custom-buttons"
+                                                                type="submit">
+                                                                Submit
+                                                            </Button>
+                                                        </div>
+                                                    </Form>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td className="text-capitalize">
+                                        {data?.subject?.name?.[0]?.text}
+                                        <div className="d-flex gap-2">
+                                            <span>
+                                                {data?.subject?.birthDate
+                                                    ? new Date(data.subject.birthDate).toISOString().split('T')[0]
+                                                    : 'N/A'}
+                                            </span>
+                                            <span>
+                                                {data?.subject?.telecom?.find(
+                                                    (item) => item.system === 'phone' && item.value
+                                                )?.value || 'No phone number'}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {formatTimeWithAmPm(data?.start)} - {formatTimeWithAmPm(data?.end)}
+                                    </td>
+                                    <td>{new Date(data?.date).toLocaleDateString('en-GB')}</td>
+                                    <td
+                                        className="text-capitalize cursor-pointer"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title={data?.reason?.[0]?.coding?.[0]?.display}>
+                                        {data?.reason?.[0]?.coding?.[0]?.display?.length > 20
+                                            ? data?.reason?.[0]?.coding?.[0]?.display?.slice(0, 19) + '...'
+                                            : data?.reason?.[0]?.coding?.[0]?.display}
+                                    </td>
+                                    <td>
+                                        <Link
+                                            to={`/apps/appointments/newAppointment?id=${data?._id}`}
+                                            className="action-icon">
+                                            <i className="mdi mdi-square-edit-outline cursor-pointer"></i>
+                                        </Link>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </Table>
+            </Col>
+            <Col className="mt-2 d-flex justify-content-end">
+                <Paginations
+                    currentPage={skip}
+                    totalPages={store?.getPatientsReducer?.data?.pagination?.totalPages}
+                    onPageChange={handlePageChange}
+                />
+            </Col>
+        </>
     );
 };
 
@@ -219,115 +283,103 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
         setValue,
         clearErrors,
     } = useForm();
-    const goto = () => {
-        navigate("/apps/appointments/appointmentCalendar");
-    };
-    const store = useSelector((state) => state);
-    const dispatch = useDispatch();
+
     const [activeTab, setActiveTab] = useState('appointments');
     const [appointmentPeriod, setAppointmentPeriod] = useState('today');
     const navigate = useNavigate();
-    const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const store = useSelector((state) => state);
+    const dispatch = useDispatch();
     useEffect(() => {
         if (activeTab === 'appointments') {
-            dispatch(getAppointmentsAction({ clinicId: clinicId, doctorId: doctorId, status: appointmentPeriod }));
+            dispatch(
+                getAppointmentsAction({ clinicId: clinicId, doctorId: doctorId || '', status: appointmentPeriod })
+            );
         }
     }, [dispatch, appointmentPeriod, activeTab]);
     return (
         <>
             <Row className="mt-2">
                 <Col xs={12}>
-                    <Card style={{ height: '87vh' }}>
+                    <Card className="scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
                         <Card.Body>
                             <Row className="mb-2">
                                 <Col sm={4}>
                                     <ul className="nav nav-underline">
                                         <li className="nav-item">
-                                            <a
-                                                className={classNames("nav-link fw-bold text-black", { active: activeTab === 'appointments', 'fw-bold': activeTab === 'appointments' })}
-                                                href="#"
-                                                onClick={() => setActiveTab('appointments')}
-                                            >
-                                                Appointments
-                                            </a>
+                                            <span
+                                                className={classNames('nav-link fw-bold text-black cursor-pointer', {
+                                                    active: activeTab === 'appointments',
+                                                    'fw-bold': activeTab === 'appointments',
+                                                })}
+                                                onClick={() => setActiveTab('appointments')}>
+                                                <FaRegListAlt /> Appointment List
+                                            </span>
                                         </li>
-                                        {/* <li className="nav-item ms-3">
-                                            <a
-                                                className={classNames("nav-link fw-bold text-black", { active: activeTab === 'transactions', 'fw-bold': activeTab === 'transactions' })}
-                                                href="#"
-                                                onClick={() => setActiveTab('transactions')}
-                                            >
-                                                Appointments History
-                                            </a>
-                                        </li> */}
-                                        <li className="nav-item ms-3">
-                                            <a
-                                                className={classNames("nav-link fw-bold text-black", { active: activeTab === 'appointmentCalendar', 'fw-bold': activeTab === 'appointmentCalendar' })}
-                                                href="#"
-                                                onClick={() => setActiveTab('appointmentCalendar')}
-                                            >
-                                                Appointment Calendar
-                                            </a>
+                                        <li className="nav-item ms-md-2">
+                                            <span
+                                                className={classNames('nav-link fw-bold text-black cursor-pointer', {
+                                                    active: activeTab === 'appointmentCalendar',
+                                                    'fw-bold': activeTab === 'appointmentCalendar',
+                                                })}
+                                                onClick={() => setActiveTab('appointmentCalendar')}>
+                                                <CiCalendar /> Appointment Calendar
+                                            </span>
                                         </li>
                                     </ul>
                                 </Col>
-
-                                <Col sm={8} className="text-end">
+                                <Col sm={8} className="text-end mt-2 mt-md-0">
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
-                                        <Col xs="auto" className="d-flex gap-2">
-                                            {/* Search input shown in both tabs */}
-                                            <FormInput
-                                                type="text"
-                                                placeholder="Search..."
-                                            />
-
-                                            {/* Additional controls shown only in the "Appointments" tab */}
+                                        <Col
+                                            xs={12}
+                                            sm="auto"
+                                            className="d-flex flex-wrap gap-2 align-items-center text-start justify-content-between responnsible-party-select">
                                             {activeTab === 'appointments' && (
                                                 <>
-                                                    <Button className="custom-buttons px-2">
+                                                    <Button className="custom-buttons">
                                                         <FiFilter className="fs-5" />
                                                     </Button>
-                                                    <FormInput
-                                                        type="Date"
-                                                        placeholder="Search..."
-                                                    />
-                                                    <Button className="custom-buttons px-2">
-                                                        <FiFileText className="fs-4" onClick={goto} />
+                                                    <Button
+                                                        as={Link}
+                                                        to="/apps/appointments/newAppointment"
+                                                        className="custom-buttons">
+                                                        New Appointment
                                                     </Button>
-                                                    <Button as={Link} to="/apps/appointments/newAppointment" className="custom-buttons px-2">New Appointment</Button>
                                                 </>
                                             )}
                                         </Col>
                                     </Row>
                                 </Col>
-                                {activeTab === 'appointments' &&
-                                    <Col md={12} className='mt-2'>
+
+                                {activeTab === 'appointments' && (
+                                    <Col md={12} className="mt-2">
                                         <div className="time-period-tabs">
                                             <ul className="nav nav-pills">
                                                 <li className="nav-item">
                                                     <button
-                                                        className={`nav-link ${appointmentPeriod === 'today' ? 'active' : 'text-black'}`}
-                                                        onClick={() => setAppointmentPeriod('today')}
-                                                    >
+                                                        className={`nav-link ${
+                                                            appointmentPeriod === 'today' ? 'active' : 'text-black'
+                                                        }`}
+                                                        onClick={() => setAppointmentPeriod('today')}>
                                                         <FiSun className="me-1" />
                                                         Today
                                                     </button>
                                                 </li>
                                                 <li className="nav-item ms-2">
                                                     <button
-                                                        className={`nav-link ${appointmentPeriod === 'upcoming' ? 'active' : 'text-black'}`}
-                                                        onClick={() => setAppointmentPeriod('upcoming')}
-                                                    >
+                                                        className={`nav-link ${
+                                                            appointmentPeriod === 'upcoming' ? 'active' : 'text-black'
+                                                        }`}
+                                                        onClick={() => setAppointmentPeriod('upcoming')}>
                                                         <FiClock className="me-1" />
                                                         Upcoming
                                                     </button>
                                                 </li>
                                                 <li className="nav-item ms-2">
                                                     <button
-                                                        className={`nav-link ${appointmentPeriod === 'history' ? 'active' : 'text-black'}`}
-                                                        onClick={() => setAppointmentPeriod('history')}
-                                                    >
+                                                        className={`nav-link ${
+                                                            appointmentPeriod === 'history' ? 'active' : 'text-black'
+                                                        }`}
+                                                        onClick={() => setAppointmentPeriod('history')}>
                                                         <FiArchive className="me-1" />
                                                         History
                                                     </button>
@@ -335,18 +387,14 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                             </ul>
                                         </div>
                                     </Col>
-                                }
+                                )}
                             </Row>
 
                             {/* Render table based on active tab */}
                             {activeTab === 'appointments' ? (
-                                <AppointmentsList patientsData={patientsData} />
+                                <AppointmentsList patientsData={patientsData} appointmentPeriod={appointmentPeriod} />
                             ) : (
-                                // <AppointmentsTransactionList patientsData={patientsData} />
-                                <AppointmentCalendar patientsData={patientsData} 
-                                // selectedDoctor={selectedDoctor?.value} 
-                                />
-
+                                <AppointmentCalendar appointmentPeriod={appointmentPeriod} selectedDoctor={doctorId} />
                             )}
                         </Card.Body>
                     </Card>
@@ -357,4 +405,3 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
 };
 
 export default Appointments;
-

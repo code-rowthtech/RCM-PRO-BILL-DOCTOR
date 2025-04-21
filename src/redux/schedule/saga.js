@@ -56,7 +56,6 @@ function* getHolidayScheduleFunction(data) {
             });
         }
     } catch (error) {
-        console.log(error, 'error')
         yield put({
             type: ScheduleActionTypes.GET_HOLIDAY_SCHEDULE_ERROR,
             payload: error,
@@ -76,6 +75,10 @@ function* deleteHolidayScheduleFunction(data) {
             yield put({
                 type: ScheduleActionTypes.DELETE_HOLIDAY_SCHEDULE_SUCCESS,
                 payload: { ...decryptedData },
+            });
+            yield put({
+                type: ScheduleActionTypes.DELETE_HOLIDAY_SCHEDULE_RESET,
+                payload: {},
             });
         } else {
             yield put({
@@ -98,7 +101,6 @@ function* createScheduleFunction(data) {
             payload: {},
         });
         const response = yield call(createScheduleApi, data);
-        // console.log(response,'response')
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success');

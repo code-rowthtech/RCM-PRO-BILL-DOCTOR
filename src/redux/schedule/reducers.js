@@ -80,14 +80,14 @@ export const deleteHolidayScheduleReducer = (state = DELETE_HOLIDAY_INITIAL_STAT
                 data: action.payload,
                 loading: false
             }
+            case ScheduleActionTypes.DELETE_HOLIDAY_SCHEDULE_RESET:
+                return {
+                    data: [],
+                    loading: false,
+                };
         case ScheduleActionTypes.DELETE_HOLIDAY_SCHEDULE_ERROR:
             return {
                 data: action.payload,
-                loading: false
-            }
-        case ScheduleActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
                 loading: false
             }
         default: return state

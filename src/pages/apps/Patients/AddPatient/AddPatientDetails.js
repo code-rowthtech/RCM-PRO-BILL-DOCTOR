@@ -253,7 +253,6 @@ const AddPatientDetails = ({
         reset();
         setLogoName(null);
         setLogo(null);
-        console.log(payload, 'Final Payload ');
     };
 
     const calculateAge = (dob) => {

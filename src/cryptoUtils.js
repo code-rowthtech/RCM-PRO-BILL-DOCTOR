@@ -34,7 +34,5 @@ export function decryptMessage(encryptedText) {
 // Example usage
 // const text = { email: "djvndfkjsn@mdg/sdfsv", password: 'sfjndkjfndsfn' };
 // const encrypted = encryptMessage(text);
-// // console.log("encrypted: ", encrypted);
 
 const decrypted = decryptMessage("qOnLIBR4sSI150WPBUdpzsu0Gv3HVQruh4Q9cp70veOZye7mpRr6hO7V3aXvkuTCurqpWgp+4BExttGF9rAsW8GwBTwIP2zoiSGWRynEModij3sgF19Q9xhvouWJR4zAQ6UHpf6NKJ7FcmdgeXAmi7pekYl5d2pbny4KWYBqvw0MY7rDcCRlRSjed7uo1JI/1CV/k4AGzWa/OThlctOswLaKhy9sGKHJ8h7Tf5TNQRZ3mzCFde4TltkSKhxtldd9OkQb2uZuoEbkH2yN/PiEr+AjmI6t5CJWq0/ZvynhKa5eSDsugYb7aO5GXmVQp0JeP+jaGbsEN69k8PepZDZS2w==");
-console.log("decrypted: ", decrypted);

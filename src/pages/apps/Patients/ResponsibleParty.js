@@ -14,20 +14,6 @@ const Responsible = ({ activeTab, setActiveTab }) => {
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const store = useSelector((state) => state);
-
-    const [submissionType, setSubmissionType] = useState(null);
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
-    const dispatch = useDispatch();
-    const [responsibleAddresses, setResponsibleAddresses] = useState([
-        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
-    ]);
-    console.log(responsibleAddresses, 'updateAddressresponsibleAddresses');
-
-    const [responsibleTelecom, setResponsibleTelecom] = useState([{ system: '', value: '', use: '' }]);
-    const createResponse = store?.createResponsiblePartyReducer?.data?.status;
-    const patientDetails = store?.getPatientsByIdReducer?.data?.data || [];
-    console.log(patientDetails, 'patientDetails');
-
     const {
         register,
         handleSubmit,
@@ -35,6 +21,17 @@ const Responsible = ({ activeTab, setActiveTab }) => {
         formState: { errors },
         reset,
     } = useForm();
+    const [submissionType, setSubmissionType] = useState(null);
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const dispatch = useDispatch();
+    const [responsibleAddresses, setResponsibleAddresses] = useState([
+        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
+    ]);
+   
+    const [responsibleTelecom, setResponsibleTelecom] = useState([{ system: '', value: '', use: '' }]);
+    const createResponse = store?.createResponsiblePartyReducer?.data?.status;
+    const patientDetails = store?.getPatientsByIdReducer?.data?.data || [];
+   
     useEffect(() => {
         if (patientDetails && id) {
             setValue('title', patientDetails?.relatedPerson?.name?.[0]?.prefix);
@@ -101,7 +98,6 @@ const Responsible = ({ activeTab, setActiveTab }) => {
             telecom: responsibleTelecom,
         };
         dispatch(createResponsiblePartyAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'payload');
     };
 
     // useEffect(() => {

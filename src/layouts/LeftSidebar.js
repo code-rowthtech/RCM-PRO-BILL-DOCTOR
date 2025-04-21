@@ -69,11 +69,9 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
     const patientsAppointment = store?.getAllAppointmentsReducer?.data?.appointments || [];
-    console.log(store?.getAllAppointmentsReducer?.data, 'appointment123')
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
     const createSuccess = store?.createAppointmentsReducer?.data?.message;
 
-    // console.log(patientsAppointment, 'patientsAppointment')
     const [activeTab, setActiveTab] = useState('Today'); // Default to "Today"
     // const updateAppointment = store?.createAppointmentsReducer?.data?.status;
 

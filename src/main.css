@@ -242,7 +242,17 @@ select.form-control:not([size]):not([multiple]) {
 }
 
 .form-check-input {
-    height: 20px !important;
+    height: 16px !important;
+    cursor: pointer;
+
+}
+.custom-active .form-check-input {
+    background-color: #6168d0 !important;
+    border-color: white !important;
+}
+.form-check-input:checked {
+    background-color: rgb(26, 192, 189) !important;
+    border: none !important;
 }
 
 .offcanvas {
@@ -299,3 +309,126 @@ hr {
     appearance: none;
     background-image: none !important;
 }
+.time-period-tabs .nav-link {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+.time-period-tabs .nav-link.active {
+    background-color: #b9bcbe44;
+    color: #727cf5;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+.pendingColor {
+    color: #f1c40f !important;
+    border: 1px solid #f1c40f !important;
+}
+.proposedColor {
+    color: #3498db !important;
+    border: 1px solid #3498db !important;
+}
+.bookedColor {
+    color: #2ecc71 !important;
+    border: 1px solid #2ecc71 !important;
+}
+.arrivedColor {
+    color: #27ae60 !important;
+    border: 1px solid #27ae60 !important;
+}
+.fulfilledColor {
+    color: #9b59b6 !important;
+    border: 1px solid #9b59b6 !important;
+}
+.cancelledColor {
+    color: #e74c3c !important;
+    border: 1px solid #e74c3c !important;
+}
+.noshowColor {
+    color: #e67e22 !important;
+    border: 1px solid #e67e22 !important;
+}
+.enteredinerrorColor {
+    color: #95a5a6 !important;
+    border: 1px solid #95a5a6 !important;
+}
+.checkedinColor {
+    color: #1abc9c !important;
+    border: 1px solid #1abc9c !important;
+}
+.waitlistColor {
+    color: #8e44ad !important;
+    border: 1px solid #8e44ad !important;
+}
+.slot-scroll-wrapper {
+    max-height: 450px;
+    overflow-y: auto;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    background-color: #f9f9f9;
+  }
+  
+  /* Inner slot table scroll */
+  .schedule-table tbody {
+    display: block;
+    max-height: 180px;
+    overflow-y: auto;
+  }
+  .schedule-table thead,
+  .schedule-table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+  
+  /* Input field spacing */
+  .schedule-table input {
+    height: 36px;
+    font-size: 14px;
+  }
+  
+  /* Clean & minimal scrollbar */
+  .schedule-table tbody::-webkit-scrollbar {
+    width: 6px;
+  }
+  .schedule-table tbody::-webkit-scrollbar-thumb {
+    background-color: #c1c1c1;
+    border-radius: 10px;
+  }
+  .schedule-table tbody::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+  .schedule-table tbody {
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 transparent;
+  }
+  
+  /* Icons spacing */
+  .plusicon,
+  .minusicon {
+    font-size: 18px;
+    color: #0d6efd;
+    cursor: pointer;
+  }
+  .minusicon {
+    color: #dc3545;
+  }
+  
+  /* Header row styling */
+  /* thead th {
+    background-color: #0d6efd;
+    color: white;
+    text-align: center;
+    vertical-align: middle;
+    border: none;
+  } */
+  
+  /* Outer table */
+
+
+  
+  

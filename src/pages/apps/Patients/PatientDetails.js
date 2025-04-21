@@ -38,8 +38,6 @@ const PatientDetails = () => {
     // const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.userId
 
     const patientsDataById = store?.getPatientsByIdReducer?.data?.data;
-    console.log(patientsDataById, 'data0987654321');
-
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
 
     useEffect(() => {
@@ -233,7 +231,6 @@ const PatientDetails = () => {
         }
 
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'main');
     };
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];

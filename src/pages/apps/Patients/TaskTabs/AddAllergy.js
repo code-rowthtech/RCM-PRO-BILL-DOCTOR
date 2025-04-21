@@ -24,7 +24,6 @@ const AddAllergy = ({ onCancel }) => {
 
     const onSubmit = (data) => {
         const createData = { ...data };
-
         const payload = {
             patientId: patientId,
             ...(createData?.allergyType ? { allergyType: createData?.allergyType } : {}),
@@ -36,8 +35,6 @@ const AddAllergy = ({ onCancel }) => {
         };
 
         dispatch(createAllergyAction({ key: encryptMessage(payload) }));
-        // reset();
-        console.log(payload, 'Allergy created');
     };
    
 
