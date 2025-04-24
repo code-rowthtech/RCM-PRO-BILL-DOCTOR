@@ -1003,11 +1003,11 @@ const NewPatient = () => {
                                                             }>
                                                             <p
                                                                 className={`patient-menu-item text-black mb-0 ps-2 pe-2 border-bottom py-1 
-                        ${
-                            isSidebarCollapsed
-                                ? 'text-center fw-bold'
-                                : 'd-flex justify-content-between align-items-center'
-                        }`}
+                                                                  ${
+                                                                    isSidebarCollapsed
+                                                                       ? 'text-center fw-bold'
+                                                                       : 'd-flex justify-content-between align-items-center'
+                                                                     }`}
                                                                 onClick={() => {
                                                                     if (item.label !== 'Clinical Review') {
                                                                         handleClinicalReviewToggle();

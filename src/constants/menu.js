@@ -46,7 +46,7 @@ const MENU_ITEMS = [
     },
     {
         key: 'patients',
-        label: 'Patient',
+        label: 'Patients',
         icon: 'uil-thermometer',
         url: '/apps/patients/list',
     },
@@ -71,7 +71,7 @@ const MENU_ITEMS = [
     },
     {
         key: 'report',
-        label: 'Report',
+        label: 'Reports',
         icon: 'uil-clipboard-alt',
         url: '/apps/report/list',
     },
