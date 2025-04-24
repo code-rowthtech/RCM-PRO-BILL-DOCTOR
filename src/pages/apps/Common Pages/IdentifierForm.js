@@ -129,7 +129,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
     }, [doctorDetails])
     return (
         <>
-            <Row>
+            <Row >
                 <Col sm={12}>
                     <h5>
                         Identifiers
@@ -161,7 +161,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
 
             {/* Dynamic Identifier Fields */}
             {identifiers.map((item, index) => (
-                <Row key={index} className="mb-2">
+                <Row key={index} className="">
                     <Col>
                         <Form.Select
                             value={item?.type?.value || ''}

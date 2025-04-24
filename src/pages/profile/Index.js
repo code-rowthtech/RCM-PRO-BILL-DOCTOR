@@ -21,7 +21,7 @@ const Index = () => {
     return (
         <div className="pt-1 pb-2">
             <div className=" mt-2">
-                <Card className=" scroll-container" style={{ height: '82vh', overflow: 'scroll',padding: '10px' }}>
+                <Card className=" scroll-container" style={{ height: '87vh', overflow: 'scroll',padding: '10px' }}>
                     <div className="row">
                         {/* <div>
                             <p className="fw-bold">PROFILE</p>

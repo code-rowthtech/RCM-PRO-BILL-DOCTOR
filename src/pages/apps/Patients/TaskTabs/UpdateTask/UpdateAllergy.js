@@ -1,12 +1,30 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import Spinner from '../../../../../constants/Spinner';
 import { updateAllergyAction } from '../../../../../redux/actions';
 import { encryptMessage } from '../../../../../cryptoUtils';
+import AsyncSelect from 'react-select/async';
+import { allergyType, severityData } from '../../../../../utils/DataSets/Allergy/allergyType';
+import { clinicalStatus } from '../../../../../utils/DataSets/Allergy/clinicalStatus';
+import { verificationStatus } from '../../../../../utils/DataSets/Allergy/verificationStatus';
+import { category, criticality } from '../../../../../utils/DataSets/Allergy/category';
+import { allergyCode } from '../../../../../utils/DataSets/Allergy/allergyCode';
+import { manifestationData } from '../../../../../utils/DataSets/Allergy/manification';
+import { exposureRouteData } from '../../../../../utils/DataSets/Allergy/exposureRoute';
+import { useSearchParams } from 'react-router-dom';
 
 const UpdateAllergy = ({ onCancel, allergy }) => {
+    console.log(allergy, 'allergy');
+    const [searchParams] = useSearchParams();
+    const patientId = searchParams.get('id');
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
+    const [code, setCode] = useState(null);
+    const [substance, setSubstance] = useState(null);
+    const [manifestation, setManifestation] = useState(null); // State to store selected manifestation
+    const [exposureRoute, setExposureRoute] = useState(null);
     const {
         register,
         handleSubmit,
@@ -20,36 +38,275 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const allergyDetails = store?.getAllergyDetailsReducer?.data?.allergy;
-
+    console.log(allergyDetails, 'allergyDetails');
     useEffect(() => {
-        setValue('allergyType', allergyDetails?.allergyType);
-        setValue('allergyname', allergyDetails?.allergyname);
-        setValue('reaction', allergyDetails?.reaction);
-        setValue('status', allergyDetails?.status);
-        setValue('severity', allergyDetails?.severity);
-        setValue('notes', allergyDetails?.notes);
+      setValue('allergyType', allergyDetails?.type?.coding[0]?.code);
+        // setValue('category', allergyDetails?.category?.coding[0]?.code);
+        setValue('criticality', allergyDetails?.criticality?.code);
+        setValue('verificationStatus', allergyDetails?.verificationStatus?.coding[0]?.code);
+        setValue('reaction', allergyDetails?.reaction[0]?.manifestation[0]?.concept?.coding[0]?.code);
+        setValue('status', allergyDetails?.clinicalStatus?.coding[0]?.code);
+        setValue('severity', allergyDetails?.reaction[0]?.severity?.coding[0]?.code);
+        setValue('notes', allergyDetails?.note[0]?.text);
+        setManifestation(allergyDetails?.reaction?.[0]?.manifestation?.[0]?.concept?.coding[0]);
+        setCode(allergyDetails?.code?.coding[0]);
+        setExposureRoute(allergyDetails?.reaction?.[0]?.exposureRoute?.coding?.[0]);
+        setSubstance(allergyDetails?.reaction[0]?.substance?.coding[0]);
     }, [allergyDetails]);
 
-      const onSubmit = (data) => {
-            const updateAllergy = { ...data };
-    
-            const payload = {
-                id: allergy?._id,
-                ...(updateAllergy?.allergyType ? { allergyType: updateAllergy?.allergyType } : {}),
-                ...(updateAllergy?.allergyname ? { allergyname: updateAllergy?.allergyname } : {}),
-                ...(updateAllergy?.reaction ? { reaction: updateAllergy?.reaction } : {}),
-                ...(updateAllergy?.status ? { status: updateAllergy?.status } : {}),
-                ...(updateAllergy?.severity ? { severity: updateAllergy?.severity } : {}),
-                ...(updateAllergy?.notes ? { notes: updateAllergy?.notes } : {}),
-            };
-    
-            dispatch(updateAllergyAction({ key: encryptMessage(payload) }));
-            // reset();
+    // const onSubmit = (data) => {
+    //     const updateAllergy = { ...data };
+
+    //     const payload = {
+    //         id: allergy?._id,
+    //         ...(updateAllergy?.allergyType ? { allergyType: updateAllergy?.allergyType } : {}),
+    //         ...(updateAllergy?.allergyname ? { allergyname: updateAllergy?.allergyname } : {}),
+    //         ...(updateAllergy?.reaction ? { reaction: updateAllergy?.reaction } : {}),
+    //         ...(updateAllergy?.status ? { status: updateAllergy?.status } : {}),
+    //         ...(updateAllergy?.severity ? { severity: updateAllergy?.severity } : {}),
+    //         ...(updateAllergy?.notes ? { notes: updateAllergy?.notes } : {}),
+    //     };
+
+    //     dispatch(updateAllergyAction({ key: encryptMessage(payload) }));
+    //     // reset();
+    // };
+
+    const onSubmit = (data) => {
+        const selectedType = allergyType.find((type) => type?.code === data?.allergyType);
+        const selectedStatus = clinicalStatus.find((item) => item?.code === data?.status);
+        const selectedVerificationStatus = verificationStatus.find(
+            (status) => status?.code === data?.verificationStatus
+        );
+        const selectedCategory = category.find((item) => item?.code === data?.category);
+        const selectedCriticalityOption = criticality.find((option) => option?.code === data?.criticality);
+        const selectedSeverityOption = severityData.find((option) => option?.code === data?.severity);
+        console.log(severityData, 'severityData');
+
+        const payload = {
+            id : allergy?._id,
+            patientId: patientId,
+            clinicId: clinicId,
+            doctorId: doctorId,
+            asserterId: doctorId,
+            recorderId: doctorId,
+            id: selectedCategory?.display,
+            resourceType: 'AllergyIntolerance',
+            type: {
+                coding: [
+                    {
+                        system: selectedType?.system,
+                        code: selectedType?.code,
+                        display: selectedType?.display,
+                    },
+                ],
+                text: selectedType?.display,
+            },
+            clinicalStatus: {
+                coding: [
+                    {
+                        system: selectedStatus?.system,
+                        code: selectedStatus?.code,
+                        display: selectedStatus?.display,
+                    },
+                ],
+                text: selectedStatus?.display,
+            },
+            verificationStatus: {
+                coding: [
+                    {
+                        system: selectedVerificationStatus?.system,
+                        code: selectedVerificationStatus?.code,
+                        display: selectedVerificationStatus?.display,
+                    },
+                ],
+                text: selectedVerificationStatus?.display,
+            },
+            category: {
+                coding: [
+                    {
+                        system: selectedCategory?.system,
+                        code: selectedCategory?.code,
+                        display: selectedCategory?.display,
+                    },
+                ],
+                text: selectedCategory?.display, // Optional, to include text description
+            },
+            criticality: {
+                system: selectedCriticalityOption?.system,
+                code: selectedCriticalityOption?.code,
+                display: selectedCriticalityOption?.display,
+            },
+            code: {
+                coding: code,
+                text: code?.display, // use display text
+            },
+            reaction: [
+                {
+                    substance: {
+                        coding: code,
+                    },
+                    manifestation: [
+                        {
+                            concept: {
+                                coding: manifestation,
+                                text: code?.display, // use display text
+                            },
+                        },
+                    ],
+                    severity: {
+                        coding: [
+                            {
+                                system: selectedSeverityOption?.system,
+                                code: selectedSeverityOption?.code,
+                                display: selectedSeverityOption?.display,
+                            },
+                        ],
+                        text: selectedSeverityOption?.display,
+                    },
+                    exposureRoute: {
+                        coding: exposureRoute,
+                        text: exposureRoute?.display,
+                    },
+                    note: [
+                        {
+                            text: '',
+                            time: '',
+                            authorReference: {
+                                reference: '',
+                                type: '',
+                                identifier: {
+                                    use: '',
+                                    system: '',
+                                    value: '',
+                                },
+                                display: '',
+                            },
+                        },
+                    ],
+                },
+            ],
+            note: [
+                {
+                    text: data?.notes,
+                    time: '',
+                    authorReference: {
+                        reference: '',
+                        type: '',
+                        identifier: {
+                            use: '',
+                            system: '',
+                            value: '',
+                        },
+                        display: '',
+                    },
+                },
+            ],
         };
+
+        dispatch(updateAllergyAction({ key: encryptMessage(payload) }));
+        console.log(payload, 'payload');
+    };
+    const formattedCodeOption = useMemo(
+        () =>
+            allergyCode?.map((reason) => ({
+                value: reason,
+                label: reason.display,
+            })),
+        []
+    );
+    const handleCodeChange = useCallback((selectedOption) => {
+        setCode(selectedOption ? selectedOption.value : '');
+    }, []);
+
+    const selectedCodeOption =
+        formattedCodeOption.find((option) => option?.value?.code === code?.code) ||
+        formattedCodeOption.find((option) => option?.display === code);
+
+    const loadCodeOptions = useCallback(
+        (inputValue, callback) => {
+            if (!inputValue) {
+                callback(formattedCodeOption.slice(0, 10));
+                return;
+            }
+
+            const filteredOptions = formattedCodeOption.filter((option) =>
+                option.label.toLowerCase().includes(inputValue.toLowerCase())
+            );
+
+            callback(filteredOptions.slice(0, 20));
+        },
+        [formattedCodeOption]
+    );
+    // Manifestation Options
+    const formattedManifestationOption = useMemo(
+        () =>
+            manifestationData?.map((reason) => ({
+                value: reason, // The whole object or unique identifier
+                label: reason.display, // What will be displayed in the dropdown
+            })),
+        [manifestationData]
+    );
+
+    const handleManifestationChange = useCallback((selectedOption) => {
+        setManifestation(selectedOption ? selectedOption.value : null); // Store the whole object or identifier
+    }, []);
+
+    const selectedManifestationOption =
+        formattedManifestationOption.find((option) => option?.value?.code === manifestation?.code) ||
+        formattedManifestationOption.find((option) => option?.value?.display === manifestation);
+
+    const loadManifestationOptions = useCallback(
+        (inputValue, callback) => {
+            if (!inputValue) {
+                callback(formattedManifestationOption.slice(0, 10)); // Load first 10 options initially
+                return;
+            }
+
+            const filteredOptions = formattedManifestationOption.filter((option) => {
+                // Check if option.label exists before calling toLowerCase()
+                return option.label && option.label.toLowerCase().includes(inputValue.toLowerCase());
+            });
+
+            callback(filteredOptions.slice(0, 20)); // Limit to first 20 results
+        },
+        [formattedManifestationOption]
+    );
+    const formattedExposurRouteOption = useMemo(
+        () =>
+            exposureRouteData?.map((reason) => ({
+                value: reason, // The whole object or unique identifier
+                label: reason.display, // What will be displayed in the dropdown
+            })),
+        [exposureRouteData]
+    );
+    const handleExposureRouteChange = useCallback((selectedOption) => {
+        setExposureRoute(selectedOption ? selectedOption.value : null); // Store the whole object or identifier
+    }, []);
+
+    const selectedExposureRouteOption =
+        formattedExposurRouteOption.find((option) => option?.value?.code === exposureRoute?.code) ||
+        formattedExposurRouteOption.find((option) => option?.value?.display === exposureRoute);
+
+    const loadExposureRouteOptions = useCallback(
+        (inputValue, callback) => {
+            if (!inputValue) {
+                callback(formattedExposurRouteOption.slice(0, 10)); // Load first 10 options initially
+                return;
+            }
+
+            const filteredOptions = formattedExposurRouteOption.filter((option) => {
+                // Check if option.label exists before calling toLowerCase()
+                return option.label && option.label.toLowerCase().includes(inputValue.toLowerCase());
+            });
+
+            callback(filteredOptions.slice(0, 20)); // Limit to first 20 results
+        },
+        [formattedExposurRouteOption]
+    );
 
     return (
         <div>
-            <Form onSubmit={handleSubmit(onSubmit)}>  
+            <Form onSubmit={handleSubmit(onSubmit)}>
                 {store?.getAllergyDetailsReducer?.loading ? (
                     <div className="text-center my-5 py-5">
                         <Spinner className=" " />
@@ -69,98 +326,244 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
                                     Allergy Type
                                 </Form.Label>
                                 <Form.Select
-                                    id="allergyType"
                                     {...register('allergyType', { required: 'Allergy Type is required' })}
                                     data-has-value={!!watch('allergyType')}>
                                     <option value="" hidden>
                                         Select Allergy Type
                                     </option>
-                                    <option value="specificdrug">Specific Drug</option>
-                                    <option value="drugclass">Drug Class</option>
-                                    <option value="nondrug">Non-drug</option>
-                                    <option value="nkda">nkda</option>
+                                    {allergyType?.map((type) => (
+                                        <option key={type?.code} value={type?.code}>
+                                            {type?.display}
+                                        </option>
+                                    ))}
                                 </Form.Select>
+                                {errors.allergyType && (
+                                    <Form.Text className="text-danger">{errors.allergyType.message}</Form.Text>
+                                )}
                             </Form.Group>
                         </Col>
 
                         <Col sm={4}>
                             <Form.Group className="mb-1">
-                                <Form.Label htmlFor="allergyname" className="mb-0">
-                                    Specific Drug Allergy
+                                <Form.Label htmlFor="category" className="mb-0">
+                                    Allergy Category
                                 </Form.Label>
-                                <Form.Control
-                                    id="allergyname"
-                                    type="text"
-                                    placeholder="Enter Specific Drug Allergy"
-                                    {...register('allergyname', { required: 'Specific Drug Allergy is required' })}
-                                    data-has-value={!!watch('allergyname')}
+                                <Form.Select
+                                    {...register('category', { required: 'Allergy Category is required' })}
+                                    data-has-value={!!watch('category')}>
+                                    <option value="" hidden>
+                                        Select Allergy Category
+                                    </option>
+                                    {category?.map((item) => (
+                                        <option key={item?.code} value={item?.code}>
+                                            {item?.display}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                                {errors.category && (
+                                    <Form.Text className="text-danger">{errors.category.message}</Form.Text>
+                                )}
+                            </Form.Group>
+                        </Col>
+
+                        <Col sm={4}>
+                            <Form.Group className="mb-1">
+                                <Form.Label htmlFor="criticality" className="mb-0">
+                                    Criticality
+                                </Form.Label>
+                                <Form.Select
+                                    {...register('criticality', { required: 'Criticality is required' })}
+                                    data-has-value={!!watch('criticality')}>
+                                    <option value="" hidden>
+                                        Select Criticality
+                                    </option>
+                                    {criticality?.map((item) => (
+                                        <option key={item?.code} value={item?.code}>
+                                            {item?.display}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                                {errors.criticality && (
+                                    <Form.Text className="text-danger">{errors.criticality.message}</Form.Text>
+                                )}
+                            </Form.Group>
+                        </Col>
+
+                        <Col sm={4}>
+                            <Form.Group className="mb-1">
+                                <Form.Label htmlFor="verificationStatus" className="mb-0">
+                                    Verification Status
+                                </Form.Label>
+                                <Form.Select
+                                    {...register('verificationStatus', { required: 'Verification Status is required' })}
+                                    data-has-value={!!watch('verificationStatus')}>
+                                    <option value="">Select Verification Status</option>
+                                    {verificationStatus.map((status) => (
+                                        <option key={status?.code} value={status?.code} className="text-capitalize">
+                                            {status?.display}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+                        <Col sm={4}>
+                            <Form.Group>
+                                <Form.Label className="mb-0">Allergy Code</Form.Label>
+                                <AsyncSelect
+                                    loadOptions={loadCodeOptions}
+                                    defaultOptions={formattedCodeOption.slice(0, 10)} // Show first 10 options initially
+                                    isSearchable
+                                    className="basic-single"
+                                    classNamePrefix="select"
+                                    placeholder="&nbsp; Select"
+                                    value={selectedCodeOption}
+                                    onChange={handleCodeChange}
+                                    styles={{
+                                        control: (provided) => ({
+                                            ...provided,
+                                            height: '30px',
+                                            minHeight: '30px',
+                                            border: '0px',
+                                        }),
+                                        placeholder: (provided) => ({
+                                            ...provided,
+                                            fontWeight: 'bold',
+                                            fontSize: '12px',
+                                            paddingBottom: '5px',
+                                        }),
+                                    }}
                                 />
                             </Form.Group>
                         </Col>
 
                         <Col sm={4}>
+                            <Form.Group>
+                                <Form.Label className="mb-0">Substance</Form.Label>
+                                <AsyncSelect
+                                    loadOptions={loadCodeOptions}
+                                    defaultOptions={formattedCodeOption.slice(0, 10)} // Show first 10 options initially
+                                    isSearchable
+                                    className="basic-single"
+                                    classNamePrefix="select"
+                                    placeholder="&nbsp; Select"
+                                    value={selectedCodeOption}
+                                    onChange={handleCodeChange}
+                                    styles={{
+                                        control: (provided) => ({
+                                            ...provided,
+                                            height: '30px',
+                                            minHeight: '30px',
+                                            border: '0px',
+                                        }),
+                                        placeholder: (provided) => ({
+                                            ...provided,
+                                            fontWeight: 'bold',
+                                            fontSize: '12px',
+                                            paddingBottom: '5px',
+                                        }),
+                                    }}
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col sm={4}>
+                            <Form.Group>
+                                <Form.Label className="mb-0">Manifestation</Form.Label>
+                                <AsyncSelect
+                                    loadOptions={loadManifestationOptions}
+                                    defaultOptions={formattedManifestationOption.slice(0, 10)} // Show first 10 options initially
+                                    isSearchable
+                                    className="basic-single"
+                                    classNamePrefix="select"
+                                    placeholder="&nbsp; Select"
+                                    value={selectedManifestationOption} // Ensure this matches the { label, value } format
+                                    onChange={handleManifestationChange}
+                                    styles={{
+                                        control: (provided) => ({
+                                            ...provided,
+                                            height: '30px',
+                                            minHeight: '30px',
+                                            border: '0px',
+                                        }),
+                                        placeholder: (provided) => ({
+                                            ...provided,
+                                            fontWeight: 'bold',
+                                            fontSize: '12px',
+                                            paddingBottom: '5px',
+                                        }),
+                                    }}
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col sm={4}>
                             <Form.Group className="mb-1">
-                                <Form.Label htmlFor="reaction" className="mb-0">
-                                    Reaction
+                                <Form.Label htmlFor="status" className="mb-0">
+                                    Clinical Status
                                 </Form.Label>
                                 <Form.Select
-                                    id="reaction"
-                                    {...register('reaction', { required: 'Reaction is required' })}
-                                    data-has-value={!!watch('reaction')}>
+                                    {...register('status', { required: 'Clinical Status is required' })}
+                                    data-has-value={!!watch('status')}>
                                     <option value="" hidden>
-                                        Select Reaction
+                                        Select Clinical Status
                                     </option>
-                                    <option value="rash">Rash</option>
-                                    <option value="anaphylaxis">Anaphylaxis</option>
-                                    <option value="swelling">Swelling</option>
-                                    <option value="nausea">Nausea</option>
-                                    <option value="other">Other</option>
+                                    {clinicalStatus?.map((status) => (
+                                        <option key={status?.code} value={status?.code}>
+                                            {status?.display}
+                                        </option>
+                                    ))}
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-
-                        <Col sm={6}>
+                        <Col sm={4}>
                             <Form.Group className="mb-1">
                                 <Form.Label htmlFor="severity" className="mb-0">
                                     Severity
                                 </Form.Label>
                                 <Form.Select
-                                    id="severity"
-                                    {...register('severity', { required: 'Severity is required' })}
+                                    {...register('severity', { required: 'Clinical severity is required' })}
                                     data-has-value={!!watch('severity')}>
                                     <option value="" hidden>
-                                        Select Severity
+                                        Select Clinical Status
                                     </option>
-                                    <option value="Fatal">Fatal</option>
-                                    <option value="Severe">Severe</option>
-                                    <option value="Moderate to severe">Moderate to severe</option>
-                                    <option value="Moderate">Moderate</option>
-                                    <option value="Mild to moderate">Mild to moderate</option>
-                                    <option value="Mild">Mild</option>
-                                    <option value="Unknown">Unknown</option>
+                                    {severityData?.map((severity) => (
+                                        <option key={severity?.code} value={severity?.code}>
+                                            {severity?.display}
+                                        </option>
+                                    ))}
                                 </Form.Select>
                             </Form.Group>
                         </Col>
 
-                        <Col sm={6}>
-                            <Form.Group className="mb-1">
-                                <Form.Label htmlFor="status" className="mb-0">
-                                    Status
-                                </Form.Label>
-                                <Form.Select
-                                    {...register('status', { required: 'Status is required' })}
-                                    data-has-value={!!watch('status')}>
-                                    <option value="" hidden>
-                                        Select Status
-                                    </option>
-                                    <option value="mild">Done</option>
-                                    <option value="moderate">Pending</option>
-                                    <option value="severe">Hold</option>
-                                </Form.Select>
+                        <Col sm={4}>
+                            <Form.Group>
+                                <Form.Label className="mb-0"> Exposure Route</Form.Label>
+                                <AsyncSelect
+                                    loadOptions={loadExposureRouteOptions}
+                                    defaultOptions={formattedExposurRouteOption.slice(0, 10)} // Show first 10 options initially
+                                    isSearchable
+                                    className="basic-single"
+                                    classNamePrefix="select"
+                                    placeholder="&nbsp; Select"
+                                    value={selectedExposureRouteOption} // Ensure this matches the { label, value } format
+                                    onChange={handleExposureRouteChange}
+                                    styles={{
+                                        control: (provided) => ({
+                                            ...provided,
+                                            height: '30px',
+                                            minHeight: '30px',
+                                            border: '0px',
+                                        }),
+                                        placeholder: (provided) => ({
+                                            ...provided,
+                                            fontWeight: 'bold',
+                                            fontSize: '12px',
+                                            paddingBottom: '5px',
+                                        }),
+                                    }}
+                                />
                             </Form.Group>
                         </Col>
 
-                        <Col sm={12}>
+                        <Col sm={8}>
                             <Form.Group className="mb-1">
                                 <Form.Label htmlFor="notes" className="mb-0">
                                     Note
@@ -178,7 +581,9 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
                         <Col sm={12} className="d-flex justify-content-end gap-1 mt-1">
                             {/* <Button className="custom-buttons">Cancel</Button> */}
                             {/* <Button className='custom-buttons'>Save and Add Another</Button> */}
-                            <Button className="custom-buttons" type='submit'>Update</Button>
+                            <Button className="custom-buttons" type="submit">
+                                Update
+                            </Button>
                         </Col>
                     </Row>
                 )}

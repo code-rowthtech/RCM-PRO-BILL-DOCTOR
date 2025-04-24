@@ -21,8 +21,9 @@ const Paginations = ({ currentPage, totalPages, onPageChange }) => {
                         className={`page-item ${currentPage === index + 1 ? 'active px-1 ' : ''}`}
                     >
                         <button
-                            className="page-link rounded-circle" disabled
+                            className="page-link rounded-circle ms-1" 
                             onClick={() => onPageChange(index + 1)}
+                            disabled={currentPage === index + 1}
                         >
                             {index + 1}
                         </button>

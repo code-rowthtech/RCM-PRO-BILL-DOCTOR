@@ -17,10 +17,11 @@ import avatar2 from '../assets/images/users/avatar-4.jpg';
 import logoSmDark from '../assets/images/logo_sm_dark.png';
 import logoSmLight from '../assets/images/logo_sm.png';
 import logo from '../assets/images/logo-light.png';
-import CloseIcon from "../assets/images/Iconclose.png"
+import CloseIcon from '../assets/images/Iconclose.png';
 //constants
 import * as layoutConstants from '../constants/layout';
 import MENU_ITEMS from '../constants/menu';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 // get the notifications
 
@@ -63,7 +64,6 @@ type TopbarProps = {
 const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: TopbarProps): React$Element<any> => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
     const [isopen, setIsopen] = useState(false);
     const navbarCssClasses = navCssClasses || '';
     const containerCssClasses = !hideLogo ? 'container-fluid' : '';
@@ -72,6 +72,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         layoutType: state.Layout.layoutType,
         leftSideBarType: state.Layout.leftSideBarType,
     }));
+    const inProgressUrls = ['/apps/report/list', '/apps/prescription/index', '/apps/diagnosis/list'];
 
     /**
      * Toggle the leftmenu when having mobile screen
@@ -130,8 +131,6 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/schedule/addBreak': 'Add Break',
         '/apps/prescription/index': 'Prescription',
         '/apps/prescription/newPrescription': 'New Prescription',
-
-
     };
     const getPageTitle = (pathToTitleMap, pathname, search) => {
         const queryParams = new URLSearchParams(search);
@@ -151,7 +150,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
     const pageTitle = getPageTitle(pathToTitleMap, pathname, search);
     return (
         <>
-            <div className={classNames('navbar-custom ', navbarCssClasses)} style={{ backgroundColor: "#ffffff" }}>
+            <div className={classNames('navbar-custom ', navbarCssClasses)} style={{ backgroundColor: '#ffffff' }}>
                 <div className={`${containerCssClasses} d-flex align-items-center`}>
                     {!hideLogo && (
                         <Link to="/" className="topnav-logo">
@@ -164,28 +163,55 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                         </Link>
                     )}
 
-
-
                     {/* toggle for vertical layout */}
                     {(layoutType === layoutConstants.LAYOUT_VERTICAL || layoutType === layoutConstants.LAYOUT_FULL) && (
                         <>
-                        <div className='d-flex align-items-center col-auto'>
-                            <button className="button-menu-mobile open-left ps-0" onClick={handleLeftMenuCallBack} style={{paddingTop:"3.2rem"}}>
-                                {/* <i className="mdi mdi-menu" /> */}
-                                <img src={CloseIcon} alt='' style={{width:"75%",height:"75%",objectFit:"contain"}}/>
-                            </button>
-                            {/* <h4 className=''>{pageTitle}</h4> */}
-                        </div>
-                        <div className='d-flex gap-3 align-items-center col-11' style={{marginLeft:'-40px'}}>
-                            {MENU_ITEMS?.map((data,index) => (
-                                <p key={index} onClick={() => navigate(data?.url)} className='fs-5 mb-0 fw-bold cursor-pointer' style={{color:location.pathname===data?.url?'black':'rgba(116, 114, 114, 0.51)'}}>{data?.label}</p>
-                            ))}
-                        </div>
+                            <div className="d-flex align-items-center col-auto">
+                                <button
+                                    className="button-menu-mobile open-left ps-0"
+                                    onClick={handleLeftMenuCallBack}
+                                    style={{ paddingTop: '' }}>
+                                    <i className="mdi mdi-menu" />
+
+                                    {/* <img src={CloseIcon} alt='' style={{width:"20px",height:"20px",objectFit:""}}/> */}
+                                </button>
+                                {/* <h4 className=''>{pageTitle}</h4> */}
+                            </div>
+                            <div className="d-flex gap-3 align-items-center col-11">
+                                {MENU_ITEMS?.map((item, index) => {
+                                    const isInProgress = inProgressUrls.includes(item?.url);
+                                    const isActive = location.pathname === item?.url;
+
+                                    const menuLabel = (
+                                        <p
+                                            className="fs-5 mb-0 fw-bold"
+                                            style={{
+                                                color: isActive ? 'black' : 'rgba(116, 114, 114, 0.51)',
+                                                cursor: isInProgress ? 'progress' : 'pointer',
+                                                opacity: isInProgress ? 0.5 : 1,
+                                            }}>
+                                            {item?.label}
+                                        </p>
+                                    );
+
+                                    return isInProgress ? (
+                                        <OverlayTrigger
+                                            key={index}
+                                            placement="bottom"
+                                            overlay={<Tooltip id={`tooltip-${index}`}>⏳ In Progress</Tooltip>}>
+                                            <div>{menuLabel}</div>
+                                        </OverlayTrigger>
+                                    ) : (
+                                        <div key={index} onClick={() => navigate(item?.url)}>
+                                            {menuLabel}
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </>
                     )}
                     <ul className="list-unstyled topbar-menu float-end mb-0">
-                        <li className="dropdown notification-list">
-                        </li>
+                        <li className="dropdown notification-list"></li>
                         <li className="dropdown notification-list">
                             <ProfileDropdown
                                 profilePic={profilePic}

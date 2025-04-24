@@ -39,14 +39,13 @@ type OrderListProps = {
 };
 
 // Component for Appointments List Table
-const AppointmentsList = ({ patientsData, appointmentPeriod }: OrderListProps): React$Element<React$FragmentType> => {
+const AppointmentsList = ({ patientsData, appointmentPeriod, setSkip ,skip }: OrderListProps): React$Element<React$FragmentType> => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
+    console.log(store?.getAppointmentsReducer, 'appointmentsList');
     const [cancelationPopupRow, setCancelationPopupRow] = useState(null);
     const [cancelationReason, setCancelationReason] = useState('');
-    const [skip, setSkip] = useState(1);
-
     const [selectedStatus, setSelectedStatus] = useState('');
     const updateSuccess = store?.updateAppointmentDetailsReducer?.data?.status;
     const {
@@ -59,7 +58,7 @@ const AppointmentsList = ({ patientsData, appointmentPeriod }: OrderListProps): 
     } = useForm();
     useEffect(() => {
         if (updateSuccess === 200) {
-            dispatch(getAppointmentsAction({ clinicId: clinicId, status: appointmentPeriod, page: skip, limit: 10 }));
+            dispatch(getAppointmentsAction({ clinicId: clinicId, status: appointmentPeriod, limit: 10 }));
             setCancelationPopupRow(null);
             setCancelationReason('');
         }
@@ -267,7 +266,7 @@ const AppointmentsList = ({ patientsData, appointmentPeriod }: OrderListProps): 
             <Col className="mt-2 d-flex justify-content-end">
                 <Paginations
                     currentPage={skip}
-                    totalPages={store?.getPatientsReducer?.data?.pagination?.totalPages}
+                    totalPages={store?.getAppointmentsReducer?.data?.totalPages}
                     onPageChange={handlePageChange}
                 />
             </Col>
@@ -289,18 +288,20 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
     const navigate = useNavigate();
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
+    const [skip, setSkip] = useState(1)
+
     useEffect(() => {
         if (activeTab === 'appointments') {
             dispatch(
-                getAppointmentsAction({ clinicId: clinicId, doctorId: doctorId || '', status: appointmentPeriod })
+                getAppointmentsAction({ clinicId: clinicId, doctorId: doctorId || '', status: appointmentPeriod , limit:10 ,page : skip })
             );
         }
-    }, [dispatch, appointmentPeriod, activeTab]);
+    }, [dispatch, appointmentPeriod, activeTab, skip]);
     return (
         <>
             <Row className="mt-2">
                 <Col xs={12}>
-                    <Card className="scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                    <Card className="scroll-container" style={{ height: '87vh', overflow: 'scroll' }}>
                         <Card.Body>
                             <Row className="mb-2">
                                 <Col sm={4}>
@@ -392,7 +393,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
 
                             {/* Render table based on active tab */}
                             {activeTab === 'appointments' ? (
-                                <AppointmentsList patientsData={patientsData} appointmentPeriod={appointmentPeriod} />
+                                <AppointmentsList setSkip= {setSkip}  patientsData={patientsData} appointmentPeriod={appointmentPeriod} />
                             ) : (
                                 <AppointmentCalendar appointmentPeriod={appointmentPeriod} selectedDoctor={doctorId} />
                             )}
