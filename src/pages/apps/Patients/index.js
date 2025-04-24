@@ -13,7 +13,6 @@ const Patients = () => {
     const dispatch = useDispatch();
     const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
-
     const store = useSelector((state) => state);
     const patientsData = store?.getPatientsReducer?.data?.data || [];
     const [skip, setSkip] = useState(1);

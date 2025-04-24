@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Card, Form, Modal } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { FiSun, FiClock, FiCalendar } from 'react-icons/fi'; // ⬅️ Icons
 import { getAppointmentByPatientProviderAction } from '../../../../redux/actions';
 import AppointmentTable from './AppointmentFilterList';
 
-const Appointment = (id) => {
+const Appointment = ({ isOpen, setIsOpen }) => {
+    console.log(isOpen, 'isOpen');
+    const [searchParams] = useSearchParams();
+    const patientId = searchParams.get('id');
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('Today');
     const [search, setSearch] = useState('');
-    const patientId = id?.Id;
+    const [skip, setSkip] = useState(1);
     const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
 
     const handleMainTabChange = (tab) => {
@@ -25,9 +28,10 @@ const Appointment = (id) => {
             doctorId: doctorId,
             status,
             search,
+            page: skip,
         };
         dispatch(getAppointmentByPatientProviderAction(payload));
-    }, [dispatch, activeTab, search, patientId, doctorId]);
+    }, [dispatch, activeTab, search, patientId, doctorId, skip]);
 
     // Icon mapping for tabs
     const tabIcons = {
@@ -39,7 +43,13 @@ const Appointment = (id) => {
     return (
         <>
             <div className="mt-2">
-                <Card className="px-2" style={{ height: '70vh' }}>
+                <Card
+                    className="px-2"
+                    style={{
+                        height: isOpen ? '60vh' : '79vh',
+                        overflowY: 'scroll',
+                        transition: 'height 0.3s ease',
+                    }}>
                     <div className="pt-2 px-2">
                         <div className="d-flex justify-content-between align-items-center">
                             <ul className="nav nav-underline">
@@ -77,14 +87,14 @@ const Appointment = (id) => {
                         <AppointmentTable
                             patientId={patientId}
                             doctorId={doctorId}
+                            skip={skip}
+                            setSkip={setSkip}
                             status={activeTab.toLowerCase()}
                             search={search}
                         />
                     </div>
                 </Card>
             </div>
-
-          
         </>
     );
 };

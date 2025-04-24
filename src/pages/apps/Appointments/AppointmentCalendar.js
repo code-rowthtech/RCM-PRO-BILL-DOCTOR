@@ -20,28 +20,32 @@ const AppointmentCalendar = () => {
     const [show, setShow] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null)
     const [selectedSlot, setSelectedSlot] = useState(null);
+    console.log(selectedSlot,'selected1')
     const [calendarView, setCalendarView] = useState('month'); // default to 'month' or your desired initial view
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
-    const createAppointmentResponse = store?.createAppointmentReducer?.data?.status;
-    const updateSuccess = store?.rescheduleAppointmentReducer?.data?.status;
+    const createAppointmentResponse = store?.createAppointmentsReducer?.data?.status;
+    console.log(createAppointmentResponse, "createAppointmentResponse")
+    const updateSuccess = store?.updateAppointmentDetailsReducer?.data?.status;
+    console.log(updateSuccess, "updateSuccess")
     useEffect(() => {
         const data ={
             clinicId:clinicId,
             doctorId: doctorId,
-            status :''
+            status :'',
+            limit: 1000
         }
         dispatch(getAppointmentsAction(data));
     }, [dispatch, doctorId])
     useEffect(() => {
         if (createAppointmentResponse === 201) {
-            dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: doctorId || '' }));
+            dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: doctorId || '' , limit:1000 }));
             setAppModal(false)
         }
     }, [createAppointmentResponse]);
     useEffect(() => {
         if (updateSuccess === 200) {
-            dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: doctorId || '' }));
+            dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: doctorId || '' , limit:1000}));
             setShow(false)
         }
     }, [updateSuccess]);
@@ -163,7 +167,7 @@ const AppointmentCalendar = () => {
             <div className='container-fluid px-4'>
                 <div className='row'>
                     {store?.getAppointmentsReducer?.loading ?
-                        <div className="row h-100">
+                        <div className="row" style={{ height: '68vh' }}>
                             <div className="col-12 d-flex align-items-center justify-content-center">
                                 <Spinner />
                             </div>

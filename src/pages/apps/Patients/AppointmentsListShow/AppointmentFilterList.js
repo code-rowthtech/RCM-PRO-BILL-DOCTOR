@@ -10,10 +10,11 @@ import AppointmentForm from '../../Appointments/Tabs/AppointmentForm';
 import { appointmentStatus } from '../../../../utils/DataSets/appointmentstatus';
 import Paginations from '../../../../helpers/Paginations';
 
-const AppointmentTable = ({ patientId, doctorId, status, search }) => {
+const AppointmentTable = ({ patientId, doctorId, status, search, skip , setSkip }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const appointments = store?.getAppointmentByPatientProviderReducer?.data?.appointments;
+    console.log('appointments', store?.getAppointmentByPatientProviderReducer);
     const loading = store?.getAppointmentByPatientProviderReducer?.loading;
     const updateStatus = store?.updateAppointmentDetailsReducer?.data?.status;
     const [showModal, setShowModal] = useState(false); // Modal visibility state
@@ -23,7 +24,6 @@ const AppointmentTable = ({ patientId, doctorId, status, search }) => {
     const [cancelationPopupRow, setCancelationPopupRow] = useState(null);
     const [cancelationReason, setCancelationReason] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('')
-    const [skip, setSkip] = useState(1);
     const [limit, setLimit] = useState(10);
 
     const { register, handleSubmit, reset } = useForm();
@@ -39,7 +39,7 @@ const AppointmentTable = ({ patientId, doctorId, status, search }) => {
 
     useEffect(() => {
         if (updateStatus === 200) {
-            dispatch(getAppointmentByPatientProviderAction({ subject: patientId, doctorId, status, search ,skip, limit }));
+            dispatch(getAppointmentByPatientProviderAction({ subject: patientId, doctorId, status, search , page: skip, limit }));
             setCancelationPopupRow(null);
             setCancelationReason('');
         }
@@ -242,7 +242,7 @@ const AppointmentTable = ({ patientId, doctorId, status, search }) => {
                 <Col className="mt-2 d-flex justify-content-end">
                 <Paginations
                     currentPage={skip}
-                    totalPages={store?.getPatientsReducer?.data?.pagination?.totalPages}
+                    totalPages={store?.getAppointmentByPatientProviderReducer?.data?.pagination?.totalPages}
                     onPageChange={handlePageChange}
                 />
             </Col>
@@ -281,13 +281,13 @@ const AppointmentTable = ({ patientId, doctorId, status, search }) => {
                         </ul>
                         <div className=" ">
                             {activeModalTab === 'Appointments' && <AppointmentForm Id={appointmentId} />}
-                            {activeModalTab === 'Billing' && <p>Billing Content In Progress...</p>}
-                            {activeModalTab === 'Eligibility' && <p>Eligibility Content In Progress...</p>}
-                            {activeModalTab === 'Vitals' && <p>Vitals Content In Progress...</p>}
-                            {activeModalTab === 'Growthcharts' && <p>Growthcharts Content In Progress...</p>}
-                            {activeModalTab === 'Log Comm.' && <p>Log Comm. Content In Progress...</p>}
-                            {activeModalTab === 'Revisions' && <p>Revisions Content In Progress...</p>}
-                            {activeModalTab === 'Mu Helper' && <p>Mu Helper Content In Progress...</p>}
+                            {activeModalTab === 'Billing' && <p>Billing Content ⏳ In Progress</p>}
+                            {activeModalTab === 'Eligibility' && <p>Eligibility Content ⏳ In Progress</p>}
+                            {activeModalTab === 'Vitals' && <p>Vitals Content ⏳ In Progress</p>}
+                            {activeModalTab === 'Growthcharts' && <p>Growthcharts Content ⏳ In Progress</p>}
+                            {activeModalTab === 'Log Comm.' && <p>Log Comm. Content ⏳ In Progress</p>}
+                            {activeModalTab === 'Revisions' && <p>Revisions Content ⏳ In Progress</p>}
+                            {activeModalTab === 'Mu Helper' && <p>Mu Helper Content ⏳ In Progress</p>}
                         </div>
                     </div>
                 </Modal.Body>

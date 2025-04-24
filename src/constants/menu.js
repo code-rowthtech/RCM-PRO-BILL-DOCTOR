@@ -58,6 +58,12 @@ const MENU_ITEMS = [
     //     url: '/apps/transaction/transaction-list',
     // },
     {
+        key: 'Profile',
+        label: 'Profile',
+        icon: 'uil-user-square',
+        url: '/apps/profile/profile-details',
+    },
+    {
         key: 'schedule',
         label: 'Schedule',
         icon: 'uil-book-medical',
@@ -81,25 +87,20 @@ const MENU_ITEMS = [
         icon: 'uil uil-medical',
         url: '/apps/diagnosis/list',
     },
-    {
-        key: 'Profile',
-        label: 'Profile',
-        icon: 'uil-user-square',
-        url: '/apps/profile/profile-details',
-    },
+   
     // {
     //     key: 'setting',
     //     label: 'Setting',
     //     icon: 'uil-lock-open-alt',
     //     url: '/apps/setting/setting-page',
     // },
-    {
-        key: 'logout',
-        label: 'Logout',
-        icon: 'uil uil-sign-out-alt',
-        // url: '/apps/logout/logout-modal',
+    // {
+    //     key: 'logout',
+    //     label: 'Logout',
+    //     icon: 'uil uil-sign-out-alt',
+    //     // url: '/apps/logout/logout-modal',
         
-    },
+    // },
     // {
     //     key: 'permissions',
     //     label: 'Permissions',

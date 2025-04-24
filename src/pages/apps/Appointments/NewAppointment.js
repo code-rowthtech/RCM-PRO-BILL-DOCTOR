@@ -61,13 +61,13 @@ const NewAppointment = () => {
 
                 <div className=" ">
                     {activeTab === 'Appointments' && <AppointmentForm />}
-                    {activeTab === 'Billing' && <p>Billing Content In Progress...</p>}
-                    {activeTab === 'Eligibility' && <p>Eligibility Content In Progress...</p>}
-                    {activeTab === 'Vitals' && <p>Vitals Content In Progress...</p>}
-                    {activeTab === 'Growthcharts' && <p>Growthcharts Content In Progress...</p>}
-                    {activeTab === 'Log Comm.' && <p>Log Comm. Content In Progress...</p>}
-                    {activeTab === 'Revisions' && <p>Revisions Content In Progress...</p>}
-                    {activeTab === 'Mu Helper' && <p>Mu Helper Content In Progress...</p>}
+                    {activeTab === 'Billing' && <p>Billing Content ⏳ In Progress</p>}
+                    {activeTab === 'Eligibility' && <p>Eligibility Content ⏳ In Progress</p>}
+                    {activeTab === 'Vitals' && <p>Vitals Content ⏳ In Progress</p>}
+                    {activeTab === 'Growthcharts' && <p>Growthcharts Content ⏳ In Progress</p>}
+                    {activeTab === 'Log Comm.' && <p>Log Comm. Content ⏳ In Progress</p>}
+                    {activeTab === 'Revisions' && <p>Revisions Content ⏳ In Progress</p>}
+                    {activeTab === 'Mu Helper' && <p>Mu Helper Content ⏳ In Progress</p>}
                 </div>
             </Card>
         </div>
