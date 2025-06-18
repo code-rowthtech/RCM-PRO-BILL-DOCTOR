@@ -11,7 +11,6 @@ const AddProblem = ({ onCancel }) => {
     const store = useSelector((state) => state);
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
-    // console.log(searchParams, patientId, 'patientId');
     // State for ICD-10 search functionality
     const [searchQuery, setSearchQuery] = useState('');
     const [search, setSearch] = useState('');
@@ -28,26 +27,18 @@ const AddProblem = ({ onCancel }) => {
         setValue,
     } = useForm();
     const allCodeICDs = store?.getSearchCodesReducer?.data?.codes || [];
-    // console.log(allCodeICDs, 'iccccd');
     const patientAppointments = store?.getPatientAppointmentsReducer?.data?.appointments;
-    // console.log(patientAppointments, 'patientAppointments');
 
     useEffect(() => {
         dispatch(getSearchCodesAction({ query: search }));
     }, [dispatch, search]);
-
-    // useEffect(() => {
-    //     if (patientId) {
-    //         dispatch(getPatientAppointmentsAction( {key:encryptMessage({patientId})} ));
-    //     }
-    // }, [dispatch, patientId]);
 
     useEffect(() => {
         const data = {
             patientId: patientId,
         };
         dispatch(getPatientAppointmentsAction({ key: encryptMessage(data) }));
-    }, [dispatch]);
+    }, [dispatch,patientId]);
 
     // Watch for changes in the ICD code field
     const icdCodeValue = watch('icdCode');
@@ -108,7 +99,6 @@ const AddProblem = ({ onCancel }) => {
 
         dispatch(createProblemAction({ key: encryptMessage(payload) }));
         // reset();
-        console.log(payload, 'Final Payload');
     };
 
     return (

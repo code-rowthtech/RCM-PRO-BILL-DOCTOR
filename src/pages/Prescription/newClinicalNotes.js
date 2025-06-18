@@ -71,7 +71,6 @@ const NewClinicalNotes = () => {
 
     const handleSelect = (eventKey) => {
         setSelectedItem(eventKey);
-        console.log(`Selected: ${eventKey}`);
     };
 
     return (

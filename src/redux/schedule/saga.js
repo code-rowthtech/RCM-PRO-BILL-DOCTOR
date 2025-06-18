@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { ScheduleActionTypes } from './constants';
-import { createHolidayScheduleApi, getHolidayScheduleApi } from './api';
+import { createHolidayScheduleApi, createScheduleApi, deleteHolidayScheduleApi, getHolidayScheduleApi, getScheduleApi, updateScheduleApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -63,6 +63,123 @@ function* getHolidayScheduleFunction(data) {
     }
 }
 
+function* deleteHolidayScheduleFunction(data) {
+    try {
+        yield put({
+            type: ScheduleActionTypes.DELETE_HOLIDAY_SCHEDULE_LOADING,
+            payload: {},
+        });
+        const response = yield call(deleteHolidayScheduleApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            yield put({
+                type: ScheduleActionTypes.DELETE_HOLIDAY_SCHEDULE_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: ScheduleActionTypes.DELETE_HOLIDAY_SCHEDULE_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: ScheduleActionTypes.DELETE_HOLIDAY_SCHEDULE_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: ScheduleActionTypes.DELETE_HOLIDAY_SCHEDULE_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* createScheduleFunction(data) {
+    try {
+        yield put({
+            type: ScheduleActionTypes.CREATE_SCHEDULE_LOADING,
+            payload: {},
+        });
+        const response = yield call(createScheduleApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: ScheduleActionTypes.CREATE_SCHEDULE_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: ScheduleActionTypes.CREATE_SCHEDULE_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: ScheduleActionTypes.CREATE_SCHEDULE_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* updateScheduleFunction(data) {
+    try {
+        yield put({
+            type: ScheduleActionTypes.UPDATE_SCHEDULE_LOADING,
+            payload: {},
+        });
+        const response = yield call(updateScheduleApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: ScheduleActionTypes.UPDATE_SCHEDULE_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: ScheduleActionTypes.UPDATE_SCHEDULE_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    }
+    catch (error) {
+        yield put({
+            type: ScheduleActionTypes.UPDATE_SCHEDULE_ERROR,
+            payload: error,
+        });
+    }
+}
+
+    
+
+function* getScheduleFunction(data) {
+    try {
+        yield put({
+            type: ScheduleActionTypes.GET_SCHEDULE_LOADING,
+            payload: {},
+        });
+        const response = yield call(getScheduleApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            yield put({
+                type: ScheduleActionTypes.GET_SCHEDULE_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: ScheduleActionTypes.GET_SCHEDULE_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: ScheduleActionTypes.GET_SCHEDULE_ERROR,
+            payload: error,
+        });
+    }
+}
+
 export function* callStateEmpty() {
     put({
         type: ScheduleActionTypes.STATE_EMPTY_INTIAL_STATE,
@@ -80,7 +197,21 @@ export function* watchGetHolidaySchedule() {
     yield takeEvery(ScheduleActionTypes.GET_HOLIDAY_SCHEDULE, getHolidayScheduleFunction);
 }
 
+export function* watchDeleteHolidaySchedule() {
+    yield takeEvery(ScheduleActionTypes.DELETE_HOLIDAY_SCHEDULE, deleteHolidayScheduleFunction);
+}
 
+export function* watchCreateSchedule() {
+    yield takeEvery(ScheduleActionTypes.CREATE_SCHEDULE, createScheduleFunction);
+}
+
+export function* watchUpdateSchedule() {
+    yield takeEvery(ScheduleActionTypes.UPDATE_SCHEDULE, updateScheduleFunction);
+}
+
+export function* watchGetSchedule() {
+    yield takeEvery(ScheduleActionTypes.GET_SCHEDULE, getScheduleFunction);
+}
 
 export function* watchresetState() {
     yield takeEvery(ScheduleActionTypes.STATE_EMPTY_INTIAL_STATE, callStateEmpty);
@@ -90,6 +221,10 @@ function* scheduleSaga() {
     yield all([
         fork(watchCreateHolidaySchedule),
         fork(watchGetHolidaySchedule),
+        fork(watchDeleteHolidaySchedule),
+        fork(watchCreateSchedule),
+        fork(watchUpdateSchedule),
+        fork(watchGetSchedule),
         fork(watchresetState)
     ]);
 }

@@ -15,13 +15,13 @@ const AllergyList = () => {
     const [showAddAllergy, setShowAddAllergy] = useState(false);
     const [showUpdateAllergy, setShowUpdateAllergy] = useState(false);
     const [selectedAllergy, setSelectedAllergy] = useState(null);
+    console.log(selectedAllergy, 'selectedAllergy');
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const allergyData = store?.getAllergiesOfAPatientReducer?.data?.allergies;
-    // console.log(allergyData, 'Allergies of Patient');
-
+    console.log(allergyData,'allergyData')
     useEffect(() => {
         const data = {
             patientId: patientId,
@@ -54,13 +54,12 @@ const AllergyList = () => {
                         <Table responsive className="table-centered table-nowrap mb-0">
                             <thead className="text-white bg-dark">
                                 <tr key="">
+                                    <th className="text-white">Clinic Status</th>
+                                    <th className="text-white">Verification Status</th>
                                     <th className="text-white">Allergy Type</th>
-                                    <th className="text-white">Allergy Name</th>
-                                    <th className="text-white">Reaction</th>
-                                    <th className="text-white">Severity</th>
-                                    <th className="text-white">Status</th>
+                                    <th className="text-white">Category</th>
+                                    <th className="text-white">Criticality</th>
                                     <th className="text-white">Notes</th>
-                                    {/* <th className="text-white">Updates</th> */}
                                     <th className="text-white">Action</th>
                                 </tr>
                             </thead>
@@ -81,14 +80,15 @@ const AllergyList = () => {
                                     ) : (
                                         allergyData?.map((data) => (
                                             <tr key={data?.id}>
-                                                <td className="text-capitalize">{data?.allergyType}</td>
-                                                <td className="text-capitalize">{data?.allergyname}</td>
-                                                <td className="text-capitalize">{data?.reaction}</td>
-                                                <td className="text-capitalize">{data?.severity}</td>
-                                                <td className="text-capitalize">{data?.status}</td>
-                                                <td>
+                                                <td className="text-capitalize">{data?.clinicalStatus?.coding?.[0]?.display || 'N/A'}</td>
+                                                <td className="text-capitalize">{data?.verificationStatus?.coding?.[0]?.display || 'N/A'}</td>
+                                                <td className="text-capitalize">{data?.type?.coding?.[0]?.display|| 'N/A'}</td>
+                                                <td className="text-capitalize">{data?.catogory?.coding?.[0]?.display || 'N/A'}</td>
+                                                <td className="text-capitalize">{data?.criticality?.display || 'N/A'}</td>
+                                                <td className="text-capitalize">{data?.notes?.[0]?.text || 'N/A'}</td>
+                                                {/* <td>
                                                     <FaEye className="fs-4 ms-2 cursor-pointer text-black" />
-                                                </td>
+                                                </td> */}
                                                 {/* <td>{data?.updates}</td> */}
                                                 <td>
                                                     <IoInformationCircleOutline className="fs-4 cursor-pointer text-black" />
@@ -101,7 +101,6 @@ const AllergyList = () => {
                                                                 id: data?._id,
                                                             };
                                                             dispatch(getAllergyDetailsAction(requestData));
-                                                            // console.log(requestData, 'Request Data');
                                                         }}
                                                     />
                                                     &nbsp;

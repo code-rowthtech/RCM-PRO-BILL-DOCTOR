@@ -12,15 +12,15 @@ import DateRangePicker from './DateRangePicker';
 import { useDispatch } from 'react-redux';
 
 const Schedule = () => {
-    const [activeTab, setActiveTab] = useState('DoctorHolidays'); // Active tab state
+    const [activeTab, setActiveTab] = useState('Doctor Time Off'); // Active tab state
     const [searchQuery, setSearchQuery] = useState(''); // State to hold search query
 
     const dispatch = useDispatch()
     // Dynamically render the content based on the active tab
     const renderTabContent = () => {
         switch (activeTab) {
-            case 'DoctorHolidays':
-                return <DoctorHoliday />;
+            case 'Doctor Time Off':
+                return <DoctorHoliday search={searchQuery} />;
             case 'breaks':
                 return <Breaks />;
             case 'schedules':
@@ -58,7 +58,7 @@ const Schedule = () => {
                                 {/* Navigation Tabs */}
                                 <Col sm={4} className='p-0'>
                                     <ul className="nav nav-underline">
-                                        {['DoctorHolidays', 'breaks', 'schedules'].map((tab, index) => (
+                                        {['Doctor Time Off', 'schedules'].map((tab, index) => (
                                             <li className="nav-item ms-2" key={index}>
                                                 <a
                                                     className={classNames('nav-link fw-bold text-black', {
@@ -70,8 +70,8 @@ const Schedule = () => {
                                                         setActiveTab(tab);
                                                     }}
                                                 >
-                                                    {tab === 'DoctorHolidays' && 'Doctor Holidays'}
-                                                    {tab === 'breaks' && 'Breaks'}
+                                                    {tab === 'Doctor Time Off' && 'Doctor Time Off'}
+                                                    {/* {tab === 'breaks' && 'Breaks'} */}
                                                     {tab === 'schedules' && 'Schedules'}
                                                 </a>
                                             </li>
@@ -110,7 +110,7 @@ const Schedule = () => {
                                                     </div>
                                                 </div>
                                             )}
-                                            {activeTab === 'DoctorHolidays' && (
+                                            {activeTab === 'Doctor Time Off' && (
                                                 <>
                                                     <DateRangePicker />
                                                     <Button

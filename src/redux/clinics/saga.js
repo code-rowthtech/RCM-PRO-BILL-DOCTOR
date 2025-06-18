@@ -29,7 +29,6 @@ function* createClinicsFunction(data) {
             });
         }
     } catch (error) {
-        // console.log({ error })
         yield put({
             type: ClinicsActionTypes.CREATE_CLINIC_ERROR,
             payload: error,
@@ -89,7 +88,6 @@ function* getClinicByIdFunction(data) {
             });
         }
     } catch (error) {
-        // console.log({ error })
         yield put({
             type: ClinicsActionTypes.GET_CLINIC_BY_ID_ERROR,
             payload: error,

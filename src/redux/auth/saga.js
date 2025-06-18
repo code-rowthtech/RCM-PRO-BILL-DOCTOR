@@ -26,15 +26,15 @@ function* login({ payload }) {
         }
         const response = yield call(loginApi, encryptedPayload);
         const user = JSON.parse(decryptMessage(response?.data?.data));
-        console.log(user,'user')
         const userData = {
-            firstName: user?.firstName,
+            name: user?.name,
             lastName: user?.lastName,
             email: user?.email,
             token: user?.accessToken,
             role: user?.role,
             userId: user?.userId,
             doctorId: user?.doctorId,
+            logo:user?.photo,
             clinicId: user?.clinicId
         }
         // NOTE - You can change this according to response format from your api
@@ -79,7 +79,6 @@ function* signup({ payload: { fullname, email, password } }) {
 }
 
 function* forgotPassword({ payload }) {
-    // console.log(payload, 'dhsfnvdhfsdhfbvhd')
     try {
         const encryptedPayload = {
             key: encryptMessage(payload)

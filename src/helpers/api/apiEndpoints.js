@@ -18,6 +18,7 @@ export const getClinicById = '/api/v1/clinic/byId';
 export const getDoctor = '/api/v1/doctor/getDoctorDetails';
 export const getCityByState = '/api/v1/doctor/cities/';
 export const getStatedByCountry = '/api/v1/doctor/states/US';
+export const updateDoctor = '/api/v1/doctor/updateDoctor';
 
 // VITALS
 export const createVitals = '/api/v1/doctor/addVitals';
@@ -28,10 +29,12 @@ export const getVitalsByAppointmentId = '/api/v1/doctor/vitalsByAppointmentId';
 
 
 // PATIENTS
-export const getPatients = '/api/v1/doctor/getPatientByDoctorId';
-export const getPatientsById = '/api/v1/doctor/patient-getById';
-export const createPatients = '/api/v1/doctor/patient-onboard';
-export const updatePatients = '/api/v1/doctor/patient-edit';
+export const getPatients = '/api/v1/doctor/get-patients';
+export const getPatientsById = '/api/v1/doctor/patient/by/id';
+export const createPatients = '/api/v1/doctor/Patient/add';
+export const updatePatients = '/api/v1/doctor/Patient/update';
+export const createReferringDoctor='/api/v1/doctor/add/referringDoc';
+export const createResponsibleParty = '/api/v1/doctor/Patient/responsible-party';
 
 // CLINIC NOTES
 export const getClinicEmployees = '/api/v1/doctor/getClinicEmployees';
@@ -52,14 +55,24 @@ export const updateAllergy = '/api/v1/doctor/updateAllergy';
 
 // DASHBOARD
 export const getAnalytics = '/api/v1/admin/analytics';
+
 // SUBSCRIPTIONS
 export const getSubscriptions = '/api/v1/admin/subscription/all'
+
 // SCHEDULE
-export const createHoliday = '/api/v1/doctor/addOrUpdateSchedule';
-export const getHoliday = '/api/v1/doctor/getSchedule';
+export const createHoliday = '/api/v1/practitioner/holiday/create';
+export const getHoliday = '/api/v1/practitioner/holidays';
+export const deleteHoliday = '/api/v1/practitioner/holiday/delete';
+export const createSchedule = '/api/v1/practitioner/schedule/create';
+export const updateSchedule = '/api/v1/practitioner/schedule/update';
+export const getSchedule = '/api/v1/practitioner/schedule';
 
 // APPOINTMENTS
-export const createAppointments = '/api/v1/doctor/appointments';
-export const getAppointments = '/api/v1/doctor/appointment/getAll';
+export const createAppointments = '/api/v1/practitioner/appointment/create';
+export const getAppointments = '/api/v1/practitioner/appointment/list';
 export const getAllAppointments = '/api/v1/doctor/getPatientsByAppointments';
+export const getPractitionerAvailability ='/api/v1/practitioner/appointment/practitionerAvailability';
+export const getAppointmentDetails ='/api/v1/practitioner/appointment/details';
+export const updateAppointmentDetails='/api/v1/practitioner/appointment/update';
+export const getAppointmentByPateintProvider = '/api/v1/practitioner/appointment/by-patient-provider'
 

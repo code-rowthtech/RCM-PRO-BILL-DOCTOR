@@ -104,7 +104,6 @@ const DateRangePicker = () => {
       search: "",
     };
 
-    console.log(payload, "date");
     // dispatch(getScheduleAction(payload));
   };
 
@@ -138,7 +137,6 @@ const DateRangePicker = () => {
       search: "",
     };
 
-    console.log(payload, "date");
     // dispatch(getScheduleAction(payload));
   };
 

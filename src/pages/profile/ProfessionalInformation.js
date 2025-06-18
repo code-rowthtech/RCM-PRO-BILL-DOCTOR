@@ -1,373 +1,428 @@
-import React, { useEffect, useState } from 'react'
-import { Button, Form } from 'react-bootstrap'
-import { FaEye, FaEyeSlash } from 'react-icons/fa'
-import { getDoctorsAction } from '../../redux/doctors/actions';
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, Col, Form, Row, Spinner } from 'react-bootstrap';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { getDoctorsAction, updateDoctorAction } from '../../redux/doctors/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
+import IdentifierForm from '../apps/Common Pages/IdentifierForm';
+import { handleUpload } from '../../helpers/HandleUpload';
+import Select from 'react-select';
+import { qualificationsData } from '../../utils/DataSets/qualificationsData';
+import { FiUploadCloud } from 'react-icons/fi';
+import { CiCircleMinus } from 'react-icons/ci';
+import { encryptMessage } from '../../cryptoUtils';
+import DoctorIdentifierForm from './DoctorIdentifiers';
+import AsyncSelect from 'react-select/async';
+import { taxonomyOptions as taxonomy } from '../../utils/DataSets/commonDataSet';
 
 const ProfessionalInformation = () => {
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        reset,
+        clearErrors,
+        setValue,
+    } = useForm();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    setValue,
-  } = useForm();
+    const [showPassword, setShowPassword] = useState(false);
+    const [showCAQHPassword, setShowCAQHPassword] = useState(false);
+    const [degreeUploading, setDegreeUploading] = useState(false);
+    const defaultIdentifiers = [
+        {
+            label: 'National Provider Identifier (NPI)',
+            value: 'http://hl7.org/fhir/sid/us-npi',
+            code: 'NPI',
+        },
+    ];
+    const [constantIdentifiers, setConstantIdentifiers] = useState([]);
+    const [identifiers, setIdentifiers] = useState([]);
+    const [licensure, setLicensure] = useState([]);
+    const store = useSelector((state) => state);
+    const dispatch = useDispatch();
+    const [taxonmy, setTaxonomy] = useState(null);
+    const doctorDetails = store?.getDoctorsReducer?.data?.result;
+    const updateLoading = store?.UpdateDoctorsReducer?.loading;
+    const updateId = store?.getDoctorsReducer?.data?.result?._id;
+    const statesData = store?.getStatesReducer?.data?.states;
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showCAQHPassword, setShowCAQHPassword] = useState(false);
-  const store = useSelector((state) => state);
-  const dispatch = useDispatch();
-  const doctorDetails = store?.getDoctorsReducer?.data
-  console.log(doctorDetails, '123456789');
+    const [taxonomyCodesList, setTaxonomyCodesList] = useState([
+        { type: 'primary', code: '', state: '', licenseNumber: '', status: '' },
+    ]);
+    const defaultLicensure = [
+        {
+            label: '',
+            value: '',
+            code: '',
+        },
+    ];
+    useEffect(() => {
+        dispatch(getDoctorsAction());
+    }, [dispatch]);
+    const handleTaxonomyChange = (selectedOption, index) => {
+        const updatedList = [...taxonomyCodesList];
+        updatedList[index] = {
+            ...updatedList[index],
+            code: selectedOption?.value || '',
+            displayName: selectedOption?.label || '',
+        };
+        setTaxonomyCodesList(updatedList);
+    };
+    const [qualifications, setQualifications] = useState([
+        { id: 1, degreeName: '', degreeFile: null, issuerOrganisation: '' },
+    ]);
+    const degreeFileInputRef = useRef(null);
+    // Add a new qualification
+    const addQualification = () => {
+        const newQualification = {
+            id: qualifications.length + 1,
+            degreeName: '',
+            degreeFile: null,
+            issuerOrganisation: '',
+        };
+        setQualifications([...qualifications, newQualification]);
+    };
 
-  useEffect(() => {
-    dispatch(
-      getDoctorsAction()
+    // Remove a qualification by its ID, but ensure the first row is not deleted
+    const removeQualification = (id) => {
+        if (qualifications.length > 1) {
+            // Ensure at least one row remains
+            const updatedQualifications = qualifications.filter((qual) => qual.id !== id);
+            setQualifications(updatedQualifications);
+        }
+    };
+
+    // Handle changes in qualification fields
+    const handleQualificationChange = (index, field, value) => {
+        const updatedQualifications = qualifications.map((qual, i) =>
+            i === index ? { ...qual, [field]: field === 'degreeName' ? value?.data : value } : qual
+        );
+        setQualifications(updatedQualifications);
+    };
+
+    // Handle file upload for degree
+    const handleFileChangeDegree = async (index, event) => {
+        const file = event.target.files[0];
+        try {
+            const url = await handleUpload(file, setDegreeUploading);
+            const fileName = file.name;
+            handleQualificationChange(index, 'degreeFile', { url: url?.url, fileName });
+        } catch (error) {}
+    };
+
+    useEffect(() => {
+        setConstantIdentifiers(
+            defaultIdentifiers.map((type) => ({
+                type,
+                number: '',
+                file: '',
+                expiry: '',
+                issuingAuthority: '',
+                use: '',
+            }))
+        );
+    }, []);
+
+    const submitData = (data) => {
+        const qualificationData = qualifications?.map((item) => ({
+            code: item?.degreeName,
+            documents: item?.degreeFile,
+            issuer: item?.issuerOrganisation,
+        }));
+        let finalIdentifiersData = [];
+        if (identifiers) {
+            identifiers.forEach((element) => {
+                let data = {
+                    expiry: element?.expiry,
+                    file: element?.file,
+                    value: element?.number,
+                    use: 'official',
+                    system: element?.type?.value,
+                    type: {
+                        coding: [
+                            {
+                                system: element?.type?.value,
+                                code: element?.type?.code,
+                                display: element?.type?.label,
+                            },
+                        ],
+                        text: element?.type?.label,
+                    },
+                    issuingAuthority: element?.issuingAuthority,
+                    status: element?.status,
+                    ennumerationDate: element?.ennumerationDate,
+                };
+                finalIdentifiersData.push(data);
+            });
+        }
+        let finalLicensureData = [];
+        if (licensure) {
+            licensure.forEach((element) => {
+                let licensureData = {
+                    expiry: element?.expiry,
+                    file: element?.file,
+                    value: element?.number,
+                    use: 'official',
+                    system: element?.type?.value,
+                    type: {
+                        coding: [
+                            {
+                                system: element?.type?.value,
+                                code: element?.type?.code,
+                                display: element?.type?.label,
+                            },
+                        ],
+                        text: element?.type?.label,
+                    },
+                    issuingAuthority: element?.issuingAuthority,
+                    licenseState: element?.licenseState,
+                    status: element?.status,
+                    ennumerationDate: element?.ennumerationDate,
+                };
+                finalLicensureData.push(licensureData);
+            });
+        }
+        const taxonomyCodes = taxonomyCodesList?.map((item) => ({
+            type: item?.type,
+            code: item?.code?.code, // Taxonomy code
+            Grouping: item?.code?.grouping, // Taxonomy grouping
+            Classification: item?.code?.classification, // Taxonomy classification
+            Specialization: item?.code?.specialization, // Taxonomy specialization
+            Definition: item?.code?.definition, // Taxonomy definition
+            Notes: item?.code?.notes, // Taxonomy notes
+            displayName: item?.code?.displayName, // Taxonomy display name
+            section: item?.code?.section, // Taxonomy section
+            state: item?.state, // Taxonomy state
+            licenseNumber: item?.licenseNumber, // Taxonomy license number
+            status: item?.status === 'active' ? true : false, // Taxonomy sta
+        }));
+        const payload = {
+            doctorId: updateId,
+            identifier: [...finalIdentifiersData, ...finalLicensureData],
+            taxonomy: taxonomyCodes,
+        };
+        dispatch(updateDoctorAction({ key: encryptMessage(payload) }));
+    };
+    useEffect(() => {
+        if (doctorDetails) {
+            const updatedTaxonomyCodes = doctorDetails?.taxonomy?.map((item, index) => ({
+                type: item?.type || '',
+                displayName: item?.displayName || '',
+                code: { code: item?.code, grouping: item?.Grouping, classification: item?.Classification } || {},
+                state: item?.state || '',
+                licenseNumber: item?.licenseNumber || '',
+                status: item?.status === true ? 'active' : 'inactive' || '',
+            }));
+            setTaxonomyCodesList(updatedTaxonomyCodes);
+        }
+    }, [doctorDetails, setValue]);
+
+    const QualificationOptions = qualificationsData?.map((qualification) => ({
+        value: qualification.code,
+        label: qualification.display,
+        data: qualification, // Store full object for later use
+    }));
+    const formattedTaxonomyOptions = taxonomy.map((option) => ({
+        value: option,
+        label: option.code + ' - ' + option.displayName,
+    }));
+
+    const addTaxonomyCode = () => {
+        setTaxonomyCodesList([
+            ...taxonomyCodesList,
+            {
+                type: '',
+                code: '',
+                Grouping: '',
+                Classification: '',
+                Specialization: '',
+                Definition: '',
+                Notes: '',
+                displayName: '',
+                section: '',
+                state: '',
+                licenseNumber: '',
+                status: '',
+            },
+        ]);
+    };
+    const selectedTaxonomyOption =
+        formattedTaxonomyOptions.find((option) => option?.value?.displayName === taxonomy?.text) ||
+        formattedTaxonomyOptions.find((option) => option?.displayName === taxonomy);
+    const loadTaxonomyOptions = (inputValue, callback) => {
+        if (!inputValue) {
+            callback(formattedTaxonomyOptions.slice(0, 10));
+            return;
+        }
+        const filteredOptions = formattedTaxonomyOptions.filter((option) =>
+            option.label.toLowerCase().includes(inputValue.toLowerCase())
+        );
+        callback(filteredOptions.slice(0, 20)); // Return up to 20 results on search
+    };
+    const removeTaxonomyItem = (index) => {
+        setTaxonomyCodesList((prev) => prev.filter((_, i) => i !== index));
+    };
+    return (
+        <div className="container-fluid px-0">
+            <Form onSubmit={handleSubmit(submitData)}>
+                {store?.getDoctorsReducer?.loading ? (
+                    <div className="d-flex justify-content-center align-items-center" style={{ height: '75vh' }}>
+                        <Spinner />
+                    </div>
+                ) : (
+                    <>
+                        <Row>
+                            <Col sm={12}>
+                                <DoctorIdentifierForm
+                                    defaultIdentifiers={defaultIdentifiers}
+                                    defaultLicensure={defaultLicensure}
+                                    identifiers={identifiers}
+                                    setIdentifiers={setIdentifiers}
+                                    licensure={licensure}
+                                    setLicensure={setLicensure}
+                                />
+                            </Col>
+                        </Row>
+                        <hr />
+                        <Row>
+                            <Col sm={12}>
+                                <h5>
+                                    Taxonomy Codes
+                                    <span
+                                        className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
+                                        onClick={addTaxonomyCode}></span>
+                                </h5>
+                            </Col>
+                            {taxonomyCodesList?.map((data, index) => (
+                                <Row key={index} className="mb-2">
+                                    <Col sm={3}>
+                                        <Form.Label className="mb-0">Code</Form.Label>
+                                        <AsyncSelect
+                                            loadOptions={loadTaxonomyOptions}
+                                            defaultOptions={formattedTaxonomyOptions.slice(0, 10)}
+                                            isSearchable
+                                            className="basic-single"
+                                            classNamePrefix="select"
+                                            placeholder="&nbsp; Select"
+                                            value={
+                                                formattedTaxonomyOptions.find((opt) => opt.value === data.code) ||
+                                                formattedTaxonomyOptions.find(
+                                                    (opt) => opt.value.code === data.code.code
+                                                )
+                                            }
+                                            onChange={(selected) => handleTaxonomyChange(selected, index)}
+                                            styles={{
+                                                control: (provided) => ({
+                                                    ...provided,
+                                                    height: '30px',
+                                                    minHeight: '30px',
+                                                    border: '0px',
+                                                }),
+                                                placeholder: (provided) => ({
+                                                    ...provided,
+                                                    fontWeight: 'bold',
+                                                    fontSize: '12px',
+                                                    paddingBottom: '5px',
+                                                }),
+                                            }}
+                                        />
+                                    </Col>
+
+                                    <Col sm={3}>
+                                        <Form.Label className="mb-0">License Number</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="License Number"
+                                            value={data.licenseNumber}
+                                            onChange={(e) => {
+                                                const updatedList = [...taxonomyCodesList];
+                                                updatedList[index].licenseNumber = e.target.value.toUpperCase();
+                                                setTaxonomyCodesList(updatedList);
+                                            }}
+                                            maxLength={10}
+                                        />
+                                    </Col>
+                                    <Col sm={3}>
+                                        <Form.Label className="mb-0">Type</Form.Label>
+                                        <Form.Select
+                                            value={data.type || 'primary'}
+                                            onChange={(e) => {
+                                                const updatedList = [...taxonomyCodesList];
+                                                updatedList[index].type = e.target.value;
+                                                setTaxonomyCodesList(updatedList);
+                                            }}>
+                                            <option value="">Select</option>
+                                            <option value="primary">Primary</option>
+                                            <option value="secondary">Secondary</option>
+                                        </Form.Select>
+                                    </Col>
+                                    <Col sm={3}>
+                                        <Form.Label className="mb-0">State</Form.Label>
+                                        <Form.Select
+                                            value={data.state}
+                                            onChange={(e) => {
+                                                const updatedList = [...taxonomyCodesList];
+                                                updatedList[index].state = e.target.value;
+                                                setTaxonomyCodesList(updatedList);
+                                            }}>
+                                            <option value="">Select State</option>
+                                            {statesData?.map((state, idx) => (
+                                                <option key={idx} value={state?.name}>
+                                                    {state?.name}
+                                                </option>
+                                            ))}
+                                        </Form.Select>
+                                    </Col>
+                                    <Col sm={3} className="position-relative">
+                                        <Form.Label className="mb-0">Status</Form.Label>
+                                        <Form.Select
+                                            value={data.status}
+                                            onChange={(e) => {
+                                                const updatedList = [...taxonomyCodesList];
+                                                updatedList[index].status = e.target.value;
+                                                setTaxonomyCodesList(updatedList);
+                                            }}>
+                                            <option value="" hidden>
+                                                Select Status
+                                            </option>
+                                            <option value="active">Active</option>
+                                            <option value="inactive">Inactive</option>
+                                        </Form.Select>
+
+                                        {/* Minus icon, aligned to the right */}
+                                        {index > 0 && (
+                                            <span
+                                                className="text-danger cursor-pointer fs-5 fw-bold position-absolute"
+                                                style={{ right: '-5px', top: '50%',  }}
+                                                onClick={() => removeTaxonomyItem(index)}>
+                                                <CiCircleMinus />
+                                            </span>
+                                        )}
+                                    </Col>
+
+                                    {taxonomyCodesList?.length >= 1 && index < taxonomyCodesList?.length - 1 && (
+                                        <hr className="mt-2" />
+                                    )}
+                                </Row>
+                            ))}
+                        </Row>
+
+                        <div className="d-flex justify-content-end gap-2 my-1">
+                            <Button className="cancel-button">Cancel</Button>
+
+                            <Button
+                                className="custom-buttons"
+                                style={{ width: '70px' }}
+                                type="submit"
+                                disabled={updateLoading}>
+                                {updateLoading ? <Spinner color="white" className="spinner-border-sm" /> : 'Update'}
+                            </Button>
+                        </div>
+                    </>
+                )}
+            </Form>
+        </div>
     );
+};
 
-  }, [dispatch]);
-
-  useEffect(() => {
-
-    setValue('TIN_SSN', doctorDetails?.result?.TIN_SSN)
-    setValue('NPI', doctorDetails?.result?.NPI)
-    setValue('NPIUsername', doctorDetails?.result?.NPIUsername)
-    setValue('CAQH_ID', doctorDetails?.result?.CAQH_ID)
-    setValue('CAQHUsername', doctorDetails?.result?.CAQHUsername)
-    setValue('medicarePTAN', doctorDetails?.result?.medicarePTAN)
-    setValue('medicaidID', doctorDetails?.result?.medicaidID)
-    setValue('department', doctorDetails?.result?.departmentId?._id)
-    setValue('Medicare_SPOT_Logins', doctorDetails?.result?.Medicare_SPOT_Logins)
-    setValue('Medicare_PECOS_Logins', doctorDetails?.result?.Medicare_PECOS_Logins)
-    setValue('stateLicense', doctorDetails?.result?.LicensingInformation?.[0]?.stateLicense)
-    setValue('stateLicenseProvider', doctorDetails?.result?.LicensingInformation?.[0]?.stateLicenseProvider)
-    setValue('stateLicenseObtained', doctorDetails?.result?.LicensingInformation?.[0]?.stateLicenseObtained)
-    setValue('DEA', doctorDetails?.result?.DEA)
-    setValue('CLIA', doctorDetails?.result?.CLIA)
-
-    const formattedDEAIssueDate = doctorDetails?.result?.DEA_IssueDate
-      ? new Date(doctorDetails?.result?.DEA_IssueDate).toISOString().split('T')[0]
-      : '';
-    const formattedStateLicenseIssueDate = doctorDetails?.result?.LicensingInformation?.[0]?.stateLicenseIssueDate
-      ? new Date(doctorDetails?.result?.LicensingInformation?.[0]?.stateLicenseIssueDate).toISOString().split('T')[0]
-      : '';
-    const formattedLicenseExpirationDate = doctorDetails?.result?.LicensingInformation?.[0]?.licenseExpirationDate
-      ? new Date(doctorDetails?.result?.LicensingInformation?.[0]?.licenseExpirationDate).toISOString().split('T')[0]
-      : '';
-
-    setValue('DEA_IssueDate', formattedDEAIssueDate);
-    setValue('stateLicenseIssueDate', formattedStateLicenseIssueDate);
-    setValue('licenseExpirationDate', formattedLicenseExpirationDate);
-
-  }, [doctorDetails, setValue])
-
-  return (
-    <div className='container-fluid px-0'>
-      <div className="row mt-1" style={{ borderBottom: '1px solid #444141' }}>
-        <p className="fw-bold mb-1">
-          Identification & Credentials
-        </p>
-        <div className="col-6">
-          <Form.Group className="mb-1">
-            <Form.Label className='mb-0'>
-              TIN/SSN
-            </Form.Label>
-            <Form.Control
-              {...register('TIN_SSN',)}
-              type="text"
-              placeholder="Enter TIN/SSN"
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-1">
-            <Form.Label className='mb-0'>
-              NPI Username
-            </Form.Label>
-            <Form.Control
-              {...register('NPIUsername',)}
-              type="text"
-              placeholder="Enter NPI Username"
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-1">
-            <Form.Label className='mb-0'>
-              CAQH ID
-            </Form.Label>
-            <Form.Control
-              {...register('CAQH_ID',)}
-              type="text"
-              placeholder="Enter CAQH ID"
-            />
-          </Form.Group>
-
-        </div>
-
-        <div className="col-6">
-          <Form.Group className="mb-1">
-            <Form.Label className='mb-0'>
-              NPI (National Provider Identifier)
-            </Form.Label>
-            <Form.Control
-              {...register('NPI',)}
-              type="text"
-              placeholder="Enter NPI"
-            />
-          </Form.Group>
-
-          <Form.Group className='mb-1 '>
-            <Form.Label className='mb-0'>NPI Password </Form.Label>
-            <div className="position-relative">
-              <Form.Control
-                type={showPassword ? "text" : "password"}
-                placeholder='NPI Password'
-                readOnly
-              />
-              <span
-                className="position-absolute end-0 top-0 mt-1 me-2 cursor-pointer"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </span>
-            </div>
-          </Form.Group>
-          <div className="row">
-            <div className="col-6">
-              <Form.Group className="mb-1">
-                <Form.Label className='mb-0'>
-                  CAQH Username
-                </Form.Label>
-                <Form.Control
-                  {...register('CAQHUsername',)}
-                  type="text"
-                  placeholder="Enter CAQH Username"
-                />
-              </Form.Group>
-            </div>
-
-            <div className="col-6">
-              <Form.Group className='mb-2 '>
-                <Form.Label className='mb-0'>CAQH Password</Form.Label>
-                <div className="position-relative">
-                  <Form.Control
-                    placeholder='CAQH Password'
-                    readOnly
-                  />
-                  <span
-                    className="position-absolute end-0 top-0 mt-1 me-2 cursor-pointer"
-                    onClick={() => setShowCAQHPassword(!showCAQHPassword)}
-                  >
-                    {showCAQHPassword ? <FaEyeSlash /> : <FaEye />}
-                  </span>
-                </div>
-              </Form.Group>
-
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="row mt-1" style={{ borderBottom: '1px solid #444141' }}>
-        <p className="fw-bold">
-          Medicare & Medicaid Information
-        </p>
-        <div className="col-6">
-          <Form.Group className="mb-1">
-            <Form.Label className='mb-0'>
-              Medicare PTAN
-            </Form.Label>
-            <Form.Control
-              {...register('medicarePTAN',)}
-              type="text"
-              placeholder="Enter Medicare PTAN"
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-1">
-            <Form.Label className='mb-0'>
-              Medicare SPOT Logins
-            </Form.Label>
-            <Form.Control
-              {...register('Medicare_SPOT_Logins',)}
-              type="text"
-              placeholder="Enter Medicare SPOT Logins"
-            />
-          </Form.Group>
-        </div>
-
-        <div className="col-6">
-          <div className="row">
-            <div className="col-6">
-              <Form.Group className="mb-1">
-                <Form.Label className='mb-0'>
-                  Medicaid ID
-                </Form.Label>
-                <Form.Control
-                  {...register('medicaidID',)}
-                  type="text"
-                  placeholder="Enter Medicaid ID"
-                />
-              </Form.Group>
-            </div>
-
-            <div className="col-6">
-              <Form.Group className="mb-1">
-                <Form.Label className='mb-0'>
-                  Department
-                </Form.Label>
-                <Form.Control
-                  // {...register('department',)}
-                  type="text"
-                placeholder="Department"
-                />
-              </Form.Group>
-            </div>
-          </div>
-
-          <Form.Group className="mb-2">
-            <Form.Label className='mb-0'>
-              Medicare PECOS Login
-            </Form.Label>
-            <Form.Control
-              {...register('Medicare_PECOS_Logins',)}
-              type="text"
-              placeholder="Enter Medicare PECOS Logins"
-            />
-          </Form.Group>
-        </div>
-      </div>
-
-      <div className="row mt-1" style={{ borderBottom: '1px solid #444141' }}>
-        <p className="fw-bold">
-          Licensing Information
-        </p>
-        <div className="col-6">
-          <Form.Group className="mb-1">
-            <Form.Label className='mb-0'>
-              State License
-            </Form.Label>
-            <Form.Control
-              {...register('stateLicense',)}
-              type="text"
-              placeholder="Enter State License"
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-1">
-            <Form.Label className='mb-0'>
-              State License Obtained (state)
-            </Form.Label>
-            <Form.Control
-              {...register('stateLicenseObtained',)}
-              type="text"
-              placeholder="Enter State of License"
-            />
-          </Form.Group>
-        </div>
-
-        <div className="col-6">
-          <Form.Group className="mb-1">
-            <Form.Label className='mb-0'>
-              State License Provider (licensing authority name)
-            </Form.Label>
-            <Form.Control
-              {...register('stateLicenseProvider',)}
-              type="text"
-              placeholder="Enter Licensing Authority Name"
-            />
-          </Form.Group>
-
-          <div className="row">
-            <div className="col-6">
-              <Form.Group className="mb-1">
-                <Form.Label className='mb-0'>
-                  State License Issue Date
-                </Form.Label>
-                <Form.Control
-                  {...register('stateLicenseIssueDate',)}
-                  type="date"
-                  placeholder="Enter Issue Date"
-                />
-              </Form.Group>
-            </div>
-
-            <div className="col-6">
-              <Form.Group className="mb-2">
-                <Form.Label className='mb-0'>
-                  License Expiration Date
-                </Form.Label>
-                <Form.Control
-                  {...register('licenseExpirationDate',)}
-                  type="date"
-                  placeholder="Enter Expiration Date"
-                />
-              </Form.Group>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="row mt-3">
-        <div className="col-6">
-          <div>
-            <Form.Group className="mb-1">
-              <Form.Label htmlFor="DEA" className="form-label mb-0">
-                DEA # (Drug Enforcement Administration number)
-              </Form.Label>
-              <Form.Control
-                {...register('DEA',)}
-                type="text"
-                id="DEA"
-                className="w-100 input ps-2 py-1"
-                placeholder="Enter DEA #"
-              />
-            </Form.Group>
-          </div>
-        </div>
-        <div className="col-6">
-          <div>
-            <div className="row">
-              <Form.Group className="mb-1">
-                <Form.Label htmlFor="DEA_IssueDate" className="form- mb-0">
-                  DEA Issue Date
-                </Form.Label>
-                <Form.Control
-                  {...register('DEA_IssueDate',)}
-                  type="date"
-                  id="DEA_IssueDate"
-                  className="w-100 input ps-2 py-1"
-                />
-              </Form.Group>
-            </div>
-          </div>
-        </div>
-        <Form.Group className="mb-1">
-          <Form.Label htmlFor="CLIA" className="form-label mb-0">
-            CLIA # (Clinical Laboratory Improvement Amendments)
-          </Form.Label>
-          <Form.Control
-            {...register('CLIA',)}
-            type="text"
-            id="CLIA"
-            className="w-100 input ps-2 py-1"
-            placeholder="Enter CLIA #"
-          />
-        </Form.Group>
-      </div>
-
-      <div className="d-flex justify-content-end gap-2 my-1">
-        <Button className="custom-buttons" >
-          Cancel
-        </Button>
-        <Button className="custom-buttons" type="submit">
-          Update
-        </Button>
-      </div>
-
-    </div >
-  )
-}
-
-export default ProfessionalInformation
+export default ProfessionalInformation;

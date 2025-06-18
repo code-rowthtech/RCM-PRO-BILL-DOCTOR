@@ -5,18 +5,6 @@ const GET_PATIENTS_INITIAL_STATE = {
     data: [],
     loading: false
 }
-const GET_PATIENTS_BY_ID_INITIAL_STATE = {
-    data: [],
-    loading: false
-}
-const CREATE_PATIENTS_INITIAL_STATE = {
-    data: [],
-    loading: false,
-}
-const UPDATE_PATIENTS_INITIAL_STATE = {
-    data: [],
-    loading: false,
-}
 
 export const getPatientsReducer = (state = GET_PATIENTS_INITIAL_STATE, action) => {
     switch (action.type) {
@@ -42,6 +30,11 @@ export const getPatientsReducer = (state = GET_PATIENTS_INITIAL_STATE, action) =
             }
         default: return state
     }
+}
+
+const GET_PATIENTS_BY_ID_INITIAL_STATE = {
+    data: [],
+    loading: false
 }
 
 export const getPatientsByIdReducer = (state = GET_PATIENTS_BY_ID_INITIAL_STATE, action) => {
@@ -70,6 +63,11 @@ export const getPatientsByIdReducer = (state = GET_PATIENTS_BY_ID_INITIAL_STATE,
     }
 }
 
+const CREATE_PATIENTS_INITIAL_STATE = {
+    data: [],
+    loading: false,
+}
+
 export const createPatientsReducer = (state = CREATE_PATIENTS_INITIAL_STATE, action) => {
     switch (action.type) {
         case PatientsActionTypes.CREATE_PATIENTS_LOADING:
@@ -94,6 +92,11 @@ export const createPatientsReducer = (state = CREATE_PATIENTS_INITIAL_STATE, act
             }
         default: return state
     }
+}
+
+const UPDATE_PATIENTS_INITIAL_STATE = {
+    data: [],
+    loading: false,
 }
 
 export const updatePatientsReducer = (state = UPDATE_PATIENTS_INITIAL_STATE, action) => {
@@ -121,6 +124,68 @@ export const updatePatientsReducer = (state = UPDATE_PATIENTS_INITIAL_STATE, act
                         status: null, // or whatever the initial state should be
                     },
                 };
+        default: return state
+    }
+}
+
+const CREATE_REFERRING_DOCTOR_INITIAL_STATE = {
+    data: [],
+    loading: false,
+}
+
+export const createReferringDoctorReducer = (state = CREATE_REFERRING_DOCTOR_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case PatientsActionTypes.CREATE_REFERRING_DOCTOR_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case PatientsActionTypes.CREATE_REFERRING_DOCTOR_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case PatientsActionTypes.CREATE_REFERRING_DOCTOR_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case PatientsActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false
+            }
+        default: return state
+    }
+}
+
+const CREATE_RESPONSIBLE_PARTY_INITIAL_STATE = {
+    data: [],
+    loading: false,
+}
+
+export const createResponsiblePartyReducer = (state = CREATE_RESPONSIBLE_PARTY_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case PatientsActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false
+            }
         default: return state
     }
 }

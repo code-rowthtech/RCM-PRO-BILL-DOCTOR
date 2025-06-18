@@ -37,7 +37,7 @@ const Login = (): React$Element<any> => {
     const { t } = useTranslation();
     const dispatch = useDispatch();
     const location = useLocation();
-    const redirectUrl = location.state && location.state.from ? location.state.from.pathname : '/dashboard/project';
+    const redirectUrl = location.state && location.state.from ? location.state.from.pathname : '/';
 
     useEffect(() => {
         dispatch(resetAuth());
@@ -113,7 +113,7 @@ const Login = (): React$Element<any> => {
 
 
                     <div className="mb-3 mb-0 d-flex justify-content-center ">
-                        <Button className='custom-buttons d-flex align-items-center justify-content-center' type="submit" disabled={loading}>
+                        <Button className='custom-buttons d-flex align-items-center justify-content-center w-100' type="submit" disabled={loading}>
                             {loading ?
                                 <Spinner className="spinner-border-sm text-white" />
                                 :

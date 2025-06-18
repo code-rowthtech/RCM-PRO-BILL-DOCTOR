@@ -14,8 +14,6 @@ axios.interceptors.response.use(
         return response;
     },
     (error) => {
-        console.log(error, 'error')
-
         // Any status codes that falls outside the range of 2xx cause this function to trigger
         let message;
 
@@ -49,9 +47,16 @@ const AUTH_SESSION_KEY = 'hyper_user';
  * @param {*} token
  */
 const setAuthorization = (token) => {
-    // console.log({ token })
-    if (token) axios.defaults.headers.common['Authorization'] = `${encryptMessage(token)}`;
-    else delete axios.defaults.headers.common['Authorization'];
+    const userData = JSON.parse(sessionStorage.getItem(AUTH_SESSION_KEY));
+
+    if (userData?.userId) {
+        axios.defaults.headers.common['x-user-id'] = `${encryptMessage(userData.userId)}`; // Set new value for 'XUIXX'
+    }
+    if (token) {
+        axios.defaults.headers.common['Authorization'] = `${encryptMessage(token)}`;
+    } else {
+        delete axios.defaults.headers.common['Authorization']; // Remove the header if token is null/undefined
+    }
 };
 
 const getUserFromSession = () => {
