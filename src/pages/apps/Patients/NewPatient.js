@@ -470,37 +470,53 @@ const NewPatient = () => {
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    <div className="col-12 mx-1 ">
+                                                                    <div className="col-12 mx-1">
                                                                         <div className="row">
                                                                             <div className="col-3">
                                                                                 <span>
                                                                                     <MdPhone className="fs-5 text-primary" />
                                                                                 </span>
                                                                             </div>
-                                                                            <div className="col-9 d-flex align-items-center">
-                                                                                <span
-                                                                                    className="ps-2 fs-6 me-2"
-                                                                                    style={{ fontWeight: 600 }}>
-                                                                                    {patientsDataById?.telecom?.[0]
-                                                                                        ?.value || 'N/A'}
-                                                                                </span>
+                                                                            <div className="col-9">
                                                                                 {patientsDataById?.telecom?.[0]
-                                                                                    ?.value && (
-                                                                                    <FaRegCopy
-                                                                                        className="text-primary cursor-pointer"
-                                                                                        onClick={() =>
-                                                                                            navigator.clipboard.writeText(
+                                                                                    ?.value ? (
+                                                                                    <div
+                                                                                        className="d-flex align-items-center group"
+                                                                                        style={{
+                                                                                            fontWeight: 600,
+                                                                                            position: 'relative',
+                                                                                        }}>
+                                                                                        <span className="ps-2 fs-6 me-2">
+                                                                                            {
                                                                                                 patientsDataById
                                                                                                     .telecom[0].value
-                                                                                            )
-                                                                                        }
-                                                                                        title="Copy to clipboard"
-                                                                                        style={{ fontSize: '10px' }}
-                                                                                    />
+                                                                                            }
+                                                                                        </span>
+
+                                                                                        <FaRegCopy
+                                                                                            className="text-primary cursor-pointer copy-icon"
+                                                                                            onClick={() =>
+                                                                                                navigator.clipboard.writeText(
+                                                                                                    patientsDataById
+                                                                                                        .telecom[0]
+                                                                                                        .value
+                                                                                                )
+                                                                                            }
+                                                                                            style={{fontSize: '10px'}}
+                                                                                            title="Copy to clipboard"
+                                                                                        />
+                                                                                    </div>
+                                                                                ) : (
+                                                                                    <span
+                                                                                        className="ps-2 fs-6 me-2"
+                                                                                        style={{ fontWeight: 600 }}>
+                                                                                        N/A
+                                                                                    </span>
                                                                                 )}
                                                                             </div>
                                                                         </div>
                                                                     </div>
+
                                                                     <div className="col-12 mx-1 ">
                                                                         <div className="row">
                                                                             <div className="col-3">
@@ -1004,10 +1020,10 @@ const NewPatient = () => {
                                                             <p
                                                                 className={`patient-menu-item text-black mb-0 ps-2 pe-2 border-bottom py-1 
                                                                   ${
-                                                                    isSidebarCollapsed
-                                                                       ? 'text-center fw-bold'
-                                                                       : 'd-flex justify-content-between align-items-center'
-                                                                     }`}
+                                                                      isSidebarCollapsed
+                                                                          ? 'text-center fw-bold'
+                                                                          : 'd-flex justify-content-between align-items-center'
+                                                                  }`}
                                                                 onClick={() => {
                                                                     if (item.label !== 'Clinical Review') {
                                                                         handleClinicalReviewToggle();

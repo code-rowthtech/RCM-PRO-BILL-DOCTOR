@@ -244,8 +244,20 @@ select.form-control:not([size]):not([multiple]) {
 .form-check-input {
     height: 16px !important;
     cursor: pointer;
-
 }
+.copy-icon {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    /* margin-left:; */
+    font-size: 12px;
+}
+
+.group:hover .copy-icon {
+    opacity: 1;
+}
+/* .group:hover .text-primary {
+    opacity: 1 !important;
+} */
 .custom-active .form-check-input {
     background-color: #6168d0 !important;
     border-color: white !important;
