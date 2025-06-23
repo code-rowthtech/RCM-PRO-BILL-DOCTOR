@@ -3,7 +3,6 @@
   "version": "3.0.0",
   "private": true,
   "dependencies": {
-    "@bodhx/react-wysiwyg": "^4.0.0",
     "@hookform/resolvers": "^3.3.4",
     "@testing-library/jest-dom": "^5.17.0",
     "assert": "^2.1.0",

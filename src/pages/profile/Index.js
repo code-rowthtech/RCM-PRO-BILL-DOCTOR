@@ -21,7 +21,7 @@ const Index = () => {
     return (
         <div className="pt-1 pb-2">
             <div>
-                <Card className=" scroll-container page-height">
+                <Card className=" scroll-container page-height px-3">
                     <div className="row">
                         <div>
                             <ul className="nav nav-underline">
