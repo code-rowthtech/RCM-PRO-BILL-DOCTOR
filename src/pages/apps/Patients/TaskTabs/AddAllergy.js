@@ -45,7 +45,6 @@ const AddAllergy = ({ onCancel }) => {
         const selectedCategory = category.find((item) => item?.code === data?.category);
         const selectedCriticalityOption = criticality.find((option) => option?.code === data?.criticality);
         const selectedSeverityOption = severityData.find((option) => option?.code === data?.severity);
-        console.log(severityData, 'severityData');
 
         const payload = {
             patientId: patientId,
@@ -168,7 +167,6 @@ const AddAllergy = ({ onCancel }) => {
         };
 
         dispatch(createAllergyAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'payload');
     };
     const formattedCodeOption = useMemo(
         () =>
@@ -531,8 +529,8 @@ const AddAllergy = ({ onCancel }) => {
                                 <option value="" hidden>
                                     Select Appointment
                                 </option>
-                                    <option value='1'>Appointment 1</option>
-                                    <option value='2'>Appointment 2</option>
+                                <option value='1'>Appointment 1</option>
+                                <option value='2'>Appointment 2</option>
                             </Form.Select>
                         </Form.Group>
                     </Col>
@@ -547,8 +545,8 @@ const AddAllergy = ({ onCancel }) => {
                                 <option value="" hidden>
                                     Select Encounter
                                 </option>
-                                    <option value='1'>Encounter 1</option>
-                                    <option value='2'>Encounter 2</option>
+                                <option value='1'>Encounter 1</option>
+                                <option value='2'>Encounter 2</option>
                             </Form.Select>
                         </Form.Group>
                     </Col>

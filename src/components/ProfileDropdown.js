@@ -36,8 +36,8 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
     const user = JSON.parse(sessionStorage.getItem('hyper_user'));
     const userName = user?.name?.text || 'John Doe';
     // const changedLogo=sessionStorage.getItem('logo');
-    const logo=JSON.parse(sessionStorage.getItem('hyper_user'))?.photo?.[0]?.url;
-    const changedLogo=JSON.parse(sessionStorage.getItem('hyper_user'))?.logo?.[0]?.url;
+    const logo = JSON.parse(sessionStorage.getItem('hyper_user'))?.photo?.[0]?.url;
+    const changedLogo = JSON.parse(sessionStorage.getItem('hyper_user'))?.logo?.[0]?.url;
     return (
         <Dropdown show={dropdownOpen} onToggle={toggleDropdown} className='m-0'>
             <Dropdown.Toggle
@@ -46,18 +46,18 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
                 as={Link}
                 to="#"
                 onClick={toggleDropdown}
-                className="nav-link  border-0 dropdown-toggle nav-user arrow-none me-0">
+                className="nav-link  border-0 dropdown-toggle nav-user bg-transparent arrow-none me-0">
                 <span className="account-user-avatar">
-                    {changedLogo?
-                     <img src={changedLogo} className="rounded-circle" alt="user" />
-                    :
-                    logo?
-                    <img src={logo} className="rounded-circle" alt="user" />
-                    :
-                    <FaUserCircle className="rounded-circle fs-1  text-dark" />
+                    {changedLogo ?
+                        <img src={changedLogo} className="rounded-circle" alt="user" />
+                        :
+                        logo ?
+                            <img src={logo} className="rounded-circle" alt="user" />
+                            :
+                            <FaUserCircle className="rounded-circle fs-1  text-dark" />
                     }
                 </span>
-                <span className='text-capitalize'>
+                {/* <span className='text-capitalize'>
                     <OverlayTrigger
                         placement="bottom"
                         overlay={<Tooltip>{userName}</Tooltip>}
@@ -67,7 +67,7 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
                         </span>
                     </OverlayTrigger>
                     <span className="account-position ">{JSON.parse(sessionStorage.getItem('hyper_user'))?.role}</span>
-                </span>
+                </span> */}
             </Dropdown.Toggle>
             <Dropdown.Menu align={'end'} className="dropdown-menu-animated topbar-dropdown-menu profile-dropdown">
                 <div onClick={toggleDropdown}>

@@ -22,6 +22,20 @@
     border: 1px solid rgb(164, 197, 213);
 }
 
+.active_inactive_buttons {
+    font-size: 13px;
+    font-weight: 400;
+    width: 78px;
+    height: 30px;
+    line-height: 10px;
+    background-color: #6169d0;
+    border-radius: 10px;
+}
+
+.active_inactive_buttons:hover {
+    background-color: #6169d0;
+    color: #ffffff;
+}
 .light-border-bottom {
     border-bottom: 1px solid #313a4615 !important;
 }
@@ -52,15 +66,14 @@ select {
 }
 
 .form-label {
-    color: black;
-    font-weight: 700 !important;
-    opacity: 0.4;
-    font-size: 13px;
+    color: rgba(51, 51, 51, 0.6) !important; /* #333 with 60% opacity */
+    font-weight: 500 !important;
+    font-size: 12px;
 }
 
 .form-control {
     color: black !important;
-    font-weight: 550 !important;
+    font-weight: 500 !important;
     padding: 6px !important;
     font-size: 12px;
     background-color: #e8f0fe !important;
@@ -84,7 +97,6 @@ select {
     color: black !important;
 }
 
-
 .form-control[data-has-value='true'],
 .form-select[data-has-value='true'] {
     color: black !important;
@@ -94,6 +106,7 @@ select {
 .form-control::placeholder {
     color: #0908084f !important;
     font-size: 12px;
+    font-weight: 400 !important;
 }
 
 .custom-file-upload {
@@ -108,9 +121,9 @@ select {
     font-size: 12px !important;
 }
 
-tbody tr:nth-child(even) {
+/* tbody tr:nth-child(even) {
     background-color: #efefef !important;
-}
+} */
 
 thead {
     background-color: #313a46 !important;
@@ -128,7 +141,6 @@ table {
 
 .select__input {
     border: none !important;
-
 }
 
 .buttons-head div {
@@ -154,11 +166,10 @@ table {
 }
 
 .patient-menu-item:hover {
-    background-color: #D9D9D9;
+    background-color: #d9d9d9;
     padding-left: 10px;
     color: #007bff;
 }
-
 
 .patient-item {
     color: white;
@@ -175,8 +186,8 @@ table {
 }
 
 .nav-underline .nav-link.active {
-    /* border-bottom-color: #727CF5!important; */
-    border-bottom: 3px solid #727CF5 !important;
+    color: #727cf5 !important;
+    border-bottom: 3px solid #727cf5 !important;
 }
 .schedule-status-select {
     border: 1px solid rgba(0, 0, 0, 0.335) !important;
@@ -196,8 +207,18 @@ table {
 }
 
 body {
-    font-family: 'Charlie Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Noto Sans', 'Oxygen', 'Ubuntu', 'Droid Sans', 'Helvetica Neue', sans-serif;
-
+    font-family:
+        'Charlie Text',
+        -apple-system,
+        BlinkMacSystemFont,
+        'Segoe UI',
+        'Roboto',
+        'Noto Sans',
+        'Oxygen',
+        'Ubuntu',
+        'Droid Sans',
+        'Helvetica Neue',
+        sans-serif;
 }
 
 .custom-btn-group button {
@@ -244,7 +265,6 @@ select.form-control:not([size]):not([multiple]) {
 .form-check-input {
     height: 16px !important;
     cursor: pointer;
-
 }
 .custom-active .form-check-input {
     background-color: #6168d0 !important;
@@ -263,14 +283,12 @@ textarea.form-control {
     height: auto !important;
 }
 
-
 .css-hlgwow {
     height: 30px !important;
     padding: 0px 8px !important;
     background-color: #e8f0fe !important;
     border-top-left-radius: 4px !important;
     border-bottom-left-radius: 4px !important;
-
 }
 
 .css-1wy0on6 {
@@ -293,7 +311,6 @@ textarea.form-control {
 
 hr {
     color: #726e6e8a !important;
-
 }
 
 .css-1dimb5e-singleValue {
@@ -370,65 +387,121 @@ hr {
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
     background-color: #f9f9f9;
-  }
-  
-  /* Inner slot table scroll */
-  .schedule-table tbody {
+}
+
+/* Inner slot table scroll */
+.schedule-table tbody {
     display: block;
     max-height: 180px;
     overflow-y: auto;
-  }
-  .schedule-table thead,
-  .schedule-table tbody tr {
+}
+.schedule-table thead,
+.schedule-table tbody tr {
     display: table;
     width: 100%;
     table-layout: fixed;
-  }
-  
-  /* Input field spacing */
-  .schedule-table input {
+}
+
+/* Input field spacing */
+.schedule-table input {
     height: 36px;
     font-size: 14px;
-  }
-  
-  /* Clean & minimal scrollbar */
-  .schedule-table tbody::-webkit-scrollbar {
+}
+
+/* Clean & minimal scrollbar */
+.schedule-table tbody::-webkit-scrollbar {
     width: 6px;
-  }
-  .schedule-table tbody::-webkit-scrollbar-thumb {
+}
+.schedule-table tbody::-webkit-scrollbar-thumb {
     background-color: #c1c1c1;
     border-radius: 10px;
-  }
-  .schedule-table tbody::-webkit-scrollbar-track {
+}
+.schedule-table tbody::-webkit-scrollbar-track {
     background-color: transparent;
-  }
-  .schedule-table tbody {
+}
+.schedule-table tbody {
     scrollbar-width: thin;
     scrollbar-color: #c1c1c1 transparent;
-  }
-  
-  /* Icons spacing */
-  .plusicon,
-  .minusicon {
+}
+
+/* Icons spacing */
+.plusicon,
+.minusicon {
     font-size: 18px;
     color: #0d6efd;
     cursor: pointer;
-  }
-  .minusicon {
+}
+.minusicon {
     color: #dc3545;
-  }
-  
-  /* Header row styling */
-  /* thead th {
-    background-color: #0d6efd;
-    color: white;
-    text-align: center;
-    vertical-align: middle;
-    border: none;
-  } */
-  
-  /* Outer table */
+}
+th {
+    color: white !important;
+}
 
+.navbar-custom {
+    min-height: 5vh !important;
+}
+.navbar-custom .nav-content-height {
+    height: 5vh !important;
+}
 
-  
-  
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.5); /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.page-height {
+    height: 90vh !important;
+}
+
+tbody tr:hover {
+    background-color: #f1f1f1 !important;
+    transition-duration: 0.4s !important;
+    transition-timing-function: ease-in-out !important;
+}
+
+.table > :not(caption) > * > * {
+    padding: 0.35rem 0.55rem !important;
+    font-size: 12px !important;
+}
+
+/* Patient Chart */
+.hasSubmenuItems {
+    position: relative !important;
+}
+
+.active-patient-chart-tab,
+.submenuItem:hover,
+.active-pagination {
+    color: #727cf5;
+    font-weight: 600;
+    background-color: #b9bcbe44;
+}
+
+.accordion-button::after {
+    background-size: 1rem !important;
+    background-position: center center !important;
+    padding-right: 3rem !important;
+}
+
+.accordion-button {
+    padding: 0;
+    background-color: #b9bcbe44 !important;
+}
+
+.patientChartCard {
+    height: 68vh;
+}
+.summary-card-body {
+    height: 22vh !important;
+}
+/* .summary-card-body-footer {
+    height: 10vh;
+} */

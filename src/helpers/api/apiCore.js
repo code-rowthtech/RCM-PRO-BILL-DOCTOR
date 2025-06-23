@@ -1,4 +1,4 @@
-import  jwtDecode  from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
 import axios from 'axios';
 
 import config from '../../config';
@@ -194,7 +194,10 @@ class APICore {
     };
 
     setLoggedInUser = (session) => {
-        if (session) sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
+        if (session) {
+            sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
+            sessionStorage.setItem('loggedInUser', encryptMessage(session));
+        }
         else {
             sessionStorage.removeItem(AUTH_SESSION_KEY);
         }

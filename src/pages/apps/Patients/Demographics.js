@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Card, Col, Form, Modal, Row, InputGroup, Table,Spinner } from 'react-bootstrap';
+import { Button, Card, Col, Form, Modal, Row, InputGroup, Table, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { FiUploadCloud } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
@@ -513,8 +513,6 @@ const Demographics = ({ patientId }) => {
         fetchGeocodeData(addressToSearch).then((data) => {
             if (data) {
                 setSearchedLocations(data?.results);
-            } else {
-                console.log('No data returned.');
             }
         });
     };
@@ -542,8 +540,6 @@ const Demographics = ({ patientId }) => {
         fetchGeocodeData(addressToSearch).then((data) => {
             if (data) {
                 setSearchedEmployerLocations(data?.results);
-            } else {
-                console.log('No data returned.');
             }
         });
     };
@@ -797,10 +793,10 @@ const Demographics = ({ patientId }) => {
                             <Form.Label className="mb-0">Emergency Contact Phone </Form.Label>
                             <Form.Group>
                                 <InputGroup>
-                                <InputGroup.Text className="p-0 px-1 d-flex align-items-center justify-content-center fs-6 gap-1 fw-bold text-black">
-                                            <img src={us} alt="country code flag" width={16} />
-                                            +1
-                                        </InputGroup.Text>
+                                    <InputGroup.Text className="p-0 px-1 d-flex align-items-center justify-content-center fs-6 gap-1 fw-bold text-black">
+                                        <img src={us} alt="country code flag" width={16} />
+                                        +1
+                                    </InputGroup.Text>
                                     {/* This is the prefix */}
                                     <Form.Control
                                         type="tel"
@@ -907,10 +903,10 @@ const Demographics = ({ patientId }) => {
                                             <Form.Label className="mb-0">Employer Phone </Form.Label>
                                             <Form.Group>
                                                 <InputGroup>
-                                                <InputGroup.Text className="p-0 px-1 d-flex align-items-center justify-content-center fs-6 gap-1 fw-bold text-black">
-                                            <img src={us} alt="country code flag" width={16} />
-                                            +1
-                                        </InputGroup.Text>
+                                                    <InputGroup.Text className="p-0 px-1 d-flex align-items-center justify-content-center fs-6 gap-1 fw-bold text-black">
+                                                        <img src={us} alt="country code flag" width={16} />
+                                                        +1
+                                                    </InputGroup.Text>
                                                     {/* This is the prefix */}
                                                     <Form.Control
                                                         type="tel"
@@ -958,7 +954,7 @@ const Demographics = ({ patientId }) => {
                                                     )}
                                                 </InputGroup>
                                             </Form.Group>
-{/* 
+                                            {/* 
                                             <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
                                                 <img src={us} alt="country code flag" width={20} />
                                             </div> */}
@@ -1034,11 +1030,10 @@ const Demographics = ({ patientId }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${
-                                                        searchedEmployerLocations?.length === 0 || !employerFocused
-                                                            ? 'd-none'
-                                                            : ''
-                                                    }`}>
+                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
+                                                        ? 'd-none'
+                                                        : ''
+                                                        }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
@@ -1179,7 +1174,7 @@ const Demographics = ({ patientId }) => {
                         <Button
                             className="custom-buttons btn-height"
                             disabled={store?.updatePatientsReducer?.loading}
-                            style={{width:'70px'}}
+                            style={{ width: '70px' }}
                             type="submit">
                             {store?.updatePatientsReducer?.loading ? (
                                 <Spinner color="white" className="spinner-border-sm" />

@@ -104,15 +104,14 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
                     },
                     organization: data.source
                         ? {
-                              reference: `Organization/${data.source.replace(/\s/g, '-').toLowerCase()}`,
-                              display: data.source,
-                          }
+                            reference: `Organization/${data.source.replace(/\s/g, '-').toLowerCase()}`,
+                            display: data.source,
+                        }
                         : undefined,
                 },
             ],
         };
         dispatch(createReferringDoctorAction({ key: encryptMessage(payload) }));
-        console.log('payload', payload);
     };
 
     return (

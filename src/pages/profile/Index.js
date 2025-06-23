@@ -20,12 +20,9 @@ const Index = () => {
 
     return (
         <div className="pt-1 pb-2">
-            <div className=" mt-2">
-                <Card className=" scroll-container" style={{ height: '87vh', overflow: 'scroll',padding: '10px' }}>
+            <div>
+                <Card className=" scroll-container page-height">
                     <div className="row">
-                        {/* <div>
-                            <p className="fw-bold">PROFILE</p>
-                        </div> */}
                         <div>
                             <ul className="nav nav-underline">
                                 {[

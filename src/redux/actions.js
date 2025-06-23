@@ -59,3 +59,5 @@ export * from './patients/actions';
 export * from './vitals/actions';
 export * from './appointments/actions';
 export * from './clinicNotes/actions';
+export * from './encounters/actions';
+export * from './allergies/actions';
