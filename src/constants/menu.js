@@ -2,13 +2,13 @@ import { Children } from "react";
 
 const MENU_ITEMS = [
     // { key: 'navigation', label: 'Navigation', isTitle: true },
-    {
-        key: 'dashboards',
-        label: 'Dashboard',
-        isTitle: false,
-        icon: 'uil-home-alt',
-        url: '/dashboard/project',
-    },
+    // {
+    //     key: 'dashboards',
+    //     label: 'Dashboard',
+    //     isTitle: false,
+    //     icon: 'uil-home-alt',
+    //     url: '/dashboard/project',
+    // },
     // {
     //     key: 'apps-crm',
     //     label: 'Clinics',
@@ -50,7 +50,7 @@ const MENU_ITEMS = [
         icon: 'uil-thermometer',
         url: '/apps/patients/list',
     },
- 
+
     // {
     //     key: 'transaction',
     //     label: 'Transaction',
@@ -87,7 +87,7 @@ const MENU_ITEMS = [
         icon: 'uil uil-medical',
         url: '/apps/diagnosis/list',
     },
-   
+
     // {
     //     key: 'setting',
     //     label: 'Setting',
@@ -99,7 +99,7 @@ const MENU_ITEMS = [
     //     label: 'Logout',
     //     icon: 'uil uil-sign-out-alt',
     //     // url: '/apps/logout/logout-modal',
-        
+
     // },
     // {
     //     key: 'permissions',

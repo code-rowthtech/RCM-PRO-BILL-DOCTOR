@@ -56,7 +56,7 @@ const AppointmentsList = React.lazy(() => import('../pages/apps/Appointments/ind
 // const AddSubscriptions = React.lazy(() => import('../pages/apps/Subscriptions/Addsubscriptions/index'));
 // const Doctors = React.lazy(() => import('../pages/apps/Doctors/index'));
 const Patients = React.lazy(() => import('../pages/apps/Patients/index'));
-const NewPatient =React.lazy(() => import('../pages/apps/Patients/NewPatient'));
+const UpdatePatients = React.lazy(() => import('../pages/apps/Patients/UpdatePatients/updateIndex'));
 // const Permissions = React.lazy(() => import('../pages/apps/Permissions/index'))
 // const Roles = React.lazy(() => import('../pages/apps/Roles/index'))
 
@@ -259,7 +259,7 @@ const AllRoutes = () => {
                                     path: 'appointmentCalendar',
                                     element: <LoadComponent component={AppointmentCalendar} />,
                                 },
-                              
+
                             ],
                         },
 
@@ -278,7 +278,7 @@ const AllRoutes = () => {
                                     path: 'addBreak',
                                     element: <LoadComponent component={addBreak} />,
                                 },
-                              
+
                             ],
                         },
                         {
@@ -296,11 +296,11 @@ const AllRoutes = () => {
                                 //     path: 'addBreak',
                                 //     element: <LoadComponent component={addBreak} />,
                                 // },
-                              
+
                             ],
                         },
-                       
-                       
+
+
                         {
                             path: 'transaction',
                             children: [
@@ -314,7 +314,7 @@ const AllRoutes = () => {
                                 // },
                             ],
                         },
-                       
+
                         {
                             path: 'patients',
                             children: [
@@ -323,8 +323,8 @@ const AllRoutes = () => {
                                     element: <LoadComponent component={Patients} />,
                                 },
                                 {
-                                    path: 'new-patient',
-                                    element: <LoadComponent component={NewPatient} />,
+                                    path: 'patientChart',
+                                    element: <LoadComponent component={UpdatePatients} />,
                                 },
                                 {
                                     path: 'add-new-patient',
@@ -348,7 +348,7 @@ const AllRoutes = () => {
                                     path: 'setting-page',
                                     element: <LoadComponent component={Setting} />,
                                 },
-                              
+
                             ],
                         },
                         {
@@ -362,7 +362,7 @@ const AllRoutes = () => {
                                     path: 'newInvestigation',
                                     element: <LoadComponent component={NewInvestigation} />,
                                 },
-                              
+
                             ],
                         },
                         {
@@ -376,10 +376,10 @@ const AllRoutes = () => {
                                     path: 'newDiagnosisTest',
                                     element: <LoadComponent component={NewDiagnosisTest} />,
                                 },
-                              
+
                             ],
                         },
-                       
+
                     ],
                 },
                 {
@@ -420,222 +420,6 @@ const AllRoutes = () => {
                         },
                     ],
                 },
-                // {
-                //     path: 'ui',
-                //     children: [
-                //         {
-                //             path: 'base-ui',
-                //             children: [
-                //                 {
-                //                     path: 'accordions',
-                //                     element: <LoadComponent component={Accordions} />,
-                //                 },
-                //                 {
-                //                     path: 'alerts',
-                //                     element: <LoadComponent component={Alerts} />,
-                //                 },
-                //                 {
-                //                     path: 'avatars',
-                //                     element: <LoadComponent component={Avatars} />,
-                //                 },
-                //                 {
-                //                     path: 'badges',
-                //                     element: <LoadComponent component={Badges} />,
-                //                 },
-                //                 {
-                //                     path: 'breadcrumb',
-                //                     element: <LoadComponent component={Breadcrumbs} />,
-                //                 },
-                //                 {
-                //                     path: 'buttons',
-                //                     element: <LoadComponent component={Buttons} />,
-                //                 },
-                //                 {
-                //                     path: 'cards',
-                //                     element: <LoadComponent component={Cards} />,
-                //                 },
-                //                 {
-                //                     path: 'carousel',
-                //                     element: <LoadComponent component={Carousels} />,
-                //                 },
-                //                 {
-                //                     path: 'dropdowns',
-                //                     element: <LoadComponent component={Dropdowns} />,
-                //                 },
-                //                 {
-                //                     path: 'embedvideo',
-                //                     element: <LoadComponent component={EmbedVideo} />,
-                //                 },
-                //                 {
-                //                     path: 'grid',
-                //                     element: <LoadComponent component={Grid} />,
-                //                 },
-                //                 {
-                //                     path: 'listgroups',
-                //                     element: <LoadComponent component={ListGroups} />,
-                //                 },
-                //                 {
-                //                     path: 'modals',
-                //                     element: <LoadComponent component={Modals} />,
-                //                 },
-                //                 {
-                //                     path: 'notifications',
-                //                     element: <LoadComponent component={Notifications} />,
-                //                 },
-                //                 {
-                //                     path: 'offcanvas',
-                //                     element: <LoadComponent component={Offcanvases} />,
-                //                 },
-                //                 {
-                //                     path: 'paginations',
-                //                     element: <LoadComponent component={Paginations} />,
-                //                 },
-                //                 // {
-                //                 //     path: 'placeholders',
-                //                 //     element: <LoadComponent component={Placeholders} />,
-                //                 // },
-                //                 {
-                //                     path: 'popovers',
-                //                     element: <LoadComponent component={Popovers} />,
-                //                 },
-                //                 {
-                //                     path: 'progress',
-                //                     element: <LoadComponent component={Progress} />,
-                //                 },
-                //                 {
-                //                     path: 'ribbons',
-                //                     element: <LoadComponent component={Ribbons} />,
-                //                 },
-                //                 {
-                //                     path: 'spinners',
-                //                     element: <LoadComponent component={Spinners} />,
-                //                 },
-                //                 {
-                //                     path: 'tabs',
-                //                     element: <LoadComponent component={Tabs} />,
-                //                 },
-                //                 {
-                //                     path: 'tooltips',
-                //                     element: <LoadComponent component={Tooltips} />,
-                //                 },
-                //                 {
-                //                     path: 'typography',
-                //                     element: <LoadComponent component={Typography} />,
-                //                 },
-                //             ],
-                //         },
-                //         {
-                //             path: 'widgets',
-                //             element: <LoadComponent component={Widgets} />,
-                //         },
-                //         {
-                //             path: 'extended',
-                //             children: [
-                //                 {
-                //                     path: 'dragdrop',
-                //                     element: <LoadComponent component={DragDrop} />,
-                //                 },
-                //                 {
-                //                     path: 'rangesliders',
-                //                     element: <LoadComponent component={RangeSliders} />,
-                //                 },
-                //                 {
-                //                     path: 'ratings',
-                //                     element: <LoadComponent component={Ratings} />,
-                //                 },
-                //             ],
-                //         },
-                //         {
-                //             path: 'icons',
-                //             children: [
-                //                 {
-                //                     path: 'unicons',
-                //                     element: <LoadComponent component={Unicons} />,
-                //                 },
-                //                 {
-                //                     path: 'mdi',
-                //                     element: <LoadComponent component={MDIIcons} />,
-                //                 },
-                //                 {
-                //                     path: 'dripicons',
-                //                     element: <LoadComponent component={Dripicons} />,
-                //                 },
-                //             ],
-                //         },
-                //         // {
-                //         //     path: 'forms',
-                //         //     children: [
-                //         //         {
-                //         //             path: 'basic',
-                //         //             element: <LoadComponent component={BasicForms} />,
-                //         //         },
-                //         //         {
-                //         //             path: 'advanced',
-                //         //             element: <LoadComponent component={FormAdvanced} />,
-                //         //         },
-                //         //         {
-                //         //             path: 'validation',
-                //         //             element: <LoadComponent component={FormValidation} />,
-                //         //         },
-                //         //         {
-                //         //             path: 'wizard',
-                //         //             element: <LoadComponent component={FormWizard} />,
-                //         //         },
-                //         //         {
-                //         //             path: 'upload',
-                //         //             element: <LoadComponent component={FileUpload} />,
-                //         //         },
-                //         //         {
-                //         //             path: 'editors',
-                //         //             element: <LoadComponent component={Editors} />,
-                //         //         },
-                //         //     ],
-                //         // },
-                //         // {
-                //         //     path: 'tables',
-                //         //     children: [
-                //         //         {
-                //         //             path: 'basic',
-                //         //             element: <LoadComponent component={BasicTables} />,
-                //         //         },
-                //         //         {
-                //         //             path: 'advanced',
-                //         //             element: <LoadComponent component={AdvancedTables} />,
-                //         //         },
-                //         //     ],
-                //         // },
-                //         {
-                //             path: 'charts',
-                //             children: [
-                //                 {
-                //                     path: 'apex',
-                //                     element: <LoadComponent component={ApexChart} />,
-                //                 },
-                //                 {
-                //                     path: 'brite',
-                //                     element: <LoadComponent component={BriteChart} />,
-                //                 },
-                //                 {
-                //                     path: 'chartjs',
-                //                     element: <LoadComponent component={ChartJs} />,
-                //                 },
-                //             ],
-                //         },
-                //         // {
-                //         //     path: 'maps',
-                //         //     children: [
-                //         //         {
-                //         //             path: 'googlemaps',
-                //         //             element: <LoadComponent component={GoogleMaps} />,
-                //         //         },
-                //         //         {
-                //         //             path: 'vectormaps',
-                //         //             element: <LoadComponent component={VectorMaps} />,
-                //         //         },
-                //         //     ],
-                //         // },
-                //     ],
-                // },
             ],
         },
     ]);

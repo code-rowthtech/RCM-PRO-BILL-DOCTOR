@@ -10,11 +10,10 @@ import AppointmentForm from '../../Appointments/Tabs/AppointmentForm';
 import { appointmentStatus } from '../../../../utils/DataSets/appointmentstatus';
 import Paginations from '../../../../helpers/Paginations';
 
-const AppointmentTable = ({ patientId, doctorId, status, search, skip , setSkip }) => {
+const AppointmentTable = ({ patientId, doctorId, status, search, skip, setSkip }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const appointments = store?.getAppointmentByPatientProviderReducer?.data?.appointments;
-    console.log('appointments', store?.getAppointmentByPatientProviderReducer);
     const loading = store?.getAppointmentByPatientProviderReducer?.loading;
     const updateStatus = store?.updateAppointmentDetailsReducer?.data?.status;
     const [showModal, setShowModal] = useState(false); // Modal visibility state
@@ -27,19 +26,10 @@ const AppointmentTable = ({ patientId, doctorId, status, search, skip , setSkip 
     const [limit, setLimit] = useState(10);
 
     const { register, handleSubmit, reset } = useForm();
-    // useEffect(() => {
-    //     const payload = {
-    //         subject: patientId,
-    //         doctorId,
-    //         status,
-    //         search,
-    //     };
-    //     dispatch(getAppointmentByPatientProviderAction(payload));
-    // }, [dispatch, patientId, doctorId, status, search]);
 
     useEffect(() => {
         if (updateStatus === 200) {
-            dispatch(getAppointmentByPatientProviderAction({ subject: patientId, doctorId, status, search , page: skip, limit }));
+            dispatch(getAppointmentByPatientProviderAction({ subject: patientId, doctorId, status, search, page: skip, limit }));
             setCancelationPopupRow(null);
             setCancelationReason('');
         }
@@ -69,7 +59,7 @@ const AppointmentTable = ({ patientId, doctorId, status, search, skip , setSkip 
             status: 'cancelled',
         };
         dispatch(updateAppointmentDetailsAction({ key: encryptMessage(payload) }));
-        
+
     };
     const modalTabs = [
         'Appointments',
@@ -132,8 +122,8 @@ const AppointmentTable = ({ patientId, doctorId, status, search, skip , setSkip 
                                                     } else {
                                                         dispatch(
                                                             updateAppointmentDetailsAction({
-                                                           
-                                                                key: encryptMessage({id: data?._id,status: e.target.value }),
+
+                                                                key: encryptMessage({ id: data?._id, status: e.target.value }),
                                                             })
                                                         );
                                                         setCancelationPopupRow(null); // close popup if status changes again
@@ -240,12 +230,12 @@ const AppointmentTable = ({ patientId, doctorId, status, search, skip , setSkip 
                     </Table>
                 </Col>
                 <Col className="mt-2 d-flex justify-content-end">
-                <Paginations
-                    currentPage={skip}
-                    totalPages={store?.getAppointmentByPatientProviderReducer?.data?.pagination?.totalPages}
-                    onPageChange={handlePageChange}
-                />
-            </Col>
+                    <Paginations
+                        currentPage={skip}
+                        totalPages={store?.getAppointmentByPatientProviderReducer?.data?.pagination?.totalPages}
+                        onPageChange={handlePageChange}
+                    />
+                </Col>
             </Row>
             <Modal centered size="xl" show={showModal} onHide={handleClose}>
                 <Modal.Header closeButton>
@@ -269,9 +259,8 @@ const AppointmentTable = ({ patientId, doctorId, status, search, skip , setSkip 
                             {modalTabs.map((modalTab) => (
                                 <li className="nav-item" key={modalTab}>
                                     <a
-                                        className={`nav-link text-black me-2 ${
-                                            activeModalTab === modalTab ? 'active fw-bold' : ''
-                                        }`}
+                                        className={`nav-link text-black me-2 ${activeModalTab === modalTab ? 'active fw-bold' : ''
+                                            }`}
                                         onClick={() => handleModalTabClick(modalTab)}
                                         style={{ cursor: 'pointer' }}>
                                         {modalTab}

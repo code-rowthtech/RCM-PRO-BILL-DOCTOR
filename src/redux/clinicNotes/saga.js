@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { ClinicNotesActionTypes } from './constants';
-import {  createAllergyApi, createProblemApi, createTaskApi, getAllergiesOfAPatientApi, getAllergyDetailsApi, getClinicEmployeesApi, getPatientAppointmentsApi, getPatientProblemsApi, getProblemDetailsApi, getSearchCodesApi, getTaskApi, getTaskDetailsApi, updateAllergyApi, updateProblemsApi, updateTaskApi,  } from './api';
+import { createAllergyApi, createProblemApi, createTaskApi, getAllergiesOfAPatientApi, getAllergyDetailsApi, getClinicEmployeesApi, getPatientAppointmentsApi, getPatientProblemsApi, getProblemDetailsApi, getSearchCodesApi, getTaskApi, getTaskDetailsApi, updateAllergyApi, updateProblemsApi, updateTaskApi, } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -182,7 +182,7 @@ function* createProblemFunction(data) {
     }
 }
 
-function*getPatientProblemsFunction(data) {
+function* getPatientProblemsFunction(data) {
     try {
         yield put({
             type: ClinicNotesActionTypes.GET_PATIENT_PROBLEMS_LOADING,
@@ -327,121 +327,121 @@ function* getPatientAppointmentsFunction(data) {
     }
 }
 
-function* createAllergyFunction(data) {
-    try {
-        yield put({
-            type: ClinicNotesActionTypes.CREATE_ALLERGY_LOADING,
-            payload: {},
-        });
-        const response = yield call(createAllergyApi, data);
-        const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 200) {
-            ToastHandle(decryptedData?.message, 'success');
-            yield put({
-                type: ClinicNotesActionTypes.CREATE_ALLERGY_SUCCESS,
-                payload: { ...decryptedData },
-            });
-        } else {
-            yield put({
-                type: ClinicNotesActionTypes.CREATE_ALLERGY_ERROR,
-                payload: { ...decryptedData },
-            });
-        }
-    } catch (error) {
-        ToastHandle(error, 'danger');
-        yield put({
-            type: ClinicNotesActionTypes.CREATE_ALLERGY_ERROR,
-            payload: error,
-        });
-    }
-}
+// function* createAllergyFunction(data) {
+//     try {
+//         yield put({
+//             type: ClinicNotesActionTypes.CREATE_ALLERGY_LOADING,
+//             payload: {},
+//         });
+//         const response = yield call(createAllergyApi, data);
+//         const decryptedData = JSON.parse(decryptMessage(response.data.data));
+//         if (response.status === 200) {
+//             ToastHandle(decryptedData?.message, 'success');
+//             yield put({
+//                 type: ClinicNotesActionTypes.CREATE_ALLERGY_SUCCESS,
+//                 payload: { ...decryptedData },
+//             });
+//         } else {
+//             yield put({
+//                 type: ClinicNotesActionTypes.CREATE_ALLERGY_ERROR,
+//                 payload: { ...decryptedData },
+//             });
+//         }
+//     } catch (error) {
+//         ToastHandle(error, 'danger');
+//         yield put({
+//             type: ClinicNotesActionTypes.CREATE_ALLERGY_ERROR,
+//             payload: error,
+//         });
+//     }
+// }
 
-function* getAllergyDetailsFunction(data) {
-    try {
-        yield put({
-            type: ClinicNotesActionTypes.GET_ALLERGY_DETAILS_LOADING,
-            payload: {},
-        });
-        const response = yield call(getAllergyDetailsApi, data);
-        const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
-            // ToastHandle(decryptedData?.message, 'success');
-            yield put({
-                type: ClinicNotesActionTypes.GET_ALLERGY_DETAILS_SUCCESS,
-                payload: { ...decryptedData },
-            });
-        } else {
-            yield put({
-                type: ClinicNotesActionTypes.GET_ALLERGY_DETAILS_ERROR,
-                payload: { ...decryptedData },
-            });
-        }
-    } catch (error) {
-        ToastHandle(error, 'danger');
-        yield put({
-            type: ClinicNotesActionTypes.GET_ALLERGY_DETAILS_ERROR,
-            payload: error,
-        });
-    }
-}
+// function* getAllergyDetailsFunction(data) {
+//     try {
+//         yield put({
+//             type: ClinicNotesActionTypes.GET_ALLERGY_DETAILS_LOADING,
+//             payload: {},
+//         });
+//         const response = yield call(getAllergyDetailsApi, data);
+//         const decryptedData = JSON.parse(decryptMessage(response.data.data));
+//         if (response.status === 201) {
+//             // ToastHandle(decryptedData?.message, 'success');
+//             yield put({
+//                 type: ClinicNotesActionTypes.GET_ALLERGY_DETAILS_SUCCESS,
+//                 payload: { ...decryptedData },
+//             });
+//         } else {
+//             yield put({
+//                 type: ClinicNotesActionTypes.GET_ALLERGY_DETAILS_ERROR,
+//                 payload: { ...decryptedData },
+//             });
+//         }
+//     } catch (error) {
+//         ToastHandle(error, 'danger');
+//         yield put({
+//             type: ClinicNotesActionTypes.GET_ALLERGY_DETAILS_ERROR,
+//             payload: error,
+//         });
+//     }
+// }
 
-function* getAllergiesOfAPatientFunction(data) {
-    try {
-        yield put({
-            type: ClinicNotesActionTypes.GET_ALLERGIES_OF_A_PATIENT_LOADING,
-            payload: {},
-        });
-        const response = yield call(getAllergiesOfAPatientApi, data);
-        const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
-            // ToastHandle(decryptedData?.message, 'success');
-            yield put({
-                type: ClinicNotesActionTypes.GET_ALLERGIES_OF_A_PATIENT_SUCCESS,
-                payload: { ...decryptedData },
-            });
-        } else {
-            yield put({
-                type: ClinicNotesActionTypes.GET_ALLERGIES_OF_A_PATIENT_ERROR,
-                payload: { ...decryptedData },
-            });
-        }
-    } catch (error) {
-        ToastHandle(error, 'danger');
-        yield put({
-            type: ClinicNotesActionTypes.GET_ALLERGIES_OF_A_PATIENT_ERROR,
-            payload: error,
-        });
-    }
-}
+// function* getAllergiesOfAPatientFunction(data) {
+//     try {
+//         yield put({
+//             type: ClinicNotesActionTypes.GET_ALLERGIES_OF_A_PATIENT_LOADING,
+//             payload: {},
+//         });
+//         const response = yield call(getAllergiesOfAPatientApi, data);
+//         const decryptedData = JSON.parse(decryptMessage(response.data.data));
+//         if (response.status === 201) {
+//             // ToastHandle(decryptedData?.message, 'success');
+//             yield put({
+//                 type: ClinicNotesActionTypes.GET_ALLERGIES_OF_A_PATIENT_SUCCESS,
+//                 payload: { ...decryptedData },
+//             });
+//         } else {
+//             yield put({
+//                 type: ClinicNotesActionTypes.GET_ALLERGIES_OF_A_PATIENT_ERROR,
+//                 payload: { ...decryptedData },
+//             });
+//         }
+//     } catch (error) {
+//         ToastHandle(error, 'danger');
+//         yield put({
+//             type: ClinicNotesActionTypes.GET_ALLERGIES_OF_A_PATIENT_ERROR,
+//             payload: error,
+//         });
+//     }
+// }
 
-function* updateAllergyFunction(data) {
-    try {
-        yield put({
-            type: ClinicNotesActionTypes.UPDATE_ALLERGY_LOADING,
-            payload: {},
-        });
-        const response = yield call(updateAllergyApi, data);
-        const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 200) {
-            ToastHandle(decryptedData?.message, 'success');
-            yield put({
-                type: ClinicNotesActionTypes.UPDATE_ALLERGY_SUCCESS,
-                payload: { ...decryptedData },
-            });
-        } else {
-            yield put({
-                type: ClinicNotesActionTypes.UPDATE_ALLERGY_ERROR,
-                payload: { ...decryptedData },
-            });
-        }
-    } catch (error) {
-        ToastHandle(error, 'danger');
-        yield put({
-            type: ClinicNotesActionTypes.UPDATE_ALLERGY_ERROR,
-            payload: error,
-        });
-    }
-}
+// function* updateAllergyFunction(data) {
+//     try {
+//         yield put({
+//             type: ClinicNotesActionTypes.UPDATE_ALLERGY_LOADING,
+//             payload: {},
+//         });
+//         const response = yield call(updateAllergyApi, data);
+//         const decryptedData = JSON.parse(decryptMessage(response.data.data));
+//         if (response.status === 200) {
+//             ToastHandle(decryptedData?.message, 'success');
+//             yield put({
+//                 type: ClinicNotesActionTypes.UPDATE_ALLERGY_SUCCESS,
+//                 payload: { ...decryptedData },
+//             });
+//         } else {
+//             yield put({
+//                 type: ClinicNotesActionTypes.UPDATE_ALLERGY_ERROR,
+//                 payload: { ...decryptedData },
+//             });
+//         }
+//     } catch (error) {
+//         ToastHandle(error, 'danger');
+//         yield put({
+//             type: ClinicNotesActionTypes.UPDATE_ALLERGY_ERROR,
+//             payload: error,
+//         });
+//     }
+// }
 
 export function* callResetUpdate() {
     put({
@@ -496,21 +496,21 @@ export function* watchGetPatientAppointments() {
     yield takeEvery(ClinicNotesActionTypes.GET_PATIENT_APPOINTMENTS, getPatientAppointmentsFunction);
 }
 
-export function* watchCreateAllergy() {
-    yield takeEvery(ClinicNotesActionTypes.CREATE_ALLERGY, createAllergyFunction);
-}
+// export function* watchCreateAllergy() {
+//     yield takeEvery(ClinicNotesActionTypes.CREATE_ALLERGY, createAllergyFunction);
+// }
 
-export function* watchGetAllergyDetails() {
-    yield takeEvery(ClinicNotesActionTypes.GET_ALLERGY_DETAILS, getAllergyDetailsFunction);
-}
+// export function* watchGetAllergyDetails() {
+//     yield takeEvery(ClinicNotesActionTypes.GET_ALLERGY_DETAILS, getAllergyDetailsFunction);
+// }
 
-export function* watchGetAllergiesOfAPatient() {
-    yield takeEvery(ClinicNotesActionTypes.GET_ALLERGIES_OF_A_PATIENT, getAllergiesOfAPatientFunction);
-}
+// export function* watchGetAllergiesOfAPatient() {
+//     yield takeEvery(ClinicNotesActionTypes.GET_ALLERGIES_OF_A_PATIENT, getAllergiesOfAPatientFunction);
+// }
 
-export function* watchUpdateAllergy() {
-    yield takeEvery(ClinicNotesActionTypes.UPDATE_ALLERGY, updateAllergyFunction);
-}
+// export function* watchUpdateAllergy() {
+//     yield takeEvery(ClinicNotesActionTypes.UPDATE_ALLERGY, updateAllergyFunction);
+// }
 
 function* clinicNotesSaga() {
     yield all([
@@ -525,10 +525,7 @@ function* clinicNotesSaga() {
         fork(watchGetProblemDetails),
         fork(watchGetSearchCodes),
         fork(watchGetPatientAppointments),
-        fork(watchCreateAllergy),
-        fork(watchGetAllergyDetails),
-        fork(watchGetAllergiesOfAPatient),
-        fork(watchUpdateAllergy),
+
 
     ]);
 }

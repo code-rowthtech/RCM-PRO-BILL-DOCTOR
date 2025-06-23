@@ -15,13 +15,11 @@ const AllergyList = () => {
     const [showAddAllergy, setShowAddAllergy] = useState(false);
     const [showUpdateAllergy, setShowUpdateAllergy] = useState(false);
     const [selectedAllergy, setSelectedAllergy] = useState(null);
-    console.log(selectedAllergy, 'selectedAllergy');
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const allergyData = store?.getAllergiesOfAPatientReducer?.data?.allergies;
-    console.log(allergyData,'allergyData')
     useEffect(() => {
         const data = {
             patientId: patientId,
@@ -82,7 +80,7 @@ const AllergyList = () => {
                                             <tr key={data?.id}>
                                                 <td className="text-capitalize">{data?.clinicalStatus?.coding?.[0]?.display || 'N/A'}</td>
                                                 <td className="text-capitalize">{data?.verificationStatus?.coding?.[0]?.display || 'N/A'}</td>
-                                                <td className="text-capitalize">{data?.type?.coding?.[0]?.display|| 'N/A'}</td>
+                                                <td className="text-capitalize">{data?.type?.coding?.[0]?.display || 'N/A'}</td>
                                                 <td className="text-capitalize">{data?.catogory?.coding?.[0]?.display || 'N/A'}</td>
                                                 <td className="text-capitalize">{data?.criticality?.display || 'N/A'}</td>
                                                 <td className="text-capitalize">{data?.notes?.[0]?.text || 'N/A'}</td>

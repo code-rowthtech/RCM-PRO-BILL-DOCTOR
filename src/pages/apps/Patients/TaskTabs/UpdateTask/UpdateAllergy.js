@@ -16,7 +16,6 @@ import { exposureRouteData } from '../../../../../utils/DataSets/Allergy/exposur
 import { useSearchParams } from 'react-router-dom';
 
 const UpdateAllergy = ({ onCancel, allergy }) => {
-    console.log(allergy, 'allergy');
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
@@ -38,9 +37,8 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const allergyDetails = store?.getAllergyDetailsReducer?.data?.allergy;
-    console.log(allergyDetails, 'allergyDetails');
     useEffect(() => {
-      setValue('allergyType', allergyDetails?.type?.coding[0]?.code);
+        setValue('allergyType', allergyDetails?.type?.coding[0]?.code);
         // setValue('category', allergyDetails?.category?.coding[0]?.code);
         setValue('criticality', allergyDetails?.criticality?.code);
         setValue('verificationStatus', allergyDetails?.verificationStatus?.coding[0]?.code);
@@ -80,10 +78,9 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
         const selectedCategory = category.find((item) => item?.code === data?.category);
         const selectedCriticalityOption = criticality.find((option) => option?.code === data?.criticality);
         const selectedSeverityOption = severityData.find((option) => option?.code === data?.severity);
-        console.log(severityData, 'severityData');
 
         const payload = {
-            id : allergy?._id,
+            id: allergy?._id,
             patientId: patientId,
             clinicId: clinicId,
             doctorId: doctorId,
@@ -204,7 +201,6 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
         };
 
         dispatch(updateAllergyAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'payload');
     };
     const formattedCodeOption = useMemo(
         () =>

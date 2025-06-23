@@ -37,7 +37,8 @@ const Login = (): React$Element<any> => {
     const { t } = useTranslation();
     const dispatch = useDispatch();
     const location = useLocation();
-    const redirectUrl = location.state && location.state.from ? location.state.from.pathname : '/';
+    // const redirectUrl = location.state && location.state.from ? location.state.from.pathname : '/apps/appointments/list';
+    const redirectUrl = '/apps/appointments/list';
 
     useEffect(() => {
         dispatch(resetAuth());
@@ -104,7 +105,7 @@ const Login = (): React$Element<any> => {
                         placeholder={t('Enter your password')}
                         defaultValue=""
                         containerClass={'mb-3'}
-                        inputProps={{ style: { height: '30px!important', padding:'0px' } }} // Pass the height style here
+                        inputProps={{ style: { height: '30px!important', padding: '0px' } }} // Pass the height style here
                     >
                         <Link to="/account/forget-password" className="text-muted float-end">
                             <small>{t('Forgot your password?')}</small>

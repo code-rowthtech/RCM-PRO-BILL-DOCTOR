@@ -7,7 +7,6 @@ import { getAppointmentByPatientProviderAction } from '../../../../redux/actions
 import AppointmentTable from './AppointmentFilterList';
 
 const Appointment = ({ isOpen, setIsOpen }) => {
-    console.log(isOpen, 'isOpen');
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const navigate = useNavigate();
@@ -56,11 +55,10 @@ const Appointment = ({ isOpen, setIsOpen }) => {
                                 {['Today', 'Upcoming', 'History'].map((tab) => (
                                     <li className="nav-item" key={tab}>
                                         <a
-                                            className={`nav-link me-3 pb-0 tab-font-family d-flex align-items-center ${
-                                                activeTab === tab
+                                            className={`nav-link me-3 pb-0 tab-font-family d-flex align-items-center ${activeTab === tab
                                                     ? 'active text-primary fw-bold'
                                                     : 'text-secondary fw-semibold'
-                                            }`}
+                                                }`}
                                             onClick={() => handleMainTabChange(tab)}
                                             style={{ cursor: 'pointer' }}>
                                             {tabIcons[tab]} {tab}
