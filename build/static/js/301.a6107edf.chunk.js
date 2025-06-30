@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkhyper_react=self.webpackChunkhyper_react||[]).push([[301],{67301:(e,t,a)=>{a.r(t),a.d(t,{default:()=>l});a(65043);var r=a(71072),s=a(70579);const l=()=>(0,s.jsx)(s.Fragment,{children:(0,s.jsx)(r.A,{breadCrumbItems:[{label:"Pages",path:"/pages/starter"},{label:"Starter",path:"/pages/starter",active:!0}],title:"Starter"})})}}]);
+//# sourceMappingURL=301.a6107edf.chunk.js.map

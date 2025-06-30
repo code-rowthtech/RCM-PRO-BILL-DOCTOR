@@ -30,7 +30,6 @@ const Report = () => {
     };
 
     const handleSubmit = () => {
-        console.log(`${modalTitle} Form Data Submitted:`, formData);
         // Add form submission logic here
         setShowModal(false); // Close the modal
     };

@@ -9,15 +9,12 @@ import Demographics from './Demographics';
 import Insurances from './Insurances';
 import VitalStatus from './VitalStatus';
 import profileDummy from '../../../assets/images/profileDummy.png';
-import CloseIcon from '../../../assets/images/Icon.png';
 import { MdPhone } from 'react-icons/md';
 import { MdOutlineMarkEmailUnread } from 'react-icons/md';
 import { BiEdit, BiSolidLocationPlus } from 'react-icons/bi';
 import { getPatientsByIdAction, resetUpdateAction, updatePatientsAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import { useDispatch, useSelector } from 'react-redux';
-import { RiImageEditLine } from 'react-icons/ri';
-import NewAppointment from '../Appointments/NewAppointment';
 import AppointmentForm from '../Appointments/Tabs/AppointmentForm';
 import { TbCapture } from 'react-icons/tb';
 import { IoClose } from 'react-icons/io5';
@@ -120,8 +117,6 @@ const NewPatient = () => {
 
     const handleEncounterTabs = () => {
         setEncounterModal(true);
-        // setEncounterTab(tab);
-        // setVisibleSection('encounter'); // Show Encounter Section, Hide Patient Section
     };
     const handleSidebarToggle = () => {
         setSidebarCollapsed(!isSidebarCollapsed);
@@ -150,13 +145,9 @@ const NewPatient = () => {
     const handleClinicalReviewToggle = () => {
         setIsClinicalReviewExpanded(!isClinicalReviewExpanded);
         setVisibleSection('task');
-        // setSelectedMainTab("Patient Info")
     };
     const [isClinicalReviewExpandedData, setIsClinicalReviewExpandedData] = useState(false);
 
-    const handleToggle = () => {
-        setIsClinicalReviewExpandedData(!isClinicalReviewExpandedData);
-    };
     const patientMenuItems = [
         { label: 'Patient Info', icon: <MdMedicalInformation /> },
         { label: 'Appointments', icon: <LuCalendarClock /> },
@@ -284,11 +275,11 @@ const NewPatient = () => {
             ...(logo?.url === null
                 ? {}
                 : {
-                      photo: {
-                          url: logo?.url?.split('?')[0] || patientsDataById?.patientChartPhoto?.url,
-                          title: logoName,
-                      },
-                  }),
+                    photo: {
+                        url: logo?.url?.split('?')[0] || patientsDataById?.patientChartPhoto?.url,
+                        title: logoName,
+                    },
+                }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
@@ -336,8 +327,8 @@ const NewPatient = () => {
                                                     <span>
                                                         {patientsDataById?.birthDate
                                                             ? new Date(patientsDataById.birthDate).toLocaleDateString(
-                                                                  'en-GB'
-                                                              )
+                                                                'en-GB'
+                                                            )
                                                             : 'N/A'}
                                                     </span>
                                                 </p>
@@ -394,8 +385,8 @@ const NewPatient = () => {
                                                                             logo?.url
                                                                                 ? logo.url.split('?')[0]
                                                                                 : patientsDataById?.photo?.[0]?.url
-                                                                                ? patientsDataById?.photo?.[0]?.url
-                                                                                : profilePhoto
+                                                                                    ? patientsDataById?.photo?.[0]?.url
+                                                                                    : profilePhoto
                                                                         }
                                                                         alt="Patient Profile"
                                                                         className="img-fluid rounded"
@@ -409,9 +400,8 @@ const NewPatient = () => {
 
                                                                 {!isCameraOpen && (
                                                                     <BiEdit
-                                                                        className={`position-absolute fs-4 text-primary ${
-                                                                            uploading ? 'd-none' : ''
-                                                                        }`}
+                                                                        className={`position-absolute fs-4 text-primary ${uploading ? 'd-none' : ''
+                                                                            }`}
                                                                         style={{
                                                                             bottom: '-5px',
                                                                             right: '-9px',
@@ -479,40 +469,19 @@ const NewPatient = () => {
                                                                             </div>
                                                                             <div className="col-9">
                                                                                 {patientsDataById?.telecom?.[0]
-                                                                                    ?.value ? (
-                                                                                    <div
-                                                                                        className="d-flex align-items-center group"
-                                                                                        style={{
-                                                                                            fontWeight: 600,
-                                                                                            position: 'relative',
-                                                                                        }}>
-                                                                                        <span className="ps-2 fs-6 me-2">
-                                                                                            {
-                                                                                                patientsDataById
-                                                                                                    .telecom[0].value
-                                                                                            }
-                                                                                        </span>
-
+                                                                                    ?.value && (
                                                                                         <FaRegCopy
-                                                                                            className="text-primary cursor-pointer copy-icon"
+                                                                                            className="text-primary cursor-pointer"
                                                                                             onClick={() =>
                                                                                                 navigator.clipboard.writeText(
                                                                                                     patientsDataById
-                                                                                                        .telecom[0]
-                                                                                                        .value
+                                                                                                        .telecom[0].value
                                                                                                 )
                                                                                             }
-                                                                                            style={{fontSize: '10px'}}
                                                                                             title="Copy to clipboard"
+                                                                                            style={{ fontSize: '10px' }}
                                                                                         />
-                                                                                    </div>
-                                                                                ) : (
-                                                                                    <span
-                                                                                        className="ps-2 fs-6 me-2"
-                                                                                        style={{ fontWeight: 600 }}>
-                                                                                        N/A
-                                                                                    </span>
-                                                                                )}
+                                                                                    )}
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -576,25 +545,22 @@ const NewPatient = () => {
                                                                                     style={{ fontWeight: 600 }}>
                                                                                     {patientsDataById?.address?.[0]
                                                                                         ?.city ||
-                                                                                    patientsDataById?.address?.[0]
-                                                                                        ?.state
-                                                                                        ? `${
-                                                                                              patientsDataById
-                                                                                                  ?.address?.[0]
-                                                                                                  ?.city || ''
-                                                                                          }${
-                                                                                              patientsDataById
-                                                                                                  ?.address?.[0]
-                                                                                                  ?.city &&
-                                                                                              patientsDataById
-                                                                                                  ?.address?.[0]?.state
-                                                                                                  ? ', '
-                                                                                                  : ''
-                                                                                          }${
-                                                                                              patientsDataById
-                                                                                                  ?.address?.[0]
-                                                                                                  ?.state || ''
-                                                                                          }`
+                                                                                        patientsDataById?.address?.[0]
+                                                                                            ?.state
+                                                                                        ? `${patientsDataById
+                                                                                            ?.address?.[0]
+                                                                                            ?.city || ''
+                                                                                        }${patientsDataById
+                                                                                            ?.address?.[0]
+                                                                                            ?.city &&
+                                                                                            patientsDataById
+                                                                                                ?.address?.[0]?.state
+                                                                                            ? ', '
+                                                                                            : ''
+                                                                                        }${patientsDataById
+                                                                                            ?.address?.[0]
+                                                                                            ?.state || ''
+                                                                                        }`
                                                                                         : 'N/A'}
                                                                                 </span>
                                                                             </div>
@@ -633,8 +599,8 @@ const NewPatient = () => {
                                                                                     style={{ fontWeight: 600 }}>
                                                                                     {patientsDataById?.createdAt
                                                                                         ? new Date(
-                                                                                              patientsDataById.createdAt
-                                                                                          ).toLocaleDateString('en-GB')
+                                                                                            patientsDataById.createdAt
+                                                                                        ).toLocaleDateString('en-GB')
                                                                                         : 'N/A'}
                                                                                 </span>
                                                                             </div>
@@ -681,9 +647,6 @@ const NewPatient = () => {
 
                                                     <Col sm={2} className="d-flex justify-content-end pe-2">
                                                         <div className="text-center">
-                                                            {/* <Button className='text-black text-nowrap bg-white mt-1 fs-6 d-flex align-items-center justify-content-center w-100' style={{ height: '30px' }}>
-                                                New Referral
-                                            </Button> */}
                                                             <Button
                                                                 className="text-black text-nowrap bg-white fs-6 d-flex align-items-center justify-content-center w-100"
                                                                 style={{ height: '30px', borderRadius: '10px' }}
@@ -692,8 +655,8 @@ const NewPatient = () => {
                                                                 {isRunning
                                                                     ? `Pause (${formatTime(timeLeft)})`
                                                                     : timeLeft > 0
-                                                                    ? `Resume (${formatTime(timeLeft)})`
-                                                                    : 'Start Session'}
+                                                                        ? `Resume (${formatTime(timeLeft)})`
+                                                                        : 'Start Session'}
                                                             </Button>
 
                                                             <Button
@@ -722,17 +685,6 @@ const NewPatient = () => {
                                     </div>
                                 </div>
                             </div>
-                            {/* <div
-                                className="mb-1"
-                                style={{
-                                    background: 'transparent',
-                                    width: 'auto',
-                                    // border: '1px solid #a4c5d5',
-                                    bordertop: '0px!important',
-                                    boxShadow: 0,
-                                }}>
-                              
-                            </div> */}
 
                             {/* Patient Info Section */}
                             {visibleSection === 'patient' && (
@@ -743,7 +695,7 @@ const NewPatient = () => {
                                             height: isOpen ? '60.4vh' : '80.3vh',
                                             transition: 'height 0.3s ease-in-out',
                                         }}>
-                                        <div className="d-flex justify-content-between pt-2 px-2">
+                                        {/* <div className="d-flex justify-content-between pt-2 px-2">
                                             <div style={{ borderBottom: '2px solid grey' }}>
                                                 <ul className="nav nav-underline">
                                                     {[
@@ -755,17 +707,14 @@ const NewPatient = () => {
                                                         'Eligibility',
                                                         'Authorizations',
                                                         'Vital Status',
-                                                        // 'Balance',
-                                                        // 'Payment',
                                                     ].map((tab) => {
                                                         const isDisabled = !workingTabs.includes(tab);
                                                         const tabElement = (
                                                             <a
-                                                                className={`nav-link me-0 p-1 pb-0 tab-font-family ${
-                                                                    selectedMainTab === tab
-                                                                        ? 'active text-primary'
-                                                                        : 'text-black'
-                                                                }`}
+                                                                className={`nav-link me-0 p-1 pb-0 tab-font-family ${selectedMainTab === tab
+                                                                    ? 'active text-primary'
+                                                                    : 'text-black'
+                                                                    }`}
                                                                 style={{
                                                                     cursor: isDisabled ? 'progress' : 'pointer',
                                                                     fontWeight: 600,
@@ -800,20 +749,13 @@ const NewPatient = () => {
                                                 </ul>
                                             </div>
                                             <div className="d-flex gap-1">
-                                                {/* <Button
-                                                    className="custom-buttons"
-                                                    onClick={() => setVisibleSection('task')}>
-                                                    <FiPlus className="fs-5 text-white" />
-                                                    &nbsp;Task
-                                                </Button> */}
-
                                                 <Button className="cancel-button" as={Link} to={'/apps/patients/list'}>
                                                     Back
                                                 </Button>
                                             </div>
-                                        </div>
+                                        </div> */}
 
-                                        <div className="px-2 scroll-container" style={{ overflow: 'auto' }}>
+                                        {/* <div className="px-2 scroll-container" style={{ overflow: 'auto' }}>
                                             {selectedMainTab === 'Patient Info' && <PatientDetails />}
                                             {selectedMainTab === 'Demographics' && <Demographics />}
                                             {selectedMainTab === 'Insurances' && <Insurances />}
@@ -824,27 +766,10 @@ const NewPatient = () => {
                                             {selectedMainTab === 'Vital Status' && <VitalStatus />}
                                             {selectedMainTab === 'Balance' && <p>⏳ In Progress</p>}
                                             {selectedMainTab === 'Payment' && <p>⏳ In Progress</p>}
-                                        </div>
+                                        </div> */}
                                     </Card>
                                 </div>
                             )}
-
-                            {/* {visibleSection === 'encounter' && (
-                                <div className="mt-2">
-                                    <Card className="px-2">
-                                        <div className="d-flex justify-content-between pt-2 px-2">
-                                            <h4>Encounter</h4>
-                                            <div className="">
-                                                <Button
-                                                    className="cancel-button"
-                                                    onClick={() => setVisibleSection('patient')}>
-                                                    Back
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </Card>
-                                </div>
-                            )} */}
                             {/* Task Section */}
                             {visibleSection === 'task' && (
                                 <div className="mt-2">
@@ -879,11 +804,10 @@ const NewPatient = () => {
                                                     ].map((subTab) => (
                                                         <li className="nav-item" key={subTab}>
                                                             <a
-                                                                className={`nav-link me-2 pb-0 tab-font-family ${
-                                                                    selectedSubTab === subTab
-                                                                        ? 'active text-primary'
-                                                                        : 'text-black'
-                                                                }`}
+                                                                className={`nav-link me-2 pb-0 tab-font-family ${selectedSubTab === subTab
+                                                                    ? 'active text-primary'
+                                                                    : 'text-black'
+                                                                    }`}
                                                                 onClick={() => handleSubTabChange(subTab)}
                                                                 style={{ cursor: 'pointer', fontWeight: 600 }}>
                                                                 {subTab}
@@ -980,24 +904,7 @@ const NewPatient = () => {
                                     <div
                                         className="card-header d-flex justify-content-center align-items-center text-white px-2 py-1"
                                         style={{ backgroundColor: '#313A46', height: '43px' }}>
-                                        {/* <button
-                                            className="btn p-0 shadow-none outline-none"
-                                            onClick={handleSidebarToggle}>
-                                            <i className="bi bi-list text-white" style={{ fontSize: '18px' }}></i>
-                                        </button> */}
                                         <h5 className="m-0">Patient Chart</h5>
-                                        {/* <button
-                                            className="btn p-0 shadow-none outline-none"
-                                            data-bs-toggle="collapse"
-                                            data-bs-target="#patientChartData"
-                                            aria-expanded={isClinicalReviewExpandedData}
-                                            aria-controls="patientChartData"
-                                            onClick={handleToggle}>
-                                            <i
-                                                className={`bi ${isClinicalReviewExpandedData ? 'bi-chevron-up' : 'bi-chevron-down'
-                                                    }`}
-                                                style={{ fontSize: '14px', color: 'white' }}></i>
-                                        </button> */}
                                     </div>
                                     <div id="patientChartData" className="expanded">
                                         <div
@@ -1019,11 +926,10 @@ const NewPatient = () => {
                                                             }>
                                                             <p
                                                                 className={`patient-menu-item text-black mb-0 ps-2 pe-2 border-bottom py-1 
-                                                                  ${
-                                                                      isSidebarCollapsed
-                                                                          ? 'text-center fw-bold'
-                                                                          : 'd-flex justify-content-between align-items-center'
-                                                                  }`}
+                                                                  ${isSidebarCollapsed
+                                                                        ? 'text-center fw-bold'
+                                                                        : 'd-flex justify-content-between align-items-center'
+                                                                    }`}
                                                                 onClick={() => {
                                                                     if (item.label !== 'Clinical Review') {
                                                                         handleClinicalReviewToggle();
@@ -1033,7 +939,7 @@ const NewPatient = () => {
                                                                     cursor: 'pointer',
                                                                     backgroundColor:
                                                                         isClinicalReviewExpanded &&
-                                                                        item.label !== 'Clinical Review'
+                                                                            item.label !== 'Clinical Review'
                                                                             ? '#f8f9fa'
                                                                             : 'transparent',
                                                                 }}>
@@ -1055,12 +961,11 @@ const NewPatient = () => {
                                                                 </span>
                                                                 {!isSidebarCollapsed && (
                                                                     <i
-                                                                        className={`bi ${
-                                                                            isClinicalReviewExpanded &&
+                                                                        className={`bi ${isClinicalReviewExpanded &&
                                                                             item.label !== 'Clinical Review'
-                                                                                ? 'bi-chevron-up'
-                                                                                : 'bi-chevron-down'
-                                                                        }`}></i>
+                                                                            ? 'bi-chevron-up'
+                                                                            : 'bi-chevron-down'
+                                                                            }`}></i>
                                                                 )}
                                                             </p>
                                                         </OverlayTrigger>
@@ -1211,9 +1116,8 @@ const NewPatient = () => {
                             {modalTabs.map((modalTab) => (
                                 <li className="nav-item" key={modalTab}>
                                     <a
-                                        className={`nav-link text-black me-2 ${
-                                            activeModalTab === modalTab ? 'active fw-bold' : ''
-                                        }`}
+                                        className={`nav-link text-black me-2 ${activeModalTab === modalTab ? 'active fw-bold' : ''
+                                            }`}
                                         onClick={() => handleModalTabClick(modalTab)}
                                         style={{ cursor: 'pointer' }}>
                                         {modalTab}

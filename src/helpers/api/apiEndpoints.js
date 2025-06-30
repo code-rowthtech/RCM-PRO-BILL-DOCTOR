@@ -1,3 +1,5 @@
+const BaseRoute = 'api/v1/practitioner';
+
 export const addPermissions = '/api/v1/permisssions';
 export const getPermissions = '/api/v1/permisssions';
 export const deletePermissions = '/api/v1/permisssions/delete';
@@ -33,7 +35,7 @@ export const getPatients = '/api/v1/doctor/get-patients';
 export const getPatientsById = '/api/v1/doctor/patient/by/id';
 export const createPatients = '/api/v1/doctor/Patient/add';
 export const updatePatients = '/api/v1/doctor/Patient/update';
-export const createReferringDoctor='/api/v1/doctor/add/referringDoc';
+export const createReferringDoctor = '/api/v1/doctor/add/referringDoc';
 export const createResponsibleParty = '/api/v1/doctor/Patient/responsible-party';
 
 // CLINIC NOTES
@@ -48,10 +50,6 @@ export const updateProblems = '/api/v1/doctor/updateProblems';
 export const getProblemDetails = '/api/v1/doctor/getProblemDetails';
 export const getSearchCodes = '/api/v1/doctor/searchCodes';
 export const getPatientAppointments = '/api/v1/doctor/getPatientAppointments';
-export const createAllergy = '/api/v1/doctor/addAllergy';
-export const getAllergyDetails = '/api/v1/doctor/getAllergyDetails';
-export const getAllergiesOfAPatient = '/api/v1/doctor/getAllergiesOfAPatient';
-export const updateAllergy = '/api/v1/doctor/updateAllergy';
 
 // DASHBOARD
 export const getAnalytics = '/api/v1/admin/analytics';
@@ -71,8 +69,23 @@ export const getSchedule = '/api/v1/practitioner/schedule';
 export const createAppointments = '/api/v1/practitioner/appointment/create';
 export const getAppointments = '/api/v1/practitioner/appointment/list';
 export const getAllAppointments = '/api/v1/doctor/getPatientsByAppointments';
-export const getPractitionerAvailability ='/api/v1/practitioner/appointment/practitionerAvailability';
-export const getAppointmentDetails ='/api/v1/practitioner/appointment/details';
-export const updateAppointmentDetails='/api/v1/practitioner/appointment/update';
+export const getPractitionerAvailability = '/api/v1/practitioner/appointment/practitionerAvailability';
+export const getAppointmentDetails = '/api/v1/practitioner/appointment/details';
+export const updateAppointmentDetails = '/api/v1/practitioner/appointment/update';
 export const getAppointmentByPateintProvider = '/api/v1/practitioner/appointment/by-patient-provider'
 
+// Encounter
+export const encounter = `${BaseRoute}/encounter`;
+export const encounterSettings = `${BaseRoute}/encounter-menu-settings`;
+export const encounterNotesType = `${BaseRoute}/notes-type/encounter-based`;
+export const encounterNoteFields = `${BaseRoute}/notes-type-settings`;
+
+// Allergies
+// export const createAllergy = `${BaseRoute}/addAllergy`;
+// export const updateAllergy = `${BaseRoute}/updateAllergy`;
+// export const deleteAllergyList = `${BaseRoute}/deleteAllergy`;
+// export const getAllergiesOfAPatient = `${BaseRoute}/allergy`;
+// export const getAllergyDetails = `${BaseRoute}/getAllergyDetails`;
+export const allergy = `${BaseRoute}/allergy`;
+export const foodAllergy = `${BaseRoute}/codes/food-allergies/search`;
+export const tobaccoHistory = `${BaseRoute}/patient/tobacco`;

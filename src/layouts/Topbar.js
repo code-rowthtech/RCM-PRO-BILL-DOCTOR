@@ -151,7 +151,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
     return (
         <>
             <div className={classNames('navbar-custom ', navbarCssClasses)} style={{ backgroundColor: '#ffffff' }}>
-                <div className={`${containerCssClasses} d-flex align-items-center`}>
+                <div className={`${containerCssClasses} nav-content-height d-flex align-items-center`}>
                     {!hideLogo && (
                         <Link to="/" className="topnav-logo">
                             <span className="topnav-logo-lg">
@@ -184,9 +184,10 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
 
                                     const menuLabel = (
                                         <p
-                                            className="fs-5 mb-0 fw-bold"
+                                            className="fs-6 mb-0 fw-semibold"
                                             style={{
-                                                color: isActive ? 'black' : 'rgba(116, 114, 114, 0.51)',
+                                                color: isActive ? 'black' : 'rgba(0, 0, 0, 0.51)',
+                                                fontWeight: isActive ? '700' : '500',
                                                 cursor: isInProgress ? 'progress' : 'pointer',
                                                 opacity: isInProgress ? 0.5 : 1,
                                             }}>

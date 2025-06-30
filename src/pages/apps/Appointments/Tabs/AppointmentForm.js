@@ -338,7 +338,6 @@ const Monthly = React.memo(({ register }) => (
 ));
 
 const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
-    console.log(selectedSlot, 'selected');
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const {
@@ -369,7 +368,6 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
     const appointmentDetails = store?.getAppointmentDetailsReducer?.data?.appointment;
     const availabilityResponse = store?.getPractitionerAvailabilityReducer?.data;
 
-    console.log(appointmentDetails, 'appointmentDetails');
     const [search, setSearch] = useState('');
     const [skip, setSkip] = useState(1);
     const [logoName, setLogoName] = useState('');
@@ -437,14 +435,6 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
         }
     };
 
-    // // Refs for frequently accessed values
-    // const watchedDoctorName = watch('doctorName');
-    // const watchedPatient = watch('patient');
-    // const watchedAppointmentType = watch('appointmentType');
-    // const watchedScheduled = watch('scheduled');
-    // const watchedStartTime = watch('startTime');
-    // const watchedDuration = watch('duration');
-    // const watchedStatus = watch('status');
     useEffect(() => {
         if (createResponse === 201 && submissionType === 'saveAndNext') {
             handleCloseModal();
@@ -480,15 +470,6 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
         }
     }, [createResponse, submissionType]);
 
-    // const renderTooltip = useCallback(
-    //     (props) => (!watchedDoctorName ? <Tooltip {...props}>Please select a doctor first</Tooltip> : <></>),
-    //     [watchedDoctorName]
-    // );
-    // const handleDisabledClick = useCallback(() => {
-    //     if (!watchedDoctorName) {
-    //         setShowToast(true);
-    //     }
-    // }, [watchedDoctorName]);
     useEffect(() => {
         setValue('primaryProvider', doctorName);
     }, [doctorName, setValue]);
@@ -604,8 +585,8 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                     'dailyOccurrenceDate',
                     appointmentDetails?.recurrenceTemplate?.lastOccurrenceDate
                         ? new Date(appointmentDetails?.recurrenceTemplate?.lastOccurrenceDate)
-                              ?.toISOString()
-                              .split('T')[0]
+                            ?.toISOString()
+                            .split('T')[0]
                         : ''
                 );
                 setValue('daysNumberDaily', appointmentDetails?.recurrenceTemplate?.every);
@@ -618,8 +599,8 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                     'weeklyOccurrenceDate',
                     appointmentDetails?.recurrenceTemplate?.lastOccurrenceDate
                         ? new Date(appointmentDetails?.recurrenceTemplate?.lastOccurrenceDate)
-                              ?.toISOString()
-                              .split('T')[0]
+                            ?.toISOString()
+                            .split('T')[0]
                         : ''
                 );
                 setValue('weekInterval', appointmentDetails?.recurrenceTemplate?.every);
@@ -676,54 +657,54 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
             created: new Date().toISOString(),
             minutesDuration: data?.duration,
             ...(appointmentReason?.text ||
-            appointmentReason?.display === appointmentDetails?.reason?.[0]?.coding?.[0]?.display
+                appointmentReason?.display === appointmentDetails?.reason?.[0]?.coding?.[0]?.display
                 ? {}
                 : {
-                      reason: [
-                          {
-                              coding: appointmentReason,
-                              text: appointmentReason?.display, // use display text
-                          },
-                      ],
-                  }),
+                    reason: [
+                        {
+                            coding: appointmentReason,
+                            text: appointmentReason?.display, // use display text
+                        },
+                    ],
+                }),
             examRoom: data?.consultationRoom,
             status: data?.status,
             slot: data?.startTime,
             ...(repeat &&
                 repeatType !== '' && {
-                    recurrenceTemplate: {
-                        ...(repeat && {
-                            recurrenceType: {
-                                coding: [selectedAppointmentRecurrence],
-                                text: selectedAppointmentRecurrence.display,
-                            },
-                        }),
-                        ...(repeatType === 'day' && {
-                            occurrenceCount: appointmentDates?.length,
-                            occurrenceDate: appointmentDates,
-                            lastOccurrenceDate: data?.dailyOccurrenceDate,
-                            every: data?.daysNumberDaily,
-                        }),
-                        ...(repeatType === 'week' && {
-                            occurrenceCount: appointmentDates?.length,
-                            occurrenceDate: appointmentDates,
-                            lastOccurrenceDate: data?.weeklyOccurrenceDate,
-                            every: data?.weekInterval,
-                            weeklyTemplate: {
-                                ...(data?.appointmentDay || {}),
-                                weekInterval: data?.weekInterval,
-                            },
-                        }),
-                        ...(repeatType === 'month' && {
-                            monthlyTemplate: {
-                                dayOfMonth: data?.dayOfMonth,
-                                nthWeekOfMonth: { system: '', code: '', display: data?.nthWeekOfMonth },
-                                dayOfWeek: { system: '', code: '', display: data?.dayOfWeek },
-                                monthInterval: data?.monthInterval,
-                            },
-                        }),
-                    },
-                }),
+                recurrenceTemplate: {
+                    ...(repeat && {
+                        recurrenceType: {
+                            coding: [selectedAppointmentRecurrence],
+                            text: selectedAppointmentRecurrence.display,
+                        },
+                    }),
+                    ...(repeatType === 'day' && {
+                        occurrenceCount: appointmentDates?.length,
+                        occurrenceDate: appointmentDates,
+                        lastOccurrenceDate: data?.dailyOccurrenceDate,
+                        every: data?.daysNumberDaily,
+                    }),
+                    ...(repeatType === 'week' && {
+                        occurrenceCount: appointmentDates?.length,
+                        occurrenceDate: appointmentDates,
+                        lastOccurrenceDate: data?.weeklyOccurrenceDate,
+                        every: data?.weekInterval,
+                        weeklyTemplate: {
+                            ...(data?.appointmentDay || {}),
+                            weekInterval: data?.weekInterval,
+                        },
+                    }),
+                    ...(repeatType === 'month' && {
+                        monthlyTemplate: {
+                            dayOfMonth: data?.dayOfMonth,
+                            nthWeekOfMonth: { system: '', code: '', display: data?.nthWeekOfMonth },
+                            dayOfWeek: { system: '', code: '', display: data?.dayOfWeek },
+                            monthInterval: data?.monthInterval,
+                        },
+                    }),
+                },
+            }),
         };
 
         // Dispatch update if `id` exists, otherwise create a new one
@@ -732,16 +713,9 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
         } else {
             dispatch(createAppointmentsAction({ key: encryptMessage(payload) }));
         }
-        console.log(payload, 'payload');
         // reset();
     };
 
-    // useEffect(() => {
-    //     if (getAppointment === 201) {
-    //         reset();
-    //         navigate('/apps/appointments/list');
-    //     }
-    // }, [getAppointment, reset, navigate]);
     // Handle new patient modal
     const handlePlusIconClick = useCallback(() => setShowModal(true), []);
     const handleCloseModal = useCallback(() => setShowModal(false), []);
@@ -791,7 +765,7 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
             ) : (
                 <Form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
                     <Row>
-                        <Col sm={6}>
+                        <Col md={6} xs={12}>
                             <Form.Group className="mb-1">
                                 <Form.Label className="mb-0">
                                     Patient{!id && <span className="text-danger">*</span>}
@@ -825,7 +799,7 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                                 )}
                             </Form.Group>
                         </Col>
-                        <Col sm={6}>
+                        <Col md={6} xs={12}>
                             <Form.Group className="mb-1">
                                 <Form.Label className="mb-0">Doctor</Form.Label>
                                 <Form.Control
@@ -838,7 +812,7 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                                 />
                             </Form.Group>
                         </Col>
-                        {/* <Col sm={6}>
+                        {/* <Col md={6} xs={12}>
                             <Form.Group className="mb-1">
                                 <Form.Label className="mb-0">Office</Form.Label>
                                 <Form.Control as="select" {...register('office')} data-has-value={!!watch('office')}>
@@ -852,7 +826,7 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                                 </Form.Control>
                             </Form.Group>
                         </Col> */}
-                        <Col sm={6}>
+                        <Col md={6} xs={12}>
                             <Form.Group className="mb-1" controlId="appointmentType">
                                 <Form.Label className="mb-0">
                                     Appointment Type{!id && <span className="text-danger">*</span>}
@@ -891,7 +865,7 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                             }}>
                             <Toast.Body>Please select a doctor first!</Toast.Body>
                         </Toast>
-                        <Col sm={6} className="d-flex gap-2">
+                        <Col md={6} xs={12} className="d-flex gap-2">
                             <Form.Group className="mb-1" style={{ width: '150px' }} controlId="scheduled">
                                 <Form.Label className="mb-0">Scheduled</Form.Label>
                                 <Form.Control
@@ -931,7 +905,7 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                             </Form.Group>
                         </Col>
 
-                        <Col sm={6}>
+                        <Col md={6} xs={12}>
                             <Form.Group>
                                 <Form.Label className="mb-0">Reason</Form.Label>
                                 <AsyncSelect
@@ -960,7 +934,7 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                                 />
                             </Form.Group>
                         </Col>
-                        <Col sm={6}>
+                        <Col md={6} xs={12}>
                             <Form.Group className="mb-1" controlId="consultationRoom">
                                 <Form.Label className="mb-0">Consultation Room</Form.Label>
                                 <Form.Select
@@ -978,7 +952,7 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                                 {/* {errors.appointmentType && <p className="text-danger err-font">{errors.consultationRoom.message}</p>} */}
                             </Form.Group>
                         </Col>
-                        {/* <Col sm={6}>
+                        {/* <Col md={6} xs={12}>
                             <Form.Group className="mb-1">
                                 <Form.Label className="mb-0">Consent Forms</Form.Label>
                                 <Form.Control
@@ -995,7 +969,7 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                                 </Form.Control>
                             </Form.Group>
                         </Col> */}
-                        <Col sm={6}>
+                        <Col md={6} xs={12}>
                             <Form.Group className="mb-3">
                                 <Form.Label className="mb-1">Status</Form.Label>
                                 <Form.Control
@@ -1106,7 +1080,7 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                                     store?.updateAppointmentDetailsReducer?.loading
                                 }>
                                 {store?.createAppointmentsReducer?.loading ||
-                                store?.updateAppointmentDetailsReducer?.loading ? (
+                                    store?.updateAppointmentDetailsReducer?.loading ? (
                                     <Spinner color="white" className="spinner-border-sm" />
                                 ) : id ? (
                                     'Update'
@@ -1141,45 +1115,40 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                             <ul className="nav nav-underline">
                                 <li className="nav-item">
                                     <button
-                                        className={`text-black nav-link fw-medium ${
-                                            activeTab === 'personalDetails' ? 'active fw-bold' : ''
-                                        }`}
+                                        className={`text-black nav-link fw-medium ${activeTab === 'personalDetails' ? 'active fw-bold' : ''
+                                            }`}
                                         onClick={() => handleTabChange('personalDetails')}>
                                         Personal Details
                                     </button>
                                 </li>
                                 <li className="nav-item">
                                     <button
-                                        className={`text-black nav-link fw-medium ${
-                                            activeTab === 'demographicDetails' ? 'active fw-bold' : ''
-                                        }`}
+                                        className={`text-black nav-link fw-medium ${activeTab === 'demographicDetails' ? 'active fw-bold' : ''
+                                            }`}
                                         onClick={() => handleTabChange('demographicDetails')}>
                                         Demographic
                                     </button>
                                 </li>
                                 <li className="nav-item">
                                     <button
-                                        className={`text-black nav-link fw-medium ${
-                                            activeTab === 'referringDoctor' ? 'active fw-bold' : ''
-                                        }`}
+                                        className={`text-black nav-link fw-medium ${activeTab === 'referringDoctor' ? 'active fw-bold' : ''
+                                            }`}
                                         onClick={() => handleTabChange('referringDoctor')}>
                                         Referring Doctor
                                     </button>
                                 </li>
                                 <li className="nav-item">
                                     <button
-                                        className={`text-black nav-link fw-medium ${
-                                            activeTab === 'responsible' ? 'active fw-bold' : ''
-                                        }`}
+                                        className={`text-black nav-link fw-medium ${activeTab === 'responsible' ? 'active fw-bold' : ''
+                                            }`}
                                         onClick={() => handleTabChange('responsible')}>
                                         Responsible party
                                     </button>
                                 </li>
                                 <li className="nav-item">
                                     <button
-                                        className={`text-black nav-link fw-medium ${
-                                            activeTab === 'insurance' ? 'active fw-bold' : ''
-                                        }`}
+                                        className={`text-black nav-link fw-medium ${activeTab === 'insurance' ? 'active fw-bold' : ''
+                                            }`}
                                         onClick={() => handleTabChange('insurance')}>
                                         Insurance
                                     </button>
