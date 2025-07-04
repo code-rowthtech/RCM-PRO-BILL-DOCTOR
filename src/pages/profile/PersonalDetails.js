@@ -43,6 +43,7 @@ const PersonalDetails = () => {
     const [logoUploading, setLogoUploading] = useState(false);
     const dispatch = useDispatch();
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
+    console.log(doctorDetails,'doctorDetails')
     const [personalAddresses, setPersonalAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);

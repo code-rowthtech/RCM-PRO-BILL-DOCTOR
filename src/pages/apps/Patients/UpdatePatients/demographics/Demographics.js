@@ -32,9 +32,12 @@ const Demographics = ({ patientId }) => {
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const {
-        register, handleSubmit,
+        register,
+        handleSubmit,
         formState: { errors },
-        setValue, clearErrors, watch,
+        setValue,
+        clearErrors,
+        watch,
     } = useForm();
     const [employerFocused, setEmployerFocused] = useState(false);
     const [searchedLocations, setSearchedLocations] = useState(null);
@@ -59,7 +62,6 @@ const Demographics = ({ patientId }) => {
 
     // const patientDetails = store?.getPatientByIdReducer;
     const patientDetails = store?.getPatientsByIdReducer?.data?.data || [];
-
 
     useEffect(() => {
         dispatch(getStatesByCountryAction());
@@ -322,11 +324,14 @@ const Demographics = ({ patientId }) => {
                 { system: data?.personalPronouns?.system }
             ),
 
-            race: formatOption(raceOptions.find((opt) => opt.display === data.race), {
-                code: data?.race?.code,
-                display: data?.race,
-                text: data?.race,
-            }),
+            race: formatOption(
+                raceOptions.find((opt) => opt.display === data.race),
+                {
+                    code: data?.race?.code,
+                    display: data?.race,
+                    text: data?.race,
+                }
+            ),
 
             ethnicity: eth ? [{ ...eth, text: eth.display }] : [],
             tribalAffiliation: tri ? [{ ...tri, text: tri.display }] : [],
@@ -372,28 +377,31 @@ const Demographics = ({ patientId }) => {
                     ],
                 },
             ],
-
             employerDetails: {
                 employerName: data?.employerName,
                 employerPhone: data?.employerPhone?.replace(/\D/g, ''),
                 employmentStatus: data?.employmentStatus,
                 occupation: data?.occupation,
-                workLocation: {
-                    address: {
-                        line: [data?.employerAddress],
-                        city: data?.employerCity,
-                        state: data?.employerStateName,
-                        postalCode: data?.employerZip,
-                        country: 'US',
-                    },
-                },
+                workLocation: data?.employerAddress
+                    ? {
+                          address: {
+                              line: Array.isArray(data?.employerAddress)
+                                  ? data?.employerAddress
+                                  : [data?.employerAddress],
+                              city: data?.employerCity,
+                              state: data?.employerStateName,
+                              postalCode: data?.employerZip,
+                              country: 'United States',
+                          },
+                      }
+                    : {},
             },
-
             identifier: mapIdentifiers(identifiers),
             address: demographicAddresses,
         };
 
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
+        console.log(payload, 'payload');
     };
 
     const getGeolocation = (e) => {
@@ -487,7 +495,7 @@ const Demographics = ({ patientId }) => {
         relationshipOption.find((option) => option?.value?.display === rela?.[0]?.coding?.[0]?.display);
     return (
         <Form className="h-100" onSubmit={handleSubmit(onSubmit)}>
-            <div className='scroll-container px-2' style={{ height: '90%' }}>
+            <div className="scroll-container px-2" style={{ height: '90%' }}>
                 <IdentifierForm
                     defaultIdentifiers={[
                         {
@@ -928,10 +936,11 @@ const Demographics = ({ patientId }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
-                                                        ? 'd-none'
-                                                        : ''
-                                                        }`}>
+                                                    className={`scroll-container hover-bg-change ${
+                                                        searchedEmployerLocations?.length === 0 || !employerFocused
+                                                            ? 'd-none'
+                                                            : ''
+                                                    }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}

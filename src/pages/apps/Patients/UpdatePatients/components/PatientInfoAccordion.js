@@ -14,7 +14,7 @@ import { IoClose, IoPrintSharp } from 'react-icons/io5';
 import { LiaReceiptSolid } from 'react-icons/lia';
 
 const PatientInfoAccordion = (props) => {
-    const { setEncounterTabs, setSelectedMainTab, setCreateEncounter } = props;
+    const { activeKey,setActiveKey, setSelectedMainTab, setCreateEncounter } = props;
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const [searchParams] = useSearchParams();
@@ -23,8 +23,6 @@ const PatientInfoAccordion = (props) => {
     const {
         handleSubmit,
     } = useForm();
-
-    const [activeKey, setActiveKey] = useState('0');
     const [isCameraOpen, setIsCameraOpen] = useState(false);
     const [logoName, setLogoName] = useState('');
     const [logo, setLogo] = useState(null);

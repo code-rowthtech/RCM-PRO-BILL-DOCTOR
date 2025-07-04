@@ -8,6 +8,7 @@ const createActionTypes = (base: string) => ({
     [`${base}_RESET`]: `${base}_RESET`,
 });
 
+
 // Base action names
 const baseActions = [
     'CREATE_ALLERGIES',

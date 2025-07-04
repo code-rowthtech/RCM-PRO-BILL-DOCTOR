@@ -510,7 +510,10 @@ tbody tr:hover {
 }
 
 .patientChartCard {
-    height: 68vh;
+    height: 70vh;
+}
+.patientChartCardClose{
+    height: 84vh;
 }
 .summary-card-body {
     height: 22vh !important;
@@ -518,3 +521,23 @@ tbody tr:hover {
 /* .summary-card-body-footer {
     height: 10vh;
 } */
+ .offcanvas {
+    z-index: 1080 !important; /* Higher than Bootstrap modal (z-index: 1050) */
+}
+.custom-suggestion-offcanvas.offcanvas {
+    z-index: -1080 !important;
+}
+/* You can add this to your main CSS file */
+.custom-dropdown .dropdown-menu {
+    min-width: 180px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    background: #fff;
+    border-radius: 4px;
+    padding: 0.5rem 0;
+}
+.custom-dropdown .dropdown-item {
+    padding: 0.5rem 1rem;
+}
+.custom-dropdown .dropdown-item:hover {
+    background: #f5f5f5;
+}

@@ -64,6 +64,7 @@ type TopbarProps = {
 const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: TopbarProps): React$Element<any> => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [openDropdown, setOpenDropdown] = useState(null);
     const [isopen, setIsopen] = useState(false);
     const navbarCssClasses = navCssClasses || '';
     const containerCssClasses = !hideLogo ? 'container-fluid' : '';
@@ -131,6 +132,15 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/schedule/addBreak': 'Add Break',
         '/apps/prescription/index': 'Prescription',
         '/apps/prescription/newPrescription': 'New Prescription',
+        '/apps/notes-and-templates/note-templates': 'Note Templates',
+        '/apps/notes-and-templates/note-categories': 'Note Categories',
+        '/apps/settings/department': 'Department',
+        '/apps/settings/desigination': 'Desigination',
+        '/apps/settings/consultationroom': 'Consultation Room',
+        '/apps/settings/office': 'Office',
+        '/apps/settings/role': 'Role',
+        '/apps/settings/taskcategory': 'Task Category',
+        '/apps/settings/purposeofvisit': 'Purpose Of Visit',
     };
     const getPageTitle = (pathToTitleMap, pathname, search) => {
         const queryParams = new URLSearchParams(search);
@@ -148,6 +158,16 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         return 'Page Not Found';
     };
     const pageTitle = getPageTitle(pathToTitleMap, pathname, search);
+    const handleDropdown = (index) => {
+        setOpenDropdown(openDropdown === index ? null : index);
+    };
+
+    // Optional: Close dropdown when clicking outside
+    React.useEffect(() => {
+        const handleClickOutside = () => setOpenDropdown(null);
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, []);
     return (
         <>
             <div className={classNames('navbar-custom ', navbarCssClasses)} style={{ backgroundColor: '#ffffff' }}>
@@ -194,6 +214,47 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                                             {item?.label}
                                         </p>
                                     );
+                                    // If item has children, render dropdown
+                                    if (item.children && item.children.length > 0) {
+                                        return (
+                                            <div
+                                                key={index}
+                                                className="custom-dropdown"
+                                                style={{ position: 'relative' }}
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // Prevent document click from closing immediately
+                                                    handleDropdown(index);
+                                                }}>
+                                                <div style={{ cursor: 'pointer' }}>{menuLabel}</div>
+                                                {openDropdown === index && (
+                                                    <ul
+                                                        className="dropdown-menu"
+                                                        style={{
+                                                            display: 'block',
+                                                            position: 'absolute',
+                                                            top: '100%',
+                                                            left: 0,
+                                                            zIndex: 1000,
+                                                        }}>
+                                                        {item.children.map((child, childIdx) => (
+                                                            <li key={childIdx}>
+                                                                <div
+                                                                    className="dropdown-item"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setOpenDropdown(null);
+                                                                        navigate(child.url);
+                                                                    }}
+                                                                    style={{ cursor: 'pointer' ,fontSize:'13px' }}>
+                                                                    {child.label}
+                                                                </div>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                )}
+                                            </div>
+                                        );
+                                    }
 
                                     return isInProgress ? (
                                         <OverlayTrigger

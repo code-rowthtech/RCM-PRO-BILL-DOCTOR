@@ -15,9 +15,9 @@ export function updateAllergiesApi(params: any): any {
 
 export function deleteAllergiesApi(params: any): any {
     const { data } = params;
-    return api.delete(`${URL.allergy}`, data);
-}
+        return api.delete(`${URL.allergy}?id=${data?.id}`);
 
+}
 export function getAllergiesApi(params: any): any {
     const { data } = params;
     return api.get(`${URL.allergy}?patientId=${data?.patientId}&limit=${data?.limit || 10}&page=${data?.skip || 1}`);

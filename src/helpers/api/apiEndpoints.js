@@ -17,10 +17,10 @@ export const getClinic = '/api/v1/clinics';
 export const getClinicById = '/api/v1/clinic/byId';
 
 // DOCTORS
-export const getDoctor = '/api/v1/doctor/getDoctorDetails';
+export const getPractitioner = '/api/v1/practitioner/Details';
 export const getCityByState = '/api/v1/doctor/cities/';
 export const getStatedByCountry = '/api/v1/doctor/states/US';
-export const updateDoctor = '/api/v1/doctor/updateDoctor';
+export const updatePractitioner = '/api/v1/practitioner/update';
 
 // VITALS
 export const createVitals = '/api/v1/doctor/addVitals';
@@ -80,12 +80,44 @@ export const encounterSettings = `${BaseRoute}/encounter-menu-settings`;
 export const encounterNotesType = `${BaseRoute}/notes-type/encounter-based`;
 export const encounterNoteFields = `${BaseRoute}/notes-type-settings`;
 
+// Suggestions
+export const createSuggestions = `${BaseRoute}/suggestions`;
+
 // Allergies
-// export const createAllergy = `${BaseRoute}/addAllergy`;
-// export const updateAllergy = `${BaseRoute}/updateAllergy`;
-// export const deleteAllergyList = `${BaseRoute}/deleteAllergy`;
-// export const getAllergiesOfAPatient = `${BaseRoute}/allergy`;
-// export const getAllergyDetails = `${BaseRoute}/getAllergyDetails`;
 export const allergy = `${BaseRoute}/allergy`;
 export const foodAllergy = `${BaseRoute}/codes/food-allergies/search`;
+
+// Problem List
+export const problem = `${BaseRoute}/problem`;
+export const allCodes = `${BaseRoute}/codes/search`;
+export const getPatientAppointmentAll = `${BaseRoute}/appointment/by-patient`;
+
+// Medication
+export const medication = `${BaseRoute}/medication`;
+export const getMedicationDrugs = `${BaseRoute}/codes/search-ndc-products`;
+
+// NoteCategories
+export const createNoteCategories = `${BaseRoute}/notes-type/`;
+export const updateNoteCategories = `${BaseRoute}/notes-type/`;
+export const getNoteCategories = `${BaseRoute}/notes-type/`;
+
+// SETTING
+export const addMastersData = `${BaseRoute}/createOrUpdateMasterData`;
+export const getMastersData = `${BaseRoute}/getmasterData`;
+export const getDepartmentData = `${BaseRoute}/getmasterData`;
+export const updateMastersData = `${BaseRoute}/createOrUpdateMasterData`;
+export const addRoleData = `${BaseRoute}/roles/create`;
+export const getRoleData = `${BaseRoute}/getAllRoles`;
+export const updateRoleData = `${BaseRoute}/roles/edit`;
+
+// SettingsNotes
+export const createnoteTypeSettings = `${BaseRoute}/notes-type-settings/`;
+
+// Template
+export const templates = `${BaseRoute}/notes-templates`;
+
+// TASKS
+export const tasks = `${BaseRoute}/task`;
+
+// Social History
 export const tobaccoHistory = `${BaseRoute}/patient/tobacco`;

@@ -61,3 +61,5 @@ export * from './appointments/actions';
 export * from './clinicNotes/actions';
 export * from './encounters/actions';
 export * from './allergies/actions';
+export * from './problems/action';
+export * from './medication/action'

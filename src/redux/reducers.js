@@ -17,6 +17,14 @@ import { createAllergyReducer, createProblemReducer, createTaskReducer, getAller
 import { createEncounterReducer, createEncounterSettingsReducer, getEncounterByIdReducer, getEncounterNotesFieldsReducer, getEncounterNotesTypeReducer, getEncounterReducer, getEncounterSettingsReducer, updateEncounterReducer, updateEncounterSettingsReducer } from './encounters/reducers';
 import { createAllergiesReducer, deleteAllergiesReducer, getAllergiesReducer, getAllergyByIdReducer, getFoodAllergiesReducer, updateAllergiesReducer } from './allergies/reducers';
 import { createTobaccoReducer, deleteTobaccoReducer, getTobaccoReducer, updateTobaccoReducer } from './tobacco/reducers';
+import { createSuggestionsReducer } from './suggestion/reducer';
+import { createProblemsReducer, deleteProblemsReducer, getAllCodeReducer, getPatientAppointmentReducer, getProblemByIdReducer, getProblemsReducer, updateProblemsReducer } from './problems/reducer';
+import { createMedicationReducer, getDrugsReducer, getMedicationReducer, updateMedicationReducer } from './medication/reducer';
+import { createTemplateReducer, deleteTemplateReducer, getTemplateReducer, updateTemplateReducer } from './templates/reducer';
+import { createNoteCategoriesReducer, createSettingsTabsReducer, getNoteCategoriesReducer, getSettingsTabsReducer, updateNoteCategoriesReducer, updateSettingsTabsReducer } from './noteCategories/reducer';
+import { createUserTasksReducer, getTaskByIdReducer, getUserTasksReducer, updateUserTasksReducer } from './Tasks/reducer';
+import { createMastersDataReducer, getDepartmentDataReducer, getMastersDataReducer, updateMastersDataReducer } from './settings/reducers';
+import { createRoleDataReducer, getRoleDataReducer, updateRoleDataReducer } from './settings/rolesetting/reducers';
 
 export default (combineReducers({
     Auth,
@@ -41,5 +49,20 @@ export default (combineReducers({
     // ALLERGIES
     createAllergiesReducer, updateAllergiesReducer, getAllergiesReducer, deleteAllergiesReducer, getAllergyByIdReducer, getFoodAllergiesReducer,
     // TOBACCO HISTORY
-    createTobaccoReducer, getTobaccoReducer, updateTobaccoReducer, deleteTobaccoReducer
+    createTobaccoReducer, getTobaccoReducer, updateTobaccoReducer, deleteTobaccoReducer,
+    // suggestions
+    createSuggestionsReducer,
+    // Problems
+    createProblemsReducer, updateProblemsReducer,deleteProblemsReducer,getProblemByIdReducer,getAllCodeReducer, getProblemsReducer,getPatientAppointmentReducer,
+    // medication
+    createMedicationReducer,updateMedicationReducer,getMedicationReducer,getDrugsReducer,
+    // notesCategories
+    createNoteCategoriesReducer,getNoteCategoriesReducer,updateNoteCategoriesReducer,getSettingsTabsReducer,createSettingsTabsReducer,updateSettingsTabsReducer,
+    // notesTEmplates
+    createTemplateReducer,updateTemplateReducer,deleteTemplateReducer,getTemplateReducer,
+    // Tasks
+    createUserTasksReducer,updateUserTasksReducer,getUserTasksReducer,getTaskByIdReducer,
+    // settings
+    createMastersDataReducer,getMastersDataReducer,getDepartmentDataReducer,updateMastersDataReducer,createRoleDataReducer,getRoleDataReducer,updateRoleDataReducer,
+
 }): any);

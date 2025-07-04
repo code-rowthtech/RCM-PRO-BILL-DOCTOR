@@ -13,7 +13,7 @@ import HorizontalLayout from '../layouts/Horizontal';
 import FullLayout from '../layouts/Full';
 import Transaction from '../pages/apps/Transaction/Transaction';
 import Diagnosis from '../pages/diagnosis/Diagnosis';
-import Setting from '../pages/setting/Setting';
+// import Setting from '../pages/setting/Setting';
 import Index from '../pages/profile/Index';
 import NewAppointment from '../pages/apps/Appointments/NewAppointment';
 import AppointmentCalendar from '../pages/apps/Appointments/AppointmentCalendar';
@@ -60,8 +60,26 @@ const UpdatePatients = React.lazy(() => import('../pages/apps/Patients/UpdatePat
 // const Permissions = React.lazy(() => import('../pages/apps/Permissions/index'))
 // const Roles = React.lazy(() => import('../pages/apps/Roles/index'))
 
-// pages
+// Notes Templates
+const ClinicalNotesType = React.lazy(()=> import ('../pages/apps/NotesAndTemplates/NotesTypes'));
+const NotesTemplates = React.lazy(()=>import('../pages/apps/NotesAndTemplates/NotesTemplates'));
 
+// Tasks
+const Tasks = React.lazy(() => import('../pages/apps/Tasks/Task'));
+
+// settings
+const Setting = React.lazy(() => import('../pages/apps/Settings/index'));
+const Department = React.lazy(() => import('../pages/apps/Settings/Department/Department'));
+const Desigination = React.lazy(() => import('../pages/apps/Settings/Designation/Desigination'));
+const PurposeOfVisit = React.lazy(() => import('../pages/apps/Settings/Purpose/PurposeOfVisit'));
+const ConsultationRoom = React.lazy(() => import('../pages/apps/Settings/Consultation Room/ConsultationRoom'));
+const Office = React.lazy(() => import('../pages/apps/Settings/Office/Office'));
+const NotesType = React.lazy(() => import('../pages/apps/Settings/NotesType/notesType'))
+const Templates = React.lazy(() => import('../pages/apps/Settings/Templates/templates'))
+const TaskCategory = React.lazy(() => import('../pages/apps/Settings/Task Category/TaskCategory'));
+const RoleSetting = React.lazy(() => import('../pages/apps/Settings/Role/RoleSetting'));
+
+// pages
 const ErrorPageNotFound = React.lazy(() => import('../pages/error/PageNotFound'));
 const ErrorPageNotFoundAlt = React.lazy(() => import('../pages/error/PageNotFoundAlt'));
 const ServerError = React.lazy(() => import('../pages/error/ServerError'));
@@ -282,6 +300,29 @@ const AllRoutes = () => {
                             ],
                         },
                         {
+                            path: 'notes-and-templates',
+                            children: [
+                                {
+                                    path: 'list',
+                                    element : <LoadComponent component={NotesTemplates} />
+                                     
+                                },
+                                {
+                                    path: 'note-categories',
+                                    element: <LoadComponent component={ClinicalNotesType}/>            
+                                },
+                                {
+                                    path: 'note-templates',
+                                 element: <LoadComponent component={NotesTemplates} />
+                                },
+                        ],
+                        },
+                        {
+                                    path: 'tasks',
+                                    element:<LoadComponent component={Tasks} />
+                                   
+                        },
+                        {
                             path: 'prescription',
                             children: [
                                 {
@@ -341,16 +382,76 @@ const AllRoutes = () => {
                                 },
                             ],
                         },
-                        {
-                            path: 'setting',
+                          {
+                            path: 'settings',
                             children: [
                                 {
-                                    path: 'setting-page',
-                                    element: <LoadComponent component={Setting} />,
+                                    path: 'list',
+                                    element: 
+                                        <LoadComponent component={Setting} />
+                             
+                                  
                                 },
-
+                                {
+                                    path: 'department',
+                                    element:
+                                        <LoadComponent component={Department} />
+                              
+                                       
+                                },
+                                {
+                                    path: 'desigination',
+                                    element: 
+                                        <LoadComponent component={Desigination} />
+                                
+                                       
+                                },
+                                {
+                                    path: 'purposeofvisit',
+                                    element:
+                                        <LoadComponent component={PurposeOfVisit} />
+                                  
+                                },
+                                {
+                                    path: 'consultationroom',
+                                    element:
+                                        <LoadComponent component={ConsultationRoom} />
+                                 
+                                },
+                                {
+                                    path: 'notesType',
+                                    element:
+                                        <LoadComponent component={NotesType} />
+                                   
+                                },
+                                {
+                                    path: 'templates',
+                                    element:
+                                        <LoadComponent component={Templates} />
+                                  
+                                },
+                                {
+                                    path: 'office',
+                                    element: 
+                                        <LoadComponent component={Office} />
+                                   
+                                },
+                                {
+                                    path: 'role',
+                                    element:
+                                        <LoadComponent component={RoleSetting} />
+                                  
+                                },
+                                  {
+                                    path: 'taskcategory',
+                                    element:
+                                        <LoadComponent component={TaskCategory} />
+                                   
+                                }
                             ],
+
                         },
+                    
                         {
                             path: 'report',
                             children: [
