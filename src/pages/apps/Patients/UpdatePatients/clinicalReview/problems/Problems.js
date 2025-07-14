@@ -21,7 +21,6 @@ const Problems = () => {
     const [skip, setSkip] = useState(1);
     const store = useSelector((state) => state);
     const problemList = store?.getProblemsReducer?.data?.problems;
-    console.log(store?.getProblemsReducer,'store?.getProblemListReducer')
     const isLoading = store?.getProblemsReducer?.loading;
     const deleteResponse = store?.deleteProblemsReducer?.data?.status;
 

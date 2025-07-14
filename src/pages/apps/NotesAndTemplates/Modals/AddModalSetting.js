@@ -142,6 +142,7 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
                     search: '',
                     skip: 1,
                     limit: 8,
+                    // doctorId :clinic_id?.doctorId,
                     clinicId: clinic_id?.clinicId,
                     active: true,
                     noteType: '',

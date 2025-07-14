@@ -85,17 +85,17 @@ const POV = () => {
         }
     }, [updateResponse]);
     useEffect(() => {
-        dispatch(getMastersDataAction({ status, category: 'purposeOfVisit', limit: 10, skip, search }));
+        dispatch(getMastersDataAction({ clinicId : clinic_id, status, category: 'purposeOfVisit', limit: 10, skip, search }));
     }, [dispatch, status, search, skip]);
     useEffect(() => {
         if (createResponse === 200) {
-            dispatch(getMastersDataAction({ status, category: 'purposeOfVisit', limit: 10, skip, search }));
+            dispatch(getMastersDataAction({ clinicId : clinic_id,status, category: 'purposeOfVisit', limit: 10, skip, search }));
             closeAddModal();
         }
     }, [createResponse]);
     useEffect(() => {
         if (updateResponse === 200) {
-            dispatch(getMastersDataAction({ status, category: 'purposeOfVisit', limit: 10, skip, search }));
+            dispatch(getMastersDataAction({clinicId:clinic_id, status, category: 'purposeOfVisit', limit: 10, skip, search }));
             closeAddModal();
         }
     }, [updateResponse]);

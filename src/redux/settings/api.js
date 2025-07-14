@@ -10,7 +10,7 @@ export function createMastersDataApi(params: any): any {
 
 export function getMastersDataApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.getMastersData}?search=${data?.search}&category=${data?.category}&status=${data?.status}&page=${data?.skip}&limit=${data?.limit}`);
+    return api.get(`${URL.getMastersData}?clinicId=${data?.clinicId}&search=${data?.search}&category=${data?.category}&status=${data?.status}&page=${data?.skip}&limit=${data?.limit}`);
 }
 export function getDepartmentDataApi(params: any): any {
     const { data } = params;

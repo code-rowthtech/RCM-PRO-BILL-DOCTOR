@@ -81,12 +81,13 @@ const TaskCategory = () => {
         }
     }, [updateResponse]);
     useEffect(() => {
-        dispatch(getMastersDataAction({ status: status, category: 'task-category', limit: 10, skip, search: search }));
+        dispatch(getMastersDataAction({clinicId:clinic_id, status: status, category: 'task-category', limit: 10, skip, search: search }));
     }, [dispatch, status, skip, search]);
     useEffect(() => {
         if (createResponse === 200)
             dispatch(
                 getMastersDataAction({
+                    clinicId:clinic_id,
                     status: status,
                     category: 'task-category',
                     search: search,
@@ -99,6 +100,7 @@ const TaskCategory = () => {
         if (updateResponse === 200) {
             dispatch(
                 getMastersDataAction({
+                    clinicId:clinic_id,
                     status: status,
                     category: 'task-category',
                     search: search,

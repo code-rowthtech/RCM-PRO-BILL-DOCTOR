@@ -16,7 +16,7 @@ const PatientDetails = () => {
     const dispatch = useDispatch();
     const {
         register, handleSubmit, watch,
-        formState: { errors }, setValue, clearErrors
+        formState: { errors }, setValue, clearErrors,getValues
     } = useForm();
 
     const [searchParams] = useSearchParams();
@@ -34,6 +34,9 @@ const PatientDetails = () => {
     useEffect(() => {
         setValue('primaryProvider', doctorName);
     }, [doctorName, setValue]);
+
+    const gender = watch('gender');
+    const title = watch('title');
 
     useEffect(() => {
         if (!patientsDataById) return;
@@ -150,6 +153,17 @@ const PatientDetails = () => {
 
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
+
+        useEffect(() => {
+            const currentTitle = getValues('title');
+    
+            if (!currentTitle || ['Mr.', 'Mrs.', 'Miss'].includes(currentTitle)) {
+                if (gender === 'male') setValue('title', 'Mr.');
+                else if (gender === 'female') setValue('title', 'Miss');
+                else if (gender === 'other') setValue('title', 'Other');
+                else if (gender === 'unknown') setValue('title', '');
+            }
+        }, [gender, title, setValue, getValues]);
 
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];

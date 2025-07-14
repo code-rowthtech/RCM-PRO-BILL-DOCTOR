@@ -33,7 +33,8 @@ const NotesTypes = () => {
         'System & Meta',
     ];
     const [selectedNote, setSelectedNote] = useState(null);
-    const ClinicId = loggedInUser?.clinicId;
+    const doctorId = loggedInUser?.doctorId;
+    const clinicId = loggedInUser?.clinicId;
     const {
         control,
         setValue,
@@ -46,7 +47,8 @@ const NotesTypes = () => {
                 search: search,
                 skip: skip,
                 limit: 8,
-                clinicId: ClinicId,
+                // doctorId: doctorId,
+                clinicId:clinicId,
                 active: status === 'active' ? true : false,
                 noteType: noteType,
             })
@@ -76,7 +78,9 @@ const NotesTypes = () => {
         setAddModal(true);
     };
     const handleActiveTab = () => {
-        dispatch(getNoteCategoriesAction({ search: search, page: skip, limit: 8, clinicId: ClinicId }));
+        dispatch(getNoteCategoriesAction({ search: search, page: skip, limit: 8,
+            // doctorId: doctorId
+            clinicId:clinicId }));
     };
 
     const [status, setStatus] = useState('active');
@@ -86,8 +90,8 @@ const NotesTypes = () => {
     };
 
     return (
-        <Row className="mt-2">
-            <Col xs={12} className="px-2">
+        <Row className="mt-">
+            <Col xs={12} className="px-2 py-2">
                 <Card className="" style={{ height: '90vh' }}>
                     <Card.Body className="px-2 py-1">
                         <Row className="">
@@ -150,7 +154,8 @@ const NotesTypes = () => {
                                                             search: search,
                                                             page: 1,
                                                             limit: 8,
-                                                            clinicId: ClinicId,
+                                                            // doctorId: doctorId,
+                                                            clinicId:clinicId,
                                                             noteType: noteType,
                                                         })
                                                     );
@@ -171,7 +176,8 @@ const NotesTypes = () => {
                                                             search: search,
                                                             page: 1,
                                                             limit: 8,
-                                                            clinicId: ClinicId,
+                                                            // doctorId: doctorId,
+                                                            clinicId:clinicId,
                                                             noteType: noteType,
                                                         })
                                                     );

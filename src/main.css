@@ -329,6 +329,7 @@ hr {
 .css-1dimb5e-singleValue {
     font-size: 12px !important;
     font-weight: 600 !important;
+    margin-left: 6px !important;
 }
 
 .err-font {
@@ -540,4 +541,9 @@ tbody tr:hover {
 }
 .custom-dropdown .dropdown-item:hover {
     background: #f5f5f5;
+}
+.css-19bb58m {
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+    margin: 0px !important;
 }

@@ -66,7 +66,7 @@ const Task = () => {
     return (
         <>
             <Row className="mt-2">
-                <Col xs={12} className="px-0">
+                <Col xs={12} className="px-2">
                     <Card className="scroll-container page-height">
                         <Card.Body className="px-2 py-2">
                             <Row>

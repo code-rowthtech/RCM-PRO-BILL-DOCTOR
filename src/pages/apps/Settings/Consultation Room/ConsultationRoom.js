@@ -65,6 +65,7 @@ const ConsultationRoom = () => {
     useEffect(() => {
         dispatch(
             getMastersDataAction({
+                clinicId:clinic_id,
                 status: status,
                 category: 'Consultation Room',
                 search: search,

@@ -32,6 +32,7 @@ const ReferringDoctor = ({ activeTab, setActiveTab }) => {
     const [referringDoctorAddress, setReferringDoctorAddress] = useState([
         { line: [''], city: '', state: '', postalCode: '', country: 'USA' },
     ]);
+    console.log(referringDoctorAddress,'address')
     const patientDetails = store?.getPatientsByIdReducer?.data?.data || [];
     const primaryState = watch('primaryStateName');
     const primaryCitySearch = watch('primaryCity');
@@ -82,7 +83,6 @@ const ReferringDoctor = ({ activeTab, setActiveTab }) => {
             );
         }
     }, []);
-
     const onSubmit = (data) => {
         const payload = {
             patientId: id,

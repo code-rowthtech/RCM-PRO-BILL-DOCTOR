@@ -20,6 +20,10 @@ const GET_STATES_INITIAL_STATE = {
     data: [],
     loading: false
 }
+const GET_ALL_DOCTORS_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
 
 export const getDoctorsReducer = (state = GET_DOCTORS_INITIAL_STATE, action) => {
     switch (action.type) {
@@ -46,6 +50,26 @@ export const getDoctorsReducer = (state = GET_DOCTORS_INITIAL_STATE, action) => 
         default: return state
     }
 };
+export const getAllDoctorsReducer = (state = GET_ALL_DOCTORS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case DoctorsActionTypes.GET_ALL_DOCTORS_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case DoctorsActionTypes.GET_ALL_DOCTORS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case DoctorsActionTypes.GET_ALL_DOCTORS_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        default: return state
+    }
+}
 
 export const getCitiesReducer = (state = GET_CITIES_INITIAL_STATE, action) => {
     switch (action.type) {

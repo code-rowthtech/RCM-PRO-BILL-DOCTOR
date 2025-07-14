@@ -130,12 +130,12 @@ const MENU_ITEMS = [
             //     url: '/apps/settings/office',
             //     parentKey: 'setting',
             // },
-            {
-                key: 'rolesetting',
-                label: 'Role',
-                url: '/apps/settings/role',
-                parentKey: 'setting',
-            },
+            // {
+            //     key: 'rolesetting',
+            //     label: 'Role',
+            //     url: '/apps/settings/role',
+            //     parentKey: 'setting',
+            // },
             {
                 key: 'taskcategory',
                 label: 'Task Category',

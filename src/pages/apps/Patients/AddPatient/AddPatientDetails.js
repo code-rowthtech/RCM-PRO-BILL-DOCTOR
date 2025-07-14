@@ -60,6 +60,8 @@ const AddPatientDetails = ({
 
     // Watch for dateOfBirth changes
     const dateOfBirth = watch('dateOfBirth');
+      const gender = watch('gender');
+    const title = watch('title');
 
     useEffect(() => {
         if (dateOfBirth) {
@@ -254,6 +256,17 @@ const AddPatientDetails = ({
         setLogoName(null);
         setLogo(null);
     };
+
+    useEffect(() => {
+        const currentTitle = getValues('title');
+
+        if (!currentTitle || ['Mr.', 'Mrs.', 'Miss'].includes(currentTitle)) {
+            if (gender === 'male') setValue('title', 'Mr.');
+            else if (gender === 'female') setValue('title', 'Miss');
+            else if (gender === 'other') setValue('title', 'Other');
+            else if (gender === 'unknown') setValue('title', '');
+        }
+    }, [gender, title, setValue, getValues]);
 
     const calculateAge = (dob) => {
         const birthDate = new Date(dob);

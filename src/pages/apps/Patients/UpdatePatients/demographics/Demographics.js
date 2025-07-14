@@ -62,6 +62,7 @@ const Demographics = ({ patientId }) => {
 
     // const patientDetails = store?.getPatientByIdReducer;
     const patientDetails = store?.getPatientsByIdReducer?.data?.data || [];
+    console.log(patientDetails,'newdaetails')
 
     useEffect(() => {
         dispatch(getStatesByCountryAction());
@@ -110,7 +111,7 @@ const Demographics = ({ patientId }) => {
             setValue('emergencyContactName', patientDetails?.contact?.[0]?.relationship?.[0]?.text || '');
             setValue('emergencyContactPhone', formatPhoneNumber(patientDetails?.contact?.[0]?.telecom?.[0]?.value));
             // setValue('emergencyContactRelation', patientDetails?.contact?.[0]?.relationship?.[0]?.text || '');
-            setRela(patientDetails?.contact?.[0]?.relationship?.[0]?.coding);
+            setRela(patientDetails?.contact?.[0]?.relationship?.[0]?.coding)
 
             // ✅ Employer Details Fix
             setValue('employerName', patientDetails?.employerDetails?.employerName || '');

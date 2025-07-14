@@ -52,6 +52,7 @@ const ConsultationModal = ({ show, onClose, defaultValues, isEdit }) => {
                 reset();
                 dispatch(
                     getMastersDataAction({
+                        clinicId:clinic_id,
                         status: true,
                         category: 'Consultation Room',
                         search: '',

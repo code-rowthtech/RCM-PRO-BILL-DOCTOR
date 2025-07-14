@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { DoctorsActionTypes } from './constants';
-import { getCityByStateApi, getDoctorsApi, getStateByCountry, updateDoctorApi } from './api';
+import { getAllDoctorApi, getCityByStateApi, getDoctorsApi, getStateByCountry, updateDoctorApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 import { t } from 'i18next';
@@ -33,6 +33,34 @@ function* getDoctorsFunction(data) {
     } catch (error) {
         yield put({
             type: DoctorsActionTypes.GET_DOCTORS_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* getAllDoctorsFunction(data) {
+    try {
+        yield put({
+            type: DoctorsActionTypes.GET_ALL_DOCTORS_LOADING,
+            payload: {},
+        });
+        const response = yield call(getAllDoctorApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+
+        if (response.status === 200) {
+            yield put({
+                type: DoctorsActionTypes.GET_ALL_DOCTORS_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: DoctorsActionTypes.GET_ALL_DOCTORS_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: DoctorsActionTypes.GET_ALL_DOCTORS_ERROR,
             payload: error,
         });
     }
@@ -198,6 +226,11 @@ export function* watchGetDoctors() {
     yield takeEvery(DoctorsActionTypes.GET_DOCTORS, getDoctorsFunction);
 }
 
+export function* watchAllGetDoctors() {
+    yield takeEvery(DoctorsActionTypes.GET_ALL_DOCTORS, getAllDoctorsFunction);
+}
+
+
 export function* watchGetStates() {
     yield takeEvery(DoctorsActionTypes.GET_STATES, getStatesFunction);
 }
@@ -218,7 +251,8 @@ function* doctorsSaga() {
         fork(watchGetCities3),
         fork(watchGetStates),
         fork(watchUpdateDoctors),
-        fork(watchresetState)
+        fork(watchresetState),
+        fork(watchAllGetDoctors),
     ]);
 }
 export default doctorsSaga;

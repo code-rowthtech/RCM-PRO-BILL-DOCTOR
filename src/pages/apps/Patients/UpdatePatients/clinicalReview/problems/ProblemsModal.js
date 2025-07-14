@@ -28,7 +28,6 @@ import { loggedInUser } from 'helpers/loggedInUser';
 const MAX_WORDS = 1000;
 const WAX_WORD_LENGTH = 45;
 const ProblemsModal = ({ show, closeModal, problemId }) => {
-    console.log(problemId,'problemdata')
     const dispatch = useDispatch();
     const quillRef = useRef();
     const [searchParams] = useSearchParams();
@@ -56,7 +55,6 @@ const ProblemsModal = ({ show, closeModal, problemId }) => {
     const addProblemStatus = store?.createProblemsReducer?.data?.status;
     const allCodeICDs = store?.getAllCodeReducer?.data?.codes || [];
     const appointments = store?.getPatientAppointmentReducer?.data?.appointments || [];
-
     useEffect(() => {
         if (createAppointmentResponse === 201) {
             dispatch(
@@ -119,7 +117,6 @@ const ProblemsModal = ({ show, closeModal, problemId }) => {
     }));
 
     const submitProblemData = (data) => {
-        console.log({ data });
         const selected = data.problem;
         const selectedStatus = clinicalStatus.find((item) => item?.code === data?.status);
         const payload = {

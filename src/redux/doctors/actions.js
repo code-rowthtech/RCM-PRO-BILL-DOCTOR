@@ -8,8 +8,6 @@ export const getDoctorsAction = (data): AuthAction => ({
     type: DoctorsActionTypes.GET_DOCTORS,
     data
 });
-
-
 export const getCitiesAction = (data) => ({
     type: DoctorsActionTypes.GET_CITIES,
     data
@@ -35,5 +33,10 @@ export const stateEmptydAction = (): LayoutAction => ({
 
 export const updateDoctorAction = (data) => ({
     type: DoctorsActionTypes.UPDATE_DOCTORS,
+    data
+});
+
+export const getAllDoctorsAction = (data): AuthAction => ({
+    type: DoctorsActionTypes.GET_ALL_DOCTORS,
     data
 });

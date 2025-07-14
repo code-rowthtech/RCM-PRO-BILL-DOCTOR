@@ -12,6 +12,7 @@ import ToastHandle from '../../../helpers/ToastMessage';
 import { createUserTasksAction, getTaskByIdAction, updateUserTasksAction } from 'redux/Tasks/action';
 import { loggedInUser } from 'helpers/loggedInUser';
 import { getMastersDataAction } from 'redux/settings/action';
+import { getAllDoctorsAction } from 'redux/doctors/actions';
 
 const ModalTask = ({ show, handleClose, taskId }) => {
     const store = useSelector((state) => state);
@@ -29,8 +30,8 @@ const ModalTask = ({ show, handleClose, taskId }) => {
     const CategoryData = store?.getMastersDataReducer?.data1?.data?.result;
     const roleData = store?.getRolesDataReducer?.data;
     const clinicId = loggedInUser?.clinicId;
-    const doctorDetails = store?.getDoctorsReducer?.data?.result;
-    console.log(doctorDetails,'docotr')
+    const doctorDetails = store?.getAllDoctorsReducer?.data?.result;
+    console.log(doctorDetails,'doctor')
     const patientsData = store?.getPatientsReducer?.data?.data;
     const createTaskResponse = store?.createUserTasksReducer?.data?.status;
     const encounters = store?.getEncounterReducer?.data?.encounters;
@@ -72,9 +73,9 @@ const ModalTask = ({ show, handleClose, taskId }) => {
                 search: '',
             };
             const doctorPayload = { status: '', search: '' };
-            dispatch(getDoctorsAction(doctorPayload));
+            dispatch(getAllDoctorsAction(doctorPayload));
             dispatch(getPatientsAction(data));
-            dispatch(getMastersDataAction({ status: '', category: 'task-category', limit: 10, skip: '', search: '' }));
+            dispatch(getMastersDataAction({clinicId:clinicId, status: '', category: 'task-category', limit: 10, skip: '', search: '' }));
             dispatch(getRolesAction({
                 clinicId: clinicId,
                 limit: 10,

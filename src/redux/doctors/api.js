@@ -18,3 +18,7 @@ export function updateDoctorApi(params) {
     const { data } = params
     return api.create(URL.updatePractitioner, data);
 }
+export function getAllDoctorApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.getAllDoctor}?status=${data?.status}&search=${data?.search}&page=${data?.page}&limit=${data?.limit}`);
+}
