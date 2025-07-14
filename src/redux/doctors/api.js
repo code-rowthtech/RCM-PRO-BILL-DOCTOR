@@ -5,7 +5,7 @@ const api = new APICore();
 
 export function getDoctorsApi(params: any): any {
     const { data } = params;
-    return api.create(`${URL.getDoctor}`);
+    return api.create(`${URL.getPractitioner}`);
 }
 export function getCityByStateApi(params: any): any {
     const { data } = params;
@@ -16,5 +16,9 @@ export function getStateByCountry(params: any): any {
 }
 export function updateDoctorApi(params) {
     const { data } = params
-    return api.create(URL.updateDoctor, data);
+    return api.create(URL.updatePractitioner, data);
+}
+export function getAllDoctorApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.getAllDoctor}?status=${data?.status}&search=${data?.search}&page=${data?.page}&limit=${data?.limit}`);
 }

@@ -23,13 +23,14 @@ const UpdateIndex = () => {
     // VARIABLES AND STATE VARIABLES
     const id = searchParams.get('id');
 
-    const [selectedMainTab, setSelectedMainTab] = useState('Patient Details');
+    const [selectedMainTab, setSelectedMainTab] = useState('Patient Summary');
+    const [activeKey, setActiveKey] = useState('0');
     const [encounterTabs, setEncounterTabs] = useState([
         {
             id: 1,
             title: 'Encounter list',
             type: 'default',
-        }
+        },
     ]);
     const [expanded, setExpanded] = useState(false);
     const [createEncounter, setCreateEncounter] = useState(false);
@@ -40,50 +41,50 @@ const UpdateIndex = () => {
         setSelectedMainTab,
     };
     const encounterTabProps = {
-        encounterTabs, setEncounterTabs,
-        expanded, setExpanded,
-        createEncounter, setCreateEncounter
-    }
+        encounterTabs,
+        setEncounterTabs,
+        expanded,
+        setExpanded,
+        createEncounter,
+        setCreateEncounter,
+    };
     const patientInfoProps = {
-        setSelectedMainTab, setCreateEncounter
-    }
+        setSelectedMainTab,
+        setCreateEncounter,
+        setActiveKey,
+        activeKey,
+    };
     // USEEFFECTS
     useEffect(() => {
         if (id) {
-            dispatch(getPatientsByIdAction({ id }))
+            dispatch(getPatientsByIdAction({ id }));
         }
-    }, [id])
+    }, [id]);
 
     useEffect(() => {
         try {
             const encryptedTab = sessionStorage?.getItem('selectedMainTab');
 
-            if (
-                encryptedTab &&
-                encryptedTab !== 'undefined' &&
-                encryptedTab.trim().length > 0
-            ) {
+            if (encryptedTab && encryptedTab !== 'undefined' && encryptedTab.trim().length > 0) {
                 const tab = decryptMessage(encryptedTab);
                 if (tab) {
                     setSelectedMainTab(tab);
                 }
             } else {
-                setSelectedMainTab('Patient Summary')
+                setSelectedMainTab('Patient Summary');
             }
         } catch (error) {
             console.error('Error decrypting selectedMainTab:', error);
         }
     }, []);
 
-
-
     return (
         <div>
-            {store?.getPatientsByIdReducer?.loading ?
-                <div className='d-flex align-items-center justify-content-center' style={{ height: '93vh' }}>
+            {store?.getPatientsByIdReducer?.loading ? (
+                <div className="d-flex align-items-center justify-content-center" style={{ height: '93vh' }}>
                     <Spinner />
                 </div>
-                :
+            ) : (
                 <>
                     <Row>
                         <TopMenu {...topMenuProps} />
@@ -91,19 +92,14 @@ const UpdateIndex = () => {
                     </Row>
                     <Row>
                         <Col sm={12}>
-                            <Card className={`mt-1 px-2 patientChartCard`}>
+                            <Card className={`mt-1 px-2 ${!activeKey ? 'patientChartCardClose' : 'patientChartCard'}`}>
                                 {selectedMainTab === 'Demographics' && <PatientDemographics />}
                                 {selectedMainTab === 'Patient Summary' && <PatientSummary />}
                                 {selectedMainTab === 'Documents' && <Documentsindex />}
                                 {selectedMainTab === 'Encounter' && <Encountersindex {...encounterTabProps} />}
-                                {[
-                                    'Allergy List',
-                                    'Problem List',
-                                    'Medication List',
-                                    'Vitals List',
-                                ].includes(selectedMainTab) && (
-                                        <ClinicalReview selectedMainTab={selectedMainTab} />
-                                    )}
+                                {['Allergy List', 'Problem List', 'Medication List', 'Vitals List'].includes(
+                                    selectedMainTab
+                                ) && <ClinicalReview selectedMainTab={selectedMainTab} activeKey={activeKey} />}
                                 {[
                                     'Tobacco',
                                     'Medical',
@@ -112,15 +108,18 @@ const UpdateIndex = () => {
                                     'Alcohol',
                                     'Vaccination',
                                 ].includes(selectedMainTab) && (
-                                        <SocialHistory selectedMainTab={selectedMainTab} setSelectedMainTab={setSelectedMainTab} />
-                                    )}
+                                    <SocialHistory
+                                        selectedMainTab={selectedMainTab}
+                                        setSelectedMainTab={setSelectedMainTab}
+                                    />
+                                )}
                             </Card>
                         </Col>
                     </Row>
                 </>
-            }
+            )}
         </div>
-    )
-}
+    );
+};
 
 export default UpdateIndex;

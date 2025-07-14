@@ -220,7 +220,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                         key={index}
                                         className={`py-1 cursor-pointer patient-item px-1 d-flex justify-content-between`}
                                         style={{ borderBottom: '1px solid rgb(127 123 123 / 67%)' }}
-                                        onClick={() => navigate(`/apps/patients/new-patient?id=${data?.subject?._id}`)}>
+                                        onClick={() => navigate(`/apps/patients/patientChart?id=${data?.subject?._id}`)}>
                                         <div className="d-flex gap-2 align-items-center">
                                             <img
                                                 height="40"

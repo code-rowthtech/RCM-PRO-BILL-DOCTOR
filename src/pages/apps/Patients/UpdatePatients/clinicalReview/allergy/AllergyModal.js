@@ -3,34 +3,56 @@ import { category, criticality } from '../../../../../../utils/DataSets/Allergy/
 import { Controller, useForm } from 'react-hook-form';
 import AsyncSelect from 'react-select/async';
 import { allergyCode } from '../../../../../../utils/DataSets/Allergy/allergyCode';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { formatDateToISO, today } from '../../../../../../helpers/helperFunctions';
 import { clinicalStatus } from '../../../../../../utils/DataSets/Allergy/clinicalStatus';
 import { useDispatch } from 'react-redux';
-import { createAllergiesAction, getAllergiesAction, getAllergyById, getFoodAllergiesAction, updateAllergiesAction } from '../../../../../../redux/allergies/actions';
+import {
+    createAllergiesAction,
+    getAllergiesAction,
+    getAllergyById,
+    getFoodAllergiesAction,
+    updateAllergiesAction,
+} from '../../../../../../redux/allergies/actions';
+import {    getPatientAppointmentsAllAction,
+} from '../../../../../../redux/problems/action'
 import { encryptMessage } from '../../../../../../cryptoUtils';
 import { useSearchParams } from 'react-router-dom';
 import { allergyType } from '../../../../../../utils/DataSets/Allergy/allergyType';
 import { loggedInUser } from '../../../../../../helpers/loggedInUser';
 import { getAllergyDetails } from '../../../../../../helpers/api/apiEndpoints';
 import Spinner from '../../../../../../constants/Spinner';
-import { TextEditor } from '../../../../../../components/TextEditor/TextEditor';
-
+import ReactQuill from 'react-quill';
+import useQuillWordLimit from 'helpers/quillWordLimit';
+import SuggestionOffcanvas from '../../SuggestionsFile/Suggestion';
+import ToastHandle from 'helpers/ToastMessage';
+import { createSuggestionAction } from 'redux/suggestion/action';
 const AllergyModal = ({ show, closeModal, allergyId }) => {
-    const { handleSubmit, register, control, formState: { errors }, reset, setValue } = useForm();
+    const {
+        handleSubmit,
+        register,
+        control,
+        formState: { errors },
+        watch,
+        getValues,
+        reset,
+        setValue,
+    } = useForm();
     const store = useSelector((state) => state);
     const [searchParams] = useSearchParams();
     const dispatch = useDispatch();
-
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const quillRef = useRef(null);
     const patientId = searchParams.get('id');
     const appointments = store?.getPatientAppointmentReducer?.data?.appointments;
     const allergyDetails = store?.getAllergyByIdReducer?.data?.allergy;
     const foodAllergyData = store?.getFoodAllergiesReducer?.data;
-    console.log(foodAllergyData, 'foodAllergyDatafoodAllergyData')
     const [code, setCode] = useState(null);
     const [selectedMode, setSelectedMode] = useState('date');
-
+    useEffect(() => {
+        dispatch(getPatientAppointmentsAllAction({ patientId: patientId }));
+    }, [dispatch]);
     const formattedCodeOption = useMemo(
         () =>
             allergyCode?.map((reason) => ({
@@ -51,17 +73,40 @@ const AllergyModal = ({ show, closeModal, allergyId }) => {
 
     useEffect(() => {
         if (allergyId) {
-            dispatch(getAllergyById({ id: allergyId }))
+            dispatch(getAllergyById({ id: allergyId }));
         }
-    }, [allergyId, show])
-
+    }, [allergyId, show]);
+    const MAX_WORDS = 1000;
+    const WAX_WORD_LENGTH = 45;
     useEffect(() => {
         if (allergyId && allergyDetails) {
+            setValue('allergyType', allergyDetails?.type?.coding[0]?.code);
             setValue('category', allergyDetails?.category?.[0]?.code);
             setValue('criticality', allergyDetails?.criticality?.code);
-            setValue('appointmentDate', formatDateToISO(allergyDetails?.onset?.onsetDateTime));
+            setValue('verificationStatus', allergyDetails?.verificationStatus?.coding[0]?.code);
+            setValue('reaction', allergyDetails?.reaction[0]?.manifestation[0]?.concept?.coding[0]?.code);
+            setValue('status', allergyDetails?.clinicalStatus?.coding[0]?.code);
+            setValue('severity', allergyDetails?.reaction[0]?.severity?.coding[0]?.code);
+            setValue('allergyCode', allergyDetails?.code?.coding[0]);
+
+            setValue('note', allergyDetails?.note[0]?.text);
+            setCode(allergyDetails?.code?.coding[0]);
+            if (allergyDetails?.appointmentId) {
+                setSelectedMode('appointment');
+                const selected = (appointments || []).find(
+                    (appt) => appt?._id === allergyDetails?.appointmentId || appt?.id === allergyDetails?.appointmentId
+                );
+                if (selected) {
+                    setValue('appointment', JSON.stringify(selected));
+                }
+                setValue('appointmentDate', null);
+            } else if (allergyDetails?.onset?.onsetDateTime) {
+                setSelectedMode('date');
+                setValue('appointmentDate', new Date(allergyDetails.onset.onsetDateTime).toISOString().split('T')[0]);
+                setValue('appointment', null);
+            }
         }
-    }, [allergyId, allergyDetails])
+    }, [allergyId, allergyDetails]);
 
     const loadCodeOptions = useCallback(
         (inputValue, callback) => {
@@ -144,42 +189,62 @@ const AllergyModal = ({ show, closeModal, allergyId }) => {
             };
         }
         if (allergyId) {
-            payload.id = allergyId
+            payload.id = allergyId;
             dispatch(updateAllergiesAction({ key: encryptMessage(payload) }));
         } else {
             dispatch(createAllergiesAction({ key: encryptMessage(payload) }));
         }
     };
+    const handleSuggestionSelect = (suggestionText) => {
+        // Append suggestion to existing note
+        const current = getValues('note'); // from useFormContext or pass as prop
+        setValue('note', `${current}<p>${suggestionText}</p>`);
+    };
 
     const allergyCategoryChange = (data) => {
-        dispatch(getFoodAllergiesAction({ query: '', skip: 1 }))
-    }
+        dispatch(getFoodAllergiesAction({ query: '', skip: 1 }));
+    };
 
+    const handleEditorFocus = () => {
+        dispatch(createSuggestionAction({ module: 'allergy' }));
+        setShowSuggestions(true);
+    };
+    const handleLimitExceed = ({ type, message }) => {
+        ToastHandle(message, 'danger');
+    };
+    useQuillWordLimit({
+        quillRef,
+        maxWords: MAX_WORDS,
+        maxWordLength: WAX_WORD_LENGTH,
+        onLimitExceed: handleLimitExceed,
+        setValue,
+        fieldName: 'note',
+    });
 
     return (
         <Modal show={show} onHide={closeModal} size="lg" centered>
             <Modal.Header closeButton className="px-2 py-0 ">
-                <Modal.Title className="mb-0">Add Allergy</Modal.Title>
+                <Modal.Title className="mb-0"> {allergyId ? 'Update Allergy' : 'Add Allergy'} </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {store?.getAllergyByIdReducer?.loading ?
+                {store?.getAllergyByIdReducer?.loading ? (
                     <Row>
-                        <Col sm={12} className='d-flex align-items-center justify-content-center p-5'>
+                        <Col sm={12} className="d-flex align-items-center justify-content-center p-5">
                             <Spinner />
                         </Col>
                     </Row>
-                    :
+                ) : (
                     <Form onSubmit={handleSubmit(submitAllergiesData)}>
                         <Row>
                             <Col sm={6}>
                                 <Form.Group>
-                                    <Form.Label>
-                                        Allergy Category
-                                    </Form.Label>
+                                    <Form.Label>Allergy Category</Form.Label>
                                     <Form.Select
                                         {...register('category', { required: 'Allergy Category is required' })}
                                         onChange={(e) => allergyCategoryChange(e.target.value)}>
-                                        <option key={''} value={''}>Select allergy category</option>
+                                        <option key={''} value={''}>
+                                            Select allergy category
+                                        </option>
                                         {category?.map((item) => (
                                             <option key={item?.code} value={item?.code}>
                                                 {item?.display}
@@ -190,7 +255,9 @@ const AllergyModal = ({ show, closeModal, allergyId }) => {
                             </Col>
                             <Col sm={6}>
                                 <Form.Group>
-                                    <Form.Label>Select Allergy <span className='text-danger'>*</span></Form.Label>
+                                    <Form.Label>
+                                        Select Allergy <span className="text-danger">*</span>
+                                    </Form.Label>
                                     <Controller
                                         name="allergyCode"
                                         control={control}
@@ -206,9 +273,11 @@ const AllergyModal = ({ show, closeModal, allergyId }) => {
                                                     classNamePrefix="select"
                                                     placeholder="Select"
                                                     value={
-                                                        formattedCodeOption.find(option => option.value.code === field.value?.code) || null
+                                                        formattedCodeOption.find(
+                                                            (option) => option.value.code === field.value?.code
+                                                        ) || null
                                                     }
-                                                    onChange={option => {
+                                                    onChange={(option) => {
                                                         field.onChange(option ? option.value : null);
                                                         setCode(option ? option.value : null);
                                                     }}
@@ -228,7 +297,9 @@ const AllergyModal = ({ show, closeModal, allergyId }) => {
                                                     }}
                                                 />
                                                 {fieldState.error && (
-                                                    <Form.Text className="text-danger">{fieldState.error.message}</Form.Text>
+                                                    <Form.Text className="text-danger">
+                                                        {fieldState.error.message}
+                                                    </Form.Text>
                                                 )}
                                             </>
                                         )}
@@ -240,8 +311,7 @@ const AllergyModal = ({ show, closeModal, allergyId }) => {
                                     <Form.Label htmlFor="criticality" className="mb-0">
                                         Criticality
                                     </Form.Label>
-                                    <Form.Select
-                                        {...register('criticality', { required: 'Criticality is required' })}>
+                                    <Form.Select {...register('criticality', { required: 'Criticality is required' })}>
                                         <option value="" hidden>
                                             Select Criticality
                                         </option>
@@ -261,8 +331,7 @@ const AllergyModal = ({ show, closeModal, allergyId }) => {
                                     <Form.Label htmlFor="status" className="mb-0">
                                         Clinical Status
                                     </Form.Label>
-                                    <Form.Select
-                                        {...register('status', { required: 'Clinical Status is required' })}>
+                                    <Form.Select {...register('status', { required: 'Clinical Status is required' })}>
                                         {clinicalStatus?.map((status) => (
                                             <option key={status?.code} value={status?.code}>
                                                 {status?.display}
@@ -303,7 +372,9 @@ const AllergyModal = ({ show, closeModal, allergyId }) => {
                                                 <option>Select Appointment Date </option>
                                                 {appointments?.map((item) => (
                                                     <option key={item?._id} value={JSON.stringify(item)}>
-                                                        {item?.date ? new Date(item.date).toISOString().split('T')[0] : 'N/A'}
+                                                        {item?.date
+                                                            ? new Date(item.date).toISOString().split('T')[0]
+                                                            : 'N/A'}
                                                     </option>
                                                 ))}
                                             </Form.Select>
@@ -316,25 +387,84 @@ const AllergyModal = ({ show, closeModal, allergyId }) => {
                                     )}
                                 </Form.Group>
                             </Col>
-                            <Col sm={12}>
-                                <TextEditor
-                                    //   value={editorContent}
-                                    //   onChange={setEditorContent}
-                                    placeholder="Start writing your content here..."
-                                    minHeight={300}
-                                    className="shadow-lg"
-                                />
+                            <Col xs={12}>
+                                <Form.Group controlId="note">
+                                    <Form.Label className="fw-medium mb-1 d-flex justify-content-between align-items-center">
+                                        <div>
+                                            Notes{' '}
+                                            <span
+                                                style={{ cursor: 'pointer' }}
+                                                title="Notes Suggestions"
+                                                onClick={handleEditorFocus}>
+                                                ✨
+                                            </span>
+                                        </div>
+                                        <small className="text-muted">
+                                            {(() => {
+                                                const content = watch('note') || '';
+                                                const plainText = quillRef?.current?.getEditor()?.getText()?.trim();
+                                                const words = plainText?.split(/\s+/)?.filter(Boolean);
+                                                const wordCount = words?.length > MAX_WORDS ? MAX_WORDS : words?.length;
+                                                return (
+                                                    <div>
+                                                        <div>{`${wordCount} / ${MAX_WORDS} words`}</div>
+                                                    </div>
+                                                );
+                                            })()}
+                                        </small>
+                                    </Form.Label>
+
+                                    <Controller
+                                        name="note"
+                                        control={control}
+                                        defaultValue="<ul><li></li></ul>"
+                                        render={({ field: { onChange, value } }) => (
+                                            <ReactQuill
+                                                ref={quillRef}
+                                                value={value}
+                                                onChange={(content, delta, source) => {
+                                                    if (source === 'user') {
+                                                        onChange(content);
+                                                    }
+                                                }}
+                                                theme="snow"
+                                                placeholder="Enter detailed notes here..."
+                                                style={{ backgroundColor: 'white' }}
+                                                modules={{
+                                                    toolbar: [
+                                                        [{ header: [1, 2, false] }],
+                                                        ['bold', 'italic', 'underline', 'strike'],
+                                                        [{ list: 'ordered' }, { list: 'bullet' }],
+                                                        // ['link', 'image'],
+                                                        ['clean'],
+                                                    ],
+                                                }}
+                                            />
+                                        )}
+                                    />
+
+                                    <SuggestionOffcanvas
+                                        show={showSuggestions}
+                                        onClose={() => setShowSuggestions(false)}
+                                        onSelect={handleSuggestionSelect}
+                                        className="custom-suggestion-offcanvas"
+                                    />
+                                </Form.Group>
                             </Col>
-                            <Col sm={12} className='d-flex align-items-center justify-content-end gap-2'>
-                                <Button className='custom-buttons' type='submit'>Save & Add Another</Button>
-                                <Button className='custom-buttons' type='submit'>Save & Exit</Button>
+                            <Col sm={12} className="d-flex justify-content-end gap-1 mt-2">
+                                <Button className="custom-buttons" type="submit">
+                                    Save & Add Another
+                                </Button>
+                                <Button className="custom-buttons" type="submit">
+                                    Save & Exit
+                                </Button>
                             </Col>
                         </Row>
                     </Form>
-                }
+                )}
             </Modal.Body>
         </Modal>
-    )
-}
+    );
+};
 
-export default AllergyModal
+export default AllergyModal;

@@ -275,11 +275,11 @@ const NewPatient = () => {
             ...(logo?.url === null
                 ? {}
                 : {
-                    photo: {
-                        url: logo?.url?.split('?')[0] || patientsDataById?.patientChartPhoto?.url,
-                        title: logoName,
-                    },
-                }),
+                      photo: {
+                          url: logo?.url?.split('?')[0] || patientsDataById?.patientChartPhoto?.url,
+                          title: logoName,
+                      },
+                  }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
@@ -327,8 +327,8 @@ const NewPatient = () => {
                                                     <span>
                                                         {patientsDataById?.birthDate
                                                             ? new Date(patientsDataById.birthDate).toLocaleDateString(
-                                                                'en-GB'
-                                                            )
+                                                                  'en-GB'
+                                                              )
                                                             : 'N/A'}
                                                     </span>
                                                 </p>
@@ -385,8 +385,8 @@ const NewPatient = () => {
                                                                             logo?.url
                                                                                 ? logo.url.split('?')[0]
                                                                                 : patientsDataById?.photo?.[0]?.url
-                                                                                    ? patientsDataById?.photo?.[0]?.url
-                                                                                    : profilePhoto
+                                                                                  ? patientsDataById?.photo?.[0]?.url
+                                                                                  : profilePhoto
                                                                         }
                                                                         alt="Patient Profile"
                                                                         className="img-fluid rounded"
@@ -400,8 +400,9 @@ const NewPatient = () => {
 
                                                                 {!isCameraOpen && (
                                                                     <BiEdit
-                                                                        className={`position-absolute fs-4 text-primary ${uploading ? 'd-none' : ''
-                                                                            }`}
+                                                                        className={`position-absolute fs-4 text-primary ${
+                                                                            uploading ? 'd-none' : ''
+                                                                        }`}
                                                                         style={{
                                                                             bottom: '-5px',
                                                                             right: '-9px',
@@ -460,37 +461,32 @@ const NewPatient = () => {
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    <div className="col-12 mx-1 ">
+                                                                    <div className="col-12 mx-1">
                                                                         <div className="row">
                                                                             <div className="col-3">
                                                                                 <span>
                                                                                     <MdPhone className="fs-5 text-primary" />
                                                                                 </span>
                                                                             </div>
-                                                                            <div className="col-9 d-flex align-items-center">
-                                                                                <span
-                                                                                    className="ps-2 fs-6 me-2"
-                                                                                    style={{ fontWeight: 600 }}>
-                                                                                    {patientsDataById?.telecom?.[0]
-                                                                                        ?.value || 'N/A'}
-                                                                                </span>
+                                                                            <div className="col-9">
                                                                                 {patientsDataById?.telecom?.[0]
                                                                                     ?.value && (
-                                                                                        <FaRegCopy
-                                                                                            className="text-primary cursor-pointer"
-                                                                                            onClick={() =>
-                                                                                                navigator.clipboard.writeText(
-                                                                                                    patientsDataById
-                                                                                                        .telecom[0].value
-                                                                                                )
-                                                                                            }
-                                                                                            title="Copy to clipboard"
-                                                                                            style={{ fontSize: '10px' }}
-                                                                                        />
-                                                                                    )}
+                                                                                    <FaRegCopy
+                                                                                        className="text-primary cursor-pointer"
+                                                                                        onClick={() =>
+                                                                                            navigator.clipboard.writeText(
+                                                                                                patientsDataById
+                                                                                                    .telecom[0].value
+                                                                                            )
+                                                                                        }
+                                                                                        title="Copy to clipboard"
+                                                                                        style={{ fontSize: '10px' }}
+                                                                                    />
+                                                                                )}
                                                                             </div>
                                                                         </div>
                                                                     </div>
+
                                                                     <div className="col-12 mx-1 ">
                                                                         <div className="row">
                                                                             <div className="col-3">
@@ -550,22 +546,25 @@ const NewPatient = () => {
                                                                                     style={{ fontWeight: 600 }}>
                                                                                     {patientsDataById?.address?.[0]
                                                                                         ?.city ||
-                                                                                        patientsDataById?.address?.[0]
-                                                                                            ?.state
-                                                                                        ? `${patientsDataById
-                                                                                            ?.address?.[0]
-                                                                                            ?.city || ''
-                                                                                        }${patientsDataById
-                                                                                            ?.address?.[0]
-                                                                                            ?.city &&
-                                                                                            patientsDataById
-                                                                                                ?.address?.[0]?.state
-                                                                                            ? ', '
-                                                                                            : ''
-                                                                                        }${patientsDataById
-                                                                                            ?.address?.[0]
-                                                                                            ?.state || ''
-                                                                                        }`
+                                                                                    patientsDataById?.address?.[0]
+                                                                                        ?.state
+                                                                                        ? `${
+                                                                                              patientsDataById
+                                                                                                  ?.address?.[0]
+                                                                                                  ?.city || ''
+                                                                                          }${
+                                                                                              patientsDataById
+                                                                                                  ?.address?.[0]
+                                                                                                  ?.city &&
+                                                                                              patientsDataById
+                                                                                                  ?.address?.[0]?.state
+                                                                                                  ? ', '
+                                                                                                  : ''
+                                                                                          }${
+                                                                                              patientsDataById
+                                                                                                  ?.address?.[0]
+                                                                                                  ?.state || ''
+                                                                                          }`
                                                                                         : 'N/A'}
                                                                                 </span>
                                                                             </div>
@@ -604,8 +603,8 @@ const NewPatient = () => {
                                                                                     style={{ fontWeight: 600 }}>
                                                                                     {patientsDataById?.createdAt
                                                                                         ? new Date(
-                                                                                            patientsDataById.createdAt
-                                                                                        ).toLocaleDateString('en-GB')
+                                                                                              patientsDataById.createdAt
+                                                                                          ).toLocaleDateString('en-GB')
                                                                                         : 'N/A'}
                                                                                 </span>
                                                                             </div>
@@ -660,8 +659,8 @@ const NewPatient = () => {
                                                                 {isRunning
                                                                     ? `Pause (${formatTime(timeLeft)})`
                                                                     : timeLeft > 0
-                                                                        ? `Resume (${formatTime(timeLeft)})`
-                                                                        : 'Start Session'}
+                                                                      ? `Resume (${formatTime(timeLeft)})`
+                                                                      : 'Start Session'}
                                                             </Button>
 
                                                             <Button
@@ -809,10 +808,11 @@ const NewPatient = () => {
                                                     ].map((subTab) => (
                                                         <li className="nav-item" key={subTab}>
                                                             <a
-                                                                className={`nav-link me-2 pb-0 tab-font-family ${selectedSubTab === subTab
-                                                                    ? 'active text-primary'
-                                                                    : 'text-black'
-                                                                    }`}
+                                                                className={`nav-link me-2 pb-0 tab-font-family ${
+                                                                    selectedSubTab === subTab
+                                                                        ? 'active text-primary'
+                                                                        : 'text-black'
+                                                                }`}
                                                                 onClick={() => handleSubTabChange(subTab)}
                                                                 style={{ cursor: 'pointer', fontWeight: 600 }}>
                                                                 {subTab}
@@ -931,10 +931,11 @@ const NewPatient = () => {
                                                             }>
                                                             <p
                                                                 className={`patient-menu-item text-black mb-0 ps-2 pe-2 border-bottom py-1 
-                                                                  ${isSidebarCollapsed
-                                                                        ? 'text-center fw-bold'
-                                                                        : 'd-flex justify-content-between align-items-center'
-                                                                    }`}
+                                                                  ${
+                                                                      isSidebarCollapsed
+                                                                          ? 'text-center fw-bold'
+                                                                          : 'd-flex justify-content-between align-items-center'
+                                                                  }`}
                                                                 onClick={() => {
                                                                     if (item.label !== 'Clinical Review') {
                                                                         handleClinicalReviewToggle();
@@ -944,7 +945,7 @@ const NewPatient = () => {
                                                                     cursor: 'pointer',
                                                                     backgroundColor:
                                                                         isClinicalReviewExpanded &&
-                                                                            item.label !== 'Clinical Review'
+                                                                        item.label !== 'Clinical Review'
                                                                             ? '#f8f9fa'
                                                                             : 'transparent',
                                                                 }}>
@@ -966,73 +967,76 @@ const NewPatient = () => {
                                                                 </span>
                                                                 {!isSidebarCollapsed && (
                                                                     <i
-                                                                        className={`bi ${isClinicalReviewExpanded &&
+                                                                        className={`bi ${
+                                                                            isClinicalReviewExpanded &&
                                                                             item.label !== 'Clinical Review'
-                                                                            ? 'bi-chevron-up'
-                                                                            : 'bi-chevron-down'
-                                                                            }`}></i>
+                                                                                ? 'bi-chevron-up'
+                                                                                : 'bi-chevron-down'
+                                                                        }`}></i>
                                                                 )}
                                                             </p>
                                                         </OverlayTrigger>
 
                                                         {/* Only show subItems if not Clinical Review and expanded */}
-                                                        {item.label !== 'Clinical Review' && isClinicalReviewExpanded && (
-                                                            <div className="ms-0">
-                                                                {item.subItems.map((subItem, subIndex) => (
-                                                                    <OverlayTrigger
-                                                                        key={subIndex}
-                                                                        placement="bottom"
-                                                                        overlay={
-                                                                            <Tooltip id={`tooltip-${subItem.label}`}>
-                                                                                ⏳ In Progress
-                                                                            </Tooltip>
-                                                                        }>
-                                                                        <div className="d-flex justify-content-between align-items-center ps-4 border-bottom py-1 pe-2">
-                                                                            <div
-                                                                                style={{
-                                                                                    opacity: 0.5,
-                                                                                    cursor: 'progress',
-                                                                                    pointerEvents: 'none',
-                                                                                    display: 'flex',
-                                                                                    width: '100%',
-                                                                                }}>
-                                                                                <p className="text-black mb-0 d-flex">
-                                                                                    <span
-                                                                                        className="mb-0 bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
-                                                                                        style={{
-                                                                                            width: '20px',
-                                                                                            height: '20px',
-                                                                                            fontSize: '10px',
-                                                                                            lineHeight: '20px',
-                                                                                        }}>
-                                                                                        0
-                                                                                    </span>
-                                                                                    {!isSidebarCollapsed &&
-                                                                                        subItem.label}
-                                                                                </p>
-                                                                                {!isSidebarCollapsed && (
-                                                                                    <p
-                                                                                        className="mb-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
-                                                                                        style={{
-                                                                                            width: '20px',
-                                                                                            height: '20px',
-                                                                                            fontSize: '10px',
-                                                                                            lineHeight: '20px',
-                                                                                        }}
-                                                                                        title={
-                                                                                            isSidebarCollapsed
-                                                                                                ? subItem.label
-                                                                                                : ''
-                                                                                        }>
-                                                                                        {subItem.icon}
+                                                        {item.label !== 'Clinical Review' &&
+                                                            isClinicalReviewExpanded && (
+                                                                <div className="ms-0">
+                                                                    {item.subItems.map((subItem, subIndex) => (
+                                                                        <OverlayTrigger
+                                                                            key={subIndex}
+                                                                            placement="bottom"
+                                                                            overlay={
+                                                                                <Tooltip
+                                                                                    id={`tooltip-${subItem.label}`}>
+                                                                                    ⏳ In Progress
+                                                                                </Tooltip>
+                                                                            }>
+                                                                            <div className="d-flex justify-content-between align-items-center ps-4 border-bottom py-1 pe-2">
+                                                                                <div
+                                                                                    style={{
+                                                                                        opacity: 0.5,
+                                                                                        cursor: 'progress',
+                                                                                        pointerEvents: 'none',
+                                                                                        display: 'flex',
+                                                                                        width: '100%',
+                                                                                    }}>
+                                                                                    <p className="text-black mb-0 d-flex">
+                                                                                        <span
+                                                                                            className="mb-0 bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
+                                                                                            style={{
+                                                                                                width: '20px',
+                                                                                                height: '20px',
+                                                                                                fontSize: '10px',
+                                                                                                lineHeight: '20px',
+                                                                                            }}>
+                                                                                            0
+                                                                                        </span>
+                                                                                        {!isSidebarCollapsed &&
+                                                                                            subItem.label}
                                                                                     </p>
-                                                                                )}
+                                                                                    {!isSidebarCollapsed && (
+                                                                                        <p
+                                                                                            className="mb-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                                                                                            style={{
+                                                                                                width: '20px',
+                                                                                                height: '20px',
+                                                                                                fontSize: '10px',
+                                                                                                lineHeight: '20px',
+                                                                                            }}
+                                                                                            title={
+                                                                                                isSidebarCollapsed
+                                                                                                    ? subItem.label
+                                                                                                    : ''
+                                                                                            }>
+                                                                                            {subItem.icon}
+                                                                                        </p>
+                                                                                    )}
+                                                                                </div>
                                                                             </div>
-                                                                        </div>
-                                                                    </OverlayTrigger>
-                                                                ))}
-                                                            </div>
-                                                        )}
+                                                                        </OverlayTrigger>
+                                                                    ))}
+                                                                </div>
+                                                            )}
                                                     </div>
                                                 ) : (
                                                     <OverlayTrigger
@@ -1050,7 +1054,7 @@ const NewPatient = () => {
                                                         <div>
                                                             <p
                                                                 className={`patient-menu-item text-black mb-0 py-1 d-flex align-items-center 
-                        ${isSidebarCollapsed ? 'text-center' : 'ps-2'}`}
+                                                                           ${isSidebarCollapsed ? 'text-center' : 'ps-2'}`}
                                                                 onClick={() => {
                                                                     if (activePatientChartItems.includes(item.label)) {
                                                                         handleChartTabChange(item.label);
@@ -1121,8 +1125,9 @@ const NewPatient = () => {
                             {modalTabs.map((modalTab) => (
                                 <li className="nav-item" key={modalTab}>
                                     <a
-                                        className={`nav-link text-black me-2 ${activeModalTab === modalTab ? 'active fw-bold' : ''
-                                            }`}
+                                        className={`nav-link text-black me-2 ${
+                                            activeModalTab === modalTab ? 'active fw-bold' : ''
+                                        }`}
                                         onClick={() => handleModalTabClick(modalTab)}
                                         style={{ cursor: 'pointer' }}>
                                         {modalTab}

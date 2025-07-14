@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Card } from 'react-bootstrap';
 import { FaAllergies } from 'react-icons/fa';
 import { MdAddCircleOutline, MdOutlinePrint } from 'react-icons/md';
@@ -7,15 +7,21 @@ import { useSelector } from 'react-redux';
 import { getAllergiesAction } from '../../../../../../redux/allergies/actions';
 import { useSearchParams } from 'react-router-dom';
 import Spinner from '../../../../../../constants/Spinner';
+import { handlePrintAllergies } from '../../PDFfiles/allergyPDF';
+import AllergyModal from '../../clinicalReview/allergy/AllergyModal';
 
 const AllergiesCard = () => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
+    const [allergyModal, setAllergyModal] = useState(false);
+    const patientDetails = store?.getPatientByIdReducer?.data?.data;
 
     const allergiesData = store?.getAllergiesReducer?.data?.allergies?.slice(0, 3);
-
+    const handleAddAllergiesModal = () => {
+        setAllergyModal(true);
+    };
     useEffect(() => {
         if (!allergiesData?.length) {
             dispatch(getAllergiesAction({ patientId: patientId, skip: 1 }))
@@ -39,7 +45,11 @@ const AllergiesCard = () => {
 
         return <span className={`ms-2 text-${variant}`}>{severity.display}</span>;
     };
+    const handleCloseModal = () => {
+        setAllergyModal(false);
+    };
     return (
+        <>
         <Card className="h-100 shadow-sm">
             <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
                 <div className="d-flex align-items-center">
@@ -49,10 +59,13 @@ const AllergiesCard = () => {
                 <div>
                     <MdAddCircleOutline
                         className="text-primary me-2 cursor-pointer"
+                            onClick={handleAddAllergiesModal}
+
                     />
                     <MdOutlinePrint
                         className="text-secondary cursor-pointer"
                         title="Print all Allergies"
+                                onClick={() => handlePrintAllergies({ patientDetails, allergiesData })}
                     />
                 </div>
             </Card.Header>
@@ -97,10 +110,16 @@ const AllergiesCard = () => {
                 }
             </Card.Body>
             <div
-                className="fs-6 text-end text-info d-flex align-items-end justify-content-end px-2 pb-1 cursor-pointer text-decoration-underline">
+                className="fs-6 text-end text-info d-flex align-items-end justify-content-end px-2 pb-1 cursor-pointer text-decoration-underline"
+                //   onClick={() => setSelectedMainTab('Allergy List')}
+                  >
                 Go To Allergies List
             </div>
-        </Card>)
+        </Card>
+                    <AllergyModal show={allergyModal} closeModal={handleCloseModal} />
+                    </>
+        
+        )
 }
 
 export default AllergiesCard

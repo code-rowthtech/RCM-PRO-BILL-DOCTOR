@@ -4,6 +4,8 @@ import ReactQuill from 'react-quill';
 import Select from 'react-select';
 import 'react-quill/dist/quill.snow.css';
 import { Controller, useForm } from 'react-hook-form';
+import DeletionModal from 'helpers/DeletionModal';
+import { useSelector } from 'react-redux';
 
 const FamilyHistory = () => {
     const [rela, setRela] = useState(null);
@@ -13,6 +15,7 @@ const FamilyHistory = () => {
     const [deleteModal, setDeleteModal] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const { control } = useForm();
+    const store = useSelector((state)=>state)
     const quillRef = useRef();
     const [formData, setFormData] = useState({
         name: '',
@@ -457,29 +460,13 @@ const FamilyHistory = () => {
             </Col>
 
             {/* Deletion Modal - Static version */}
-            {deleteModal && (
-                <div className="modal show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                    <div className="modal-dialog modal-dialog-centered">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Confirm Deletion</h5>
-                                <button type="button" className="btn-close" onClick={closeDeleteModal}></button>
-                            </div>
-                            <div className="modal-body">
-                                <p>Are you sure you want to delete this family history record?</p>
-                            </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" onClick={closeDeleteModal}>
-                                    Cancel
-                                </button>
-                                <button type="button" className="btn btn-danger" onClick={deleteHistory}>
-                                    Delete
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+           <DeletionModal
+                show={deleteModal}
+                onHide={closeDeleteModal}
+                onConfirm={deleteHistory}
+                item="family history"
+                isLoading={store?.deleteFamilyGenticReducer?.loading}
+            />
         </Row>
     );
 };

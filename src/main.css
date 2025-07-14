@@ -266,6 +266,19 @@ select.form-control:not([size]):not([multiple]) {
     height: 16px !important;
     cursor: pointer;
 }
+.copy-icon {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    /* margin-left:; */
+    font-size: 12px;
+}
+
+.group:hover .copy-icon {
+    opacity: 1;
+}
+/* .group:hover .text-primary {
+    opacity: 1 !important;
+} */
 .custom-active .form-check-input {
     background-color: #6168d0 !important;
     border-color: white !important;
@@ -316,6 +329,7 @@ hr {
 .css-1dimb5e-singleValue {
     font-size: 12px !important;
     font-weight: 600 !important;
+    margin-left: 6px !important;
 }
 
 .err-font {
@@ -497,7 +511,10 @@ tbody tr:hover {
 }
 
 .patientChartCard {
-    height: 68vh;
+    height: 70vh;
+}
+.patientChartCardClose{
+    height: 84vh;
 }
 .summary-card-body {
     height: 22vh !important;
@@ -505,3 +522,28 @@ tbody tr:hover {
 /* .summary-card-body-footer {
     height: 10vh;
 } */
+ .offcanvas {
+    z-index: 1080 !important; /* Higher than Bootstrap modal (z-index: 1050) */
+}
+.custom-suggestion-offcanvas.offcanvas {
+    z-index: -1080 !important;
+}
+/* You can add this to your main CSS file */
+.custom-dropdown .dropdown-menu {
+    min-width: 180px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    background: #fff;
+    border-radius: 4px;
+    padding: 0.5rem 0;
+}
+.custom-dropdown .dropdown-item {
+    padding: 0.5rem 1rem;
+}
+.custom-dropdown .dropdown-item:hover {
+    background: #f5f5f5;
+}
+.css-19bb58m {
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+    margin: 0px !important;
+}
