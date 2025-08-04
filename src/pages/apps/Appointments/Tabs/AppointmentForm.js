@@ -414,8 +414,11 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
         const data = {
             id: appointmentId ? appointmentId : id,
         };
-        dispatch(getAppointmentDetailsAction(data));
+        if (appointmentId || id) {
+            dispatch(getAppointmentDetailsAction(data));
+        }
     }, [dispatch, appointmentId, id]);
+
     useEffect(() => {
         setSelectedOption(Id);
     }, [Id]);
@@ -441,7 +444,7 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
             reset();
             setActiveTab('demographicDetails');
             setPatientId(createPatientResponse?._id);
-            dispatch(stateEmptydAction());
+            // dispatch(stateEmptydAction());
             const data = {
                 doctorId: doctorId,
                 page: skip,

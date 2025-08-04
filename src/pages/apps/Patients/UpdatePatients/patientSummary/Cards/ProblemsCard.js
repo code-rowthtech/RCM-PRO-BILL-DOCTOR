@@ -19,7 +19,6 @@ const ProblemsCard = () => {
     const [problemModal, setProblemModal] = useState(false);
     const [selectedProblem, setSelectedProblem] = useState(null);
     const problemData = store?.getProblemsReducer?.data?.problems;
-    console.log('problemData', problemData);
     const handleAddProblemOpen = () => setProblemModal(true);
 
     useEffect(() => {
@@ -91,12 +90,12 @@ const ProblemsCard = () => {
                         </ul>
                     )}
                 </Card.Body>
-                <div
+                {/* <div
                     className="fs-6 text-end text-info d-flex align-items-end justify-content-end px-2 pb-1 cursor-pointer text-decoration-underline"
-                    // onClick={() => setSelectedMainTab('Problem List')}
+                onClick={() => setSelectedMainTab('Problem List')}
                 >
                     Go To Problem List
-                </div>
+                </div> */}
             </Card>
             <ProblemsModal show={problemModal} closeModal={handleCloseModal} problemId={selectedProblem} />
         </>

@@ -30,7 +30,7 @@ export function getProblemsByIdApi(params: any): any {
     return api.get(`${URL.problem}/${data?.id}`);
 }
 
-export function getPatientAppointmentsAllApi(params: any): any {
-    const { data } = params;
-    return api.get(`${URL.getPatientAppointmentAll}?patientId=${data?.patientId}`,);
-}
+// export function getPatientAppointmentsAllApi(params: any): any {
+//     const { data } = params;
+//     return api.get(`${URL.getPatientAppointmentAll}?patientId=${data?.patientId}`,);
+// }

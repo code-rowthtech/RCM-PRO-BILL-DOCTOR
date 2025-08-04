@@ -80,7 +80,7 @@ export const createPatientsReducer = (state = CREATE_PATIENTS_INITIAL_STATE, act
                 data: action.payload,
                 loading: false
             }
-        case PatientsActionTypes.STATE_EMPTY_INTIAL_STATE:
+        case PatientsActionTypes.CREATE_PATIENTS_RESET:
             return {
                 data: [],
                 loading: false
@@ -111,13 +111,10 @@ export const updatePatientsReducer = (state = UPDATE_PATIENTS_INITIAL_STATE, act
                 data: action.payload,
                 loading: false
             }
-        case PatientsActionTypes.RESET_UPDATE_STATUS:
+        case PatientsActionTypes.UPDATE_PATIENTS_RESET:
             return {
                 ...state,
-                data: {
-                    ...state.data,
-                    status: null, // or whatever the initial state should be
-                },
+                data: [],
             };
         default: return state
     }
@@ -145,7 +142,7 @@ export const createReferringDoctorReducer = (state = CREATE_REFERRING_DOCTOR_INI
                 data: action.payload,
                 loading: false
             }
-        case PatientsActionTypes.STATE_EMPTY_INTIAL_STATE:
+        case PatientsActionTypes.CREATE_REFERRING_DOCTOR_RESET:
             return {
                 data: [],
                 loading: false
@@ -176,7 +173,7 @@ export const createResponsiblePartyReducer = (state = CREATE_RESPONSIBLE_PARTY_I
                 data: action.payload,
                 loading: false
             }
-        case PatientsActionTypes.STATE_EMPTY_INTIAL_STATE:
+        case PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_RESET:
             return {
                 data: [],
                 loading: false

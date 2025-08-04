@@ -47,6 +47,7 @@ const AddPatientDetails = ({
     const doctorName = JSON.parse(sessionStorage.getItem('hyper_user'))?.name?.text;
     const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
 
+    console.log(store?.createPatientsReducer?.data?.status, 'store?.createPatientsReducer')
     // Function to calculate approximate age from date of birth
     const calculateApproxAge = (dob) => {
         if (!dob) return '';
@@ -60,7 +61,7 @@ const AddPatientDetails = ({
 
     // Watch for dateOfBirth changes
     const dateOfBirth = watch('dateOfBirth');
-      const gender = watch('gender');
+    const gender = watch('gender');
     const title = watch('title');
 
     useEffect(() => {
@@ -72,6 +73,14 @@ const AddPatientDetails = ({
         }
     }, [dateOfBirth, setValue, getValues]);
 
+    useEffect(() => {
+        if (store?.createPatientsReducer?.data?.status === 201) {
+            reset();
+            setLogoName(null);
+            setLogo(null);
+        }
+    }, [store?.createPatientsReducer?.data?.status])
+
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];
         try {
@@ -79,7 +88,7 @@ const AddPatientDetails = ({
             setLogo(url);
             setLogoName(selectedFile?.name);
             clearErrors('profileImage');
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -114,13 +123,13 @@ const AddPatientDetails = ({
                         rules={
                             !id
                                 ? {
-                                      pattern: {
-                                          value: /^\(\d{3}\)\d{3}-\d{4}$/,
-                                          message: 'Format must be (XXX)XXX-XXXX',
-                                      },
-                                      maxLength: { value: 13, message: 'Max 13 characters' },
-                                      minLength: { value: 13, message: 'Min 13 characters' },
-                                  }
+                                    pattern: {
+                                        value: /^\(\d{3}\)\d{3}-\d{4}$/,
+                                        message: 'Format must be (XXX)XXX-XXXX',
+                                    },
+                                    maxLength: { value: 13, message: 'Max 13 characters' },
+                                    minLength: { value: 13, message: 'Min 13 characters' },
+                                }
                                 : {}
                         }
                         render={({ field: { onChange, value, ref } }) => (
@@ -252,9 +261,7 @@ const AddPatientDetails = ({
             }
         }
         dispatch(createPatientsAction({ key: encryptMessage(payload) }));
-        reset();
-        setLogoName(null);
-        setLogo(null);
+
     };
 
     useEffect(() => {
@@ -551,9 +558,8 @@ const AddPatientDetails = ({
                             <div
                                 onClick={() => logoFileInputRef.current.click()}
                                 style={{ height: '30px' }}
-                                className={`custom-file-upload justify-content-between cursor-pointer ${
-                                    logoName || profileUploading ? '' : 'custom-form-fields'
-                                }`}>
+                                className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'
+                                    }`}>
                                 {logoName ? logoName : profileUploading ? 'Uploading...' : 'Upload Photo'}
                                 <p className="mb-0">
                                     <FiUploadCloud />

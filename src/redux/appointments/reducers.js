@@ -22,6 +22,11 @@ const GET_PRACTITIONER_APPOINTMENTS_INITIAL_STATE = {
     loading: false,
 };
 
+const GET_PRACTITIONER_APPOINTMENTS__BY_PATIENTID_INITIAL_STATE = {
+    data: [],
+    loading: false,
+};
+
 export const createAppointmentsReducer = (state = CREATE_APPOINTMENTS_INITIAL_STATE, action) => {
     switch (action.type) {
         case AppointmentsActionTypes.CREATE_APPOINTMENTS_LOADING:
@@ -39,7 +44,7 @@ export const createAppointmentsReducer = (state = CREATE_APPOINTMENTS_INITIAL_ST
                 data: action.payload,
                 loading: false,
             };
-        case AppointmentsActionTypes.STATE_EMPTY_INTIAL_STATE:
+        case AppointmentsActionTypes.CREATE_APPOINTMENTS_RESET:
             return {
                 data: [],
                 loading: false,
@@ -209,7 +214,7 @@ export const updateAppointmentDetailsReducer = (state = UPDATE_APPOINTMENT_DETAI
                 data: action.payload,
                 loading: false,
             };
-        case AppointmentsActionTypes.STATE_EMPTY_INTIAL_STATE:
+        case AppointmentsActionTypes.UPDATE_APPOINTMENT_DETAILS_RESET:
             return {
                 data: [],
                 loading: false,
@@ -217,4 +222,32 @@ export const updateAppointmentDetailsReducer = (state = UPDATE_APPOINTMENT_DETAI
         default:
             return state;
     }
-    };
+};
+
+
+export const getAppointmentByPatientIdReducer = (state = GET_PRACTITIONER_APPOINTMENTS__BY_PATIENTID_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case AppointmentsActionTypes.GET_APPOINTMENT_BY_PATIENT_ID_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case AppointmentsActionTypes.GET_APPOINTMENT_BY_PATIENT_ID_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case AppointmentsActionTypes.GET_APPOINTMENT_BY_PATIENT_ID_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case AppointmentsActionTypes.GET_APPOINTMENT_BY_PATIENT_ID_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        default:
+            return state;
+    }
+};

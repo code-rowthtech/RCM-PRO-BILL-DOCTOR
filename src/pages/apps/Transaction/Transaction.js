@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 import PageTitle from '../../../components/PageTitle';
 import { FormInput } from '../../../components';
-import { orderData, patientsData } from '../Appointments/data';
+// import { orderData, patientsData } from '../Appointments/data';
 import { GrDocumentText } from 'react-icons/gr';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { FiFileText, FiFilter } from 'react-icons/fi';
@@ -97,23 +97,23 @@ const Transaction = ({ orderData }: { orderData: Array<OrderListItems> }): React
           <Card>
             <Card.Body>
               <Row className="mb-2">
-              <Row className="">
-                                <Col sm={8}>
-                                    <Row className="gy-2 gx-2 align-items-center justify-content-xl-start justify-content-between">
-                                        <Col xs="auto">
-                                            <FormInput
-                                                type="text"
-                                                // onChange={(e) => setName(e.target.value)}
-                                                placeholder="Search..." />
-                                        </Col>
-                                    </Row>
-                                </Col>
-                                <Col sm={4} className='text-end'>
-                                    {/* <Button as={Link} to="/apps/crm/addclinic" className="custom-buttons">
+                <Row className="">
+                  <Col sm={8}>
+                    <Row className="gy-2 gx-2 align-items-center justify-content-xl-start justify-content-between">
+                      <Col xs="auto">
+                        <FormInput
+                          type="text"
+                          // onChange={(e) => setName(e.target.value)}
+                          placeholder="Search..." />
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col sm={4} className='text-end'>
+                    {/* <Button as={Link} to="/apps/crm/addclinic" className="custom-buttons">
                                         Add Clinics
                                     </Button> */}
-                                </Col>
-                            </Row>
+                  </Col>
+                </Row>
               </Row>
               <TransactionList patientsData={orderData} />
             </Card.Body>

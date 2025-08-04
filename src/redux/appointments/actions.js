@@ -36,3 +36,8 @@ export const getAppointmentByPatientProviderAction = (data): AuthAction => ({
     type: AppointmentsActionTypes.GET_APPOINTMENT_BY_PATIENT_PROVIDER,
     data,
 });
+
+export const getAppointmentByPatientIdAction = (data): AuthAction => ({
+    type: AppointmentsActionTypes.GET_APPOINTMENT_BY_PATIENT_ID,
+    data,
+});

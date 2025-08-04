@@ -9,7 +9,7 @@ export function createTobaccooApi(params: any): any {
 
 export function updateTobaccooApi(params: any): any {
     const { data } = params;
-    return api.update(`${URL.updateTobacco}/${data?.id}`, data);
+    return api.update(`${URL.updateTobacco}/${data?.id}`, { key: data?.key });
 }
 
 // export function updateTobaccooApi(params: any): any {
@@ -34,12 +34,12 @@ export function createFamilyGeneticApi(params: any): any {
 }
 export function updateFamilyGeneticApi(params: any): any {
     const { data } = params;
-    return api.update(`${URL.updateFamily}/${data?.id}`, data);
+    return api.update(`${URL.updateFamily}`, data);
 
 }
 export function getFamilyGeneticApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.getFamily}?subject=${data?.patientId}`);
+    return api.get(`${URL.getFamily}/${data?.patientId}`);
 }
 
 export function deleteFamilyGeneticApi(params: any): any {
@@ -60,12 +60,12 @@ export function updateSurgicalHistoryApi(params: any): any {
 }
 export function getSurgicalHistoryApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.getSurgicalHistory}?subject=${data?.patientId}`);
+    return api.get(`${URL.getSurgicalHistory}/${data?.patientId}`);
 }
 
 export function deleteSurgicalHistoryApi(params: any): any {
     const { data } = params;
-    return api.delete(`${URL.deleteSurgicalHistory}?id=${data?.id}`);
+    return api.delete(`${URL.deleteSurgicalHistory}/${data?.id}`);
 }
 
 // MEDICAL HISTORY
@@ -80,7 +80,7 @@ export function updateMedicalHistoryApi(params: any): any {
 }
 export function getMedicalHistoryApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.getMedicalHistory}?subject=${data?.patientId}`);
+    return api.get(`${URL.getMedicalHistory}/${data?.patientId}`);
 }
 export function deleteMedicalHistoryApi(params: any): any {
     const { data } = params;
@@ -100,7 +100,7 @@ export function updateAlcoholHistoryApi(params: any): any {
 }
 export function getAlcoholHistoryApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.alcoholHistory}?subject=${data?.patientId}`);
+    return api.get(`${URL.alcoholHistory}?patientId=${data?.patientId}`);
 }
 
 export function deleteAlcoholHistoryApi(params: any): any {

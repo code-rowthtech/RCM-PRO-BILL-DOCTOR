@@ -15,7 +15,7 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const notesCategoriesData = store?.getNoteCategoriesReducer?.data?.data;
     const loading = store?.getNoteCategoriesReducer?.loading;
-
+    console.log(store?.getNoteCategoriesReducer, 'store?.getNoteCategoriesReducer')
     useEffect(() => {
         if (notesCategoriesData) setNoteTypes(notesCategoriesData);
     }, [notesCategoriesData]);

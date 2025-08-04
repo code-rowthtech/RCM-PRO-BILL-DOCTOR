@@ -1,6 +1,10 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { AppointmentsActionTypes } from './constants';
-import { createAppointmentsApi, getAllAppointmentsApi, getAppointmentByPateintProviderApi, getAppointmentDetailsApi, getAppointmentsApi, getPractitionerAvailabilityApi, updateAppointmentDetailsApi } from './api';
+import {
+    createAppointmentsApi, getAllAppointmentsApi, getAppointmentByPateintIdApi, getAppointmentByPateintProviderApi,
+    getAppointmentDetailsApi, getAppointmentsApi, getPractitionerAvailabilityApi,
+    updateAppointmentDetailsApi
+} from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -16,12 +20,18 @@ function* createAppointmentsFunction(data) {
             payload: {},
         });
         const response = yield call(createAppointmentsApi, data);
-        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        const decryptedData = response.data.data;
+        console.log(decryptedData, response, ';ewr23r24f')
+        // const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 201) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: AppointmentsActionTypes.CREATE_APPOINTMENTS_SUCCESS,
                 payload: { ...decryptedData },
+            });
+            yield put({
+                type: AppointmentsActionTypes.CREATE_APPOINTMENTS_RESET,
+                payload: {},
             });
         } else {
             yield put({
@@ -45,7 +55,8 @@ function* getAppointmentsFunction(data) {
             payload: {},
         });
         const response = yield call(getAppointmentsApi, data);
-        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        const decryptedData = response.data.data;
+        // const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 201) {
             // ToastHandle(decryptedData?.message, 'success');
             yield put({
@@ -168,6 +179,10 @@ function* updateAppointmentDetailsFunction(data) {
                 type: AppointmentsActionTypes.UPDATE_APPOINTMENT_DETAILS_SUCCESS,
                 payload: { ...decryptedData },
             });
+            yield put({
+                type: AppointmentsActionTypes.UPDATE_APPOINTMENT_DETAILS_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: AppointmentsActionTypes.UPDATE_APPOINTMENT_DETAILS_ERROR,
@@ -211,6 +226,34 @@ function* getAppointmentByPatientProviderFunction(data) {
         });
     }
 }
+
+function* getAppointmentByPatientIdFunction(data) {
+    try {
+        yield put({
+            type: AppointmentsActionTypes.GET_APPOINTMENT_BY_PATIENT_ID_LOADING,
+            payload: {},
+        });
+        const response = yield call(getAppointmentByPateintIdApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            yield put({
+                type: AppointmentsActionTypes.GET_APPOINTMENT_BY_PATIENT_ID_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: AppointmentsActionTypes.GET_APPOINTMENT_BY_PATIENT_ID_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: AppointmentsActionTypes.GET_APPOINTMENT_BY_PATIENT_ID_ERROR,
+            payload: error,
+        });
+    }
+}
 export function* watchCreateAppointments() {
     yield takeEvery(AppointmentsActionTypes.CREATE_APPOINTMENTS, createAppointmentsFunction);
 }
@@ -238,6 +281,9 @@ export function* watchUpdateAppointmentDetails() {
 export function* watchGetAppointmentByPatientProvider() {
     yield takeEvery(AppointmentsActionTypes.GET_APPOINTMENT_BY_PATIENT_PROVIDER, getAppointmentByPatientProviderFunction);
 }
+export function* watchGetAppointmentByPatientId() {
+    yield takeEvery(AppointmentsActionTypes.GET_APPOINTMENT_BY_PATIENT_ID, getAppointmentByPatientIdFunction);
+}
 
 function* appointmentsSaga() {
     yield all([
@@ -248,6 +294,7 @@ function* appointmentsSaga() {
         fork(watchGetAppointmentDetails),
         fork(watchUpdateAppointmentDetails),
         fork(watchGetAppointmentByPatientProvider),
+        fork(watchGetAppointmentByPatientId),
 
     ]);
 }

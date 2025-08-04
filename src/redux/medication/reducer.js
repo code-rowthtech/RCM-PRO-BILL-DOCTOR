@@ -27,12 +27,13 @@ const createReducer = (actionPrefix: string, hasReset = false) =>
         }
     };
 
-    // Export all reducers
-    export const createMedicationReducer = createReducer('CREATE_MEDICATION', true);
-    export const updateMedicationReducer = createReducer('UPDATE_MEDICATION', true);
-    export const getMedicationReducer = createReducer('GET_MEDICATION');
-    export const getDrugsReducer = createReducer('GET_MEDICATION_DRUGS');
-    
+// Export all reducers
+export const createMedicationReducer = createReducer('CREATE_MEDICATION', true);
+export const updateMedicationReducer = createReducer('UPDATE_MEDICATION', true);
+export const deleteMedicationReducer = createReducer('DELETE_MEDICATION', true);
+export const getMedicationReducer = createReducer('GET_MEDICATION');
+export const getDrugsReducer = createReducer('GET_MEDICATION_DRUGS');
+
 
 
 

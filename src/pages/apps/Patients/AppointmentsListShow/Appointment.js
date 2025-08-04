@@ -56,8 +56,8 @@ const Appointment = ({ isOpen, setIsOpen }) => {
                                     <li className="nav-item" key={tab}>
                                         <a
                                             className={`nav-link me-3 pb-0 tab-font-family d-flex align-items-center ${activeTab === tab
-                                                    ? 'active text-primary fw-bold'
-                                                    : 'text-secondary fw-semibold'
+                                                ? 'active text-primary fw-bold'
+                                                : 'text-secondary fw-semibold'
                                                 }`}
                                             onClick={() => handleMainTabChange(tab)}
                                             style={{ cursor: 'pointer' }}>

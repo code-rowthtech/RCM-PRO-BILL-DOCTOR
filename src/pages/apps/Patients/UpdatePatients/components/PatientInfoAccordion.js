@@ -14,7 +14,7 @@ import { IoClose, IoPrintSharp } from 'react-icons/io5';
 import { LiaReceiptSolid } from 'react-icons/lia';
 
 const PatientInfoAccordion = (props) => {
-    const { activeKey,setActiveKey, setSelectedMainTab, setCreateEncounter } = props;
+    const { activeKey, setActiveKey, setSelectedMainTab, setCreateEncounter } = props;
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const [searchParams] = useSearchParams();
@@ -137,7 +137,7 @@ const PatientInfoAccordion = (props) => {
                                     })()}
                             </span>
                             <span className="fs-6 fw-bold text-capitalize px-1">
-                                Chart ID: {patientDetails?.chartNumber || ''}
+                                MRN: {patientDetails?.chartNumber || ''}
                             </span>
                         </p>
                     </div>

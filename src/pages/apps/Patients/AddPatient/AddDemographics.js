@@ -5,7 +5,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import us from '../../../../assets/images/flags/us.jpg';
 import { encryptMessage } from '../../../../cryptoUtils';
-import { resetUpdateAction, updatePatientsAction } from '../../../../redux/actions';
+import {
+    //  resetUpdateAction, 
+    updatePatientsAction
+} from '../../../../redux/actions';
 import IdentifierForm from '../../Common Pages/IdentifierForm';
 import AddressForm from '../../Common Pages/AddressForm';
 import { genderIdentityOptions } from '../../../../utils/DataSets/genderIdentities';
@@ -266,7 +269,7 @@ const AddDemographics = ({ patientId, setActiveTab, setVisibleReffering }) => {
     };
     useEffect(() => {
         if (updateSuccess === 200) {
-            dispatch(resetUpdateAction());
+            // dispatch(resetUpdateAction());
             // setActiveTab('Insurances'); // Go to Responsible tab if allowed
         }
     }, [updateSuccess]);
@@ -717,11 +720,10 @@ const AddDemographics = ({ patientId, setActiveTab, setVisibleReffering }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${
-                                                        searchedEmployerLocations?.length === 0 || !employerFocused
-                                                            ? 'd-none'
-                                                            : ''
-                                                    }`}>
+                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
+                                                        ? 'd-none'
+                                                        : ''
+                                                        }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
@@ -874,7 +876,7 @@ const AddDemographics = ({ patientId, setActiveTab, setVisibleReffering }) => {
                         }}
                         disabled={store?.updatePatientsReducer?.loading}
                         className="custom-buttons"
-                        style={{width: '200px'}}
+                        style={{ width: '200px' }}
                         type="submit">
                         {store?.updatePatientsReducer?.loading ? (
                             <Spinner color="white" className="spinner-border-sm" />

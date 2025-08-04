@@ -1,11 +1,26 @@
 import DeletionModal from 'helpers/DeletionModal';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Col, Row, Form, Button, Card, Accordion } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
+import { createAlcoholHistoryAction, updateAlcoholHistoryAction, getAlcoholHistoryAction, deleteAlcoholHistoryAction } from 'redux/socialHistory/action';
+import { encryptMessage } from 'cryptoUtils';
+import { loggedInUser } from 'helpers/loggedInUser';
+import ToastHandle from 'helpers/ToastMessage';
+import Spinner from 'constants/Spinner';
+import useQuillWordLimit from 'helpers/quillWordLimit';
+import SuggestionOffcanvas from '../../SuggestionsFile/Suggestion';
+import { createSuggestionAction } from 'redux/suggestion/action';
 
 const AlcoholHistory = () => {
+    const dispatch = useDispatch();
+    const [searchParams] = useSearchParams();
+    const patientId = searchParams.get('id');
+    const store = useSelector((state) => state);
+    const quillRef = useRef(null);
+
     const [formData, setFormData] = useState({
         useStatus: '',
         alcoholType: '',
@@ -17,67 +32,110 @@ const AlcoholHistory = () => {
         ageOfFirstUse: '',
         lastUseDate: '',
         reasonForStopping: '',
+        duration: '',
+        summary: ''
     });
 
-    // Static data
-    const alcoholData = [
-        {
-            _id: '1',
-            useStatus: 'Current User',
-            alcoholType: 'Beer and Wine',
-            frequency: 'Weekly',
-            quantityPerOccasion: '3 or 4',
-            note: [
-                {
-                    text: '<p>Patient reports drinking 3-4 beers weekly, mostly on weekends. No dependence symptoms reported.</p>',
-                },
-            ],
-            effectiveDateTime: '2023-05-15T14:30:00Z',
-        },
-        {
-            _id: '2',
-            useStatus: 'Former User',
-            ageOfFirstUse: 18,
-            lastUseDate: '2020-01-10',
-            reasonForStopping: 'Health concerns',
-            note: [
-                { text: '<p>Patient was a heavy drinker in their 20s but stopped in 2020 due to liver concerns.</p>' },
-            ],
-            effectiveDateTime: '2023-05-10T10:15:00Z',
-        },
-    ];
-
     const MAX_WORDS = 1000;
-    const wordCount = formData.note ? formData.note.split(/\s+/).filter(Boolean).length : 0;
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [toDelete, setToDelete] = useState(null);
     const [toEdit, setToEdit] = useState(null);
     const [deleteModal, setDeleteModal] = useState(false);
-    const store = useSelector((state)=> state)
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // Static form submission handling
-        if (toEdit) {
-            // Update logic would go here
-            setToEdit(null);
-        } else {
-            // Create logic would go here
-        }
-        setFormData({
-            useStatus: '',
-            alcoholType: '',
-            frequency: '',
-            quantityPerOccasion: '',
-            hasDependenceSymptoms: false,
-            heavyIntakeFrequency: '',
-            note: '<ul><li></li></ul>',
-            ageOfFirstUse: '',
-            lastUseDate: '',
-            reasonForStopping: '',
-        });
-    };
 
-    const handleReset = () => {
+    // Redux state
+    const alcoholHistory = store?.getAlcoholHistoryReducer?.data?.data || [];
+    const isLoading = store?.getAlcoholHistoryReducer?.loading;
+    const createSuccess = store?.createAlcoholHistoryReducer?.data?.status;
+    const updateSuccess = store?.updateAlcoholHistoryReducer?.data?.status;
+    const deleteSuccess = store?.deleteAlcoholHistoryReducer?.data?.status;
+    const isCreating = store?.createAlcoholHistoryReducer?.loading;
+    const isUpdating = store?.updateAlcoholHistoryReducer?.loading;
+    const isDeleting = store?.deleteAlcoholHistoryReducer?.loading;
+    // Initialize data
+    useEffect(() => {
+        if (patientId) {
+            dispatch(getAlcoholHistoryAction({ patientId }));
+        }
+    }, [dispatch, patientId]);
+
+    // Handle successful operations
+    useEffect(() => {
+        if (createSuccess === 201 || updateSuccess === 200) {
+            dispatch(getAlcoholHistoryAction({ patientId }));
+            handleReset();
+        }
+    }, [createSuccess, updateSuccess, patientId, toEdit]);
+
+    // Handle successful deletion
+    useEffect(() => {
+        if (deleteSuccess === 200) {
+            dispatch(getAlcoholHistoryAction({ patientId }));
+            setToDelete(null);
+            setDeleteModal(false);
+        }
+    }, [deleteSuccess, patientId]);
+
+    // Handle edit mode
+    useEffect(() => {
+        if (toEdit) {
+            setFormData({
+                useStatus: toEdit.useStatus || '',
+                alcoholType: toEdit.alcoholType || '',
+                frequency: toEdit.frequency || '',
+                quantityPerOccasion: toEdit.quantityPerOccasion || '',
+                hasDependenceSymptoms: toEdit.hasDependenceSymptoms || false,
+                heavyIntakeFrequency: toEdit.heavyIntakeFrequency || '',
+                note: toEdit.note?.[0]?.text || '<ul><li></li></ul>',
+                ageOfFirstUse: toEdit.ageOfFirstUse || '',
+                lastUseDate: toEdit.lastUseDate ? new Date(toEdit.lastUseDate).toISOString().split('T')[0] : '',
+                reasonForStopping: toEdit.reasonForStopping || '',
+                duration: toEdit.duration || '',
+                summary: toEdit.summary || ''
+            });
+        }
+    }, [toEdit]);
+
+    const handleSubmit = useCallback((e) => {
+        e.preventDefault();
+
+        if (!formData.useStatus) {
+            ToastHandle('Please select alcohol use status', 'danger');
+            return;
+        }
+
+        const payload = {
+            subject: patientId,
+            performer: loggedInUser?._id,
+            recordedBy: loggedInUser?._id,
+            effectiveDateTime: new Date().toISOString(),
+            issued: new Date().toISOString(),
+            valueCodeableConcept: {
+                text: formData.useStatus
+            },
+            useStatus: formData.useStatus,
+            alcoholType: formData.alcoholType,
+            frequency: formData.frequency,
+            quantityPerOccasion: formData.quantityPerOccasion,
+            hasDependenceSymptoms: formData.hasDependenceSymptoms,
+            heavyIntakeFrequency: formData.heavyIntakeFrequency,
+            ageOfFirstUse: formData.ageOfFirstUse ? parseInt(formData.ageOfFirstUse) : null,
+            lastUseDate: formData.lastUseDate || null,
+            reasonForStopping: formData.reasonForStopping,
+            duration: formData.duration,
+            summary: formData.summary,
+            note: [{
+                text: formData.note
+            }]
+        };
+
+        if (toEdit) {
+            dispatch(updateAlcoholHistoryAction({ key: encryptMessage({ ...payload, id: toEdit._id }) }));
+        } else {
+            dispatch(createAlcoholHistoryAction({ key: encryptMessage(payload) }));
+        }
+    }, [dispatch, formData, patientId, toEdit]);
+
+    const handleReset = useCallback(() => {
         setFormData({
             useStatus: '',
             alcoholType: '',
@@ -89,25 +147,39 @@ const AlcoholHistory = () => {
             ageOfFirstUse: '',
             lastUseDate: '',
             reasonForStopping: '',
+            duration: '',
+            summary: ''
         });
         setToEdit(null);
-        setDeleteModal(false);
-    };
+    }, []);
 
-    const handleEditorFocus = () => {
+    const handleEditorFocus = useCallback(() => {
+        dispatch(createSuggestionAction({ module: 'alcoholHistory' }));
         setShowSuggestions(true);
-    };
+    }, [dispatch]);
 
-    const deleteHistory = () => {
-        // Static delete handling
+    const deleteHistory = useCallback(() => {
+        if (toDelete) {
+            dispatch(deleteAlcoholHistoryAction({ id: toDelete }));
+        }
+    }, [dispatch, toDelete]);
+
+    const closeDeleteModal = useCallback(() => {
         setToDelete(null);
         setDeleteModal(false);
-    };
+    }, []);
 
-    const closeDeleteModal = () => {
-        setToDelete(null);
-        setDeleteModal(false);
-    };
+    const handleSuggestionSelect = useCallback((suggestionText) => {
+        const current = formData.note;
+        setFormData(prev => ({
+            ...prev,
+            note: `${current}<p>${suggestionText}</p>`
+        }));
+    }, [formData.note]);
+
+    const handleLimitExceed = useCallback(({ message }) => {
+        ToastHandle(message, 'danger');
+    }, []);
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -117,12 +189,22 @@ const AlcoholHistory = () => {
         });
     };
 
-    const handleQuillChange = (content) => {
-        setFormData({
-            ...formData,
-            note: content,
-        });
-    };
+    const handleQuillChange = useCallback((content) => {
+        setFormData(prev => ({
+            ...prev,
+            note: content
+        }));
+    }, []);
+
+    // Word limit hook
+    useQuillWordLimit({
+        quillRef,
+        maxWords: MAX_WORDS,
+        maxWordLength: 45,
+        onLimitExceed: handleLimitExceed,
+        setValue: (value) => setFormData(prev => ({ ...prev, note: value })),
+        fieldName: 'note',
+    });
 
     return (
         <Row className="scroll-container" style={{ overflowY: 'scroll', overflowX: 'hidden', height: '100%' }}>
@@ -283,6 +365,8 @@ const AlcoholHistory = () => {
                                                     name="ageOfFirstUse"
                                                     value={formData.ageOfFirstUse}
                                                     onChange={handleInputChange}
+                                                    min="1"
+                                                    max="100"
                                                 />
                                             </Form.Group>
                                         </Col>
@@ -298,7 +382,7 @@ const AlcoholHistory = () => {
                                                 />
                                             </Form.Group>
                                         </Col>
-                                        <Col sm={6}>
+                                        <Col sm={12}>
                                             <Form.Group className="mb-1">
                                                 <Form.Label className="mb-0">
                                                     Reason for stopping alcohol use
@@ -309,6 +393,19 @@ const AlcoholHistory = () => {
                                                     name="reasonForStopping"
                                                     value={formData.reasonForStopping}
                                                     onChange={handleInputChange}
+                                                    placeholder="Enter reason for stopping alcohol use"
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm={6}>
+                                            <Form.Group className="mb-1">
+                                                <Form.Label className="mb-0">Duration of use</Form.Label>
+                                                <Form.Control
+                                                    type="text"
+                                                    name="duration"
+                                                    value={formData.duration}
+                                                    onChange={handleInputChange}
+                                                    placeholder="e.g., 5 years, Since college"
                                                 />
                                             </Form.Group>
                                         </Col>
@@ -330,15 +427,25 @@ const AlcoholHistory = () => {
                                                         </span>
                                                     </div>
                                                     <small className="text-muted">
-                                                        {`${wordCount} / ${MAX_WORDS} words`}
+                                                        {(() => {
+                                                            const plainText = quillRef?.current?.getEditor()?.getText()?.trim();
+                                                            const words = plainText?.split(/\s+/)?.filter(Boolean);
+                                                            const wordCount = words?.length || 0;
+                                                            return `${wordCount} / ${MAX_WORDS} words`;
+                                                        })()}
                                                     </small>
                                                 </Form.Label>
                                                 <ReactQuill
+                                                    ref={quillRef}
                                                     value={formData.note}
-                                                    onChange={handleQuillChange}
+                                                    onChange={(content, delta, source) => {
+                                                        if (source === 'user') {
+                                                            handleQuillChange(content);
+                                                        }
+                                                    }}
                                                     theme="snow"
                                                     placeholder="Enter detailed notes here..."
-                                                    style={{ height: '270px', backgroundColor: 'white' }}
+                                                    style={{ height: '200px', backgroundColor: 'white' }}
                                                     modules={{
                                                         toolbar: [
                                                             [{ header: [1, 2, false] }],
@@ -348,14 +455,56 @@ const AlcoholHistory = () => {
                                                         ],
                                                     }}
                                                 />
+                                                <SuggestionOffcanvas
+                                                    show={showSuggestions}
+                                                    onClose={() => setShowSuggestions(false)}
+                                                    onSelect={handleSuggestionSelect}
+                                                />
                                             </Form.Group>
                                         </Col>
                                     </Row>
                                 )}
+
+                                {/* Summary field for all statuses except Never Used */}
+                                {/* {formData.useStatus !== 'Never Used' && formData.useStatus !== '' && (
+                                    <Row>
+                                        <Col xs={12}>
+                                            <Form.Group className="mb-1">
+                                                <Form.Label className="mb-0">Summary</Form.Label>
+                                                <Form.Control
+                                                    as="textarea"
+                                                    rows={2}
+                                                    name="summary"
+                                                    value={formData.summary}
+                                                    onChange={handleInputChange}
+                                                    placeholder="Doctor's interpretation or quick summary"
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                )} */}
                             </div>
-                            <div className="d-flex justify-content-end mt-3 align-items-center">
-                                <Button variant="primary" type="submit" className="custom-buttons px-4 py-1">
-                                    {toEdit ? 'Update' : 'Add'}
+                            <div className="d-flex justify-content-end mt-3 align-items-center gap-2">
+                                {toEdit && (
+                                    <Button
+                                        type="button"
+                                        variant="outline-secondary"
+                                        onClick={handleReset}
+                                        className="px-3 py-1"
+                                    >
+                                        Cancel
+                                    </Button>
+                                )}
+                                <Button
+                                    variant="primary"
+                                    type="submit"
+                                    disabled={isCreating || isUpdating}
+                                    className="custom-buttons px-4 py-1"
+                                >
+                                    {(isCreating || isUpdating) && (
+                                        <Spinner color='white' className="me-1 spinner-border-sm" />
+                                    )}
+                                    {toEdit ? 'Update Record' : 'Add Record'}
                                 </Button>
                             </div>
                         </Form>
@@ -366,14 +515,18 @@ const AlcoholHistory = () => {
             {/* Right Side - Display */}
             <Col md={6} className="d-flex flex-column px-0 scroll-container">
                 <Card.Body className="px-2 py-1 p-0">
-                    {alcoholData?.length === 0 ? (
+                    {isLoading ? (
+                        <div className="text-center py-4">
+                            <Spinner />
+                        </div>
+                    ) : !alcoholHistory?.length ? (
                         <div className="text-center py-4 text-muted">
                             <i className="bi bi-journal-x fs-1"></i>
                             <p className="mt-2 mb-0">No alcohol use records found</p>
                         </div>
                     ) : (
                         <Accordion alwaysOpen flush>
-                            {alcoholData?.map((item, index) => (
+                            {alcoholHistory?.map((item, index) => (
                                 <Accordion.Item eventKey={index.toString()} key={index} className="rounded-1">
                                     <Accordion.Header>
                                         <div
@@ -386,15 +539,25 @@ const AlcoholHistory = () => {
                                                 <span className="fw-normal fs-6 tab-font-family text-black">
                                                     {item?.useStatus?.length > 35
                                                         ? item?.useStatus?.slice(0, 34) + '...'
-                                                        : item?.useStatus || ''}{' '}
+                                                        : item?.useStatus || 'No status'}{' '}
                                                     <span className="fs-6 text-muted fw-semibold">
                                                         {item?.alcoholType && `(${item?.alcoholType})`}
                                                     </span>
                                                 </span>
                                                 <small className="text-black" style={{ fontSize: '12px' }}>
+                                                    (
                                                     {item?.effectiveDateTime
-                                                        ? `${new Date(item?.effectiveDateTime).toLocaleDateString()} (${new Date(item?.effectiveDateTime).toLocaleTimeString()})`
+                                                        ? new Date(item?.effectiveDateTime).toLocaleDateString('en-US', {
+                                                            month: 'short',
+                                                            day: 'numeric',
+                                                            year: 'numeric',
+                                                        })
                                                         : 'No date'}
+                                                    -
+                                                    {item?.effectiveDateTime
+                                                        ? new Date(item?.effectiveDateTime).toLocaleTimeString()
+                                                        : 'No time'}
+                                                    )
                                                 </small>
                                             </div>
                                             {/* Action Icons */}
@@ -403,6 +566,7 @@ const AlcoholHistory = () => {
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                 }}>
+
                                                 <i
                                                     className="bi bi-trash text-danger cursor-pointer"
                                                     onClick={(e) => {
@@ -419,29 +583,16 @@ const AlcoholHistory = () => {
                                                             e.stopPropagation();
                                                             handleReset();
                                                         }}
-                                                        title="Cancel"
+                                                        title="Cancel Edit"
                                                     />
                                                 ) : (
                                                     <i
-                                                        className="bi bi-pencil text-info cursor-pointer"
+                                                        className="mdi mdi-square-edit-outline cursor-pointer fs-5"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             setToEdit(item);
-                                                            setFormData({
-                                                                useStatus: item.useStatus || '',
-                                                                alcoholType: item.alcoholType || '',
-                                                                frequency: item.frequency || '',
-                                                                quantityPerOccasion: item.quantityPerOccasion || '',
-                                                                hasDependenceSymptoms:
-                                                                    item.hasDependenceSymptoms || false,
-                                                                heavyIntakeFrequency: item.heavyIntakeFrequency || '',
-                                                                note: item.note?.[0]?.text || '<ul><li></li></ul>',
-                                                                ageOfFirstUse: item.ageOfFirstUse || '',
-                                                                lastUseDate: item.lastUseDate || '',
-                                                                reasonForStopping: item.reasonForStopping || '',
-                                                            });
                                                         }}
-                                                        title="Edit"
+                                                        title="Edit Record"
                                                     />
                                                 )}
                                             </div>
@@ -466,13 +617,12 @@ const AlcoholHistory = () => {
                 </Card.Body>
             </Col>
 
-            {/* Deletion Modal - Static version */}
             <DeletionModal
                 show={deleteModal}
                 onHide={closeDeleteModal}
                 onConfirm={deleteHistory}
-                item="alcohol history"
-                isLoading={store?.deleteAlcoholHistoryReducer?.loading}
+                item="alcohol history record"
+                isLoading={isDeleting}
             />
         </Row>
     );

@@ -13,6 +13,7 @@ const createMedicationTypes = (base: string) => ({
 const baseActions = [
     'CREATE_MEDICATION',
     'UPDATE_MEDICATION',
+    'DELETE_MEDICATION',
     'GET_MEDICATION',
     'GET_MEDICATION_DRUGS',
 ];

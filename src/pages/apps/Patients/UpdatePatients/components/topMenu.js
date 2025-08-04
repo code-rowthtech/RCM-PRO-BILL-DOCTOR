@@ -1,30 +1,64 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Col } from 'react-bootstrap';
 import { encryptMessage } from '../../../../../cryptoUtils';
 import { patientMenuItems } from '../../../../../utils/patientChartUiData';
 const TopMenu = (props) => {
-    const { selectedMainTab, setSelectedMainTab } = props;
-    const [activeSubmenu, setActiveSubmenu] = useState(null);
+    const { selectedMainTab, setSelectedMainTab, activeSubmenu, setActiveSubmenu } = props;
     const [showMoreMenu, setShowMoreMenu] = useState(false);
+    const menuRef = useRef(null);
+
+
+
+    // Close dropdowns when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setActiveSubmenu(null);
+                setShowMoreMenu(false);
+            }
+        };
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, []);
+
 
     const handleSelectTab = (e, item) => {
         e?.stopPropagation();
         if (item.subItems) {
             toggleSubmenu(item.label);
         } else {
-            // setActiveKey('0')
             setSelectedMainTab(item.tab);
             sessionStorage.setItem('selectedMainTab', encryptMessage(item.tab));
-            // setActiveSubmenu(null);
+            setActiveSubmenu(null);
+            sessionStorage.setItem('activeSubmenu', null);
         }
     }
 
     const toggleSubmenu = (label) => {
-        setActiveSubmenu((prev) => (prev === label ? null : label));
+        const newSubmenu = activeSubmenu === label ? null : label;
+        setActiveSubmenu(newSubmenu);
+        sessionStorage.setItem('activeSubmenu', newSubmenu);
     };
+
+    const handleSubmenuSelect = (subItem) => {
+        setSelectedMainTab(subItem.tab);
+        sessionStorage.setItem('selectedMainTab', encryptMessage(subItem.tab));
+        setActiveSubmenu(null); // Close submenu after selection
+    };
+
+    // Auto-open submenu if selected tab is a submenu item
+    // useEffect(() => {
+    //     const parentMenu = patientMenuItems.find(item =>
+    //         item.subItems?.some(subItem => subItem.tab === selectedMainTab)
+    //     );
+    //     if (parentMenu && !activeSubmenu) {
+    //         setActiveSubmenu(parentMenu.label);
+    //         sessionStorage.setItem('activeSubmenu', parentMenu.label);
+    //     }
+    // }, [selectedMainTab, activeSubmenu, setActiveSubmenu]);
     return (
         <Col xs={12}>
-            <ul className='list-group border border-muted d-flex flex-row patientChartscroll position-relative list-unstyled '>
+            <ul ref={menuRef} className='list-group border border-muted d-flex flex-row patientChartscroll position-relative list-unstyled '>
                 {patientMenuItems?.map((item, index) => (
                     <li className={`cursor-pointer px-0 p-1 fs-6 text-nowrap list-group-item  
                                                         py-1 flex-fill text-center position-relative fw-bold
@@ -54,11 +88,9 @@ const TopMenu = (props) => {
                                 {item.subItems.map((subItem, subIndex) => (
                                     <li
                                         key={subIndex}
-                                        onClick={() => {
-                                            setSelectedMainTab(subItem.tab);
-                                            sessionStorage.setItem('selectedMainTab', subItem.tab);
-                                        }}
-                                        className="list-group-item submenuItem py-1 text-start fs-6">
+                                        onClick={() => handleSubmenuSelect(subItem)}
+                                        className={`list-group-item submenuItem py-1 text-start fs-6 cursor-pointer ${selectedMainTab === subItem.tab ? 'bg-light text-primary fw-bold' : ''
+                                            }`}>
                                         {subItem.label}
                                     </li>
                                 ))}
@@ -78,8 +110,10 @@ const TopMenu = (props) => {
                                     key={index}
                                     onClick={() => {
                                         setSelectedMainTab(data.tab);
-                                        sessionStorage.setItem('selectedMainTab', data.tab);
+                                        sessionStorage.setItem('selectedMainTab', encryptMessage(data.tab));
                                         setShowMoreMenu(false);
+                                        setActiveSubmenu(null);
+                                        sessionStorage.setItem('activeSubmenu', null);
                                     }}
                                     className="list-group-item  py-1 text-start fs-6">
                                     {data.label}

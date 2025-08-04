@@ -1,65 +1,91 @@
+// React imports
 import { useEffect, useState } from "react";
+import { Col, Row } from "react-bootstrap";
+
+// Redux imports
+import { useDispatch, useSelector } from "react-redux";
+import { getNoteSettingAction } from "redux/noteCategories/action";
+import { getEncounterSettingsAction } from "redux/actions";
+
+// Icon imports
 import { CiSettings } from "react-icons/ci";
 import { HiMiniBars3BottomLeft } from 'react-icons/hi2';
 import { BiCollapse, BiExpand } from 'react-icons/bi';
-import { useDispatch } from "react-redux";
 import { IoClose } from 'react-icons/io5';
-import NewEncounterModal from "./components/NewEncounterModal";
-import { Col, Row } from "react-bootstrap";
+
+// Component imports
 import EncounterList from "./components/EncounterList";
-import CreateEncounter from "./components/CreateEncounter";
-import EncounterSettings from "./components/EncounterSettings";
+import DuplicateEncounterModal from "./components/DuplicateEncounterModal";
+import CreateEncounterComponent from "./components/CreateEncounterComponent";
+import EncounterSettingsForm from "./components/EncounterSettings";
 
+/**
+ * Encountersindex Component
+ * Main container for encounter management with tabbed interface
+ * Features: Tab management, encounter list/create views, settings, expand/collapse
+ */
 const Encountersindex = (props) => {
-    const { encounterTabs, setEncounterTabs, expanded, setExpanded, createEncounter, setCreateEncounter } = props;
-    const [activeTab, setActiveTab] = useState(encounterTabs[0]?.id || '');
-    const [isCollapsed, setIsCollapsed] = useState(false);
-    const [newEncounterModal, setNewEncounterModal] = useState(false);
-    const [showSettings, setShowSettings] = useState(false);
+    // Props destructuring
+    const {
+        encounterTabs,
+        setEncounterTabs,
+        expanded,
+        setExpanded,
+        createEncounter,
+        setCreateEncounter
+    } = props;
 
-    const toggleCollapse = () => setIsCollapsed(!isCollapsed);
-    const encounterListProps = {
-        expanded, setExpanded, setCreateEncounter, encounterTabs, setEncounterTabs, setActiveTab
-    }
-    const removeEncounterTab = (idToRemove, e) => {
-        if (e) e.stopPropagation();
-        const newTabs = encounterTabs.filter(tab => tab.id !== idToRemove);
-        setEncounterTabs(newTabs);
+    // Hooks initialization
+    const dispatch = useDispatch();
+    const store = useSelector((state) => state);
 
-        if (activeTab === idToRemove) {
-            setActiveTab(newTabs.length > 0 ? newTabs[0].id : '');
+    // Component state management
+    const [activeTab, setActiveTab] = useState(encounterTabs[0]?.id || ''); // Currently active tab
+    const [isCollapsed, setIsCollapsed] = useState(false); // Tab bar collapse state
+    const [newEncounterModal, setNewEncounterModal] = useState(false); // Duplicate encounter modal
+    const [showSettings, setShowSettings] = useState(false); // Settings panel visibility
+
+    // Effect hooks
+
+    // Load encounter settings on component mount
+    useEffect(() => {
+        dispatch(getEncounterSettingsAction({ doctorId: store?.Auth?.user?.doctorId }));
+    }, [dispatch, store?.Auth?.user?.doctorId]);
+
+    // Handle create encounter trigger
+    useEffect(() => {
+        if (createEncounter) {
+            handleCreateEncounterRequest();
+            setCreateEncounter(false);
+        }
+    }, [createEncounter, encounterTabs, setEncounterTabs, setCreateEncounter]);
+
+    // Event handlers
+
+    /**
+     * Handle create encounter request
+     * Checks for existing tab and shows modal if duplicate exists
+     */
+    const handleCreateEncounterRequest = () => {
+        const today = new Date().toISOString().split('T')[0];
+
+        // Check if there's already a createEncounter tab for today
+        const existingTodayTab = encounterTabs.find(
+            (tab) => tab.type === 'createEncounter' && tab.title === today
+        );
+
+        if (existingTodayTab) {
+            setNewEncounterModal(true);
+        } else {
+            createNewEncounterTab();
         }
     };
 
-    useEffect(() => {
-        if (createEncounter) {
-            const today = new Date().toISOString().split('T')[0];
-
-            // Check if there's already a createEncounter tab for today
-            const existingTodayTab = encounterTabs.find(
-                (tab) => tab.type === 'createEncounter' && tab.title === today
-            );
-
-            if (existingTodayTab) {
-                setNewEncounterModal(true);
-            } else {
-                // Proceed to create new tab
-                const newTab = {
-                    id: Date.now(),
-                    title: today,
-                    type: 'createEncounter',
-                };
-                setEncounterTabs([...encounterTabs, newTab]);
-                setActiveTab(newTab.id);
-            }
-
-            setCreateEncounter(false);
-        }
-    }, [createEncounter]);
-
-    const closeNewEncounterModal = () => setNewEncounterModal(false);
-
-    const createNewEncounter = () => {
+    /**
+     * Create new encounter tab
+     * Adds new tab and sets it as active
+     */
+    const createNewEncounterTab = () => {
         const newTab = {
             id: Date.now(),
             title: new Date().toISOString().split('T')[0],
@@ -67,43 +93,102 @@ const Encountersindex = (props) => {
         };
         setEncounterTabs([...encounterTabs, newTab]);
         setActiveTab(newTab.id);
+    };
+
+    /**
+     * Remove encounter tab
+     * Handles tab removal and active tab switching
+     */
+    const removeEncounterTab = (idToRemove, e) => {
+        if (e) e.stopPropagation();
+
+        const newTabs = encounterTabs.filter(tab => tab.id !== idToRemove);
+        setEncounterTabs(newTabs);
+
+        // Switch active tab if removed tab was active
+        if (activeTab === idToRemove) {
+            setActiveTab(newTabs.length > 0 ? newTabs[0].id : '');
+        }
+    };
+
+    /**
+     * Handle tab click
+     * Sets active tab and manages expanded state
+     */
+    const handleTabClick = (tab) => {
+        if (tab?.type !== 'default') {
+            setExpanded(true);
+        }
+        setActiveTab(tab?.id);
+    };
+
+    // UI control handlers
+    const toggleCollapse = () => setIsCollapsed(!isCollapsed);
+    const closeNewEncounterModal = () => setNewEncounterModal(false);
+    const createNewEncounter = () => {
+        createNewEncounterTab();
         setNewEncounterModal(false);
-    }
+    };
+
+    // Props for child components
+    const encounterListProps = {
+        expanded,
+        setExpanded,
+        setCreateEncounter,
+        encounterTabs,
+        setEncounterTabs,
+        setActiveTab
+    };
+
     return (
         <div className="row pt-2 pb-1">
-            <div className="col-12 d-flex align-items-center justify-content-between px-2 " style={{ height: 'fit-content' }}>
-                <div className="d-flex align-items-center ">
-                    {encounterTabs?.length > 1 &&
+            {/* Tab Header Section */}
+            <div className="col-12 d-flex align-items-center justify-content-between px-2"
+                style={{ height: 'fit-content' }}>
+
+                {/* Tab Navigation */}
+                <div className="d-flex align-items-center">
+                    {/* Control Icons - Only show when multiple tabs exist */}
+                    {encounterTabs?.length > 1 && (
                         <>
                             <HiMiniBars3BottomLeft
                                 onClick={toggleCollapse}
-                                className='fw-bold fs-4 mx-1 cursor-pointer text-black' />
+                                className='fw-bold fs-4 mx-1 cursor-pointer text-black'
+                                title="Toggle tab collapse"
+                            />
                             <CiSettings
                                 onClick={() => setShowSettings(!showSettings)}
-                                className='fw-bold fs-4 mx-1 cursor-pointer text-black' />
-                        </>}
-                    <EncounterSettings showSettings={showSettings} closeSettings={() => setShowSettings(false)} />
+                                className='fw-bold fs-4 mx-1 cursor-pointer text-black'
+                                title="Encounter settings"
+                            />
+                        </>
+                    )}
+
+                    {/* Settings Panel */}
+                    <EncounterSettingsForm
+                        showSettings={showSettings}
+                        closeSettings={() => setShowSettings(false)}
+                    />
+
+                    {/* Tab List */}
                     {encounterTabs?.map((tab) => (
                         <div
                             key={tab?.id}
                             className={`cursor-pointer p-1 fs-6 rounded-0 list-group-item  
-                                    d-flex align-items-center flex-fill justify-content-center fw-bold 
-                                     ${activeTab === tab?.id ? 'active-patient-chart-tab fw-medium border border-muted' : 'border border-muted'}`}
-                            onClick={() => {
-                                if (tab?.type !== 'default') {
-                                    setExpanded(true);
-                                }
-                                if (tab?.type === 'updateEncounter') {
-                                    // dispatch(getEncounterByIdAction({ encounterId: tab?.id }))
-                                }
-                                setActiveTab(tab?.id)
-                            }}
+                                d-flex align-items-center flex-fill justify-content-center fw-bold 
+                                ${activeTab === tab?.id
+                                    ? 'active-patient-chart-tab fw-medium border border-muted'
+                                    : 'border border-muted'}`}
+                            onClick={() => handleTabClick(tab)}
                         >
                             <span className="text-nowrap">{tab?.title}</span>
+
+                            {/* Close button for non-default tabs */}
                             {tab.type !== 'default' && (
                                 <span
                                     className="p-0 ms-2 m-0"
                                     onClick={(e) => removeEncounterTab(tab?.id, e)}
+                                    title="Close tab"
                                 >
                                     <IoClose />
                                 </span>
@@ -111,28 +196,54 @@ const Encountersindex = (props) => {
                         </div>
                     ))}
                 </div>
-                {expanded ?
-                    <BiCollapse className='text-primary fw-bold fs-4 cursor-pointer me-2' onClick={() => setExpanded(!expanded)} />
-                    :
-                    <BiExpand className='text-primary fw-bold fs-4 cursor-pointer me-2' onClick={() => setExpanded(!expanded)} />
-                }
+
+                {/* Expand/Collapse Toggle */}
+                {expanded ? (
+                    <BiCollapse
+                        className='text-primary fw-bold fs-4 cursor-pointer me-2'
+                        onClick={() => setExpanded(!expanded)}
+                        title="Collapse panel"
+                    />
+                ) : (
+                    <BiExpand
+                        className='text-primary fw-bold fs-4 cursor-pointer me-2'
+                        onClick={() => setExpanded(!expanded)}
+                        title="Expand panel"
+                    />
+                )}
             </div>
+
+            {/* Tab Content Section */}
             <Row>
                 <Col sm={12}>
                     {encounterTabs?.map((tab) => (
-                        <div key={tab.id} className="mt-1" style={{ display: activeTab === tab.id ? 'block' : 'none' }}>
+                        <div
+                            key={tab.id}
+                            className="mt-1"
+                            style={{ display: activeTab === tab.id ? 'block' : 'none' }}
+                        >
+                            {/* Render appropriate component based on tab type */}
                             {tab?.type === 'default' ? (
                                 <EncounterList {...encounterListProps} />
                             ) : (
-                                <CreateEncounter isCollapsed={isCollapsed} />
+                                <CreateEncounterComponent
+                                    activeTabId={activeTab}
+                                    tabType={tab?.type}
+                                />
                             )}
                         </div>
                     ))}
                 </Col>
             </Row>
-            <NewEncounterModal showModal={newEncounterModal} closeNewEncounterModal={closeNewEncounterModal} createNewEncounter={createNewEncounter} />
+
+            {/* Duplicate Encounter Modal */}
+            <DuplicateEncounterModal
+                show={newEncounterModal}
+                onHide={closeNewEncounterModal}
+                onCreateNew={createNewEncounter}
+            />
         </div>
-    )
-}
+    );
+};
 
 export default Encountersindex;

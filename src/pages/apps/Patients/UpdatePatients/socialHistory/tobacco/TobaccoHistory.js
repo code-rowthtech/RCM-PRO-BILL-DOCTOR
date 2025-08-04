@@ -20,7 +20,7 @@ const Tobacco = () => {
     const patientId = searchParams.get('id');
     const store = useSelector((state) => state);
     const createSuccess = store?.createTobaccooReducer?.data?.status;
-    const tobaccoHistory = store?.getTobaccooReducer?.data?.tobaccoHistory;
+    const tobaccoHistory = store?.getTobaccooReducer?.data?.data?.tobaccoHistory;
     const isLoading = store?.getTobaccooReducer?.loading;
     const [showSuggestions, setShowSuggestions] = useState(false);
     const { register, handleSubmit, reset, getValues, control, setValue, watch } = useForm();
@@ -85,6 +85,7 @@ const Tobacco = () => {
         ];
         data.clinicId = loggedInUser?._id;
         if (toEdit) {
+            // data.id = ;
             dispatch(updateTobaccooAction({ key: encryptMessage(data), id: toEdit?._id }))
         } else {
             dispatch(createTobaccooAction({ key: encryptMessage(data) }));

@@ -7,9 +7,6 @@ import { decryptMessage } from '../../cryptoUtils';
  * @param {*} payload - username and password
  */
 
-
-
-
 function* createVitalsFunction(data) {
     try {
         yield put({

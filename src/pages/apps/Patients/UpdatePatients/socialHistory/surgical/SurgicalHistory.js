@@ -1,49 +1,50 @@
+// React and third-party imports
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Col, Row, Form, Button, Card, Accordion } from 'react-bootstrap';
+import { Col, Row, Form, Button, Accordion } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
+import Select from 'react-select';
+
+// Redux imports
 import { useDispatch, useSelector } from 'react-redux';
-import { useSearchParams } from 'react-router-dom';
 import { createSurgicalHistoryAction, deleteSurgicalHistoryAction, getSurgicalHistoryAction, updateSurgicalHistoryAction } from 'redux/socialHistory/action';
 import { getICDProcedureAction } from 'redux/icdCodes/action';
-import { encryptMessage } from 'cryptoUtils';
 import { createSuggestionAction } from 'redux/suggestion/action';
+
+// Router imports
+import { useSearchParams } from 'react-router-dom';
+
+// Utility imports
+import { encryptMessage } from 'cryptoUtils';
 import ToastHandle from 'helpers/ToastMessage';
 import useQuillWordLimit from 'helpers/quillWordLimit';
+
+// Component imports
 import Spinner from 'constants/Spinner';
-import Select from 'react-select';
 import DeletionModal from 'helpers/DeletionModal';
 import SuggestionOffcanvas from '../../SuggestionsFile/Suggestion';
+
+// Data imports
 import { bodySite } from 'utils/DataSets/surgicalHistoryDataset';
 
-
+// Constants
 const MAX_WORDS = 1000;
 const MAX_WORD_LENGTH = 45;
 
+/**
+ * SurgicalHistory Component
+ * Manages surgical history records for patients with CRUD operations
+ * Features: Form validation, rich text editor, ICD procedure codes, suggestions
+ */
 const SurgicalHistory = () => {
+    // Hooks initialization
     const dispatch = useDispatch();
     const quillRef = useRef(null);
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const store = useSelector((state) => state);
 
-    // State declarations
-    const [selectedIcdProcedure, setSelectedIcdProcedure] = useState(null);
-    const [bodySiteSelected, setBodySiteSelected] = useState(null);
-    const [search, setSearch] = useState('');
-    const [deleteModal, setDeleteModal] = useState(false);
-    const [toDelete, setToDelete] = useState(null);
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    const [toEdit, setToEdit] = useState(null);
-
-    // Selectors
-    const createSuccess = store?.createSurgicalHistoryReducer?.data?.status;
-    const deleteSuccess = store?.deleteSurgicalHistoryReducer?.data?.status;
-    const updateSuccess = store?.updateSurgicalHistoryReducer?.data?.status;
-    const surgicalHistory = store?.getSurgicalHistoryReducer?.data?.result;
-    const icdProcedureCodes = store?.getIcdProcedureReducer?.data?.pcsCodes;
-
-    // Form handling
+    // Form handling with react-hook-form
     const {
         register,
         handleSubmit,
@@ -55,12 +56,30 @@ const SurgicalHistory = () => {
         formState: { errors },
     } = useForm();
 
-    useEffect(() => {
-        if (!surgicalHistory) {
-            dispatch(getSurgicalHistoryAction({ patientId: patientId }));
-        }
-    }, [surgicalHistory, dispatch]);
+    // Component state management
+    const [selectedIcdProcedure, setSelectedIcdProcedure] = useState(null); // Selected ICD procedure code
+    const [bodySiteSelected, setBodySiteSelected] = useState(null); // Selected body site for surgery
+    const [search, setSearch] = useState(''); // Search term for ICD procedures
+    const [deleteModal, setDeleteModal] = useState(false); // Delete confirmation modal state
+    const [toDelete, setToDelete] = useState(null); // Item ID to delete
+    const [showSuggestions, setShowSuggestions] = useState(false); // Suggestions panel visibility
+    const [toEdit, setToEdit] = useState(null); // Item being edited
 
+    // Redux state selectors
+    const createSuccess = store?.createSurgicalHistoryReducer?.data?.status;
+    const deleteSuccess = store?.deleteSurgicalHistoryReducer?.data?.status;
+    const updateSuccess = store?.updateSurgicalHistoryReducer?.data?.status;
+    const surgicalHistory = store?.getSurgicalHistoryReducer?.data?.result;
+    const icdProcedureCodes = store?.getIcdProcedureReducer?.data?.pcsCodes;
+
+    // Effect hooks for data fetching and state management
+    
+    // Initial data fetch on component mount
+    useEffect(() => {
+        dispatch(getSurgicalHistoryAction({ patientId: patientId }));
+    }, [dispatch, patientId]);
+
+    // Populate form when editing an existing record
     useEffect(() => {
         if (toEdit) {
             setValue(
@@ -75,12 +94,14 @@ const SurgicalHistory = () => {
             });
             setBodySiteSelected(toEdit?.bodySite?.[0]?.coding?.[0]);
         }
-    }, [toEdit]);
+    }, [toEdit, setValue]);
 
+    // Fetch ICD procedure codes based on search term
     useEffect(() => {
         dispatch(getICDProcedureAction({ search: search }));
     }, [dispatch, search]);
 
+    // Handle successful record creation
     useEffect(() => {
         if (createSuccess === 201) {
             dispatch(getSurgicalHistoryAction({ patientId: patientId }));
@@ -89,6 +110,7 @@ const SurgicalHistory = () => {
         }
     }, [createSuccess, dispatch, patientId, reset]);
 
+    // Handle successful record deletion
     useEffect(() => {
         if (deleteSuccess === 200) {
             dispatch(getSurgicalHistoryAction({ patientId: patientId }));
@@ -97,8 +119,9 @@ const SurgicalHistory = () => {
             setDeleteModal(false);
             reset();
         }
-    }, [deleteSuccess, patientId]);
+    }, [deleteSuccess, dispatch, patientId, reset]);
 
+    // Handle successful record update
     useEffect(() => {
         if (updateSuccess === 200) {
             dispatch(getSurgicalHistoryAction({ patientId: patientId }));
@@ -107,8 +130,14 @@ const SurgicalHistory = () => {
             setBodySiteSelected(null);
             reset();
         }
-    }, [updateSuccess, patientId]);
+    }, [updateSuccess, dispatch, patientId, reset]);
 
+    // Event handlers and utility functions
+    
+    /**
+     * Form submission handler - creates or updates surgical history record
+     * Constructs FHIR-compliant payload with encrypted data
+     */
     const onSubmit = (data) => {
         const payload = {
             code: {
@@ -140,6 +169,8 @@ const SurgicalHistory = () => {
             subject: patientId,
             performedDateTime: data?.effectiveDateTime,
         };
+        
+        // Determine if updating existing record or creating new one
         if (toEdit) {
             payload.id = toEdit?._id;
             dispatch(updateSurgicalHistoryAction({ key: encryptMessage(payload) }));
@@ -148,6 +179,7 @@ const SurgicalHistory = () => {
         }
     };
 
+    // Rich text editor handlers
     const handleEditorFocus = () => {
         dispatch(createSuggestionAction({ module: 'surgical' }));
         setShowSuggestions(true);
@@ -158,11 +190,11 @@ const SurgicalHistory = () => {
         setValue('note', `${current}<p>${suggestionText}</p>`);
     };
 
-    const procedureOptions = icdProcedureCodes?.map((data) => ({
-        label: data?.title,
-        value: data?.value,
-    }));
+    const handleLimitExceed = ({ type, message }) => {
+        ToastHandle(message, 'danger');
+    };
 
+    // Form control handlers
     const handleIcdProcedure = (selectedOne) => {
         setSelectedIcdProcedure(selectedOne);
     };
@@ -174,6 +206,7 @@ const SurgicalHistory = () => {
         setToEdit(null);
     };
 
+    // Modal handlers
     const closeDeleteModal = () => {
         setToDelete(null);
         setDeleteModal(false);
@@ -183,10 +216,13 @@ const SurgicalHistory = () => {
         dispatch(deleteSurgicalHistoryAction({ id: toDelete }));
     };
 
-    const handleLimitExceed = ({ type, message }) => {
-        ToastHandle(message, 'danger');
-    };
+    // Data transformation
+    const procedureOptions = icdProcedureCodes?.map((data) => ({
+        label: data?.title,
+        value: data?.value,
+    }));
 
+    // Custom hook for word limit validation in Quill editor
     useQuillWordLimit({
         quillRef,
         maxWords: MAX_WORDS,
@@ -339,7 +375,7 @@ const SurgicalHistory = () => {
                                     }
                                     className="px-3 py-1 custom-buttons">
                                     {store?.createSurgicalHistoryReducer?.loading ||
-                                    store?.updateSurgicalHistoryReducer?.loading ? (
+                                        store?.updateSurgicalHistoryReducer?.loading ? (
                                         <Spinner />
                                     ) : toEdit ? (
                                         'Update'
@@ -385,13 +421,13 @@ const SurgicalHistory = () => {
                                                         (
                                                         {item?.performedDateTime
                                                             ? new Date(item.performedDateTime).toLocaleDateString(
-                                                                  'en-US',
-                                                                  {
-                                                                      month: 'short',
-                                                                      day: 'numeric',
-                                                                      year: 'numeric',
-                                                                  }
-                                                              )
+                                                                'en-US',
+                                                                {
+                                                                    month: 'short',
+                                                                    day: 'numeric',
+                                                                    year: 'numeric',
+                                                                }
+                                                            )
                                                             : 'No date'}
                                                         -{item.bodySite?.[0]?.coding?.[0]?.display || 'No site'})
                                                     </small>

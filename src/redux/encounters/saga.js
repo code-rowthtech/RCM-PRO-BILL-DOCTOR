@@ -24,7 +24,8 @@ function* createEncounterFunction(data) {
             payload: {},
         });
         const response = yield call(createEncounterApi, data);
-        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        // const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        const decryptedData = response.data.data;
         if (response.status === 201) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
@@ -155,7 +156,8 @@ function* getEncounterFunction(data) {
             payload: {},
         });
         const response = yield call(getEncounterApi, data);
-        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        // const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        const decryptedData = response.data.data;
         if (response.status === 200) {
             yield put({
                 type: EncounterActionTypes.GET_ENCOUNTER_SUCCESS,
@@ -208,7 +210,8 @@ function* getEncounterByIdFunction(data) {
             payload: {},
         });
         const response = yield call(getEncounterByIdApi, data);
-        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        // const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        const decryptedData = response.data.data;
         if (response.status === 200) {
             yield put({
                 type: EncounterActionTypes.GET_ENCOUNTER_BY_ID_SUCCESS,

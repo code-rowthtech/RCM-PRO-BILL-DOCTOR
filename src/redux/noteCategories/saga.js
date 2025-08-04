@@ -49,6 +49,51 @@ function* createNoteCategoriesFunction(data) {
     }
 }
 
+// function* getNoteCategoriesFunction(data) {
+//     try {
+//         yield put({
+//             type: NotesCategoriesActionTypes.GET_NOTE_CATEGORIES_LOADING,
+//             payload: {},
+//         });
+//         const response = yield call(getNoteCategoriesApi, data);
+//         console.log(response, '432rf23f')
+//         if (response?.data?.data) {
+//             const decryptedData = JSON.parse(decryptMessage(response.data.data));
+
+//             if (response.status === 200 || response.status === 201) {
+//                 yield put({
+//                     type: NotesCategoriesActionTypes.GET_NOTE_CATEGORIES_SUCCESS,
+//                     payload: { ...decryptedData },
+//                 });
+//             } else {
+//                 console.warn('Unexpected response status:', response.status);
+//                 yield put({
+//                     type: NotesCategoriesActionTypes.GET_NOTE_CATEGORIES_ERROR,
+//                     payload: { message: decryptedData?.message || 'Failed to fetch note categories' },
+//                 });
+//             }
+//         } else {
+//             yield put({
+//                 type: NotesCategoriesActionTypes.GET_NOTE_CATEGORIES_ERROR,
+//                 payload: { message: 'Invalid response format' },
+//             });
+//         }
+//     } catch (error) {
+//         console.error('Error fetching note categories:', error);
+//         const errorMessage = error?.response?.data?.message || error?.message || 'Failed to fetch note categories';
+
+//         yield put({
+//             type: NotesCategoriesActionTypes.GET_NOTE_CATEGORIES_ERROR,
+//             payload: { message: errorMessage },
+//         });
+
+//         // Only show toast for non-search related errors or critical errors
+//         if (!data?.data?.search || error?.response?.status >= 500) {
+//             ToastHandle(errorMessage, 'danger');
+//         }
+//     }
+// }
+
 function* getNoteCategoriesFunction(data) {
     try {
         yield put({
@@ -57,15 +102,10 @@ function* getNoteCategoriesFunction(data) {
         });
         const response = yield call(getNoteCategoriesApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
-            // ToastHandle(decryptedData?.message, 'success');
+        if (response.status === 200) {
             yield put({
                 type: NotesCategoriesActionTypes.GET_NOTE_CATEGORIES_SUCCESS,
                 payload: { ...decryptedData },
-            });
-            yield put({
-                type: NotesCategoriesActionTypes.GET_NOTE_CATEGORIES_RESET,
-                payload: {},
             });
         } else {
             yield put({
@@ -81,7 +121,6 @@ function* getNoteCategoriesFunction(data) {
         });
     }
 }
-
 function* updateNoteCategoriesFunction(data) {
     try {
         yield put({

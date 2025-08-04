@@ -7,9 +7,13 @@ import AddRefferingDoctor from './ReferringDoctor';
 import AddResponsibleParty from './ResponsibleParty';
 import AddInsurance from './AddInsurance';
 import { useSelector } from 'react-redux';
+import { loggedInUser } from 'helpers/loggedInUser';
+import { useDispatch } from 'react-redux';
+import { getPatientsAction } from 'redux/actions';
 
 const AddNewPatient = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const [activeTab, setActiveTab] = useState('Patient Details');
     const [patientId, setPatientId] = useState(null);
@@ -25,6 +29,13 @@ const AddNewPatient = () => {
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
     useEffect(() => {
         if (createResponse === 201 && createPatientResponse?._id) {
+            dispatch(getPatientsAction({
+                doctorId: loggedInUser?.doctorId || store?.Auth?.user?.doctorId,
+                page: 1,
+                limit: 10,
+                search: '',
+                clinicId: loggedInUser?.clinicId || store?.Auth?.user?.clinicId,
+            }));
             setPatientId(createPatientResponse._id);
             setActiveTab('Demographics');
         }
@@ -64,7 +75,7 @@ const AddNewPatient = () => {
                 <Card className="px-2 ">
                     <div className="d-flex justify-content-between pt-2 px-2">
                         <div style={{ borderBottom: '2px solid grey' }}>
-                            <ul className="nav nav-underline">
+                            <ul className="nav nav-underline fs-6">
                                 {[
                                     'Patient Details',
                                     'Demographics',
@@ -79,9 +90,8 @@ const AddNewPatient = () => {
                                 ].map((tab) => (
                                     <li className="nav-item" key={tab}>
                                         <a
-                                            className={`nav-link pb-0 tab-font-family me-3 ${
-                                                activeTab === tab ? 'active text-primary' : 'text-black'
-                                            }`}
+                                            className={`nav-link pb-0 tab-font-family me-3 ${activeTab === tab ? 'active text-primary' : 'text-black'
+                                                }`}
                                             onClick={() => handleTabClick(tab)}
                                             style={{ cursor: 'pointer', fontWeight: 600 }}>
                                             {tab}
@@ -109,12 +119,12 @@ const AddNewPatient = () => {
                         {activeTab === 'Demographics' && (
                             <AddDemographics
                                 patientId={patientId}
-                                //  setActiveTab={setActiveTab} setVisibleResponsible={setVisibleReffering}
+                            //  setActiveTab={setActiveTab} setVisibleResponsible={setVisibleReffering}
                             />
                         )}
                         {activeTab === 'Insurances' && <AddInsurance patientId={patientId} />}
-                        {activeTab === 'RefferingDoctor' && <AddRefferingDoctor patientId={patientId}  setActiveTab={setActiveTab}/>}
-                        {activeTab === 'ResponsibleParty' && <AddResponsibleParty patientId={patientId} setActiveTab={setActiveTab } />}
+                        {activeTab === 'RefferingDoctor' && <AddRefferingDoctor patientId={patientId} setActiveTab={setActiveTab} />}
+                        {activeTab === 'ResponsibleParty' && <AddResponsibleParty patientId={patientId} setActiveTab={setActiveTab} />}
                         {activeTab === 'Eligibility' && <p>⏳ In Progress</p>}
                         {activeTab === 'Authorizations' && <p>⏳ In Progress</p>}
                         {activeTab === 'Vital Status' && <p>⏳ In Progress</p>}

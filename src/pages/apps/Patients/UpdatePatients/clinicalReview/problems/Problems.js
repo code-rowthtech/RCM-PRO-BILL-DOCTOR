@@ -1,61 +1,70 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Col, Row, Table } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import { deleteProblemsAction, getProblemById, getProblemsAction } from 'redux/actions';
 import Spinner from '../../../../../../constants/Spinner';
 import Paginations from 'helpers/Paginations';
 import DeletionModal from 'helpers/DeletionModal';
-import { useSelector } from 'react-redux';
 import ProblemsModal from './ProblemsModal';
 
 const Problems = () => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
-    const patientId = searchParams.get('id');
     const [problemModal, setProblemModal] = useState(false);
-    const [isEditMode, setIsEditMode] = useState(false);
     const [selectedProblem, setSelectedProblem] = useState(null);
     const [deleteModal, setDeleteModal] = useState(false);
     const [deletionId, setDeletionId] = useState(null);
     const [skip, setSkip] = useState(1);
-    const store = useSelector((state) => state);
-    const problemList = store?.getProblemsReducer?.data?.problems;
-    const isLoading = store?.getProblemsReducer?.loading;
-    const deleteResponse = store?.deleteProblemsReducer?.data?.status;
+    
+    const patientId = searchParams.get('id');
+    
+    const { getProblemsReducer, deleteProblemsReducer, getProblemListReducer } = useSelector((state) => state);
+    const problemList = getProblemsReducer?.data?.problems;
+    const isLoading = getProblemsReducer?.loading;
+    const deleteResponse = deleteProblemsReducer?.data?.status;
+    const totalPages = getProblemListReducer?.data?.pagination?.totalPages;
 
     useEffect(() => {
-        dispatch(getProblemsAction({ patientId, skip }));
+        if (patientId) {
+            dispatch(getProblemsAction({ patientId, skip }));
+        }
     }, [dispatch, patientId, skip]);
 
-    const handleEditClick = (problem) => {
+    const handleEditClick = useCallback((problem) => {
         setSelectedProblem(problem);
-        setIsEditMode(true);
         setProblemModal(true);
-    };
+        dispatch(getProblemById({ id: problem._id }));
+    }, [dispatch]);
 
-    // delete function
-    const handleDelete = () => {
+    const handleDelete = useCallback(() => {
         dispatch(deleteProblemsAction({ id: deletionId }));
-    };
+    }, [dispatch, deletionId]);
     
- const handleCloseModal = () => {
+    const handleCloseModal = useCallback(() => {
         setProblemModal(false);
         setSelectedProblem(null);
-    };
+    }, []);
+    
+    const closeDeleteModal = useCallback(() => {
+        setDeleteModal(false);
+    }, []);
+    
+    const handleDeleteClick = useCallback((problemId) => {
+        setDeletionId(problemId);
+        setDeleteModal(true);
+    }, []);
+    
+    const handlePageChange = useCallback((pageNumber) => {
+        setSkip(pageNumber);
+    }, []);
+
     useEffect(() => {
         if (deleteResponse === 200) {
             dispatch(getProblemsAction({ patientId, skip: 1 }));
             setDeleteModal(false);
         }
     }, [deleteResponse, dispatch, patientId]);
-
-    const closeDeleteModal = () => {
-        setDeleteModal(false);
-    };
-    const handlePageChange = (pageNumber) => {
-        setSkip(pageNumber);
-    };
     return (
         <Row>
             <Col sm={12}>
@@ -77,35 +86,32 @@ const Problems = () => {
                                 </td>
                             </tr>
                         ) : problemList?.length > 0 ? (
-                            problemList?.map((data, index) => (
-                                <tr key={data.id || index}>
-                                    <td>{index + 1}</td>
-                                    <td>{data?.code?.coding?.[0]?.display || 'N/A'}</td>
-                                    <td>{data?.code?.coding?.[0]?.code || 'N/A'}</td>
-                                    <td>{new Date(data?.onsetDateTime).toLocaleDateString('en-GB')}</td>
-                                    <td>{data.clinicalStatus?.coding?.[0]?.display || 'N/A'}</td>
-                                    <td>
-                                        <i
-                                            className="mdi mdi-square-edit-outline cursor-pointer fs-5"
-                                            onClick={() => {
-                                                handleEditClick(data);
-                                                const requestData = {
-                                                    id: data?._id,
-                                                };
-                                                dispatch(getProblemById(requestData));
-                                            }}
-                                        />
-                                        &nbsp;
-                                        <i
-                                            className="bi bi-trash-fill text-danger cursor-pointer"
-                                            onClick={() => {
-                                                setDeletionId(data?._id);
-                                                setDeleteModal(true);
-                                            }}
-                                        />
-                                    </td>
-                                </tr>
-                            ))
+                            problemList.map((data, index) => {
+                                const formattedDate = data.onsetDateTime 
+                                    ? new Date(data.onsetDateTime).toLocaleDateString('en-GB') 
+                                    : 'N/A';
+                                    
+                                return (
+                                    <tr key={data._id || index}>
+                                        <td>{index + 1}</td>
+                                        <td>{data.code?.coding?.[0]?.display || 'N/A'}</td>
+                                        <td>{data.code?.coding?.[0]?.code || 'N/A'}</td>
+                                        <td>{formattedDate}</td>
+                                        <td>{data.clinicalStatus?.coding?.[0]?.display || 'N/A'}</td>
+                                        <td>
+                                            <i
+                                                className="mdi mdi-square-edit-outline cursor-pointer fs-5"
+                                                onClick={() => handleEditClick(data)}
+                                            />
+                                            &nbsp;
+                                            <i
+                                                className="bi bi-trash-fill text-danger cursor-pointer"
+                                                onClick={() => handleDeleteClick(data._id)}
+                                            />
+                                        </td>
+                                    </tr>
+                                );
+                            })
                         ) : (
                             <tr>
                                 <td colSpan={10} className="text-center">
@@ -120,18 +126,18 @@ const Problems = () => {
                 <div className="mt-2 d-flex justify-content-end">
                     <Paginations
                         currentPage={skip}
-                        totalPages={store?.getProblemListReducer?.data?.pagination?.totalPages}
+                        totalPages={totalPages}
                         onPageChange={handlePageChange}
                     />
                 </div>
             </div>
-            <ProblemsModal show={problemModal} closeModal={handleCloseModal} problemId = {selectedProblem}/>
+            <ProblemsModal show={problemModal} closeModal={handleCloseModal} problemId={selectedProblem}/>
             <DeletionModal
                 show={deleteModal}
                 onHide={closeDeleteModal}
                 onConfirm={handleDelete}
                 item={'problem'}
-                isLoading={store?.deleteProblemsReducer?.loading}
+                isLoading={deleteProblemsReducer?.loading}
             />
         </Row>
     );

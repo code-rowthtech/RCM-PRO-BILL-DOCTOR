@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Col, Row, Form, Button, Card, Accordion } from 'react-bootstrap';
+import { Col, Row, Form, Button, Accordion } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
@@ -27,57 +27,102 @@ const MedicalHistory = () => {
     const store = useSelector((state) => state);
     const [selectedProblem, setSelectedProblem] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
-    const allCodeICDs = store?.getALLCodesReducer?.data?.codes || [];
-    const createSuccess = store?.createMedicalHistoryReducer?.data?.status;
-    const medicalHistory = store?.getMedicalHistoryReducer?.data?.medicalHistory;
-    const deleteResponse = store?.deleteMedicalHistoryReducer?.data?.status;
-    const isLoading = store?.getMedicalHistoryReducer?.loading;
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [deleteModal, setDeleteModal] = useState(false);
     const [toDelete, setToDelete] = useState(null);
     const [toEdit, setToEdit] = useState(null);
-    const updateResponse = store?.updateMedicalHistoryReducer?.data?.status;
     const quillRef = useRef(null);
-
     const { register, handleSubmit, reset, getValues, control, setValue, watch } = useForm();
 
+    // Memoized selectors for better performance
+    const {
+        allCodeICDs,
+        createSuccess,
+        medicalHistory,
+        deleteResponse,
+        isLoading,
+        updateResponse,
+        isCreating,
+        isUpdating,
+        isDeleting
+    } = useMemo(() => ({
+        allCodeICDs: store?.getAllCodeReducer?.data?.codes || [],
+        createSuccess: store?.createMedicalHistoryReducer?.data?.status,
+        medicalHistory: store?.getMedicalHistoryReducer?.data?.medicalHistory,
+        deleteResponse: store?.deleteMedicalHistoryReducer?.data?.status,
+        isLoading: store?.getMedicalHistoryReducer?.loading,
+        updateResponse: store?.updateMedicalHistoryReducer?.data?.status,
+        isCreating: store?.createMedicalHistoryReducer?.loading,
+        isUpdating: store?.updateMedicalHistoryReducer?.loading,
+        isDeleting: store?.deleteMedicalHistoryReducer?.loading
+    }), [store]);
+
+    // Initialize data on component mount
     useEffect(() => {
-        dispatch(getMedicalHistoryAction({ patientId: patientId }));
-        dispatch(getAllCodesAction({ search: '' }));
+        if (patientId) {
+            dispatch(getMedicalHistoryAction({ patientId }));
+            dispatch(getAllCodesAction({ search: '' }));
+        }
     }, [dispatch, patientId]);
 
+    // Handle successful operations
     useEffect(() => {
         if (createSuccess === 201 || updateResponse === 200) {
-            dispatch(getMedicalHistoryAction({ patientId: patientId }));
-            setToEdit(null);
-            setSelectedProblem(null);
-            reset();
+            dispatch(getMedicalHistoryAction({ patientId }));
+            handleReset();
         }
-    }, [createSuccess, updateResponse]);
+    }, [createSuccess, updateResponse, patientId, toEdit]);
 
-    const deleteHistory = () => {
-        dispatch(deleteMedicalHistoryAction({ id: toDelete }));
-    };
-
+    // Handle successful deletion
     useEffect(() => {
         if (deleteResponse === 200) {
-            dispatch(getMedicalHistoryAction({ patientId: patientId }));
+            dispatch(getMedicalHistoryAction({ patientId }));
             setToDelete(null);
             setDeleteModal(false);
         }
-    }, [deleteResponse]);
+    }, [deleteResponse, patientId]);
 
-    const closeDeleteModal = () => {
+    // Memoized callbacks
+    const deleteHistory = useCallback(() => {
+        if (toDelete) {
+            dispatch(deleteMedicalHistoryAction({ id: toDelete }));
+        }
+    }, [dispatch, toDelete]);
+
+    const closeDeleteModal = useCallback(() => {
         setToDelete(null);
         setDeleteModal(false);
-    };
+    }, []);
 
+    const handleReset = useCallback(() => {
+        setToEdit(null);
+        setSelectedProblem(null);
+        reset({
+            problem: null,
+            startDate: '',
+            endDate: '',
+            note: '<ul><li></li></ul>'
+        });
+    }, [reset]);
+
+    // Memoized formatted options
+    const formattedOptions = useMemo(() =>
+        allCodeICDs.map((code) => ({
+            value: code.value,
+            label: `${code.title} - ${code.codeType}`,
+            system: 'http://hl7.org/fhir/condition-code',
+            display: code.title,
+        })), [allCodeICDs]
+    );
+
+    // Handle edit mode
     useEffect(() => {
-        if (toEdit) {
+        if (toEdit && formattedOptions.length > 0) {
             const conditionCode = toEdit?.code?.coding?.[0];
             const matchedProblem = formattedOptions.find(
                 (opt) => opt.value === conditionCode?.code && opt.display === conditionCode?.display
             );
+
             setSelectedProblem(matchedProblem || null);
             setValue('problem', matchedProblem || null);
             setValue(
@@ -88,83 +133,74 @@ const MedicalHistory = () => {
             );
             setValue(
                 'endDate',
-                toEdit?.effectivePeriod?.end ? new Date(toEdit?.effectivePeriod?.end)?.toISOString()?.split('T')[0] : ''
+                toEdit?.effectivePeriod?.end
+                    ? new Date(toEdit?.effectivePeriod?.end)?.toISOString()?.split('T')[0]
+                    : ''
             );
             setValue('note', toEdit?.note?.[0]?.text || '<ul><li></li></ul>');
-        } else {
-            reset();
         }
-    }, [toEdit]);
+    }, [toEdit, formattedOptions, setValue]);
 
-    const onSubmit = (data) => {
+    const onSubmit = useCallback((data) => {
+        if (!data.problem || !patientId) {
+            ToastHandle('Please fill all required fields', 'danger');
+            return;
+        }
+
         const selected = data.problem;
         const payload = {
             clinicId: loggedInUser?._id,
             code: {
-                coding: [
-                    {
-                        system: selected?.system,
-                        code: selected?.value,
-                        display: selected?.display,
-                    },
-                ],
+                coding: [{
+                    system: selected?.system,
+                    code: selected?.value,
+                    display: selected?.display,
+                }],
                 text: selected?.display,
             },
             effectivePeriod: {
                 start: data.startDate,
                 end: data.endDate,
             },
-            note: [
-                {
-                    text: data.note,
-                    time: new Date().toISOString(),
-                },
-            ],
+            note: [{
+                text: data.note,
+                time: new Date().toISOString(),
+            }],
             subject: patientId,
         };
-        if (toEdit) {
-            dispatch(updateMedicalHistoryAction({ key: encryptMessage(payload), id: toEdit?._id }));
-        } else {
-            dispatch(createMedicalHistoryAction({ key: encryptMessage(payload) }));
-        }
-    };
 
-    const handleEditorFocus = () => {
+        const encryptedPayload = { key: encryptMessage(payload) };
+
+        if (toEdit) {
+            dispatch(updateMedicalHistoryAction({ ...encryptedPayload, id: toEdit._id }));
+        } else {
+            dispatch(createMedicalHistoryAction(encryptedPayload));
+        }
+    }, [dispatch, patientId, toEdit]);
+
+    const handleEditorFocus = useCallback(() => {
         dispatch(createSuggestionAction({ module: 'medicalHistory' }));
         setShowSuggestions(true);
-    };
+    }, [dispatch]);
 
-    const handleSuggestionSelect = (suggestionText) => {
+    const handleSuggestionSelect = useCallback((suggestionText) => {
         const current = getValues('note');
         setValue('note', `${current}<p>${suggestionText}</p>`);
-    };
+    }, [getValues, setValue]);
 
+    // Debounced search for codes
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
             dispatch(getAllCodesAction({ search: searchQuery }));
         }, 300);
-
         return () => clearTimeout(delayDebounce);
     }, [dispatch, searchQuery]);
 
-    const formattedOptions = allCodeICDs.map((code) => ({
-        value: code.value,
-        label: `${code.title} - ${code.codeType}`,
-        system: 'http://hl7.org/fhir/condition-code',
-        display: code.title,
-    }));
-
     const startDate = watch('startDate');
 
-    const handleReset = () => {
-        setToEdit(null);
-        setSelectedProblem(null);
-        reset();
-    };
-
-    const handleLimitExceed = ({ type, message }) => {
+    const handleLimitExceed = useCallback(({ message }) => {
         ToastHandle(message, 'danger');
-    };
+    }, []);
 
     useQuillWordLimit({
         quillRef,
@@ -308,13 +344,25 @@ const MedicalHistory = () => {
                                 </Col>
                             </Row>
 
-                            <div className="mt-5 d-flex justify-content-end">
+                            <div className="mt-5 d-flex justify-content-end gap-2">
+                                {toEdit && (
+                                    <Button
+                                        type="button"
+                                        variant="outline-secondary"
+                                        onClick={handleReset}
+                                        className="px-3 py-1">
+                                        Cancel
+                                    </Button>
+                                )}
                                 <Button
                                     type="submit"
                                     variant="primary"
-                                    disabled={isLoading}
+                                    disabled={isCreating || isUpdating}
                                     className="px-3 py-1 custom-buttons">
-                                    {toEdit ? 'Update' : 'Add Record'}
+                                    {(isCreating || isUpdating) && (
+                                        <Spinner color='white' className="spinner-border-sm" />
+                                    )}
+                                    {toEdit ? 'Update Record' : 'Add Record'}
                                 </Button>
                             </div>
                         </Form>
@@ -326,11 +374,11 @@ const MedicalHistory = () => {
             <Col md={6} className="d-flex flex-column px-0" style={{ height: '100%' }}>
                 <div className="h-100">
                     <div className="p-0" style={{ overflowY: 'auto' }}>
-                        {isLoading && !medicalHistory?.length ? (
+                        {isLoading ? (
                             <div className="text-center py-4">
                                 <Spinner />
                             </div>
-                        ) : medicalHistory?.length === 0 ? (
+                        ) : !medicalHistory?.length ? (
                             <div className="text-center py-4 text-muted">
                                 <i className="bi bi-journal-x fs-1"></i>
                                 <p className="mt-2 mb-0">No medical history records found</p>
@@ -376,7 +424,7 @@ const MedicalHistory = () => {
                                                         className="bi bi-trash text-danger cursor-pointer"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            setToDelete(item?._id);
+                                                            setToDelete(item._id);
                                                             setDeleteModal(true);
                                                         }}
                                                         title="Delete"
@@ -388,7 +436,7 @@ const MedicalHistory = () => {
                                                                 e.stopPropagation();
                                                                 handleReset();
                                                             }}
-                                                            title="Cancel"
+                                                            title="Cancel Edit"
                                                         />
                                                     ) : (
                                                         <i
@@ -397,7 +445,7 @@ const MedicalHistory = () => {
                                                                 e.stopPropagation();
                                                                 setToEdit(item);
                                                             }}
-                                                            title="Edit"
+                                                            title="Edit Record"
                                                         />
                                                     )}
                                                 </div>
@@ -422,8 +470,8 @@ const MedicalHistory = () => {
                                     show={deleteModal}
                                     onHide={closeDeleteModal}
                                     onConfirm={deleteHistory}
-                                    item="medical history"
-                                    isLoading={store?.deleteMedicalHistoryReducer?.loading}
+                                    item="medical history record"
+                                    isLoading={isDeleting}
                                 />
                             </Accordion>
                         )}
