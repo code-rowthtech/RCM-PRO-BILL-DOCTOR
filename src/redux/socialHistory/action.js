@@ -25,7 +25,7 @@ export const createFamilyGeneticAction = (data): AuthAction => ({
     type: TobaccooActionTypes.CREATE_FAMILY_GENETIC,
     data
 });
-export const updateFamilyGeneticction = (data): AuthAction => ({
+export const updateFamilyGeneticaction = (data): AuthAction => ({
     type: TobaccooActionTypes.UPDATE_FAMILY_GENETIC,
     data
 });

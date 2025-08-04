@@ -6,7 +6,7 @@ import { debounce } from 'lodash';
 import Select from 'react-select';
 import { useSearchParams } from 'react-router-dom';
 import ReactQuill from 'react-quill';
-import { createMedicationAction, getDrugsAction, getMedicationAction, updateMedicationAction } from 'redux/actions';
+import { createMedicationAction, getDrugsAction, getMedicationAction, getProblemsAction, updateMedicationAction } from 'redux/actions';
 import useQuillWordLimit from 'helpers/quillWordLimit';
 import { additionalInformation } from 'utils/DataSets/Medication/medicationData';
 import { encryptMessage } from 'cryptoUtils';
@@ -37,7 +37,9 @@ const MedicationsModal = ({ show, closeModal, selectedMedication }) => {
 
     // VARIABLE DECLARATIONS
     const drugsData = store?.getDrugsReducer?.data?.ndcProducts || [];
-    const problemList = store?.getProblemListReducer?.data?.problems;
+    // const problemList = store?.getProblemListReducer?.data?.problems;
+    const problemList = store?.getProblemsReducer?.data?.problems;
+
     const createSuccess = store?.createMedicationReducer?.data?.status;
     const updateSuccess = store?.updateMedicationReducer?.data?.status;
     const additionalInstructionOptions = additionalInformation?.map((item) => ({
@@ -52,6 +54,13 @@ const MedicationsModal = ({ show, closeModal, selectedMedication }) => {
         );
     }, [additionalInstruction, additionalInstructionOptions]);
     // USEEFFECTS
+
+    useEffect(() => {
+        if (!problemList?.length && patientId && show) {
+            dispatch(getProblemsAction({ patientId, skip: 1 }));
+        }
+    }, [dispatch, patientId, problemList, show]);
+
     useEffect(() => {
         if (createSuccess === 201 || updateSuccess === 200) {
             closeModal();

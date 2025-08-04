@@ -4,6 +4,7 @@ import ToastHandle from '../../helpers/ToastMessage';
 import { MedicationActionTypes } from './constants';
 import {
     createMedicationApi,
+    deleteMedicationApi,
     getMedicationApi,
     getMedicationDrugsApi,
     updateMedicationApi
@@ -78,6 +79,38 @@ function* updateMedicationFunction(data) {
     }
 }
 
+function* deleteMedicationFunction(data) {
+    try {
+        yield put({
+            type: MedicationActionTypes.DELETE_MEDICATION_LOADING,
+            payload: {},
+        });
+        const response = yield call(deleteMedicationApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: MedicationActionTypes.DELETE_MEDICATION_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: MedicationActionTypes.DELETE_MEDICATION_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: MedicationActionTypes.DELETE_MEDICATION_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: MedicationActionTypes.DELETE_MEDICATION_ERROR,
+            payload: error,
+        });
+    }
+}
+
 function* getDrugsFunction(data) {
     try {
         yield put({
@@ -146,6 +179,10 @@ export function* watchUpdateMedication() {
     yield takeEvery(MedicationActionTypes.UPDATE_MEDICATION, updateMedicationFunction);
 }
 
+export function* watchDeleteMedication() {
+    yield takeEvery(MedicationActionTypes.DELETE_MEDICATION, deleteMedicationFunction);
+}
+
 export function* watchGetMedicalDrugs() {
     yield takeEvery(MedicationActionTypes.GET_MEDICATION_DRUGS, getDrugsFunction);
 }
@@ -159,6 +196,7 @@ function* medicationSaga() {
         fork(watchGetMedicalDrugs),
         fork(watchGetMedication),
         fork(watchUpdateMedication),
+        fork(watchDeleteMedication),
     ]);
 }
 export default medicationSaga;

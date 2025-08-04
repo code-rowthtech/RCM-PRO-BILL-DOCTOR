@@ -1,7 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap';
 import { useSearchParams } from 'react-router-dom';
-import { getPatientsByIdAction, resetUpdateAction, updatePatientsAction } from '../../../redux/actions';
+import {
+    getPatientsByIdAction,
+    // resetUpdateAction,
+    updatePatientsAction
+} from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
@@ -55,7 +59,7 @@ const PatientDetails = () => {
         };
         if (updateSuccess === 200) {
             dispatch(getPatientsByIdAction({ key: encryptMessage(data) }));
-            dispatch(resetUpdateAction());
+            // dispatch(resetUpdateAction());
         }
     }, [updateSuccess]);
 
@@ -85,30 +89,30 @@ const PatientDetails = () => {
                 'homePhone',
                 patientsDataById?.telecom?.[0]?.value
                     ? patientsDataById?.telecom?.[0]?.value
-                          .replace(/\D/g, '')
-                          .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                              p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
-                          )
+                        .replace(/\D/g, '')
+                        .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                            p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
+                        )
                     : ''
             );
             setValue(
                 'cellPhone',
                 patientsDataById?.telecom?.[1]?.value
                     ? patientsDataById?.telecom?.[1]?.value
-                          .replace(/\D/g, '')
-                          .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                              p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
-                          )
+                        .replace(/\D/g, '')
+                        .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                            p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
+                        )
                     : ''
             );
             setValue(
                 'officePhone',
                 patientsDataById?.telecom?.[2]?.value
                     ? patientsDataById?.telecom?.[2]?.value
-                          .replace(/\D/g, '')
-                          .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                              p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
-                          )
+                        .replace(/\D/g, '')
+                        .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                            p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
+                        )
                     : ''
             );
             setValue('email', patientsDataById?.telecom?.[3]?.value);
@@ -570,9 +574,9 @@ const PatientDetails = () => {
                                         //  { required: 'Gender is required' }
                                     )}
                                     data-has-value={!!watch('gender')}
-                                     defaultValue=""
-                                     className = "form-select"
-                                    >
+                                    defaultValue=""
+                                    className="form-select"
+                                >
                                     <option value="" disabled  >
                                         Select
                                     </option>
@@ -594,9 +598,8 @@ const PatientDetails = () => {
                                 <div
                                     onClick={() => logoFileInputRef.current.click()}
                                     style={{ height: '30px' }}
-                                    className={`custom-file-upload justify-content-between cursor-pointer ${
-                                        logoName || profileUploading ? '' : 'custom-form-fields'
-                                    }`}>
+                                    className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'
+                                        }`}>
                                     {logoName ? logoName : profileUploading ? 'Uploading...' : 'Upload Photo'}
                                     <p className="mb-0">
                                         <FiUploadCloud />
@@ -860,7 +863,7 @@ const PatientDetails = () => {
                             style={{ width: '70px' }}
                             type="submit">
                             {store?.updatePatientsReducer?.loading ? (
-                                <Spinner color="white" className="spinner-border-sm"/>
+                                <Spinner color="white" className="spinner-border-sm" />
                             ) : (
                                 '  Update'
                             )}

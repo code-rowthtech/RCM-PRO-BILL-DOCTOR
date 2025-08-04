@@ -285,6 +285,7 @@ function* deleteFamilyGenticFunction(data) {
         });
     }
 }
+
 // SURGICAL HISTORY
 
 function* createSurgicalHistoryFunction(data) {
@@ -295,6 +296,9 @@ function* createSurgicalHistoryFunction(data) {
         });
         const response = yield call(createSurgicalHistoryApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
+
+        console.log(decryptedData, 'decryptedDatadecryptedDatadecryptedData');
+
         if (response.status === 201) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
@@ -392,14 +396,10 @@ function* getSurgicalHistoryFunction(data) {
         });
         const response = yield call(getSurgicalHistoryApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
+        if (response.status === 200) {
             yield put({
                 type: TobaccooActionTypes.GET_SURGICAL_HISTORY_SUCCESS,
                 payload: { ...decryptedData },
-            });
-            yield put({
-                type: TobaccooActionTypes.GET_SURGICAL_HISTORY_RESET,
-                payload: {},
             });
         } else {
             yield put({
@@ -416,7 +416,6 @@ function* getSurgicalHistoryFunction(data) {
 }
 
 // Medical HISTORY
-
 function* createMedicalHistoryFunction(data) {
     try {
         yield put({
@@ -545,7 +544,7 @@ function* getMedicalHistoryFunction(data) {
     }
 }
 
-// SURGICAL HISTORY
+// ALCOHOL HISTORY
 function* getAlcoholHistoryFunction(data) {
     try {
         yield put({
@@ -576,6 +575,7 @@ function* getAlcoholHistoryFunction(data) {
         });
     }
 }
+
 function* createAlcoholHistoryFunction(data) {
     try {
         yield put({
@@ -706,6 +706,7 @@ export function* watchGetFamilyGenetic() {
 export function* watchDeleteFamilyGenetic() {
     yield takeEvery(TobaccooActionTypes.DELETE_FAMILY_GENTIC, deleteFamilyGenticFunction);
 }
+
 // SURGICAL HISTORY
 export function* watchCreateSurgicalHistory() {
     yield takeEvery(TobaccooActionTypes.CREATE_SURGICAL_HISTORY, createSurgicalHistoryFunction);
@@ -740,7 +741,8 @@ export function* watchGetMedicalHistory() {
 export function* watchDeleteMedicalHistory() {
     yield takeEvery(TobaccooActionTypes.DELETE_MEDICAL_HISTORY, deleteMedicalHistoryFunction);
 }
-// SURGICAL HISTORY
+
+// ALCOHOL HISTORY
 export function* watchCreateAlcoholHistory() {
     yield takeEvery(TobaccooActionTypes.CREATE_ALCOHOL_HISTORY, createAlcoholHistoryFunction);
 }

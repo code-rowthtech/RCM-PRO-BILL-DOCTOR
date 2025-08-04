@@ -161,8 +161,8 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
 
             {/* Dynamic Identifier Fields */}
             {identifiers.map((item, index) => (
-                <Row key={index} className="">
-                    <Col>
+                <Row key={index} className={`position-relative ${identifiers?.length > 1 ? 'pe-2' : ''}`}>
+                    <Col >
                         <Form.Select
                             value={item?.type?.value || ''}
                             className={defaultIdentifiers.includes(item.type) ? 'no-arrow' : ''}
@@ -192,7 +192,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                             maxLength={10}
                         />
                     </Col>
-                    <Col className="mb-2 position-relative">
+                    <Col className="mb-2 ">
                         <div
                             onClick={() => document.getElementById(`fileInput-identifier-${index}`).click()}
                             className={`custom-file-upload justify-content-between cursor-pointer ${item?.file?.name ? 'form-control' : 'custom-form-fields'

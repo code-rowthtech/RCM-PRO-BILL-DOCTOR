@@ -24,11 +24,11 @@ export const updatePractitioner = '/api/v1/practitioner/update';
 export const getAllDoctor = `${BaseRoute}/list`;
 
 // VITALS
-export const createVitals = '/api/v1/doctor/addVitals';
-export const updateVitals = '/api/v1/doctor/updateVitals';
-export const getVitals = '/api/v1/doctor/getAllVitals';
-export const getVitalsByPatientId = '/api/v1/doctor/vitalsByPatientId';
-export const getVitalsByAppointmentId = '/api/v1/doctor/vitalsByAppointmentId';
+export const createVitals = '/api/v1/practitioner/vitals';
+export const updateVitals = '/api/v1/practitioner/vitals';
+export const getVitals = '/api/v1/practitioner/getAllVitals';
+export const getVitalsByPatientId = '/api/v1/practitioner/vitals/patient';
+export const getVitalsByAppointmentId = '/api/v1/practitioner/vitalsByAppointmentId';
 
 
 // PATIENTS
@@ -74,6 +74,7 @@ export const getPractitionerAvailability = '/api/v1/practitioner/appointment/pra
 export const getAppointmentDetails = '/api/v1/practitioner/appointment/details';
 export const updateAppointmentDetails = '/api/v1/practitioner/appointment/update';
 export const getAppointmentByPateintProvider = '/api/v1/practitioner/appointment/by-patient-provider'
+export const getAppointmentByPateintId = '/api/v1/practitioner/appointment/by-patient'
 
 // Encounter
 export const encounter = `${BaseRoute}/encounter`;
@@ -123,20 +124,20 @@ export const icdProcedures = `${BaseRoute}/codes/pcs`;
 export const tobaccoHistory = `${BaseRoute}/patient/tobacco`;
 
 // Tobaccoo
-export const createTobaccoo = `${BaseRoute}/tobaccoHistory`;
-export const deleteTobaccoo = `${BaseRoute}/tobaccoHistory`;
-export const updateTobacco = `${BaseRoute}/tobaccoHistory`;
-export const getTobaccoo = `${BaseRoute}/tobaccoHistory`;
+export const createTobaccoo = `${BaseRoute}/patient/tobacco`;
+export const deleteTobaccoo = `${BaseRoute}/patient/tobacco`;
+export const updateTobacco = `${BaseRoute}/patient/tobacco`;
+export const getTobaccoo = `${BaseRoute}/patient/tobacco`;
 
 // Medication
-export const medication = `${BaseRoute}/medication`;
+export const medication = `${BaseRoute}/medication-request`;
 export const getMedicationDrugs = `${BaseRoute}/codes/search-ndc-products`;
 
 // Family/Genetic
 export const createFamily = `${BaseRoute}/familyMedicalHistory`;
 export const updateFamily = `${BaseRoute}/familyMedicalHistory`;
 export const getFamily = `${BaseRoute}/familyMedicalHistory`;
-export const deleteFamily = `${BaseRoute}/familyMedicalHistory/`;
+export const deleteFamily = `${BaseRoute}/familyMedicalHistory`;
 
 // Surgical 
 export const createSurgicalHistory = `${BaseRoute}/surgicalHistory`;
@@ -148,7 +149,10 @@ export const deleteSurgicalHistory = `${BaseRoute}/surgicalHistory`;
 export const alcoholHistory = `${BaseRoute}/alcoholHistory`;
 
 // Surgical 
-export const createMedicalHistory = `${BaseRoute}/medicalHistory`;
-export const updateMedicalHistory = `${BaseRoute}/medicalHistory`;
-export const getMedicalHistory = `${BaseRoute}/medicalHistory`;
-export const deleteMedicalHistory = `${BaseRoute}/medicalHistory`;
+export const createMedicalHistory = `${BaseRoute}/patient/medicalHistory`;
+export const updateMedicalHistory = `${BaseRoute}/patient/medicalHistory`;
+export const getMedicalHistory = `${BaseRoute}/patient/medicalHistory`;
+export const deleteMedicalHistory = `${BaseRoute}/patient/medicalHistory`;
+
+// Documents
+export const patientDocuments = `${BaseRoute}/documents`;

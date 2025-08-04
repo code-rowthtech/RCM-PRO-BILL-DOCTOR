@@ -14,7 +14,7 @@ export function getVitalsApi(params: any): any {
 }
 export function getVitalsByPatientApi(params: any): any {
     const { data } = params;
-    return api.create(URL.getVitalsByPatientId, data);
+    return api.get(`${URL.getVitalsByPatientId}/${data?.patientId}`, data);
 }
 export function getVitalsByAppointmentApi(params: any): any {
     const { data } = params;
@@ -23,5 +23,5 @@ export function getVitalsByAppointmentApi(params: any): any {
 
 export function updateVitalsApi(params: any): any {
     const { data } = params;
-    return api.update(URL.updateVitals, data);
+    return api.update(`${URL.updateVitals}/${data?.id}`, { key: data?.key });
 }

@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Col, Modal, Row, Form } from 'react-bootstrap';
 import { Controller, useForm } from 'react-hook-form';
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import {
     createProblemsAction,
@@ -10,7 +9,7 @@ import {
     getAppointmentsAction,
     getProblemsAction,
     updateProblemsAction,
-    getPatientAppointmentsAllAction,
+    getAppointmentByPatientIdAction,
 } from 'redux/actions';
 import Select from 'react-select';
 import { encryptMessage } from '../../../../../../cryptoUtils';
@@ -26,7 +25,8 @@ import useQuillWordLimit from 'helpers/quillWordLimit';
 import { loggedInUser } from 'helpers/loggedInUser';
 
 const MAX_WORDS = 1000;
-const WAX_WORD_LENGTH = 45;
+const MAX_WORD_LENGTH = 45;
+
 const ProblemsModal = ({ show, closeModal, problemId }) => {
     const dispatch = useDispatch();
     const quillRef = useRef();
@@ -42,170 +42,162 @@ const ProblemsModal = ({ show, closeModal, problemId }) => {
         watch,
     } = useForm();
 
-    const patientId = searchParams.get('id');
     const [searchQuery, setSearchQuery] = useState('');
-
-    const [submissionType, setSubmissionType] = useState(null);
     const [selectedProblem, setSelectedProblem] = useState(null);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [showAppointmentModal, setShowAppointmentModal] = useState(false);
 
-    const store = useSelector((state) => state);
-    const createAppointmentResponse = store?.getPatientAppointmentReducer?.data?.status;
-    const addProblemStatus = store?.createProblemsReducer?.data?.status;
-    const allCodeICDs = store?.getAllCodeReducer?.data?.codes || [];
-    const appointments = store?.getPatientAppointmentReducer?.data?.appointments || [];
+    const patientId = searchParams.get('id');
+
+    const {
+        getPatientAppointmentReducer,
+        createProblemsReducer,
+        updateProblemsReducer,
+        getAllCodeReducer,
+        getAppointmentByPatientIdReducer
+    } = useSelector((state) => state);
+
+    const createAppointmentResponse = getPatientAppointmentReducer?.data?.status;
+    const addProblemStatus = createProblemsReducer?.data?.status;
+    const updateProblemStatus = updateProblemsReducer?.data?.status;
+    const allCodeICDs = getAllCodeReducer?.data?.codes || [];
+    const appointments = getAppointmentByPatientIdReducer?.data?.appointments;
+    const isLoading = createProblemsReducer?.loading;
+
+    const resetForm = useCallback(() => {
+        closeModal();
+        reset();
+        setSelectedProblem(null);
+    }, [closeModal, reset]);
+
     useEffect(() => {
         if (createAppointmentResponse === 201) {
-            dispatch(
-                getAppointmentsAction({
-                    clinicId: loggedInUser?.clinicId,
-                    status: '',
-                    doctorId: '',
-                    limit: '',
-                    skip: '',
-                    monthYear: '',
-                })
-            );
-            setShowAppointmentModal(false); // Closing the modal after creating appointment
+            dispatch(getAppointmentsAction({
+                clinicId: loggedInUser?.clinicId,
+                status: '',
+                doctorId: '',
+                limit: '',
+                skip: '',
+                monthYear: '',
+            }));
+            setSelectedProblem(null);
+            setShowAppointmentModal(false);
         }
-    }, [createAppointmentResponse]);
+    }, [createAppointmentResponse, dispatch]);
 
-    // Fetch dynamic ICD codes
     useEffect(() => {
-        dispatch(getAllCodesAction({ search: searchQuery }));
-    }, [dispatch, searchQuery]);
-
-    // Fetch dynamic appointments
-    // useEffect(() => {
-    //     dispatch(getPatientAppointmentsAllAction({ patientId: patientId }));
-    // }, [dispatch]);
-   useEffect(() => {
+        if (show) {
+            dispatch(getAppointmentByPatientIdAction({ patientId }));
+            dispatch(getAllCodesAction({ search: searchQuery }));
+        }
+    }, [dispatch, show, patientId, searchQuery]);
+    useEffect(() => {
         if (problemId) {
+            const coding = problemId.code?.coding?.[0];
             const selected = {
-                value: problemId?.code?.coding?.[0]?.code,
-                label: problemId?.code?.coding?.[0]?.display,
-                display: problemId?.code?.coding?.[0]?.display,
+                value: coding?.code,
+                label: coding?.display,
+                display: coding?.display,
                 system: 'http://hl7.org/fhir/condition-code',
             };
-            setSelectedProblem(selected); // if you need it
-            setValue('problem', selected); // 👈 this is critical
-            setValue('icdCode', problemId?.code?.coding?.[0]?.code);
-            setValue('status', problemId?.clinicalStatus?.coding?.[0]?.code);
-            setValue('appointment', problemId?.appointment);
-            setValue('datetimeDiagnosis', problemId?.onsetDateTime?.split('T')[0]);
-            setValue('note', problemId?.note?.[0]?.text);
+
+            setSelectedProblem(selected);
+            setValue('problem', selected);
+            setValue('icdCode', coding?.code);
+            setValue('status', problemId.clinicalStatus?.coding?.[0]?.code);
+            setValue('appointment', problemId.appointment);
+            setValue('diagnosisDate', problemId.onsetDateTime?.split('T')[0]);
+            setValue('note', problemId.note?.[0]?.text);
         }
-    }, [problemId, appointments, setValue]);
+    }, [problemId, setValue, appointments]);
+
     useEffect(() => {
-        if (selectedProblem) {
-            setValue('icdCode', selectedProblem.value || '');
-        } else {
-            setValue('icdCode', '');
-        }
+        setValue('icdCode', selectedProblem?.value || '');
     }, [selectedProblem, setValue]);
 
-    const closeAppointmentModal = () => {
+    const closeAppointmentModal = useCallback(() => {
         setShowAppointmentModal(false);
-    };
+    }, []);
 
-    const formattedOptions = allCodeICDs?.map((code) => ({
-        value: code.value,
-        label: `${code.title} - ${code.codeType}`,
-        system: 'http://hl7.org/fhir/condition-code',
-        display: code.title,
-    }));
+    const formattedOptions = useMemo(() =>
+        allCodeICDs?.map((code) => ({
+            value: code.value,
+            label: `${code.title} - ${code.codeType}`,
+            system: 'http://hl7.org/fhir/condition-code',
+            display: code.title,
+        })) || [], [allCodeICDs]
+    );
 
-    const submitProblemData = (data) => {
+    const submitProblemData = useCallback((data) => {
         const selected = data.problem;
-        const selectedStatus = clinicalStatus.find((item) => item?.code === data?.status);
+        const selectedStatus = clinicalStatus.find((item) => item.code === data.status);
+
         const payload = {
             code: {
-                coding: [
-                    {
-                        system: selected?.system,
-                        code: selected?.value,
-                        display: selected?.display,
-                    },
-                ],
+                coding: [{
+                    system: selected?.system,
+                    code: selected?.value,
+                    display: selected?.display,
+                }],
                 text: selected?.display,
             },
             subject: patientId,
             icdCode: data.icdCode,
             clinicalStatus: {
-                coding: [
-                    {
-                        system: selectedStatus?.system,
-                        code: selectedStatus?.code,
-                        display: selectedStatus?.display,
-                    },
-                ],
+                coding: [{
+                    system: selectedStatus?.system,
+                    code: selectedStatus?.code,
+                    display: selectedStatus?.display,
+                }],
                 text: selectedStatus?.display,
             },
             ...(data.appointment && { appointment: data.appointment }),
             ...(data.diagnosisDate && { onsetDateTime: data.diagnosisDate }),
-            // onsetDate: data.onsetDate,
-            note: [
-                {
-                    authorReference: {
-                        reference: '',
-                        type: '',
-                        display: '',
-                    },
-                    authorString: ' ',
-                    time: '',
-                    text: data?.note,
+            note: [{
+                authorReference: {
+                    reference: '',
+                    type: '',
+                    display: '',
                 },
-            ],
+                authorString: ' ',
+                time: '',
+                text: data.note,
+            }],
         };
+
         if (problemId) {
             payload.id = problemId;
             dispatch(updateProblemsAction({ key: encryptMessage(payload) }));
         } else {
             dispatch(createProblemsAction({ key: encryptMessage(payload) }));
         }
-    };
+    }, [problemId, patientId, dispatch]);
 
     useEffect(() => {
-        if (addProblemStatus === 201) {
-            if (submissionType === 'saveAndNext') {
-                const data = {
-                    patientId: patientId,
-                };
-                dispatch(getProblemsAction(data));
-                closeModal();
-            } else if (submissionType === 'saveAndReset') {
-                reset({
-                    problem: null,
-                    note: '',
-                    status: '',
-                    appointment: '',
-                    diagnosisDate: '', // Resetting other fields like diagnosisDate
-                });
-                setSelectedProblem(null);
-            }
+        if (addProblemStatus === 201 || updateProblemStatus === 200) {
+            dispatch(getProblemsAction({ patientId }));
+            resetForm();
         }
-    }, [addProblemStatus, submissionType]);
-    const handleEditorFocus = () => {
+    }, [addProblemStatus, updateProblemStatus, dispatch, patientId, resetForm]);
+
+    const handleEditorFocus = useCallback(() => {
         dispatch(createSuggestionAction({ module: 'problem' }));
         setShowSuggestions(true);
-    };
-    const handleSuggestionSelect = (suggestionText) => {
-        // Append suggestion to existing note
-        const current = getValues('note'); // from useFormContext or pass as prop
+    }, [dispatch]);
+
+    const handleSuggestionSelect = useCallback((suggestionText) => {
+        const current = getValues('note');
         setValue('note', `${current}<p>${suggestionText}</p>`);
-    };
+    }, [getValues, setValue]);
 
-    // react quill word limit
-
-    const handleLimitExceed = ({ type, message }) => {
+    const handleLimitExceed = useCallback(({ message }) => {
         ToastHandle(message, 'danger');
-    };
+    }, []);
 
     useQuillWordLimit({
         quillRef,
         maxWords: MAX_WORDS,
-        maxWordLength: WAX_WORD_LENGTH,
+        maxWordLength: MAX_WORD_LENGTH,
         onLimitExceed: handleLimitExceed,
         setValue,
         fieldName: 'note',
@@ -213,7 +205,7 @@ const ProblemsModal = ({ show, closeModal, problemId }) => {
     return (
         <Modal show={show} onHide={closeModal} size="lg" centered>
             <Modal.Header closeButton className="px-2 py-0 ">
-                <Modal.Title className="mb-0">{problemId? 'Update Problem ' : 'Add Problem'}</Modal.Title>
+                <Modal.Title className="mb-0">{problemId ? 'Update Problem ' : 'Add Problem'}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit(submitProblemData)}>
@@ -232,7 +224,7 @@ const ProblemsModal = ({ show, closeModal, problemId }) => {
                                             options={formattedOptions}
                                             onChange={(selected) => {
                                                 field.onChange(selected);
-                                                setSelectedProblem(selected); // 🔁 update local state
+                                                setSelectedProblem(selected);
                                             }}
                                             onInputChange={(value, { action }) => {
                                                 if (action === 'input-change') {
@@ -254,10 +246,6 @@ const ProblemsModal = ({ show, closeModal, problemId }) => {
                                                     fontWeight: 'bold',
                                                     fontSize: '12px',
                                                     paddingBottom: '5px',
-                                                }),
-                                                valueContainer: (provided) => ({
-                                                    ...provided,
-                                                    padding: '0px 6px',
                                                 }),
                                             }}
                                         />
@@ -308,9 +296,9 @@ const ProblemsModal = ({ show, closeModal, problemId }) => {
                             <Form.Group>
                                 <Form.Label className="mb-0">
                                     Appointment{' '}
-                                    <i
+                                    {/* <i
                                         onClick={() => setShowAppointmentModal(true)}
-                                        className="bi bi-plus-circle text-black cursor-pointer"></i>
+                                        className="bi bi-plus-circle text-black cursor-pointer"></i> */}
                                 </Form.Label>
                                 <Form.Select {...register('appointment')}>
                                     <option value="">Select Appointment</option>
@@ -418,28 +406,28 @@ const ProblemsModal = ({ show, closeModal, problemId }) => {
                         </Col>
 
                         <Col sm={12} className="d-flex justify-content-end gap-1 mt-3">
-                            <Button
+                            {/* <Button
                                 className="custom-buttons"
                                 style={{ width: '150px' }}
                                 type="submit"
                                 disabled={store?.createProblemsReducer?.loading}
                                 onClick={() => setSubmissionType('saveAndReset')}>
                                 {store?.createProblemsReducer?.loading && submissionType === 'saveAndReset' ? (
-                                    <Spinner animation="border" size="sm" className="text-white" />
+                                    <Spinner className="text-white spinner-border-sm" />
                                 ) : (
                                     'Save & Add Another'
                                 )}
-                            </Button>
+                            </Button> */}
                             <Button
                                 className="custom-buttons"
                                 type="submit"
                                 style={{ width: '120px' }}
-                                disabled={store?.createProblemsReducer?.loading}
-                                onClick={() => setSubmissionType('saveAndNext')}>
-                                {store?.createProblemsReducer?.loading && submissionType === 'saveAndNext' ? (
-                                    <Spinner animation="border" size="sm" className="text-white" />
+                                disabled={isLoading}
+                            >
+                                {isLoading ? (
+                                    <Spinner className="text-white spinner-border-sm" />
                                 ) : (
-                                    'Save & Exit'
+                                    'Save'
                                 )}
                             </Button>
                         </Col>

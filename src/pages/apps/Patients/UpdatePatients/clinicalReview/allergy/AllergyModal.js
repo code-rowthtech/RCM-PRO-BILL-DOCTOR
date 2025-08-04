@@ -4,10 +4,9 @@ import { Controller, useForm } from 'react-hook-form';
 import AsyncSelect from 'react-select/async';
 import { allergyCode } from '../../../../../../utils/DataSets/Allergy/allergyCode';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { formatDateToISO, today } from '../../../../../../helpers/helperFunctions';
+import { useSelector, useDispatch } from 'react-redux';
+import { today } from '../../../../../../helpers/helperFunctions';
 import { clinicalStatus } from '../../../../../../utils/DataSets/Allergy/clinicalStatus';
-import { useDispatch } from 'react-redux';
 import {
     createAllergiesAction,
     getAllergiesAction,
@@ -15,19 +14,16 @@ import {
     getFoodAllergiesAction,
     updateAllergiesAction,
 } from '../../../../../../redux/allergies/actions';
-import {    getPatientAppointmentsAllAction,
-} from '../../../../../../redux/problems/action'
 import { encryptMessage } from '../../../../../../cryptoUtils';
 import { useSearchParams } from 'react-router-dom';
-import { allergyType } from '../../../../../../utils/DataSets/Allergy/allergyType';
 import { loggedInUser } from '../../../../../../helpers/loggedInUser';
-import { getAllergyDetails } from '../../../../../../helpers/api/apiEndpoints';
 import Spinner from '../../../../../../constants/Spinner';
 import ReactQuill from 'react-quill';
 import useQuillWordLimit from 'helpers/quillWordLimit';
 import SuggestionOffcanvas from '../../SuggestionsFile/Suggestion';
 import ToastHandle from 'helpers/ToastMessage';
 import { createSuggestionAction } from 'redux/suggestion/action';
+import { getAppointmentByPatientIdAction } from 'redux/actions';
 const AllergyModal = ({ show, closeModal, allergyId }) => {
     const {
         handleSubmit,
@@ -39,74 +35,87 @@ const AllergyModal = ({ show, closeModal, allergyId }) => {
         reset,
         setValue,
     } = useForm();
-    const store = useSelector((state) => state);
-    const [searchParams] = useSearchParams();
+
     const dispatch = useDispatch();
-    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [searchParams] = useSearchParams();
     const quillRef = useRef(null);
-    const patientId = searchParams.get('id');
-    const appointments = store?.getPatientAppointmentReducer?.data?.appointments;
-    const allergyDetails = store?.getAllergyByIdReducer?.data?.allergy;
-    const foodAllergyData = store?.getFoodAllergiesReducer?.data;
+    const [showSuggestions, setShowSuggestions] = useState(false);
     const [code, setCode] = useState(null);
     const [selectedMode, setSelectedMode] = useState('date');
-    useEffect(() => {
-        dispatch(getPatientAppointmentsAllAction({ patientId: patientId }));
-    }, [dispatch]);
+
+    const patientId = searchParams.get('id');
+
+    const {
+        getAppointmentByPatientIdReducer,
+        getAllergyByIdReducer,
+        createAllergiesReducer,
+        updateAllergiesReducer
+    } = useSelector((state) => state);
+
+    const appointments = getAppointmentByPatientIdReducer?.data?.appointments;
+    const allergyDetails = getAllergyByIdReducer?.data?.allergy;
+    const createResponseStatus = createAllergiesReducer?.data?.status;
+    const updateResponseStatus = updateAllergiesReducer?.data?.status;
     const formattedCodeOption = useMemo(
-        () =>
-            allergyCode?.map((reason) => ({
-                value: reason,
-                label: reason.display,
-            })),
+        () => allergyCode?.map((reason) => ({
+            value: reason,
+            label: reason.display,
+        })) || [],
         []
     );
-    const createResponseStatus = store?.createAllergiesReducer?.data?.status;
+
+    const resetForm = useCallback(() => {
+        closeModal();
+        setSelectedMode('date');
+        setCode(null);
+        reset();
+    }, [closeModal, reset]);
 
     useEffect(() => {
-        if (createResponseStatus === 201) {
-            dispatch(getAllergiesAction({ patientId: patientId, skip: 1 }));
-            closeModal();
-            reset();
+        if (show) {
+            dispatch(getAppointmentByPatientIdAction({ patientId }));
+            if (allergyId) {
+                dispatch(getAllergyById({ id: allergyId }));
+            }
         }
-    }, [createResponseStatus]);
+    }, [dispatch, show, allergyId, patientId]);
 
     useEffect(() => {
-        if (allergyId) {
-            dispatch(getAllergyById({ id: allergyId }));
+        if (createResponseStatus === 201 || updateResponseStatus === 200) {
+            dispatch(getAllergiesAction({ patientId, skip: 1 }));
+            resetForm();
         }
-    }, [allergyId, show]);
+    }, [createResponseStatus, updateResponseStatus, dispatch, patientId, resetForm]);
+
     const MAX_WORDS = 1000;
-    const WAX_WORD_LENGTH = 45;
+    const MAX_WORD_LENGTH = 45;
+
     useEffect(() => {
         if (allergyId && allergyDetails) {
-            setValue('allergyType', allergyDetails?.type?.coding[0]?.code);
-            setValue('category', allergyDetails?.category?.[0]?.code);
-            setValue('criticality', allergyDetails?.criticality?.code);
-            setValue('verificationStatus', allergyDetails?.verificationStatus?.coding[0]?.code);
-            setValue('reaction', allergyDetails?.reaction[0]?.manifestation[0]?.concept?.coding[0]?.code);
-            setValue('status', allergyDetails?.clinicalStatus?.coding[0]?.code);
-            setValue('severity', allergyDetails?.reaction[0]?.severity?.coding[0]?.code);
-            setValue('allergyCode', allergyDetails?.code?.coding[0]);
+            const coding = allergyDetails.code?.coding?.[0];
+            const clinicalCoding = allergyDetails.clinicalStatus?.coding?.[0];
 
-            setValue('note', allergyDetails?.note[0]?.text);
-            setCode(allergyDetails?.code?.coding[0]);
-            if (allergyDetails?.appointmentId) {
+            setValue('category', allergyDetails.category?.[0]?.code);
+            setValue('criticality', allergyDetails.criticality?.code);
+            setValue('status', clinicalCoding?.code);
+            setValue('allergyCode', coding);
+            setValue('note', allergyDetails.note?.[0]?.text);
+            setCode(coding);
+
+            if (allergyDetails.appointmentId) {
                 setSelectedMode('appointment');
-                const selected = (appointments || []).find(
-                    (appt) => appt?._id === allergyDetails?.appointmentId || appt?.id === allergyDetails?.appointmentId
+                const selected = appointments?.find(
+                    (appt) => appt._id === allergyDetails.appointmentId || appt.id === allergyDetails.appointmentId
                 );
                 if (selected) {
                     setValue('appointment', JSON.stringify(selected));
                 }
-                setValue('appointmentDate', null);
-            } else if (allergyDetails?.onset?.onsetDateTime) {
+            } else if (allergyDetails.onset?.onsetDateTime) {
                 setSelectedMode('date');
                 setValue('appointmentDate', new Date(allergyDetails.onset.onsetDateTime).toISOString().split('T')[0]);
-                setValue('appointment', null);
             }
         }
-    }, [allergyId, allergyDetails]);
+    }, [allergyId, allergyDetails, appointments, setValue]);
 
     const loadCodeOptions = useCallback(
         (inputValue, callback) => {
@@ -124,33 +133,29 @@ const AllergyModal = ({ show, closeModal, allergyId }) => {
         [formattedCodeOption]
     );
 
-    const submitAllergiesData = (data) => {
-        const selectedStatus = clinicalStatus.find((item) => item?.code === data?.status);
-        const selectedCategory = category.find((item) => item?.code === data?.category);
-        const selectedCriticalityOption = criticality.find((option) => option?.code === data?.criticality);
+    const submitAllergiesData = useCallback((data) => {
+        const selectedStatus = clinicalStatus.find((item) => item.code === data.status);
+        const selectedCategory = category.find((item) => item.code === data.category);
+        const selectedCriticalityOption = criticality.find((option) => option.code === data.criticality);
 
         const payload = {
-            patientId: patientId,
+            patientId,
             clinicId: loggedInUser?.clinicId,
             recorderId: loggedInUser?.doctorId,
             resourceType: 'AllergyIntolerance',
             clinicalStatus: {
-                coding: [
-                    {
-                        system: selectedStatus?.system,
-                        code: selectedStatus?.code,
-                        display: selectedStatus?.display,
-                    },
-                ],
+                coding: [{
+                    system: selectedStatus?.system,
+                    code: selectedStatus?.code,
+                    display: selectedStatus?.display,
+                }],
                 text: selectedStatus?.display,
             },
-            category: [
-                {
-                    system: selectedCategory?.system,
-                    code: selectedCategory?.code,
-                    display: selectedCategory?.display,
-                },
-            ],
+            category: [{
+                system: selectedCategory?.system,
+                code: selectedCategory?.code,
+                display: selectedCategory?.display,
+            }],
             criticality: {
                 system: selectedCriticalityOption?.system,
                 code: selectedCriticalityOption?.code,
@@ -158,64 +163,57 @@ const AllergyModal = ({ show, closeModal, allergyId }) => {
             },
             code: {
                 coding: code,
-                text: code?.display, // use display text
+                text: code?.display,
             },
-            note: [
-                {
-                    text: data?.note,
-                    time: '',
-                    authorReference: {
-                        reference: '',
-                        type: '',
-                        identifier: {
-                            use: '',
-                            system: '',
-                            value: '',
-                        },
-                        display: '',
-                    },
+            note: [{
+                text: data.note,
+                time: '',
+                authorReference: {
+                    reference: '',
+                    type: '',
+                    identifier: { use: '', system: '', value: '' },
+                    display: '',
                 },
-            ],
+            }],
         };
+
         if (selectedMode === 'appointment' && data.appointment) {
-            let appData = JSON.parse(data.appointment);
-            payload.appointmentId = appData?._id;
-            payload.onset = {
-                onsetDateTime: appData?.date, // optionally use actual date
-            };
+            const appData = JSON.parse(data.appointment);
+            payload.appointmentId = appData._id;
+            payload.onset = { onsetDateTime: appData.date };
         } else if (selectedMode === 'date' && data.appointmentDate) {
-            payload.onset = {
-                onsetDateTime: data.appointmentDate,
-            };
+            payload.onset = { onsetDateTime: data.appointmentDate };
         }
+
         if (allergyId) {
             payload.id = allergyId;
             dispatch(updateAllergiesAction({ key: encryptMessage(payload) }));
         } else {
             dispatch(createAllergiesAction({ key: encryptMessage(payload) }));
         }
-    };
-    const handleSuggestionSelect = (suggestionText) => {
-        // Append suggestion to existing note
-        const current = getValues('note'); // from useFormContext or pass as prop
+    }, [selectedMode, code, allergyId, patientId, dispatch]);
+    const handleSuggestionSelect = useCallback((suggestionText) => {
+        const current = getValues('note');
         setValue('note', `${current}<p>${suggestionText}</p>`);
-    };
+    }, [getValues, setValue]);
 
-    const allergyCategoryChange = (data) => {
+    const allergyCategoryChange = useCallback(() => {
         dispatch(getFoodAllergiesAction({ query: '', skip: 1 }));
-    };
+    }, [dispatch]);
 
-    const handleEditorFocus = () => {
+    const handleEditorFocus = useCallback(() => {
         dispatch(createSuggestionAction({ module: 'allergy' }));
         setShowSuggestions(true);
-    };
-    const handleLimitExceed = ({ type, message }) => {
+    }, [dispatch]);
+
+    const handleLimitExceed = useCallback(({ message }) => {
         ToastHandle(message, 'danger');
-    };
+    }, []);
+
     useQuillWordLimit({
         quillRef,
         maxWords: MAX_WORDS,
-        maxWordLength: WAX_WORD_LENGTH,
+        maxWordLength: MAX_WORD_LENGTH,
         onLimitExceed: handleLimitExceed,
         setValue,
         fieldName: 'note',
@@ -227,7 +225,7 @@ const AllergyModal = ({ show, closeModal, allergyId }) => {
                 <Modal.Title className="mb-0"> {allergyId ? 'Update Allergy' : 'Add Allergy'} </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {store?.getAllergyByIdReducer?.loading ? (
+                {getAllergyByIdReducer?.loading ? (
                     <Row>
                         <Col sm={12} className="d-flex align-items-center justify-content-center p-5">
                             <Spinner />
@@ -316,7 +314,7 @@ const AllergyModal = ({ show, closeModal, allergyId }) => {
                                             Select Criticality
                                         </option>
                                         {criticality?.map((item) => (
-                                            <option selected={item?.code === 'low'} key={item?.code} value={item?.code}>
+                                            <option key={item?.code} value={item?.code}>
                                                 {item?.display}
                                             </option>
                                         ))}

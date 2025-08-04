@@ -595,7 +595,7 @@ export default function Vitals({ activeKey, unitSystem, setUnitSystem, convertFr
                                     <i
                                         className="bi bi-check-square ms-2 cursor-pointer fs-4 text-success"
                                         onClick={() => {
-                                                    dispatch(getVitalsByPatientIdAction({ patientId, limit: 5 }))
+                                            dispatch(getVitalsByPatientIdAction({ patientId, limit: 5 }))
                                             // Save all changes for this date
                                             setEditingDate(null);
                                         }}

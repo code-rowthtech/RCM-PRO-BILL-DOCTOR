@@ -24,10 +24,6 @@ export const updatePatientsAction = (data): AuthAction => ({
     data
 });
 
-export const resetUpdateAction = (): LayoutAction => ({
-    type: PatientsActionTypes.RESET_UPDATE_STATUS,
-});
-
 export const createReferringDoctorAction = (data): AuthAction => ({
     type: PatientsActionTypes.CREATE_REFERRING_DOCTOR,
     data

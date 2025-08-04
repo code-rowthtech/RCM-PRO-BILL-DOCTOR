@@ -3,8 +3,9 @@ import { useEffect, useState } from 'react';
 import { Table, Row, Col, Button, Modal, Spinner } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
-import { getMedicationAction } from 'redux/actions';
+import { deleteMedicationAction, getMedicationAction } from 'redux/actions';
 import MedicationsModal from './MedicationsModal';
+import DeletionModal from 'helpers/DeletionModal';
 
 const Medications = () => {
     const dispatch = useDispatch();
@@ -16,10 +17,14 @@ const Medications = () => {
     const [selectedMedication, setSelectedMedication] = useState(null);
     const [medicationModal, setMedicationModal] = useState(false);
     const [skip, setSkip] = useState(1);
+    const [deletionId, setDeletionId] = useState(null);
+    const [deleteModal, setDeleteModal] = useState(false);
 
     // VARIABLES DECLARATIONS
     const medicationList = store?.getMedicationReducer?.data?.medicationRequests;
     const createSuccess = store?.createMedicationReducer?.data?.status;
+    const deleteSuccess = store?.deleteMedicationReducer?.data?.status;
+
     const statusColorMap = {
         active: 'text-success',
         'on-hold': 'text-warning',
@@ -37,6 +42,12 @@ const Medications = () => {
             setSelectedMedication(null);
         }
     }, [createSuccess]);
+    useEffect(() => {
+        if (deleteSuccess === 200) {
+            closeDeletionModal();
+            dispatch(getMedicationAction({ patientId: patientId, skip, limit: 10 }));
+        }
+    }, [deleteSuccess]);
 
     useEffect(() => {
         dispatch(getMedicationAction({ patientId: patientId, skip, limit: 10 }));
@@ -56,6 +67,15 @@ const Medications = () => {
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
     };
+
+    const handleDeleteMedication = () => {
+        dispatch(deleteMedicationAction({ medicationId: deletionId }));
+    }
+
+    const closeDeletionModal = () => {
+        setDeleteModal(false);
+        setDeletionId(null);
+    }
     return (
         <Row>
             <Col sm={12}>
@@ -119,6 +139,15 @@ const Medications = () => {
                                             className="mdi mdi-square-edit-outline cursor-pointer fs-5"
                                             onClick={() => handleEditClick(data)}
                                         />
+                                        <i
+                                            className="bi bi-trash-fill text-danger cursor-pointer"
+                                            onClick={() => {
+                                                setDeleteModal(true);
+                                                setDeletionId(data._id);
+                                            }}
+                                        />
+                                        <DeletionModal isLoading={store?.deleteMedicationReducer?.loading} show={deleteModal} onConfirm={handleDeleteMedication} onHide={closeDeletionModal} item='medication' />
+
                                     </td>
                                 </tr>
                             ))

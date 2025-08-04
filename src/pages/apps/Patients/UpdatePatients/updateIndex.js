@@ -5,7 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getPatientsByIdAction } from '../../../../redux/actions';
 import PatientInfoAccordion from './components/PatientInfoAccordion';
-import { decryptMessage } from '../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 import PatientDemographics from './demographics';
 import Spinner from '../../../../constants/Spinner';
 import { useSelector } from 'react-redux';
@@ -25,6 +25,7 @@ const UpdateIndex = () => {
 
     const [selectedMainTab, setSelectedMainTab] = useState('Patient Summary');
     const [activeKey, setActiveKey] = useState('0');
+    const [activeSubmenu, setActiveSubmenu] = useState(null);
     const [encounterTabs, setEncounterTabs] = useState([
         {
             id: 1,
@@ -39,6 +40,8 @@ const UpdateIndex = () => {
     const topMenuProps = {
         selectedMainTab,
         setSelectedMainTab,
+        activeSubmenu,
+        setActiveSubmenu,
     };
     const encounterTabProps = {
         encounterTabs,
@@ -54,6 +57,7 @@ const UpdateIndex = () => {
         setActiveKey,
         activeKey,
     };
+
     // USEEFFECTS
     useEffect(() => {
         if (id) {
@@ -64,6 +68,7 @@ const UpdateIndex = () => {
     useEffect(() => {
         try {
             const encryptedTab = sessionStorage?.getItem('selectedMainTab');
+            const savedSubmenu = sessionStorage?.getItem('activeSubmenu');
 
             if (encryptedTab && encryptedTab !== 'undefined' && encryptedTab.trim().length > 0) {
                 const tab = decryptMessage(encryptedTab);
@@ -73,6 +78,10 @@ const UpdateIndex = () => {
             } else {
                 setSelectedMainTab('Patient Summary');
             }
+
+            if (savedSubmenu && savedSubmenu !== 'null') {
+                setActiveSubmenu(savedSubmenu);
+            }
         } catch (error) {
             console.error('Error decrypting selectedMainTab:', error);
         }
@@ -80,7 +89,7 @@ const UpdateIndex = () => {
 
     return (
         <div>
-            {store?.getPatientsByIdReducer?.loading ? (
+            {store?.getPatientsByIdReducer?.loading || !store?.getPatientsByIdReducer?.data?.data ? (
                 <div className="d-flex align-items-center justify-content-center" style={{ height: '93vh' }}>
                     <Spinner />
                 </div>
@@ -106,13 +115,12 @@ const UpdateIndex = () => {
                                     'Surgical',
                                     'Family / Genetic',
                                     'Alcohol',
-                                    'Vaccination',
                                 ].includes(selectedMainTab) && (
-                                    <SocialHistory
-                                        selectedMainTab={selectedMainTab}
-                                        setSelectedMainTab={setSelectedMainTab}
-                                    />
-                                )}
+                                        <SocialHistory
+                                            selectedMainTab={selectedMainTab}
+                                            setSelectedMainTab={setSelectedMainTab}
+                                        />
+                                    )}
                             </Card>
                         </Col>
                     </Row>

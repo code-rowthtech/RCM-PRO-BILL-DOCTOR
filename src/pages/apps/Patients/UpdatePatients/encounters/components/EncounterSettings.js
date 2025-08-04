@@ -1,16 +1,23 @@
+// React and third-party imports
+import { useEffect } from 'react';
+import { Button, Offcanvas, Form, Card } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { Button, Card, Col, Form, Offcanvas, Row } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import { useEffect, useCallback, useMemo } from 'react';
-import { createEncounterSettingsAction, getEncounterSettingsAction, updateEncounterSettingsAction } from '../../../../../../redux/actions';
-import { loggedInUser } from '../../../../../../helpers/loggedInUser';
-import { encryptMessage } from '../../../../../../cryptoUtils';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { GripVertical } from 'lucide-react';
 
-// Schema validation using Yup
+// Redux imports
+import { useDispatch, useSelector } from 'react-redux';
+import { createEncounterSettingsAction, getEncounterSettingsAction, updateEncounterSettingsAction } from 'redux/actions';
+
+// Utility imports
+import { encryptMessage } from 'cryptoUtils';
+import { loggedInUser } from 'helpers/loggedInUser';
+
+// Constants and Configuration
+
+// Validation schema using Yup
 const settingsSchema = yup.object().shape({
     items: yup.array().of(
         yup.object().shape({
@@ -28,7 +35,8 @@ const settingsSchema = yup.object().shape({
     )
 });
 
-const PREDEFINED_MENU_ITEMS = [
+// Default menu structure
+const predefinedMenuItems = [
     {
         name: 'Summary',
         show: true,
@@ -49,46 +57,21 @@ const PREDEFINED_MENU_ITEMS = [
     }
 ];
 
-// Utility functions
-const convertToOneBased = (items) =>
-    items?.map(item => ({
-        ...item,
-        order: item.order + 1,
-        subMenu: item.subMenu?.map(sub => ({
-            ...sub,
-            order: sub.order + 1
-        })) || []
-    }));
+/**
+ * EncounterSettingsForm Component
+ * Manages encounter menu configuration with drag-and-drop reordering
+ * Features: Menu item management, submenu configuration, order management
+ */
+const EncounterSettingsForm = ({ showSettings, closeSettings, initialData }) => {
+    // Hooks initialization
+    const dispatch = useDispatch();
+    const store = useSelector((state) => state);
 
-const convertToZeroBased = (items) =>
-    items?.map(item => ({
-        ...item,
-        order: item.order - 1,
-        subMenu: item.subMenu?.map(sub => ({
-            ...sub,
-            order: sub.order - 1
-        })) || []
-    }));
-
-const getDefaultValues = (initialData) => ({
-    items: initialData?.items
-        ? convertToOneBased(initialData.items)
-        : PREDEFINED_MENU_ITEMS.map((item, index) => ({
-            ...item,
-            order: index + 1,
-            subMenu: item.subMenu.map((sub, subIndex) => ({
-                ...sub,
-                order: subIndex + 1
-            }))
-        }))
-});
-
-const EncounterSettings = ({ showSettings, closeSettings, initialData }) => {
-    const defaultValues = useMemo(() => getDefaultValues(initialData), [initialData]);
-
+    // Form management with validation
     const {
         register,
         handleSubmit,
+        control,
         reset,
         formState: { errors },
         watch,
@@ -96,71 +79,133 @@ const EncounterSettings = ({ showSettings, closeSettings, initialData }) => {
         getValues
     } = useForm({
         resolver: yupResolver(settingsSchema),
-        defaultValues
+        defaultValues: {
+            items: getDefaultItems()
+        }
     });
 
-    const dispatch = useDispatch();
-    const store = useSelector((state) => state);
-
+    // Redux state selectors
     const createResponse = store?.createEncounterSettingsReducer?.data?.status;
     const updateResponse = store?.updateEncounterSettingsReducer?.data?.status;
     const settingsData = store?.getEncounterSettingsReducer?.data?.data;
     const items = watch('items');
 
+    // Helper functions
+
+    /**
+     * Get default menu items with proper ordering
+     */
+    function getDefaultItems() {
+        return initialData?.items?.map(convertToFormFormat) ||
+            predefinedMenuItems.map((item, index) => ({
+                ...item,
+                order: index + 1,
+                subMenu: item.subMenu.map((sub, subIndex) => ({
+                    ...sub,
+                    order: subIndex + 1
+                }))
+            }));
+    }
+
+    /**
+     * Convert API data format to form format (0-based to 1-based indexing)
+     */
+    function convertToFormFormat(item) {
+        return {
+            ...item,
+            order: item.order + 1,
+            subMenu: item.subMenu?.map(sub => ({
+                ...sub,
+                order: sub.order + 1
+            })) || []
+        };
+    }
+
+    /**
+     * Convert form data format to API format (1-based to 0-based indexing)
+     */
+    function convertToApiFormat(items) {
+        return items.map(item => ({
+            ...item,
+            order: item.order - 1,
+            subMenu: item.subMenu?.map(sub => ({
+                ...sub,
+                order: sub.order - 1
+            })) || []
+        }));
+    }
+
+    // Effect hooks
+
+    // Handle successful create/update responses
     useEffect(() => {
         if (createResponse === 201 || updateResponse === 200) {
-            dispatch(getEncounterSettingsAction({ doctorId: loggedInUser?.doctorId }));
+            dispatch(getEncounterSettingsAction({ doctorId: store?.Auth?.user?.doctorId }));
             closeSettings();
         }
-    }, [createResponse, updateResponse, dispatch, closeSettings]);
+    }, [createResponse, updateResponse, dispatch, closeSettings, store?.Auth?.user?.doctorId]);
 
+    // Reset form when initial data changes
     useEffect(() => {
         if (initialData) {
-            reset({ items: convertToOneBased(initialData.items) });
+            reset({
+                items: initialData.items.map(convertToFormFormat)
+            });
         }
     }, [initialData, reset]);
 
-    // Reset form when settingsData changes
+    // Reset form when settings data is loaded
     useEffect(() => {
         if (settingsData?._id) {
-            reset({ items: convertToOneBased(settingsData.items) });
+            reset({
+                items: settingsData.items.map(convertToFormFormat)
+            });
         }
     }, [settingsData, reset]);
 
-    const onSubmit = useCallback((data) => {
-        const submissionData = {
-            items: convertToZeroBased(data.items),
-            doctorId: loggedInUser?.doctorId,
-        };
+    // Event handlers
 
-        const action = settingsData?._id ? updateEncounterSettingsAction : createEncounterSettingsAction;
+    /**
+     * Form submission handler
+     * Converts data format and dispatches appropriate action
+     */
+    const onSubmit = (data) => {
+        const submissionData = {
+            items: convertToApiFormat(data.items),
+            doctorId: store?.Auth?.user?.doctorId || loggedInUser?._id,
+        };
 
         if (settingsData?._id) {
             submissionData._id = settingsData._id;
+            dispatch(updateEncounterSettingsAction({ key: encryptMessage(submissionData) }));
+        } else {
+            dispatch(createEncounterSettingsAction({ key: encryptMessage(submissionData) }));
         }
+    };
 
-        dispatch(action({ key: encryptMessage(submissionData) }));
-    }, [dispatch, settingsData?._id]);
-
-    const updateItemOrder = useCallback((items) =>
-        items.map((item, index) => ({ ...item, order: index + 1 })), []
-    );
-
-    const updateSubMenuOrder = useCallback((subMenu) =>
-        subMenu.map((sub, index) => ({ ...sub, order: index + 1 })), []
-    );
-
-    const onDragEnd = useCallback((result) => {
+    /**
+     * Handle main menu drag and drop reordering
+     */
+    const onDragEnd = (result) => {
         if (!result.destination) return;
 
         const newItems = [...getValues('items')];
         const [reorderedItem] = newItems.splice(result.source.index, 1);
         newItems.splice(result.destination.index, 0, reorderedItem);
 
-        setValue('items', updateItemOrder(newItems));
-    }, [getValues, setValue, updateItemOrder]);
+        // Update orders based on new positions
+        const updatedItems = newItems.map((item, index) => ({
+            ...item,
+            order: index + 1
+        }));
 
-    const onSubMenuDragEnd = useCallback((itemIndex, result) => {
+        setValue('items', updatedItems);
+    };
+
+    /**
+     * Handle submenu drag and drop reordering
+     */
+    const onSubMenuDragEnd = (itemIndex, result) => {
         if (!result.destination) return;
 
         const newItems = [...getValues('items')];
@@ -168,155 +213,166 @@ const EncounterSettings = ({ showSettings, closeSettings, initialData }) => {
         const [reorderedSubItem] = subMenu.splice(result.source.index, 1);
         subMenu.splice(result.destination.index, 0, reorderedSubItem);
 
-        newItems[itemIndex].subMenu = updateSubMenuOrder(subMenu);
+        // Update submenu orders based on new positions
+        newItems[itemIndex].subMenu = subMenu.map((sub, index) => ({
+            ...sub,
+            order: index + 1
+        }));
+
         setValue('items', newItems);
-    }, [getValues, setValue, updateSubMenuOrder]);
-
-    const toggleItemShow = useCallback((itemIndex, checked) => {
-        const newItems = [...getValues('items')];
-        newItems[itemIndex].show = checked;
-        setValue('items', newItems);
-    }, [getValues, setValue]);
-
-    const renderSubMenuItem = useCallback((subItem, subIndex, itemIndex, provided) => (
-        <div
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            className="mb-0"
-        >
-            <Card className="bg-light mb-1">
-                <Card.Body className='p-1 pe-2'>
-                    <Row className="align-items-center">
-                        <Col md={1} {...provided.dragHandleProps}>
-                            <GripVertical size={16} />
-                        </Col>
-                        <Col md={5}>
-                            <Form.Control
-                                {...register(`items.${itemIndex}.subMenu.${subIndex}.name`)}
-                                readOnly
-                                isInvalid={!!errors.items?.[itemIndex]?.subMenu?.[subIndex]?.name}
-                            />
-                        </Col>
-                        <Col md={2}>
-                            <Form.Control
-                                {...register(`items.${itemIndex}.subMenu.${subIndex}.order`)}
-                                readOnly
-                                isInvalid={!!errors.items?.[itemIndex]?.subMenu?.[subIndex]?.order}
-                            />
-                        </Col>
-                        <Col md={4}>
-                            <Form.Check
-                                type="switch"
-                                defaultChecked={settingsData?._id ? subItem?.hide : true}
-                                id={`hide-${itemIndex}-${subIndex}`}
-                                label={watch(`items.${itemIndex}.subMenu.${subIndex}.hide`) ? 'Hide' : 'Show'}
-                                {...register(`items.${itemIndex}.subMenu.${subIndex}.hide`)}
-                            />
-                        </Col>
-                    </Row>
-                </Card.Body>
-            </Card>
-        </div>
-    ), [register, errors, settingsData?._id, watch]);
-
-    const renderMenuItem = useCallback((item, itemIndex, provided) => (
-        <div
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            className="mb-2"
-        >
-            <Card className='my-0 py-0'>
-                <Card.Header className="d-flex p-1 px-2 justify-content-between align-items-center bg-light">
-                    <div className="d-flex align-items-center">
-                        <span {...provided.dragHandleProps} className="me-2">
-                            <GripVertical size={18} />
-                        </span>
-                        <span className="fw-semibold">
-                            <span className='text-primary'>{item.order}.&nbsp;</span>
-                            {item.name}
-                        </span>
-                    </div>
-                    <Form.Check
-                        type="switch"
-                        id={`show-${itemIndex}`}
-                        label={item.show ? 'Hide' : 'Show'}
-                        checked={item.show}
-                        onChange={(e) => toggleItemShow(itemIndex, e.target.checked)}
-                        className="ms-3"
-                    />
-                </Card.Header>
-                {item.show && item.subMenu?.length > 0 && (
-                    <Card.Body className='py-0'>
-                        <div className="mt-0 pt-2">
-                            <DragDropContext onDragEnd={(result) => onSubMenuDragEnd(itemIndex, result)}>
-                                <Droppable droppableId={`submenu-${itemIndex}`}>
-                                    {(provided) => (
-                                        <div {...provided.droppableProps} ref={provided.innerRef}>
-                                            {item.subMenu.map((subItem, subIndex) => (
-                                                <Draggable
-                                                    key={subIndex}
-                                                    draggableId={`subitem-${itemIndex}-${subIndex}`}
-                                                    index={subIndex}
-                                                >
-                                                    {(provided) => renderSubMenuItem(subItem, subIndex, itemIndex, provided)}
-                                                </Draggable>
-                                            ))}
-                                            {provided.placeholder}
-                                        </div>
-                                    )}
-                                </Droppable>
-                            </DragDropContext>
-                        </div>
-                    </Card.Body>
-                )}
-            </Card>
-        </div>
-    ), [toggleItemShow, onSubMenuDragEnd, renderSubMenuItem]);
-
-    if (!items?.length) return null;
+    };
 
     return (
         <Offcanvas show={showSettings} placement='end' className='w-100' onHide={closeSettings}>
+            {/* Header Section */}
             <Offcanvas.Header closeButton className='border-bottom'>
                 <Offcanvas.Title className='fw-bold'>Encounter Menu Settings</Offcanvas.Title>
             </Offcanvas.Header>
+
+            {/* Body Section */}
             <Offcanvas.Body>
                 <Form onSubmit={handleSubmit(onSubmit)} className="h-100 d-flex flex-column">
-                    <div className="flex-grow-1 overflow-auto">
-                        <Card>
-                            <Card.Body className='p-0 px-1'>
-                                <h5 className="mt-0 mb-1 fw-semibold">Menu Items Configuration</h5>
-                                <p className="text-muted fs-6 mt-0 mb-2">
-                                    Drag and drop items to reorder them. The order number will update automatically.
-                                    Toggle the switch to include/exclude items from the menu.
-                                </p>
 
-                                <DragDropContext onDragEnd={onDragEnd}>
-                                    <Droppable droppableId="menuItems">
-                                        {(provided) => (
-                                            <div {...provided.droppableProps} ref={provided.innerRef}>
-                                                {items.map((item, itemIndex) => (
-                                                    <Draggable
-                                                        key={itemIndex}
-                                                        draggableId={`item-${itemIndex}`}
-                                                        index={itemIndex}
-                                                    >
-                                                        {(provided) => renderMenuItem(item, itemIndex, provided)}
-                                                    </Draggable>
-                                                ))}
-                                                {provided.placeholder}
-                                            </div>
-                                        )}
-                                    </Droppable>
-                                </DragDropContext>
-                            </Card.Body>
-                        </Card>
+                    {/* Main Content Area */}
+                    <div className="flex-grow-1 overflow-auto">
+                        {items?.length > 0 && (
+                            <Card>
+                                <Card.Body className='p-0 px-1 '>
+                                    {/* Instructions */}
+                                    <h5 className="mt-0 mb-1 fw-semibold">Menu Items Configuration</h5>
+                                    <p className="text-muted fs-6 mt-0 mb-2">
+                                        Drag and drop items to reorder them. The order number will update automatically.
+                                        Toggle the switch to include/exclude items from the menu.
+                                    </p>
+
+                                    {/* Drag and Drop Menu Items */}
+                                    <DragDropContext onDragEnd={onDragEnd}>
+                                        <Droppable droppableId="menuItems">
+                                            {(provided) => (
+                                                <div {...provided.droppableProps} ref={provided.innerRef}>
+                                                    {items.map((item, itemIndex) => (
+                                                        <Draggable
+                                                            key={itemIndex}
+                                                            draggableId={`item-${itemIndex}`}
+                                                            index={itemIndex}
+                                                        >
+                                                            {(provided) => (
+                                                                <div
+                                                                    ref={provided.innerRef}
+                                                                    {...provided.draggableProps}
+                                                                    className="mb-2"
+                                                                >
+                                                                    {/* Menu Item Card */}
+                                                                    <Card className="border">
+                                                                        <Card.Body className="p-2">
+                                                                            <div className="d-flex align-items-center justify-content-between">
+                                                                                {/* Drag Handle and Item Info */}
+                                                                                <div className="d-flex align-items-center">
+                                                                                    <div
+                                                                                        {...provided.dragHandleProps}
+                                                                                        className="me-2 cursor-grab"
+                                                                                    >
+                                                                                        <GripVertical size={16} />
+                                                                                    </div>
+                                                                                    <div>
+                                                                                        <strong>{item.name}</strong>
+                                                                                        <small className="text-muted ms-2">
+                                                                                            Order: {item.order}
+                                                                                        </small>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                {/* Show/Hide Toggle */}
+                                                                                <Form.Check
+                                                                                    type="switch"
+                                                                                    id={`show-${itemIndex}`}
+                                                                                    label="Show"
+                                                                                    {...register(`items.${itemIndex}.show`)}
+                                                                                />
+                                                                            </div>
+
+                                                                            {/* Submenu Section */}
+                                                                            {item.subMenu?.length > 0 && (
+                                                                                <div className="mt-2 ps-3">
+                                                                                    <small className="text-muted">Submenu Items:</small>
+                                                                                    <DragDropContext
+                                                                                        onDragEnd={(result) => onSubMenuDragEnd(itemIndex, result)}
+                                                                                    >
+                                                                                        <Droppable droppableId={`submenu-${itemIndex}`}>
+                                                                                            {(provided) => (
+                                                                                                <div {...provided.droppableProps} ref={provided.innerRef}>
+                                                                                                    {item.subMenu.map((subItem, subIndex) => (
+                                                                                                        <Draggable
+                                                                                                            key={subIndex}
+                                                                                                            draggableId={`sub-${itemIndex}-${subIndex}`}
+                                                                                                            index={subIndex}
+                                                                                                        >
+                                                                                                            {(provided) => (
+                                                                                                                <div
+                                                                                                                    ref={provided.innerRef}
+                                                                                                                    {...provided.draggableProps}
+                                                                                                                    className="d-flex align-items-center justify-content-between py-1 border-bottom"
+                                                                                                                >
+                                                                                                                    <div className="d-flex align-items-center">
+                                                                                                                        <div
+                                                                                                                            {...provided.dragHandleProps}
+                                                                                                                            className="me-2"
+                                                                                                                        >
+                                                                                                                            <GripVertical size={12} />
+                                                                                                                        </div>
+                                                                                                                        <small>{subItem.name}</small>
+                                                                                                                    </div>
+                                                                                                                    <div className="d-flex align-items-center">
+                                                                                                                        <Form.Check
+                                                                                                                            type="switch"
+                                                                                                                            id={`hide-${itemIndex}-${subIndex}`}
+                                                                                                                            label="Hide"
+                                                                                                                            size="sm"
+                                                                                                                            {...register(`items.${itemIndex}.subMenu.${subIndex}.hide`)}
+                                                                                                                        />
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                            )}
+                                                                                                        </Draggable>
+                                                                                                    ))}
+                                                                                                    {provided.placeholder}
+                                                                                                </div>
+                                                                                            )}
+                                                                                        </Droppable>
+                                                                                    </DragDropContext>
+                                                                                </div>
+                                                                            )}
+                                                                        </Card.Body>
+                                                                    </Card>
+                                                                </div>
+                                                            )}
+                                                        </Draggable>
+                                                    ))}
+                                                    {provided.placeholder}
+                                                </div>
+                                            )}
+                                        </Droppable>
+                                    </DragDropContext>
+                                </Card.Body>
+                            </Card>
+                        )}
                     </div>
 
-                    <div className="border-top pt-3">
+                    {/* Footer Actions */}
+                    <div className="border-top pt-3 mt-3">
                         <div className="d-flex justify-content-end gap-2">
-                            <Button type="submit" className='custom-buttons'>
-                                {settingsData?._id ? 'Update' : 'Save'} Settings
+                            <Button className='custom-buttons' onClick={closeSettings}>
+                                Cancel
+                            </Button>
+                            <Button
+                                type="submit"
+                                className='custom-buttons'
+                                disabled={store?.createEncounterSettingsReducer?.loading || store?.updateEncounterSettingsReducer?.loading}
+                            >
+                                {(store?.createEncounterSettingsReducer?.loading || store?.updateEncounterSettingsReducer?.loading)
+                                    ? 'Saving...'
+                                    : 'Save Settings'
+                                }
                             </Button>
                         </div>
                     </div>
@@ -326,4 +382,4 @@ const EncounterSettings = ({ showSettings, closeSettings, initialData }) => {
     );
 };
 
-export default EncounterSettings;
+export default EncounterSettingsForm;

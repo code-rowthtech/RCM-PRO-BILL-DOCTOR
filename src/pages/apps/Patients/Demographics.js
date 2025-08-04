@@ -440,16 +440,6 @@ const Demographics = ({ patientId }) => {
                 ],
             }),
             ...(data?.notes && { notes: data.notes }),
-            // ✅ Fixing Emergency Contact Field
-            // ...(data?.emergencyContactName && {
-            // contact: [
-            //     {
-            //         relationship: [{...rela,text:rela.display}],
-            //         name: { text: data?.emergencyContactName },
-            //         telecom: [{ system: 'phone', value: data?.emergencyContactPhone?.replace(/\D/g, '') }],
-
-            //     },
-            // ],
             contact: [
                 {
                     relationship: [

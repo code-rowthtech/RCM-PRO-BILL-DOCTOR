@@ -33,5 +33,5 @@ export const updateProblemsReducer = createReducer('UPDATE_PROBLEMS', true);
 export const getProblemsReducer = createReducer('GET_PROBLEMS');
 export const deleteProblemsReducer = createReducer('DELETE_PROBLEMS', true);
 export const getProblemByIdReducer = createReducer('GET_PROBLEM_BY_ID');
-export const getAllCodeReducer = createReducer('ALL_CODES' ,true);
-export const getPatientAppointmentReducer = createReducer('GET_PATIENT_APPOINTMENTS');
+export const getAllCodeReducer = createReducer('ALL_CODES', true);
+// export const getPatientAppointmentReducer = createReducer('GET_PATIENT_APPOINTMENTS');

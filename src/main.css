@@ -81,7 +81,7 @@ select {
 }
 
 .form-select {
-    color: #0908084f !important;
+    /* color: #0908084f !important; */
     font-weight: 550 !important;
     padding: 6px !important;
     font-size: 12px;
@@ -92,15 +92,15 @@ select {
     color: #6169d0;
 }
 
-.form-control:focus,
+/* .form-control:focus,
 .form-select:focus {
     color: black !important;
-}
+} */
 
-.form-control[data-has-value='true'],
+/* .form-control[data-has-value='true'],
 .form-select[data-has-value='true'] {
     color: black !important;
-}
+} */
 
 .custom-form-fields,
 .form-control::placeholder {
@@ -513,7 +513,7 @@ tbody tr:hover {
 .patientChartCard {
     height: 70vh;
 }
-.patientChartCardClose{
+.patientChartCardClose {
     height: 84vh;
 }
 .summary-card-body {
@@ -522,7 +522,7 @@ tbody tr:hover {
 /* .summary-card-body-footer {
     height: 10vh;
 } */
- .offcanvas {
+.offcanvas {
     z-index: 1080 !important; /* Higher than Bootstrap modal (z-index: 1050) */
 }
 .custom-suggestion-offcanvas.offcanvas {
@@ -531,7 +531,7 @@ tbody tr:hover {
 /* You can add this to your main CSS file */
 .custom-dropdown .dropdown-menu {
     min-width: 180px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     background: #fff;
     border-radius: 4px;
     padding: 0.5rem 0;
@@ -546,4 +546,21 @@ tbody tr:hover {
     padding-top: 5px !important;
     padding-bottom: 5px !important;
     margin: 0px !important;
+}
+
+option {
+    color: black !important;
+}
+
+.vital-item {
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.vitals-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
 }

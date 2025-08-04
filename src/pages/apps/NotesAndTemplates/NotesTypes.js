@@ -41,6 +41,7 @@ const NotesTypes = () => {
         getValues,
         formState: { errors },
     } = useForm();
+
     useEffect(() => {
         dispatch(
             getNoteCategoriesAction({
@@ -48,7 +49,7 @@ const NotesTypes = () => {
                 skip: skip,
                 limit: 8,
                 // doctorId: doctorId,
-                clinicId:clinicId,
+                clinicId: clinicId,
                 active: status === 'active' ? true : false,
                 noteType: noteType,
             })
@@ -78,9 +79,11 @@ const NotesTypes = () => {
         setAddModal(true);
     };
     const handleActiveTab = () => {
-        dispatch(getNoteCategoriesAction({ search: search, page: skip, limit: 8,
+        dispatch(getNoteCategoriesAction({
+            search: search, page: skip, limit: 8,
             // doctorId: doctorId
-            clinicId:clinicId }));
+            clinicId: clinicId
+        }));
     };
 
     const [status, setStatus] = useState('active');
@@ -155,7 +158,7 @@ const NotesTypes = () => {
                                                             page: 1,
                                                             limit: 8,
                                                             // doctorId: doctorId,
-                                                            clinicId:clinicId,
+                                                            clinicId: clinicId,
                                                             noteType: noteType,
                                                         })
                                                     );
@@ -177,7 +180,7 @@ const NotesTypes = () => {
                                                             page: 1,
                                                             limit: 8,
                                                             // doctorId: doctorId,
-                                                            clinicId:clinicId,
+                                                            clinicId: clinicId,
                                                             noteType: noteType,
                                                         })
                                                     );

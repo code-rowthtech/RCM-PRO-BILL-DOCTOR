@@ -113,8 +113,6 @@ function* deleteAllergiesFunction(data) {
     }
 }
 
-
-
 function* getAllergiesFunction(data) {
     try {
         yield put({

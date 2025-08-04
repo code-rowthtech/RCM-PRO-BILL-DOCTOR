@@ -26,9 +26,11 @@ import settingsSaga from './settings/saga';
 import settingsRoleSaga from './settings/rolesetting/saga';
 import clinicalHistorySaga from './socialHistory/saga';
 import icdCodesSaga from './icdCodes/saga';
+import patientDocumentsSaga from './patientDocuments/saga';
 export default function* rootSaga(): any {
     yield all([authSaga(), layoutSaga(), permissionsSaga(), rolesSaga(), clinicsSaga(), doctorsSaga(), patientsSaga(), dashboardSaga(),
     subscriptionsSaga(), scheduleSaga(), vitalsSaga(), appointmentsSaga(), clinicNotesSaga(), encounterSaga(), allergiesSaga(), problemsSaga(), medicationSaga(),
-    suggestionsListSaga(),templateSaga(),noteCategoriesSaga(),userTasksSaga(),settingsSaga(),settingsRoleSaga(),clinicalHistorySaga(),icdCodesSaga(),
-]);
+    suggestionsListSaga(), templateSaga(), noteCategoriesSaga(), userTasksSaga(), settingsSaga(), settingsRoleSaga(), clinicalHistorySaga(), icdCodesSaga(),
+    patientDocumentsSaga(),
+    ]);
 }

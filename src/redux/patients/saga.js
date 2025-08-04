@@ -44,7 +44,8 @@ function* getPatientsByIdFunction(data) {
             payload: {},
         });
         const response = yield call(getPatientsByIdApi, data);
-        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        // const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        const decryptedData = response.data.data;
 
         if (response.status === 200) {
             yield put({
@@ -64,6 +65,7 @@ function* getPatientsByIdFunction(data) {
         });
     }
 }
+
 function* createPatientsFunction(data) {
     try {
         yield put({
@@ -77,6 +79,10 @@ function* createPatientsFunction(data) {
             yield put({
                 type: PatientsActionTypes.CREATE_PATIENTS_SUCCESS,
                 payload: { ...decryptedData },
+            });
+            yield put({
+                type: PatientsActionTypes.CREATE_PATIENTS_RESET,
+                payload: {},
             });
         } else {
             yield put({
@@ -107,6 +113,10 @@ function* updatePatientsFunction(data) {
                 type: PatientsActionTypes.UPDATE_PATIENTS_SUCCESS,
                 payload: { ...decryptedData },
             });
+            yield put({
+                type: PatientsActionTypes.UPDATE_PATIENTS_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: PatientsActionTypes.UPDATE_PATIENTS_ERROR,
@@ -135,6 +145,10 @@ function* createReferringDoctorFunction(data) {
             yield put({
                 type: PatientsActionTypes.CREATE_REFERRING_DOCTOR_SUCCESS,
                 payload: { ...decryptedData },
+            });
+            yield put({
+                type: PatientsActionTypes.CREATE_REFERRING_DOCTOR_RESET,
+                payload: {},
             });
         } else {
             yield put({
@@ -165,6 +179,10 @@ function* createResponsiblePartyFunction(data) {
                 type: PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_SUCCESS,
                 payload: { ...decryptedData },
             });
+            yield put({
+                type: PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_ERROR,
@@ -178,14 +196,6 @@ function* createResponsiblePartyFunction(data) {
             payload: error,
         });
     }
-}
-
-export function* callResetUpdate() {
-    put({
-        type: PatientsActionTypes.RESET_UPDATE_STATUS,
-        payload: {},
-    });
-
 }
 
 
@@ -208,16 +218,13 @@ export function* watchCreateResponsibleParty() {
     yield takeEvery(PatientsActionTypes.CREATE_RESPONSIBLE_PARTY, createResponsiblePartyFunction);
 }
 
-export function* watchresetState() {
-    yield takeEvery(PatientsActionTypes.RESET_UPDATE_STATUS, callResetUpdate);
-}
+
 function* patientsSaga() {
     yield all([
         fork(watchGetPatients),
         fork(watchGetPatientsById),
         fork(watchCreatePatients),
         fork(watchUpdatePatients),
-        fork(watchresetState),
         fork(watchCreateReferringDoctor),
         fork(watchCreateResponsibleParty),
     ]);

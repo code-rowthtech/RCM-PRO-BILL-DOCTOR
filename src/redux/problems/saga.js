@@ -2,7 +2,11 @@ import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects'
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 import { ProblemsActionTypes } from './constants';
-import { createProblemsApi, deleteProblemsApi, getAllCodeApi, getPatientAppointmentsAllApi, getProblemsApi, getProblemsByIdApi, updateProblemsApi } from './api';
+import {
+    createProblemsApi, deleteProblemsApi, getAllCodeApi,
+    // getPatientAppointmentsAllApi,
+    getProblemsApi, getProblemsByIdApi, updateProblemsApi
+} from './api';
 
 /**
  * Login the user
@@ -80,7 +84,7 @@ function* deleteProblemsFunction(data) {
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
 
         if (response?.status === 200) {
-            ToastHandle(decryptedData?.message, 'danger');
+            ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: ProblemsActionTypes.DELETE_PROBLEMS_SUCCESS,
                 payload: { ...decryptedData },
@@ -144,7 +148,6 @@ function* getAllCodesFunction(data) {
         });
         const response = yield call(getAllCodeApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-
         if (response.status === 200) {
             yield put({
                 type: ProblemsActionTypes.ALL_CODES_SUCCESS,
@@ -164,32 +167,33 @@ function* getAllCodesFunction(data) {
     }
 }
 
-function* getPatientAppointmentFunction(data) {
-    try {
-        yield put({
-            type: ProblemsActionTypes.GET_PATIENT_APPOINTMENTS_LOADING,
-            payload: {},
-        });
-        const response = yield call(getPatientAppointmentsAllApi, data);
-        const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 200) {
-            yield put({
-                type: ProblemsActionTypes.GET_PATIENT_APPOINTMENTS_SUCCESS,
-                payload: decryptedData, // ✅ FIXED
-            });
-        } else {
-            yield put({
-                type: ProblemsActionTypes.GET_PATIENT_APPOINTMENTS_ERROR,
-                payload: decryptedData,
-            });
-        }
-    } catch (error) {
-        yield put({
-            type: ProblemsActionTypes.GET_PATIENT_APPOINTMENTS_ERROR,
-            payload: error,
-        });
-    }
-}
+// function* getPatientAppointmentFunction(data) {
+//     try {
+//         yield put({
+//             type: ProblemsActionTypes.GET_PATIENT_APPOINTMENTS_LOADING,
+//             payload: {},
+//         });
+//         const response = yield call(getPatientAppointmentsAllApi, data);
+//         const decryptedData = JSON.parse(decryptMessage(response.data.data));
+
+//         if (response.status === 200) {
+//             yield put({
+//                 type: ProblemsActionTypes.GET_PATIENT_APPOINTMENTS_SUCCESS,
+//                 payload: decryptedData, // ✅ FIXED
+//             });
+//         } else {
+//             yield put({
+//                 type: ProblemsActionTypes.GET_PATIENT_APPOINTMENTS_ERROR,
+//                 payload: decryptedData,
+//             });
+//         }
+//     } catch (error) {
+//         yield put({
+//             type: ProblemsActionTypes.GET_PATIENT_APPOINTMENTS_ERROR,
+//             payload: error,
+//         });
+//     }
+// }
 
 function* getProblemByIdFunction(data) {
     try {
@@ -247,9 +251,9 @@ export function* watchAllCode() {
     yield takeEvery(ProblemsActionTypes.ALL_CODES, getAllCodesFunction);
 }
 
-export function* watchPatientAppointment() {
-    yield takeEvery(ProblemsActionTypes.GET_PATIENT_APPOINTMENTS, getPatientAppointmentFunction);
-}
+// export function* watchPatientAppointment() {
+//     yield takeEvery(ProblemsActionTypes.GET_PATIENT_APPOINTMENTS, getPatientAppointmentFunction);
+// }
 
 export function* watchProblemById() {
     yield takeEvery(ProblemsActionTypes.GET_PROBLEM_BY_ID, getProblemByIdFunction);
@@ -262,7 +266,7 @@ function* problemsSaga() {
         fork(watchUpdateProblems),
         fork(watchAllCode),
         fork(watchProblemById),
-        fork(watchPatientAppointment),
+        // fork(watchPatientAppointment),
     ]);
 }
 export default problemsSaga;

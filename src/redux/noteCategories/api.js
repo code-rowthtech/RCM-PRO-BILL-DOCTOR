@@ -9,7 +9,18 @@ export function createNoteCategoriesApi(params: any): any {
 
 export function getNoteCategoriesApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.getNoteCategories}?clinicId=${data?.clinicId}&page=${data?.skip}&limit=${data?.limit}&search=${data?.search}&active=${data?.active}&noteType=${data?.noteType}`);
+    
+    // Build query parameters more efficiently
+    const queryParams = new URLSearchParams();
+    
+    if (data?.clinicId) queryParams.append('clinicId', data.clinicId);
+    if (data?.skip) queryParams.append('page', data.skip.toString());
+    if (data?.limit) queryParams.append('limit', data.limit.toString());
+    if (data?.search && data.search.trim()) queryParams.append('search', data.search.trim());
+    if (data?.active !== undefined) queryParams.append('active', data.active.toString());
+    if (data?.noteType) queryParams.append('noteType', data.noteType);
+    
+    return api.get(`${URL.getNoteCategories}?${queryParams.toString()}`);
 }
 
 export function updateNoteCategoriesApi(params: any): any {

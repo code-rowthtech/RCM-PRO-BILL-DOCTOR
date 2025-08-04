@@ -33,7 +33,12 @@ export function updateAppointmentDetailsApi(params: any): any {
     return api.update(URL.updateAppointmentDetails, data);
 }
 
-export function getAppointmentByPateintProviderApi(parmas: any): any{
+export function getAppointmentByPateintProviderApi(parmas: any): any {
     const { data } = parmas;
     return api.get(URL.getAppointmentByPateintProvider, data);
+}
+
+export function getAppointmentByPateintIdApi(parmas: any): any {
+    const { data } = parmas;
+    return api.get(URL.getAppointmentByPateintId, data);
 }
