@@ -5,7 +5,7 @@ import SummarySection from './SummarySection';
 import TemplatesSection from './TemplatesSection';
 import PastEncountersSection from './PastEncountersSection';
 
-const EncounterLeftSection = ({ selectedFromList, setSelectedFromList }) => {
+const EncounterLeftSection = ({ selectedFromList, setSelectedFromList, expanded }) => {
     const store = useSelector((state) => state);
     const [leftSectionActive, setLeftSectionActive] = useState('Summary');
     const defaultTabs = ['Summary', 'Templates', 'Past Encounters'];
@@ -26,7 +26,7 @@ const EncounterLeftSection = ({ selectedFromList, setSelectedFromList }) => {
 
 
     return (
-        <div>
+        <div style={{ height: expanded ? '84vh' : 'auto' }}>
             <ul className='d-flex list-unstyled mt-0 mb-0' style={{ height: 'fit-content' }}>
                 {visibleTabs?.map((item) => (
                     <li
@@ -49,7 +49,7 @@ const EncounterLeftSection = ({ selectedFromList, setSelectedFromList }) => {
                     />
                 )}
                 {leftSectionActive === 'Templates' && (
-                    <TemplatesSection 
+                    <TemplatesSection
                         selectedFromList={selectedFromList}
                         setSelectedFromList={setSelectedFromList}
                     />

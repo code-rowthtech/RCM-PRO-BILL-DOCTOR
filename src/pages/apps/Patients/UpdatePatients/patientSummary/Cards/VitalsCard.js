@@ -61,7 +61,7 @@ const VitalsDisplay = ({ vitalsData }) => {
     );
 };
 
-const VitalsCard = () => {
+const VitalsCard = ({ activeKey }) => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const [effectiveDateTime, setEffectiveDateTime] = useState('');
@@ -184,7 +184,7 @@ const VitalsCard = () => {
                         />
                     </div>
                 </Card.Header>
-                <Card.Body className="  p-2 scroll-container" style={{ height: '22vh' }}>
+                <Card.Body className="  p-2 scroll-container" style={{ height: activeKey === '0' ? '25vh' : '32vh' }}>
                     {isLoading ? (
                         <div className="d-flex justify-content-center align-items-center w-100 p-5 h-100">
                             <Spinner className="spinner-border-sm" />

@@ -66,10 +66,10 @@ const UploadDocumentsModal = ({ showUploadModal, closeModal }) => {
 
     // Load encounters on component mount
     useEffect(() => {
-        if (!store?.getEncounterReducer?.data?.encounters?.length) {
-            dispatch(getEncounterAction({ patientId: subjectId, skip: 1 }))
-        }
-    }, [store?.getEncounterReducer?.data?.encounters, dispatch, subjectId])
+        // if (!store?.getEncounterReducer?.data?.encounters?.length) {
+        dispatch(getEncounterAction({ patientId: subjectId, skip: 1 }))
+        // }
+    }, [dispatch, subjectId])
 
     // Setup Quill editor text length limit
     useEffect(() => {
@@ -291,8 +291,8 @@ const UploadDocumentsModal = ({ showUploadModal, closeModal }) => {
     return (
         <Modal className="upload-documents" show={showUploadModal} onHide={closeModal} size="lg" centered>
             {/* Modal Header */}
-            <Modal.Header className="p-0 border-0 pb-0 d-flex justify-content-center">
-                <Modal.Title className="fw-semibold">
+            <Modal.Header className="p-0 ps-3 text-dark border-0 pb-0 d-flex justify-content-start">
+                <Modal.Title className="fw-semibold fs-5">
                     Upload Documents
                 </Modal.Title>
             </Modal.Header>
@@ -302,10 +302,10 @@ const UploadDocumentsModal = ({ showUploadModal, closeModal }) => {
                     {/* File Upload Area */}
                     <Col xs={6}>
                         <div
-                            className="border rounded p-2 text-center"
+                            className=" rounded p-2 text-center"
                             onDrop={handleDrop}
                             onDragOver={(e) => e.preventDefault()}
-                            style={{ borderStyle: 'dashed', backgroundColor: '#f8f9fa' }}
+                            style={{ border: '1px dashed #ccc', backgroundColor: '#f8f9fa' }}
                         >
                             <UploadIcon size={24} className="mb-1" />
                             <p>Drag and drop files or</p>
@@ -492,7 +492,7 @@ const UploadDocumentsModal = ({ showUploadModal, closeModal }) => {
                             theme="snow"
                             value={notes}
                             onChange={setNotes}
-                            style={{ height: '30vh' }}
+                            style={{ height: '20vh', marginBottom: '35px' }}
                             modules={{
                                 toolbar: [
                                     ['bold', 'italic', 'underline'],

@@ -229,6 +229,7 @@ const Encountersindex = (props) => {
                                 <CreateEncounterComponent
                                     activeTabId={activeTab}
                                     tabType={tab?.type}
+                                    expanded={expanded}
                                 />
                             )}
                         </div>

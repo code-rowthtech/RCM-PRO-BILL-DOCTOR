@@ -191,7 +191,7 @@ const DocumentsCard = () => {
         <Col sm={12} key={doc._id} className="my-1 position-relative">
             <Card className='p-1 mb-0 border'>
                 <Card.Body className='p-0'>
-                    <div className="row mb-2 d-flex align-items-center">
+                    <div className="row mb-2 d-flex align-items-start">
                         {/* Document actions */}
                         <div className="col-6">
                             <span className={`badge text-capitalize ${doc.status === 'current' ? 'bg-success' : 'bg-secondary'}`}>

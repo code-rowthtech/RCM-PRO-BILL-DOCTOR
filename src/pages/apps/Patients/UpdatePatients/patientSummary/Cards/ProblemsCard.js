@@ -10,7 +10,7 @@ import Spinner from 'constants/Spinner';
 import { getProblemsAction } from 'redux/actions';
 import ProblemsModal from '../../clinicalReview/problems/ProblemsModal';
 
-const ProblemsCard = () => {
+const ProblemsCard = ({ activeKey }) => {
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const store = useSelector((state) => state);
@@ -47,7 +47,7 @@ const ProblemsCard = () => {
                         />
                     </div>
                 </Card.Header>
-                <Card.Body className="p-2">
+                <Card.Body className="p-2" style={{ height: activeKey === '0' ? '25vh' : '32vh' }}>
                     {store?.getProblemListReducer?.loading ? (
                         <div
                             className="d-flex justify-content-center align-items-center w-100 p-5"
