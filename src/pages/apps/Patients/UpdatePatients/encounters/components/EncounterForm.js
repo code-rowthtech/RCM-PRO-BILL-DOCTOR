@@ -278,6 +278,8 @@ const EncounterForm = ({ selectedFromList = {} }, expanded) => {
                                         color: '#6c757d',
                                     }),
                                 }}
+                                menuPlacement="auto"
+                                menuPosition="fixed"
                             />
                             {notesError && (
                                 <div className="text-danger small mt-1">
@@ -379,7 +381,7 @@ const EncounterForm = ({ selectedFromList = {} }, expanded) => {
                         <Button
                             type="submit"
                             className='custom-buttons'
-                            disabled={store?.createEncounterReducer?.loading||store?.updateEncounterReducer?.loading}
+                            disabled={store?.createEncounterReducer?.loading || store?.updateEncounterReducer?.loading}
                         >
                             {store?.createEncounterReducer?.loading ? 'Saving...' : encounterById ? 'Update Encounter' : 'Save Encounter'}
                         </Button>

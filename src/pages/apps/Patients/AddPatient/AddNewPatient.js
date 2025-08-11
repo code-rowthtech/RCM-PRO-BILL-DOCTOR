@@ -27,6 +27,7 @@ const AddNewPatient = () => {
     const createResponse = store?.createPatientsReducer?.data?.status;
     const createPatientResponse = store?.createPatientsReducer?.data?.data;
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
+
     useEffect(() => {
         if (createResponse === 201 && createPatientResponse?._id) {
             dispatch(getPatientsAction({
@@ -70,9 +71,9 @@ const AddNewPatient = () => {
     }, [updateSuccess, activeTab, visibleReffering, visibleResponsible]);
 
     return (
-        <div>
+        <div className='px-0'>
             <div className=" mt-2 ">
-                <Card className="px-2 ">
+                <Card className="px-2">
                     <div className="d-flex justify-content-between pt-2 px-2">
                         <div style={{ borderBottom: '2px solid grey' }}>
                             <ul className="nav nav-underline fs-6">

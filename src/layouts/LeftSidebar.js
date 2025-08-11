@@ -226,7 +226,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                                 height="40"
                                                 width="40"
                                                 src={data?.subject?.photo?.[0]?.url || profileDummy}
-                                                className="rounded-circle border border-black"
+                                                className="rounded-circle border border-black object-fit-cover"
                                                 alt="profile image"
                                             />
                                             <div>

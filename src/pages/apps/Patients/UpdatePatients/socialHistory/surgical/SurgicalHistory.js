@@ -73,7 +73,7 @@ const SurgicalHistory = () => {
     const icdProcedureCodes = store?.getIcdProcedureReducer?.data?.pcsCodes;
 
     // Effect hooks for data fetching and state management
-    
+
     // Initial data fetch on component mount
     useEffect(() => {
         dispatch(getSurgicalHistoryAction({ patientId: patientId }));
@@ -133,7 +133,7 @@ const SurgicalHistory = () => {
     }, [updateSuccess, dispatch, patientId, reset]);
 
     // Event handlers and utility functions
-    
+
     /**
      * Form submission handler - creates or updates surgical history record
      * Constructs FHIR-compliant payload with encrypted data
@@ -169,7 +169,7 @@ const SurgicalHistory = () => {
             subject: patientId,
             performedDateTime: data?.effectiveDateTime,
         };
-        
+
         // Determine if updating existing record or creating new one
         if (toEdit) {
             payload.id = toEdit?._id;
@@ -259,6 +259,8 @@ const SurgicalHistory = () => {
                                                     border: '0px',
                                                 }),
                                             }}
+                                            menuPlacement="auto"
+                                            menuPosition="fixed"
                                         />
                                     </Form.Group>
                                 </Col>

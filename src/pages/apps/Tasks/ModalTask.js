@@ -31,7 +31,7 @@ const ModalTask = ({ show, handleClose, taskId }) => {
     const roleData = store?.getRolesDataReducer?.data;
     const clinicId = loggedInUser?.clinicId;
     const doctorDetails = store?.getAllDoctorsReducer?.data?.result;
-    console.log(doctorDetails,'doctor')
+    console.log(doctorDetails, 'doctor')
     const patientsData = store?.getPatientsReducer?.data?.data;
     const createTaskResponse = store?.createUserTasksReducer?.data?.status;
     const encounters = store?.getEncounterReducer?.data?.encounters;
@@ -51,18 +51,19 @@ const ModalTask = ({ show, handleClose, taskId }) => {
                 setValue('encounter', taskData?.encounter)
             }
         }
-    }, [taskData, taskId, encounters, CategoryData])
+    }, [taskData, taskId, encounters, CategoryData]);
 
     useEffect(() => {
         if (taskId) {
             dispatch(getTaskByIdAction({ taskId: taskId }));
         }
-    }, [taskId])
+    }, [taskId]);
+
     useEffect(() => {
         if (createTaskResponse === 201) {
             reset();
         }
-    }, [createTaskResponse])
+    }, [createTaskResponse]);
 
     useEffect(() => {
         if (show) {
@@ -75,7 +76,7 @@ const ModalTask = ({ show, handleClose, taskId }) => {
             const doctorPayload = { status: '', search: '' };
             dispatch(getAllDoctorsAction(doctorPayload));
             dispatch(getPatientsAction(data));
-            dispatch(getMastersDataAction({clinicId:clinicId, status: '', category: 'task-category', limit: 10, skip: '', search: '' }));
+            dispatch(getMastersDataAction({ clinicId: clinicId, status: '', category: 'task-category', limit: 10, skip: '', search: '' }));
             dispatch(getRolesAction({
                 clinicId: clinicId,
                 limit: 10,
@@ -86,7 +87,6 @@ const ModalTask = ({ show, handleClose, taskId }) => {
             );
         }
     }, [show]);
-
 
     // Reset form when modal closes
     useEffect(() => {
@@ -100,7 +100,6 @@ const ModalTask = ({ show, handleClose, taskId }) => {
                 ([_, value]) => value !== '' && value !== undefined && value !== null
             )
         );
-
 
         // Overwrite note with formatted object if note exists
         if (cleanedData.note) {
@@ -121,7 +120,6 @@ const ModalTask = ({ show, handleClose, taskId }) => {
             dispatch(createUserTasksAction({ key: `${encryptMessage(cleanedData)}` }));
         }
     };
-
 
     const handleReset = () => {
         reset();
@@ -144,13 +142,13 @@ const ModalTask = ({ show, handleClose, taskId }) => {
         setValue,
         fieldName: 'note',
     });
+
     return (
         <>
             <Modal show={show} onHide={handleClose} centered size="lg">
                 <Modal.Header className="px-2 py-0" closeButton>
                     <Modal.Title>{taskId ? 'Update' : 'Add'} Task</Modal.Title>
                 </Modal.Header>
-
                 <Modal.Body>
                     {store?.getTaskByIdReducer?.loading ?
                         <Row>
@@ -280,6 +278,8 @@ const ModalTask = ({ show, handleClose, taskId }) => {
                                                     }}
                                                 />
                                             )}
+                                            menuPlacement="auto"
+                                            menuPosition="fixed"
                                         />
                                         {errors.assignedToId && (
                                             <Form.Text className="text-danger">{errors.assignedToId.message}</Form.Text>
@@ -392,6 +392,8 @@ const ModalTask = ({ show, handleClose, taskId }) => {
                                                             paddingBottom: '5px',
                                                         }),
                                                     }}
+                                                    menuPlacement="auto"
+                                                    menuPosition="fixed"
                                                 />
                                             )}
                                         />

@@ -476,6 +476,8 @@ const UploadDocumentsModal = ({ showUploadModal, closeModal }) => {
                                                 paddingBottom: '5px',
                                             }),
                                         }}
+                                        menuPlacement="auto"
+                                        menuPosition="fixed"
                                     />
                                 </Form.Group>
                             </Col>

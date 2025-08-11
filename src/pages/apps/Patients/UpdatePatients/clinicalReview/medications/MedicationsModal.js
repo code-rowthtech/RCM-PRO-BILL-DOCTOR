@@ -361,6 +361,8 @@ const MedicationsModal = ({ show, closeModal, selectedMedication }) => {
                                     placeholder="&nbsp; Select"
                                     value={selectedInstruction}
                                     onChange={additionalInstructionChange}
+                                    menuPlacement="auto"
+                                    menuPosition="fixed"
                                 />
                             </Form.Group>
                         </Col>

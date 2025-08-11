@@ -62,7 +62,7 @@ const Demographics = ({ patientId }) => {
 
     // const patientDetails = store?.getPatientByIdReducer;
     const patientDetails = store?.getPatientsByIdReducer?.data?.data || [];
-    console.log(patientDetails,'newdaetails')
+    console.log(patientDetails, 'newdaetails')
 
     useEffect(() => {
         dispatch(getStatesByCountryAction());
@@ -385,16 +385,16 @@ const Demographics = ({ patientId }) => {
                 occupation: data?.occupation,
                 workLocation: data?.employerAddress
                     ? {
-                          address: {
-                              line: Array.isArray(data?.employerAddress)
-                                  ? data?.employerAddress
-                                  : [data?.employerAddress],
-                              city: data?.employerCity,
-                              state: data?.employerStateName,
-                              postalCode: data?.employerZip,
-                              country: 'United States',
-                          },
-                      }
+                        address: {
+                            line: Array.isArray(data?.employerAddress)
+                                ? data?.employerAddress
+                                : [data?.employerAddress],
+                            city: data?.employerCity,
+                            state: data?.employerStateName,
+                            postalCode: data?.employerZip,
+                            country: 'United States',
+                        },
+                    }
                     : {},
             },
             identifier: mapIdentifiers(identifiers),
@@ -614,6 +614,8 @@ const Demographics = ({ patientId }) => {
                                         paddingBottom: '5px',
                                     }),
                                 }}
+                                menuPlacement="auto"
+                                menuPosition="fixed"
                             />
                         </Form.Group>
                     </Col>
@@ -663,6 +665,8 @@ const Demographics = ({ patientId }) => {
                                         paddingBottom: '5px',
                                     }),
                                 }}
+                                menuPlacement="auto"
+                                menuPosition="fixed"
                             />
                         </Form.Group>
                     </Col>
@@ -784,6 +788,8 @@ const Demographics = ({ patientId }) => {
                                         paddingBottom: '5px',
                                     }),
                                 }}
+                                menuPlacement="auto"
+                                menuPosition="fixed"
                             />
                         </Form.Group>
                     </Col>
@@ -937,11 +943,10 @@ const Demographics = ({ patientId }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${
-                                                        searchedEmployerLocations?.length === 0 || !employerFocused
-                                                            ? 'd-none'
-                                                            : ''
-                                                    }`}>
+                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
+                                                        ? 'd-none'
+                                                        : ''
+                                                        }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
