@@ -27,11 +27,11 @@ const Responsible = ({ activeTab, setActiveTab }) => {
     const [responsibleAddresses, setResponsibleAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
-   
+
     const [responsibleTelecom, setResponsibleTelecom] = useState([{ system: '', value: '', use: '' }]);
     const createResponse = store?.createResponsiblePartyReducer?.data?.status;
     const patientDetails = store?.getPatientsByIdReducer?.data?.data || [];
-   
+
     useEffect(() => {
         if (patientDetails && id) {
             setValue('title', patientDetails?.relatedPerson?.name?.[0]?.prefix);
@@ -47,24 +47,24 @@ const Responsible = ({ activeTab, setActiveTab }) => {
             const rawAddress = patientDetails?.relatedPerson?.address;
             const updateAddress = Array.isArray(rawAddress)
                 ? rawAddress.map((data) => ({
-                      city: data?.city,
-                      country: data?.country,
-                      line: data?.line,
-                      postalCode: data?.postalCode,
-                      state: data?.state,
-                      type: data?.type,
-                      use: data?.use,
-                  }))
+                    city: data?.city,
+                    country: data?.country,
+                    line: data?.line,
+                    postalCode: data?.postalCode,
+                    state: data?.state,
+                    type: data?.type,
+                    use: data?.use,
+                }))
                 : [];
 
             setResponsibleAddresses(updateAddress);
             const rawTelecom = patientDetails?.relatedPerson?.telecom;
             const updateTelecom = Array.isArray(rawTelecom)
                 ? rawTelecom.map((data) => ({
-                      system: data?.system || '',
-                      value: data?.value || '',
-                      use: data?.use || '',
-                  }))
+                    system: data?.system || '',
+                    value: data?.value || '',
+                    use: data?.use || '',
+                }))
                 : [];
 
             setResponsibleTelecom(updateTelecom);
@@ -210,6 +210,8 @@ const Responsible = ({ activeTab, setActiveTab }) => {
                                             paddingBottom: '5px',
                                         }),
                                     }}
+                                    menuPlacement="auto"
+                                    menuPosition="fixed"
                                 />
                             </Form.Group>
                         </Col>

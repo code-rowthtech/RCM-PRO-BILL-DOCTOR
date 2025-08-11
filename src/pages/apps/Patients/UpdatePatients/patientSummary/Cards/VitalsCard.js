@@ -61,7 +61,7 @@ const VitalsDisplay = ({ vitalsData }) => {
     );
 };
 
-const VitalsCard = () => {
+const VitalsCard = ({ activeKey }) => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const [effectiveDateTime, setEffectiveDateTime] = useState('');
@@ -130,7 +130,7 @@ const VitalsCard = () => {
             effectiveDateTime
         }));
     }, [dispatch, patientId, effectiveDateTime]);
-    
+
     const handleModalDateChange = useCallback((newDate) => {
         setEffectiveDateTime(newDate);
         // Refresh vitals data for the new date
@@ -166,7 +166,7 @@ const VitalsCard = () => {
                     </div>
                     <div className="d-flex align-items-center">
                         <input
-                            className="fs-6 fw-semibold bg-white px-1 me-1 border border-1 border-muted"
+                            className="fs-6 fw-semibold bg-transparent px-1 me-1"
                             type="date"
                             value={effectiveDateTime}
                             onChange={handleDateChange}
@@ -184,7 +184,7 @@ const VitalsCard = () => {
                         />
                     </div>
                 </Card.Header>
-                <Card.Body className="  p-2 scroll-container" style={{ height: '22vh' }}>
+                <Card.Body className="  p-2 scroll-container" style={{ height: activeKey === '0' ? '25vh' : '32vh' }}>
                     {isLoading ? (
                         <div className="d-flex justify-content-center align-items-center w-100 p-5 h-100">
                             <Spinner className="spinner-border-sm" />
@@ -202,8 +202,8 @@ const VitalsCard = () => {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="p-2">
-                    <VitalsModal 
-                        onClose={closeVitalsModal} 
+                    <VitalsModal
+                        onClose={closeVitalsModal}
                         initialDate={effectiveDateTime}
                         onDateChange={handleModalDateChange}
                     />

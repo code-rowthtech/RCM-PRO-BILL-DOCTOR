@@ -28,7 +28,7 @@ import useNotesTypes from 'hooks/useNotesTypes';
  * Manages patient encounter creation with dynamic note types and fields
  * Features: FHIR-compliant data structure, dynamic form fields, note type management
  */
-const EncounterForm = ({ selectedFromList = {} }) => {
+const EncounterForm = ({ selectedFromList = {} }, expanded) => {
     // Hooks initialization
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
@@ -278,6 +278,8 @@ const EncounterForm = ({ selectedFromList = {} }) => {
                                         color: '#6c757d',
                                     }),
                                 }}
+                                menuPlacement="auto"
+                                menuPosition="fixed"
                             />
                             {notesError && (
                                 <div className="text-danger small mt-1">
@@ -349,7 +351,7 @@ const EncounterForm = ({ selectedFromList = {} }) => {
                 </Row>
 
                 {/* Dynamic Notes Fields Section */}
-                <Row className="mt-1 scroll-container" style={{ height: '43vh' }}>
+                <Row className="mt-1 scroll-container" style={{ minHeight: expanded ? '62vh' : '45vh', height: expanded ? '62vh' : '45vh' }}>
                     <Col sm={12}>
                         {selectedNoteType ? (
                             notesFields && Array.isArray(notesFields) && notesFields.length > 0 ? (
@@ -375,11 +377,11 @@ const EncounterForm = ({ selectedFromList = {} }) => {
 
                 {/* Submit Button */}
                 <Row>
-                    <Col sm={12} className="d-flex justify-content-end mt-2">
+                    <Col sm={12} className="d-flex justify-content-end mt-2 mb-1">
                         <Button
                             type="submit"
                             className='custom-buttons'
-                            disabled={store?.createEncounterReducer?.loading||store?.updateEncounterReducer?.loading}
+                            disabled={store?.createEncounterReducer?.loading || store?.updateEncounterReducer?.loading}
                         >
                             {store?.createEncounterReducer?.loading ? 'Saving...' : encounterById ? 'Update Encounter' : 'Save Encounter'}
                         </Button>

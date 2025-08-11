@@ -10,7 +10,7 @@ import Spinner from '../../../../../../constants/Spinner';
 import { handlePrintAllergies } from '../../PDFfiles/allergyPDF';
 import AllergyModal from '../../clinicalReview/allergy/AllergyModal';
 
-const AllergiesCard = () => {
+const AllergiesCard = ({ activeKey }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const [searchParams] = useSearchParams();
@@ -69,7 +69,7 @@ const AllergiesCard = () => {
                         />
                     </div>
                 </Card.Header>
-                <Card.Body className="p-2 pb-0 summary-card-body scroll-container">
+                <Card.Body className="p-2 pb-0 summary-card-body scroll-container" style={{ height: activeKey === '0' ? '25vh' : '32vh' }}>
                     {store?.getAllergiesReducer?.loading ?
                         <div className='d-flex align-items-center justify-content-center h-100'>
                             <Spinner className='spinner-border-sm' />

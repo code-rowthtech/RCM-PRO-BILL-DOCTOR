@@ -359,7 +359,7 @@ const PatientInfoAccordion = (props) => {
                                     <Button
                                         as={Link}
                                         to="/apps/appointments/newAppointment"
-                                        className="shadow-none"
+                                        className="shadow-none text-nowrap"
                                         style={{
                                             fontSize: '10px',
                                             borderRadius: '8px',

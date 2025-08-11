@@ -200,6 +200,8 @@ const ResponsibleParty = () => {
                                         paddingBottom: '5px',
                                     }),
                                 }}
+                                menuPlacement="auto"
+                                menuPosition="fixed"
                             />
                         </Form.Group>
                     </Col>

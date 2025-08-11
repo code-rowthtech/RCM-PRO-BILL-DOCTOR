@@ -120,7 +120,7 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
 
     const onSubmit = (data) => {
         const payload = {
-            clinicId: clinic_id?.clinicId,
+            userId: clinic_id?.clinicId || store?.Auth?.user?.clinicId,
             noteType: data.noteType,
             title: data.title === 'Other' ? data.customTitle : data.title,
             active: 'true',
@@ -143,7 +143,7 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
                     skip: 1,
                     limit: 8,
                     // doctorId :clinic_id?.doctorId,
-                    clinicId: clinic_id?.clinicId,
+                    clinicId: clinic_id?.clinicId || store?.Auth?.user?.clinicId,
                     active: true,
                     noteType: '',
                 })

@@ -6,40 +6,40 @@ import ProblemsCard from './Cards/ProblemsCard';
 import MedicationsCard from './Cards/MedicationsCard';
 import RecentEncountersCard from './Cards/RecentEncountersCard';
 
-const PatientSummary = () => {
+const PatientSummary = ({ activeKey }) => {
     return (
         <div className=' pt-2 pb-1'>
             <Row className="g-2">
                 <Col md={4} xs={6} className="d-flex">
                     <div className="w-100 d-flex flex-column h-100">
-                        <VitalsCard />
+                        <VitalsCard activeKey={activeKey} />
                     </div>
                 </Col>
                 <Col md={4} xs={6} className="d-flex">
                     <div className="w-100 d-flex flex-column h-100">
-                        <AllergiesCard />
+                        <AllergiesCard activeKey={activeKey} />
                     </div>
                 </Col>
                 <Col md={4} xs={6} className="d-flex">
                     <div className="w-100 d-flex flex-column h-100">
-                        <ProblemsCard />
+                        <ProblemsCard activeKey={activeKey} />
                     </div>
                 </Col>
             </Row>
             <Row className="g-2 mt-1">
                 <Col md={4} xs={6} className="d-flex">
                     <div className="w-100 d-flex flex-column h-100">
-                        <MedicationsCard />
+                        <MedicationsCard activeKey={activeKey} />
                     </div>
                 </Col>
                 <Col md={4} xs={6} className="d-flex">
                     <div className="w-100 d-flex flex-column h-100">
-                        <SocialHistoryCard />
+                        <SocialHistoryCard activeKey={activeKey} />
                     </div>
                 </Col>
                 <Col md={4} xs={6} className="d-flex">
                     <div className="w-100 d-flex flex-column h-100">
-                        <RecentEncountersCard />
+                        <RecentEncountersCard activeKey={activeKey} />
                     </div>
                 </Col>
             </Row>

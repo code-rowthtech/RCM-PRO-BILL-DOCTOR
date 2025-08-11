@@ -77,7 +77,7 @@ const DoctorQualifications = () => {
             const url = await handleUpload(file, setDegreeUploading);
             const fileName = file.name;
             handleQualificationChange(index, 'degreeFile', { url: url?.url, fileName });
-        } catch (error) {}
+        } catch (error) { }
     };
     const [degreeUploading, setDegreeUploading] = useState(false);
     const QualificationOptions = qualificationsData.map((qualification) => ({
@@ -151,7 +151,7 @@ const DoctorQualifications = () => {
             const url = await handleUpload(file, setDocumentUploading);
             const fileName = file.name;
             handleDocumentsChange(index, 'document', { url: url?.url, fileName });
-        } catch (error) {}
+        } catch (error) { }
     };
     const removeDocument = (indexToRemove) => {
         if (documents.length > 1) {
@@ -218,19 +218,18 @@ const DoctorQualifications = () => {
                                                     onClick={() =>
                                                         document.getElementById(`degree-upload-${index}`).click()
                                                     }
-                                                    className={`custom-file-upload d-flex justify-content-between align-items-center cursor-pointer form-control ${
-                                                        qualification.degreeFile ? '' : 'custom-form-fields'
-                                                    }`}
+                                                    className={`custom-file-upload d-flex justify-content-between align-items-center cursor-pointer form-control ${qualification.degreeFile ? '' : 'custom-form-fields'
+                                                        }`}
                                                     style={{ height: '30px' }}>
                                                     <span>
                                                         {degreeUploading
                                                             ? 'Uploading...'
                                                             : qualification.degreeFile?.fileName
-                                                              ? qualification.degreeFile.fileName.length > 30
-                                                                  ? qualification.degreeFile.fileName.slice(0, 30) +
+                                                                ? qualification.degreeFile.fileName.length > 30
+                                                                    ? qualification.degreeFile.fileName.slice(0, 30) +
                                                                     '...'
-                                                                  : qualification.degreeFile.fileName
-                                                              : 'Upload Degree'}
+                                                                    : qualification.degreeFile.fileName
+                                                                : 'Upload Degree'}
                                                     </span>
                                                     <FiUploadCloud className="mb-0" />
                                                 </div>
@@ -347,10 +346,10 @@ const DoctorQualifications = () => {
                                                             {documentUploading
                                                                 ? 'Uploading...'
                                                                 : data?.document?.fileName
-                                                                  ? data.document.fileName.length > 30
-                                                                      ? data.document.fileName.slice(0, 30) + '...'
-                                                                      : data.document.fileName
-                                                                  : 'Upload document'}
+                                                                    ? data.document.fileName.length > 30
+                                                                        ? data.document.fileName.slice(0, 30) + '...'
+                                                                        : data.document.fileName
+                                                                    : 'Upload document'}
                                                             <p className="mb-0">
                                                                 <FiUploadCloud />
                                                             </p>
@@ -401,7 +400,7 @@ const DoctorQualifications = () => {
                         </Row>
 
                         <div className="d-flex justify-content-end gap-2 mt-1">
-                            <Button className="cancel-button">Cancel</Button>
+                            {/* <Button className="cancel-button">Cancel</Button> */}
                             <Button
                                 className="custom-buttons"
                                 style={{ width: '70px' }}

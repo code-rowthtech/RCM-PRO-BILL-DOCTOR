@@ -251,6 +251,8 @@ const MedicalHistory = () => {
                                                             border: '0px',
                                                         }),
                                                     }}
+                                                    menuPlacement="auto"
+                                                    menuPosition="fixed"
                                                 />
                                             )}
                                         />

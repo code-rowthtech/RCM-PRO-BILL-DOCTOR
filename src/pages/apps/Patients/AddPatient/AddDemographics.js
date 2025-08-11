@@ -391,6 +391,8 @@ const AddDemographics = ({ patientId, setActiveTab, setVisibleReffering }) => {
                                         paddingBottom: '5px',
                                     }),
                                 }}
+                                menuPlacement="auto"
+                                menuPosition="fixed"
                             />
                         </Form.Group>
                     </Col>
@@ -442,6 +444,8 @@ const AddDemographics = ({ patientId, setActiveTab, setVisibleReffering }) => {
                                         paddingBottom: '5px',
                                     }),
                                 }}
+                                menuPlacement="auto"
+                                menuPosition="fixed"
                             />
                         </Form.Group>
                     </Col>
@@ -569,6 +573,8 @@ const AddDemographics = ({ patientId, setActiveTab, setVisibleReffering }) => {
                                         paddingBottom: '5px',
                                     }),
                                 }}
+                                menuPlacement="auto"
+                                menuPosition="fixed"
                             />
                         </Form.Group>
                     </Col>

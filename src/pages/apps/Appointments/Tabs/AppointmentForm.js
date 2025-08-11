@@ -13,7 +13,6 @@ import {
     getPatientsAction,
     getPatientsByIdAction,
     getPractitionerAvailabilityAction,
-    stateEmptydAction,
     updateAppointmentDetailsAction,
 } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
@@ -30,16 +29,19 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
     const daysNumberDaily = watch('daysNumberDaily');
     const dailyOccurrenceDate = watch('dailyOccurrenceDate');
     const dailyOccurenceCount = watch('dailyOccurenceCount');
+    const scheduledDate = watch('scheduled');
 
     useEffect(() => {
-        if (!daysNumberDaily || (!dailyOccurrenceDate && !dailyOccurenceCount)) {
+        if (!daysNumberDaily || (!dailyOccurrenceDate && !dailyOccurenceCount) || !scheduledDate) {
+            setValue('dailyOccurenceCount', '');
+            onDatesCalculated?.([]);
             return;
         }
 
-        const startDate = new Date();
+        const startDate = new Date(scheduledDate);
         const dates = [];
 
-        if (dailyOccurenceCount) {
+        if (dailyOccurenceCount && !dailyOccurrenceDate) {
             for (let i = 0; i < dailyOccurenceCount; i++) {
                 const nextDate = new Date(startDate);
                 nextDate.setDate(startDate.getDate() + i * daysNumberDaily);
@@ -55,11 +57,9 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
             }
         }
 
-        // Only call if onDatesCalculated exists
         onDatesCalculated?.(dates);
         setValue('dailyOccurenceCount', dates?.length);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [daysNumberDaily, dailyOccurrenceDate, dailyOccurenceCount]);
+    }, [daysNumberDaily, dailyOccurrenceDate, scheduledDate, setValue, onDatesCalculated]);
 
     return (
         <>
@@ -83,6 +83,7 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
                         <Form.Control
                             {...register('dailyOccurrenceDate')}
                             type="date"
+                            min={scheduledDate}
                             readOnly={appointmentDetails?.repeat}
                             style={{ cursor: appointmentDetails?.repeat ? 'not-allowed' : '' }}
                         />
@@ -111,67 +112,56 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
 });
 
 const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appointmentDetails }) => {
-    const [endDate, setEndDate] = useState(null);
     const appointmentDays = watch('appointmentDay');
-    const weeklyOccurrenceDate = endDate;
-    const [weekInterval, setWeekInterval] = useState(null);
+    const weeklyOccurrenceDate = watch('weeklyOccurrenceDate');
+    const weekInterval = watch('weekInterval');
+    const scheduledDate = watch('scheduled');
 
-    const calculateAppointments = useCallback(
-        debounce(() => {
-            if (!appointmentDays || !weeklyOccurrenceDate) {
-                setValue('weeklyOccurenceCount', '');
-                onDatesCalculated([]);
-                return;
-            }
-            const selectedDays = Object.entries(appointmentDays)
-                .filter(([_, selected]) => selected)
-                .map(([day]) =>
-                    ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].indexOf(day)
-                );
+    useEffect(() => {
+        if (!appointmentDays || !weeklyOccurrenceDate || !scheduledDate || !weekInterval) {
+            setValue('weeklyOccurenceCount', '');
+            onDatesCalculated([]);
+            return;
+        }
 
-            const interval = parseInt(weekInterval) || 1;
-            const endDate = new Date(weeklyOccurrenceDate);
+        const selectedDays = Object.entries(appointmentDays)
+            .filter(([_, selected]) => selected)
+            .map(([day]) =>
+                ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].indexOf(day)
+            );
 
-            if (selectedDays.length === 0 || isNaN(endDate.getTime())) {
-                setValue('weeklyOccurenceCount', '');
-                onDatesCalculated([]);
-                return;
-            }
+        const interval = parseInt(weekInterval) || 1;
+        const endDate = new Date(weeklyOccurrenceDate);
 
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+        if (selectedDays.length === 0 || isNaN(endDate.getTime())) {
+            setValue('weeklyOccurenceCount', '');
+            onDatesCalculated([]);
+            return;
+        }
 
-            const appointments = [];
-            let currentDate = new Date(today);
+        const scheduledStart = new Date(scheduledDate);
+        scheduledStart.setHours(0, 0, 0, 0);
 
-            while (currentDate <= endDate) {
-                selectedDays.forEach((dayIndex) => {
-                    const weekStartDate = new Date(currentDate);
-                    const appointmentDate = new Date(weekStartDate);
-                    appointmentDate.setDate(weekStartDate.getDate() + ((dayIndex - weekStartDate.getDay() + 7) % 7));
+        const appointments = [];
+        let currentDate = new Date(scheduledStart);
 
-                    if (appointmentDate >= today && appointmentDate <= endDate) {
-                        appointments.push(appointmentDate);
-                    }
-                });
-                currentDate.setDate(currentDate.getDate() + 7 * interval);
-            }
+        while (currentDate <= endDate) {
+            selectedDays.forEach((dayIndex) => {
+                const weekStartDate = new Date(currentDate);
+                const appointmentDate = new Date(weekStartDate);
+                appointmentDate.setDate(weekStartDate.getDate() + ((dayIndex - weekStartDate.getDay() + 7) % 7));
 
-            appointments.sort((a, b) => a.getTime() - b.getTime());
-            setValue('weeklyOccurenceCount', appointments.length);
-            onDatesCalculated(appointments);
-        }, 300),
-        [endDate, weekInterval]
-    );
+                if (appointmentDate >= scheduledStart && appointmentDate <= endDate) {
+                    appointments.push(appointmentDate);
+                }
+            });
+            currentDate.setDate(currentDate.getDate() + 7 * interval);
+        }
 
-    // useEffect(() => {
-    //     if (!appointmentDetails) {
-    //         calculateAppointments();
-    //         return () => {
-    //             calculateAppointments.cancel();
-    //         };
-    //     }
-    // }, [calculateAppointments]);
+        appointments.sort((a, b) => a.getTime() - b.getTime());
+        setValue('weeklyOccurenceCount', appointments.length);
+        onDatesCalculated(appointments);
+    }, [appointmentDays, weeklyOccurrenceDate, weekInterval, scheduledDate, setValue, onDatesCalculated]);
 
     const todayString = new Date().toISOString().split('T')[0];
     const oneYearLaterString = new Date(new Date().setFullYear(new Date().getFullYear() + 1))
@@ -207,7 +197,6 @@ const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appoi
                             placeholder="Enter number of weeks"
                             {...register('weekInterval', { valueAsNumber: true })}
                             type="number"
-                            onChange={(e) => setWeekInterval(e.target.value)}
                             min={1}
                             readOnly={appointmentDetails?.repeat}
                             style={{ cursor: appointmentDetails?.repeat ? 'not-allowed' : '' }}
@@ -224,8 +213,7 @@ const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appoi
                         <Form.Control
                             {...register('weeklyOccurrenceDate')}
                             type="date"
-                            onChange={(e) => setEndDate(e.target.value)}
-                            min={todayString}
+                            min={scheduledDate || todayString}
                             max={oneYearLaterString}
                             readOnly={appointmentDetails?.repeat}
                             style={{ cursor: appointmentDetails?.repeat ? 'not-allowed' : '' }}
@@ -255,7 +243,7 @@ const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appoi
     );
 });
 
-const Monthly = React.memo(({ register }) => (
+const Monthly = React.memo(({ register, watch }) => (
     <>
         <Col sm={6}>
             <Form.Group className="mb-1" controlId="dayOfMonth">
@@ -314,7 +302,11 @@ const Monthly = React.memo(({ register }) => (
             <Form.Group className="mb-1">
                 <Form.Label className="mb-0">Ends On</Form.Label>
                 <span className="d-flex">
-                    <Form.Control {...register('monthlyOccurrenceDate')} type="date" />
+                    <Form.Control
+                        {...register('monthlyOccurrenceDate')}
+                        type="date"
+                        min={watch('scheduled')}
+                    />
                     <Form.Text className="text-black fs-6 fw-semibold">&nbsp;&nbsp;after</Form.Text>
                 </span>
             </Form.Group>
@@ -391,6 +383,8 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
         store?.createAppointmentsReducer?.loading ||
         store?.getPractitionerAvailabilityReducer?.loading ||
         store?.updateAppointmentDetailsReducer?.loading;
+
+    const patientsData = store?.getPatientsReducer?.data?.data || [];
 
     useEffect(() => {
         if (createAppointmentResponse === 200 && createAppointmentType === 'back') {
@@ -476,6 +470,7 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
     useEffect(() => {
         setValue('primaryProvider', doctorName);
     }, [doctorName, setValue]);
+
     const formatTime = (isoDateString) => {
         if (!isoDateString) return '';
         const date = new Date(isoDateString);
@@ -483,10 +478,12 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
         const minutes = String(date.getMinutes()).padStart(2, '0');
         return `${hours}:${minutes}`;
     };
+
     const getTodayDate = () => {
         const today = new Date();
         return today.toISOString().split('T')[0]; // Format YYYY-MM-DD
     };
+
     const getDefaultTime = () => {
         return '10:00'; // Default Start Time
     };
@@ -522,6 +519,7 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
             }
         }
     }, [selectedSlot, calendarView]);
+
     useEffect(() => {
         const data = {
             doctorId: doctorId,
@@ -540,7 +538,6 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
     useEffect(() => {
         if (selectedDate) {
             const data = { date: selectedDate };
-
             dispatch(getPractitionerAvailabilityAction(data));
         }
     }, [dispatch, selectedDate]);
@@ -550,7 +547,6 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
             setShowConfirmationModal(true);
         }
     }, [availabilityResponse]);
-    const patientsData = store?.getPatientsReducer?.data?.data || [];
 
     useEffect(() => {
         if (createResponse === 201) {
@@ -732,7 +728,9 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
             })),
         []
     );
+
     const [appointmentReason, setAppointmentReason] = useState(null);
+
     const handleReasonChange = useCallback((selectedOption) => {
         setAppointmentReason(selectedOption ? selectedOption.value : '');
     }, []);
@@ -790,7 +788,6 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                                             </option>
                                         ))}
                                     </Form.Select>
-
                                     {!id && (
                                         <InputGroup.Text onClick={handlePlusIconClick} style={{ cursor: 'pointer' }}>
                                             <FaPlus className="text-primary" />
@@ -974,7 +971,7 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                         </Col> */}
                         <Col md={6} xs={12}>
                             <Form.Group className="mb-3">
-                                <Form.Label className="mb-1">Status</Form.Label>
+                                <Form.Label className="mb-1">Status <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
                                     as="select"
                                     data-has-value={!!watch('status')}
@@ -1055,7 +1052,7 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                                     onDatesCalculated={(dates) => setAppointmentDates(dates)}
                                 />
                             )}
-                            {repeatType === 'month' && <Monthly register={register} />}
+                            {repeatType === 'month' && <Monthly register={register} watch={watch} />}
                         </Row>
                     )}
                     <Row>

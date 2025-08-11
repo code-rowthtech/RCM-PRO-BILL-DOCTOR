@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import { getMedicationAction } from 'redux/actions';
 
-const MedicationsCard = () => {
+const MedicationsCard = ({ activeKey }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
@@ -32,7 +32,7 @@ const MedicationsCard = () => {
         unknown: 'text-dark',
     };
     return (
-        <Card className="h-100 shadow-sm">
+        <Card className="shadow-sm" style={{ height: activeKey === '0' ? '29vh' : '37vh' }}>
             <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
                 <div className="d-flex align-items-center">
                     <FaPills className="me-2 text-secondary" />

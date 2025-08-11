@@ -30,9 +30,12 @@ axios.interceptors.response.use(
                 case 404:
                     message = 'Sorry! the data you are looking for could not be found';
                     break;
+                case 409:
+                    message = 'Duplicate entry detected. This item already exists';
+                    break;
                 default: {
                     message =
-                        error.response && error.response.data ? error.response.data['message'] : error.message || error;
+                        error.response && error.response.data ? error.response.data['message'] : error.message || 'An error occurred';
                 }
             }
             return Promise.reject(message);

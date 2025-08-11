@@ -32,7 +32,6 @@ const Patients = () => {
     const [skip, setSkip] = useState(1);
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState(false);
-
     // USEEFFECTS
 
     useEffect(() => {
@@ -44,11 +43,11 @@ const Patients = () => {
 
     const fetchPatients = (page = 1, query = search) => {
         dispatch(getPatientsAction({
-            doctorId: loggedInUser?.doctorId,
+            doctorId: loggedInUser?.doctorId || store?.Auth?.user?.doctorId,
             page: page,
             limit: 10,
             search: query,
-            clinicId: loggedInUser?.clinicId,
+            clinicId: loggedInUser?.clinicId || store?.Auth?.user?.clinicId,
         }));
     }
 

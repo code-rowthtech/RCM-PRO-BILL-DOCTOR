@@ -72,7 +72,7 @@ const DoctorHoliday = ({ search }) => {
                 </thead>
                 {store?.getHolidayScheduleReducer?.loading ? (
                     <tr>
-                        <td className="text-center" colSpan={5} style={{ height: '65vh' }}>
+                        <td colSpan={5} className="text-center" style={{ height: '65vh' }}>
                             <Spinner />
                         </td>
                     </tr>

@@ -24,11 +24,11 @@ import Spinner from 'constants/Spinner';
 import { encryptMessage } from 'cryptoUtils';
 
 // Redux Actions
-import { 
-    createFamilyGeneticAction, 
-    deleteFamilyGeneticAction, 
-    getFamilyGeneticAction, 
-    updateFamilyGeneticaction 
+import {
+    createFamilyGeneticAction,
+    deleteFamilyGeneticAction,
+    getFamilyGeneticAction,
+    updateFamilyGeneticaction
 } from 'redux/socialHistory/action';
 
 // ============================================================================
@@ -39,20 +39,20 @@ const FamilyHistory = () => {
     // ========================================================================
     // HOOKS & STATE INITIALIZATION
     // ========================================================================
-    
+
     const dispatch = useDispatch();
     const { control } = useForm();
     const [searchParams] = useSearchParams();
     const store = useSelector((state) => state);
     const quillRef = useRef();
-    
+
     // Extract patient ID from URL parameters
     const patientId = searchParams.get('id');
-    
+
     // ========================================================================
     // COMPONENT STATE
     // ========================================================================
-    
+
     // Form-related state
     const [formData, setFormData] = useState({
         name: '',
@@ -63,33 +63,33 @@ const FamilyHistory = () => {
         dateOfDeath: '',
         note: '<ul><li></li></ul>'
     });
-    
+
     // Selection state
     const [rela, setRela] = useState(null); // Selected relationship
     const [selectedProblem, setSelectedProblem] = useState(null); // Selected medical condition
-    
+
     // Modal and editing state
     const [toDelete, setToDelete] = useState(null); // Item to be deleted
     const [toEdit, setToEdit] = useState(null); // Item being edited
     const [deleteModal, setDeleteModal] = useState(false); // Delete modal visibility
     const [showSuggestions, setShowSuggestions] = useState(false); // Notes suggestions visibility
-    
+
     // ========================================================================
     // REDUX STATE SELECTORS
     // ========================================================================
-    
+
     // API response status tracking
     const createFamilyHistorySuccess = store?.createFamilyGeneticReducer?.data?.status;
     const updateFamilyHistorySuccess = store?.updateFamilyGeneticReducer?.data?.status;
     const deleteFamilyHistorySuccess = store?.deleteFamilyGenticReducer?.data?.status;
-    
+
     // Family history data from store
     const familyGeneticHistory = store?.getFamilyGeneticReducer?.data?.familyMedicalHistory;
 
     // ========================================================================
     // SIDE EFFECTS
     // ========================================================================
-    
+
     // Initial data fetch on component mount
     useEffect(() => {
         dispatch(getFamilyGeneticAction({ patientId }));
@@ -124,7 +124,7 @@ const FamilyHistory = () => {
     // ========================================================================
     // CONSTANTS & STATIC DATA
     // ========================================================================
-    
+
     // Family relationship options for dropdown
     const relationshipOption = [
         { value: { code: 'FTH', display: 'Father' }, label: 'Father' },
@@ -144,53 +144,53 @@ const FamilyHistory = () => {
 
     // Medical conditions with ICD-10 codes
     const formattedOptions = [
-        { 
-            value: 'I25.10', 
-            label: 'Atherosclerotic heart disease - ICD-10', 
-            system: 'http://hl7.org/fhir/condition-code', 
-            display: 'Atherosclerotic heart disease' 
+        {
+            value: 'I25.10',
+            label: 'Atherosclerotic heart disease - ICD-10',
+            system: 'http://hl7.org/fhir/condition-code',
+            display: 'Atherosclerotic heart disease'
         },
-        { 
-            value: 'E11.65', 
-            label: 'Type 2 diabetes mellitus - ICD-10', 
-            system: 'http://hl7.org/fhir/condition-code', 
-            display: 'Type 2 diabetes mellitus' 
+        {
+            value: 'E11.65',
+            label: 'Type 2 diabetes mellitus - ICD-10',
+            system: 'http://hl7.org/fhir/condition-code',
+            display: 'Type 2 diabetes mellitus'
         },
-        { 
-            value: 'C34.90', 
-            label: 'Lung cancer - ICD-10', 
-            system: 'http://hl7.org/fhir/condition-code', 
-            display: 'Lung cancer' 
+        {
+            value: 'C34.90',
+            label: 'Lung cancer - ICD-10',
+            system: 'http://hl7.org/fhir/condition-code',
+            display: 'Lung cancer'
         },
-        { 
-            value: 'I10', 
-            label: 'Hypertension - ICD-10', 
-            system: 'http://hl7.org/fhir/condition-code', 
-            display: 'Hypertension' 
+        {
+            value: 'I10',
+            label: 'Hypertension - ICD-10',
+            system: 'http://hl7.org/fhir/condition-code',
+            display: 'Hypertension'
         }
     ];
 
     // Form validation constants
     const MAX_WORDS = 1000;
-    
+
     // ========================================================================
     // COMPUTED VALUES
     // ========================================================================
-    
+
     const wordCount = formData.note ? formData.note.split(/\s+/).filter(Boolean).length : 0;
     const isDeceased = formData.deceased === 'yes';
 
     // ========================================================================
     // EVENT HANDLERS
     // ========================================================================
-    
+
     /**
      * Handles form submission for creating or updating family history
      * Transforms form data into FHIR-compliant format before API call
      */
     const handleSubmit = (e) => {
         e.preventDefault();
-        
+
         // Prepare FHIR-compliant data structure
         const submitData = {
             subject: patientId,
@@ -279,7 +279,7 @@ const FamilyHistory = () => {
     // ========================================================================
     // RENDER
     // ========================================================================
-    
+
     return (
         <Row className="py-0 m-auto">
             {/* ================================================================ */}
@@ -316,6 +316,8 @@ const FamilyHistory = () => {
                                                 border: '0px',
                                             }),
                                         }}
+                                        menuPlacement="auto"
+                                        menuPosition="fixed"
                                     />
                                 </Form.Group>
                             </Col>
@@ -345,7 +347,7 @@ const FamilyHistory = () => {
                                     />
                                 </Form.Group>
                             </Col>
-                            
+
                             {/* Gender/Sex Selection */}
                             <Col md={6} className="mt-0">
                                 <Form.Group controlId="sex">
@@ -388,10 +390,12 @@ const FamilyHistory = () => {
                                                 border: '0px',
                                             }),
                                         }}
+                                        menuPlacement="auto"
+                                        menuPosition="fixed"
                                     />
                                 </Form.Group>
                             </Col>
-                            
+
                             {/* Deceased Status */}
                             <Col md={6} className="mt-0">
                                 <Form.Group controlId="deceased">
@@ -486,7 +490,7 @@ const FamilyHistory = () => {
                                 </Form.Group>
                             </Col>
                         </Row>
-                        
+
                         {/* Form Action Buttons */}
                         <div className="d-flex justify-content-end align-items-end pe-1 py-2">
                             <Button

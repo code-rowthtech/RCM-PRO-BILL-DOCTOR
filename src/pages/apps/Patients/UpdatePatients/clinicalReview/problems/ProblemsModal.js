@@ -248,6 +248,8 @@ const ProblemsModal = ({ show, closeModal, problemId }) => {
                                                     paddingBottom: '5px',
                                                 }),
                                             }}
+                                            menuPlacement="auto"
+                                            menuPosition="fixed"
                                         />
                                     )}
                                 />
