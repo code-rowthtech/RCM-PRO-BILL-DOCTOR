@@ -54,8 +54,8 @@ const AppointmentList = () => {
     // FUNCTIONS
     const fetchAppointments = () => {
         const currentQuery = {
-            clinicId: loggedInUser?.clinicId,
-            doctorId: loggedInUser?.doctorId || '',
+            clinicId: loggedInUser?.clinicId || store?.Auth?.user?.clinicId,
+            doctorId: loggedInUser?.doctorId || store?.Auth?.user?.doctorId,
             status: appointmentPeriod,
             limit: 10,
             page: skip,

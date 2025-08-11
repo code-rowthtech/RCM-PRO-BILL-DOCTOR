@@ -29,6 +29,7 @@ const Schedule = () => {
                 return null;
         }
     };
+
     // const searchHandle = (e) => {
     //     const payload = {
     //         startDate: '',  // Add actual startDate if needed
@@ -52,7 +53,7 @@ const Schedule = () => {
         <div>
             <Row className="mt-2">
                 <Col xs={12}>
-                    <Card style={{height:'87vh'}}>
+                    <Card style={{ height: '87vh' }}>
                         <Card.Body>
                             <Row className="mb-2">
                                 {/* Navigation Tabs */}
@@ -96,7 +97,7 @@ const Schedule = () => {
                                                                 width: '100%',
                                                             }}
                                                             onChange={(e) => setSearchQuery(e.target.value)} // Update state on input change
-                                                            // onKeyUp={searchHandle}
+                                                        // onKeyUp={searchHandle}
                                                         />
                                                         {/* <FiSearch
                                                             style={{

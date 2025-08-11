@@ -25,26 +25,40 @@ function* login({ payload }) {
             key: encryptMessage(payload)
         }
         const response = yield call(loginApi, encryptedPayload);
-        const user = JSON.parse(decryptMessage(response?.data?.data));
-        const userData = {
-            name: user?.name,
-            lastName: user?.lastName,
-            email: user?.email,
-            token: user?.accessToken,
-            role: user?.role,
-            userId: user?.userId,
-            doctorId: user?.doctorId,
-            logo:user?.photo,
-            clinicId: user?.clinicId
+
+        if (!response?.data?.data) {
+            throw new Error('Invalid response data');
         }
-        // NOTE - You can change this according to response format from your api
+
+        const decryptedData = decryptMessage(response.data.data);
+        if (!decryptedData) {
+            throw new Error('Failed to decrypt response data');
+        }
+
+        const user = JSON.parse(decryptedData);
+        if (!user) {
+            throw new Error('Invalid user data');
+        }
+
+        const userData = {
+            name: user?.name || '',
+            lastName: user?.lastName || '',
+            email: user?.email || '',
+            token: user?.accessToken || '',
+            role: user?.role || '',
+            userId: user?.userId || '',
+            doctorId: user?.doctorId || '',
+            logo: user?.photo || '',
+            clinicId: user?.clinicId || ''
+        }
+
         api.setLoggedInUser(userData);
-        // setAuthorization(user['token']);
-        setAuthorization(userData?.token); // Corrected to use userData.token
+        setAuthorization(userData.token);
 
         yield put(authApiResponseSuccess(AuthActionTypes.LOGIN_USER, userData));
     } catch (error) {
-        yield put(authApiResponseError(AuthActionTypes.LOGIN_USER, error));
+        const errorMessage = error?.message || 'Login failed';
+        yield put(authApiResponseError(AuthActionTypes.LOGIN_USER, errorMessage));
         api.setLoggedInUser(null);
         setAuthorization(null);
     }

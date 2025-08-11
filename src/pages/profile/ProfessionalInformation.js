@@ -107,7 +107,7 @@ const ProfessionalInformation = () => {
             const url = await handleUpload(file, setDegreeUploading);
             const fileName = file.name;
             handleQualificationChange(index, 'degreeFile', { url: url?.url, fileName });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -393,7 +393,7 @@ const ProfessionalInformation = () => {
                                         {index > 0 && (
                                             <span
                                                 className="text-danger cursor-pointer fs-5 fw-bold position-absolute"
-                                                style={{ right: '-5px', top: '50%',  }}
+                                                style={{ right: '-5px', top: '50%', }}
                                                 onClick={() => removeTaxonomyItem(index)}>
                                                 <CiCircleMinus />
                                             </span>
@@ -408,7 +408,7 @@ const ProfessionalInformation = () => {
                         </Row>
 
                         <div className="d-flex justify-content-end gap-2 my-1">
-                            <Button className="cancel-button">Cancel</Button>
+                            {/* <Button className="cancel-button">Cancel</Button> */}
 
                             <Button
                                 className="custom-buttons"

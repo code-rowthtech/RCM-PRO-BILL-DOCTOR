@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FiUploadCloud } from 'react-icons/fi';
-import { Button, Form, InputGroup ,Spinner} from 'react-bootstrap';
+import { Button, Form, InputGroup, Spinner } from 'react-bootstrap';
 import { handleFirstSpace } from '../../helpers/noSpace';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { handleUpload } from '../../helpers/HandleUpload';
@@ -43,7 +43,7 @@ const PersonalDetails = () => {
     const [logoUploading, setLogoUploading] = useState(false);
     const dispatch = useDispatch();
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
-    console.log(doctorDetails,'doctorDetails')
+    console.log(doctorDetails, 'doctorDetails')
     const [personalAddresses, setPersonalAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
@@ -60,10 +60,10 @@ const PersonalDetails = () => {
             'phone',
             doctorDetails?.telecom?.[0]?.value
                 ? doctorDetails?.telecom?.[0]?.value
-                      .replace(/\D/g, '')
-                      .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                          p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
-                      )
+                    .replace(/\D/g, '')
+                    .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                        p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
+                    )
                 : ''
         );
         setValue('gender', doctorDetails?.userId?.gender);
@@ -395,14 +395,13 @@ const PersonalDetails = () => {
                                         <Form.Label className="mb-0">Profile Image</Form.Label>
                                         <div
                                             onClick={() => logoFileInputRef.current.click()}
-                                            className={`custom-file-upload justify-content-between cursor-pointer form-control ${
-                                                logoName || logoUploading ? '' : 'custom-form-fields'
-                                            }`}>
+                                            className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName || logoUploading ? '' : 'custom-form-fields'
+                                                }`}>
                                             {logoName
                                                 ? logoName
                                                 : logoUploading
-                                                ? 'Uploading...'
-                                                : 'Upload Profile Image'}
+                                                    ? 'Uploading...'
+                                                    : 'Upload Profile Image'}
                                             <p className="mb-0">
                                                 <FiUploadCloud />
                                             </p>
@@ -442,14 +441,14 @@ const PersonalDetails = () => {
                             </div>
                             <div className="col-12 mt-3">
                                 <div className="d-flex justify-content-end gap-2">
-                                    <Button className="cancel-button">Cancel</Button>
-                                    <Button className="custom-buttons" style={{width:"70px"}} type="submit" disabled={updateLoading}>
+                                    {/* <Button className="cancel-button">Cancel</Button> */}
+                                    <Button className="custom-buttons" style={{ width: "70px" }} type="submit" disabled={updateLoading}>
                                         {
                                             updateLoading ? (
-                                                <Spinner color = "white" className="spinner-border-sm" />
+                                                <Spinner color="white" className="spinner-border-sm" />
                                             ) : (
                                                 'Update'
-                                                )}
+                                            )}
                                     </Button>
                                 </div>
                             </div>

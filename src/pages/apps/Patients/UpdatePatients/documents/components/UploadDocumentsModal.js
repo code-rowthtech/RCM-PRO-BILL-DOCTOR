@@ -66,10 +66,10 @@ const UploadDocumentsModal = ({ showUploadModal, closeModal }) => {
 
     // Load encounters on component mount
     useEffect(() => {
-        if (!store?.getEncounterReducer?.data?.encounters?.length) {
-            dispatch(getEncounterAction({ patientId: subjectId, skip: 1 }))
-        }
-    }, [store?.getEncounterReducer?.data?.encounters, dispatch, subjectId])
+        // if (!store?.getEncounterReducer?.data?.encounters?.length) {
+        dispatch(getEncounterAction({ patientId: subjectId, skip: 1 }))
+        // }
+    }, [dispatch, subjectId])
 
     // Setup Quill editor text length limit
     useEffect(() => {

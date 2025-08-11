@@ -49,12 +49,12 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
                 className="nav-link  border-0 dropdown-toggle nav-user bg-transparent arrow-none me-0">
                 <span className="account-user-avatar">
                     {changedLogo ?
-                        <img src={changedLogo} className="rounded-circle" alt="user" />
+                        <img src={changedLogo} className="rounded-circle border border-1" alt="user" />
                         :
                         logo ?
-                            <img src={logo} className="rounded-circle" alt="user" />
+                            <img src={logo} className="rounded-circle border border-1" alt="user" />
                             :
-                            <FaUserCircle className="rounded-circle fs-1  text-dark" />
+                            <FaUserCircle className="rounded-circle border border-1 fs-1  text-dark" />
                     }
                 </span>
                 {/* <span className='text-capitalize'>

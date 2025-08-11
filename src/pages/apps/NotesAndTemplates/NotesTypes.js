@@ -33,8 +33,8 @@ const NotesTypes = () => {
         'System & Meta',
     ];
     const [selectedNote, setSelectedNote] = useState(null);
-    const doctorId = loggedInUser?.doctorId;
-    const clinicId = loggedInUser?.clinicId;
+    const doctorId = loggedInUser?.doctorId || store?.Auth?.user?.doctorId;
+    const clinicId = loggedInUser?.clinicId || store?.Auth?.user?.clinicId;
     const {
         control,
         setValue,

@@ -130,7 +130,7 @@ const VitalsCard = () => {
             effectiveDateTime
         }));
     }, [dispatch, patientId, effectiveDateTime]);
-    
+
     const handleModalDateChange = useCallback((newDate) => {
         setEffectiveDateTime(newDate);
         // Refresh vitals data for the new date
@@ -166,7 +166,7 @@ const VitalsCard = () => {
                     </div>
                     <div className="d-flex align-items-center">
                         <input
-                            className="fs-6 fw-semibold bg-white px-1 me-1 border border-1 border-muted"
+                            className="fs-6 fw-semibold bg-transparent px-1 me-1"
                             type="date"
                             value={effectiveDateTime}
                             onChange={handleDateChange}
@@ -202,8 +202,8 @@ const VitalsCard = () => {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="p-2">
-                    <VitalsModal 
-                        onClose={closeVitalsModal} 
+                    <VitalsModal
+                        onClose={closeVitalsModal}
                         initialDate={effectiveDateTime}
                         onDateChange={handleModalDateChange}
                     />
