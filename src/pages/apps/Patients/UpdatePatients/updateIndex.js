@@ -95,15 +95,17 @@ const UpdateIndex = () => {
                 </div>
             ) : (
                 <>
-                    <Row>
-                        <TopMenu {...topMenuProps} />
-                        <PatientInfoAccordion {...patientInfoProps} />
-                    </Row>
+                    {!expanded && (
+                        <Row>
+                            <TopMenu {...topMenuProps} />
+                            <PatientInfoAccordion {...patientInfoProps} />
+                        </Row>
+                    )}
+
                     <Row>
                         <Col sm={12}>
-                            <Card className={`mt-1 px-2 ${!activeKey ? 'patientChartCardClose' : 'patientChartCard'}`}>
-                                {selectedMainTab === 'Demographics' && <PatientDemographics />}
-                                {selectedMainTab === 'Patient Summary' && <PatientSummary />}
+                            <Card className={`mt-1 px-2 ${!activeKey ? 'patientChartCardClose' : 'patientChartCard'}`} style={{ height: expanded ? '90vh' : 'auto' }}>
+                                {selectedMainTab === 'Patient Summary' && <PatientSummary activeKey={activeKey} />}
                                 {selectedMainTab === 'Documents' && <Documentsindex />}
                                 {selectedMainTab === 'Encounter' && <Encountersindex {...encounterTabProps} />}
                                 {['Allergy List', 'Problem List', 'Medication List', 'Vitals List'].includes(

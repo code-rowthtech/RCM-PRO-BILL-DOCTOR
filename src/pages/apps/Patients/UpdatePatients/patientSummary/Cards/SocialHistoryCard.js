@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import { getFamilyGeneticAction, getTobaccooAction } from 'redux/socialHistory/action';
 
-const SocialHistoryCard = () => {
+const SocialHistoryCard = ({ activeKey }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
@@ -25,7 +25,7 @@ const SocialHistoryCard = () => {
         // }
     }, [dispatch])
     return (
-        <Card className="h-100 shadow-sm">
+        <Card className="shadow-sm" style={{ height: activeKey === '0' ? '29vh' : '37vh' }}>
             <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
                 <div className="d-flex align-items-center">
                     <FaUserMd className="me-2 text-secondary" />

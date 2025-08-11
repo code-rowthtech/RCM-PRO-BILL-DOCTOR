@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import { getEncounterAction } from 'redux/actions';
 
-const RecentEncountersCard = () => {
+const RecentEncountersCard = ({ activeKey }) => {
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const dispatch = useDispatch();
@@ -21,7 +21,7 @@ const RecentEncountersCard = () => {
     }, [dispatch]);
 
     return (
-        <Card className="h-100 shadow-sm">
+        <Card className="shadow-sm" style={{ height: activeKey === '0' ? '29vh' : '37vh' }}>
             <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
                 <div className="d-flex align-items-center">
                     <FaCalendarAlt className="me-2 text-secondary" />

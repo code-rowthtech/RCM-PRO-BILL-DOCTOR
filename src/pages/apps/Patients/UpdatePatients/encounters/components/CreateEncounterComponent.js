@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import EncounterForm from "./EncounterForm";
 import EncounterLeftSection from "./EncounterLeftSection";
 
-const CreateEncounterComponent = ({ isCollapsed }) => {
+const CreateEncounterComponent = ({ isCollapsed, expanded }) => {
     const [selectedFromList, setSelectedFromList] = useState({});
 
     return (
@@ -12,11 +12,13 @@ const CreateEncounterComponent = ({ isCollapsed }) => {
                     <EncounterLeftSection 
                         selectedFromList={selectedFromList}
                         setSelectedFromList={setSelectedFromList}
+                        expanded={expanded}
                     />
                 </div>
                 <div className="col-8">
                     <EncounterForm 
                         selectedFromList={selectedFromList}
+                        expanded={expanded}
                     />
                 </div>
             </div>
