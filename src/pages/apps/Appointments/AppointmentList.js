@@ -186,7 +186,14 @@ const AppointmentList = () => {
                                         )}
                                     </td>
                                     <td className="text-capitalize">
-                                        {data?.subject?.name?.[0]?.text}
+                                        {(data?.subject?.name?.[0]?.prefix?.[0]
+                                            ? data?.subject?.name?.[0]?.prefix?.[0] + ' '
+                                            : '') +
+                                            (data?.subject?.name?.[0]?.family || '') +
+                                            (data?.subject?.name?.[0]?.given?.length > 0
+                                                ? ' ' + data?.subject?.name?.[0]?.given?.join(' ')
+                                                : '') || 'N/A'}
+                                        {/* {data?.subject?.name?.[0]?.text} */}
                                         <div className="d-flex gap-2">
                                             <span>{data?.subject?.birthDate ? new Date(data.subject.birthDate).toISOString().split('T')[0] : 'N/A'}</span>
                                             <span>{data?.subject?.telecom?.find(item => item.system === 'phone')?.value || 'No phone number'}</span>

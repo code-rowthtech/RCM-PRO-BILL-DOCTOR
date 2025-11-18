@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Accordion, Col, Spinner, Table } from 'react-bootstrap';
+import { Accordion, Col, Spinner } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import './Encounters.css';
-import { defaultVitals } from 'utils/DataSets/commonData2';
+
 import { 
     getAllergiesAction, 
     getMedicationAction, 
@@ -15,20 +15,6 @@ import { getFamilyGeneticAction, getTobaccooAction } from 'redux/socialHistory/a
 // ============================================================================
 // CONSTANTS
 // ============================================================================
-
-const IMPERIAL_UNITS = {
-    Temperature: '°F',
-    Height: 'in',
-    Weight: 'lbs',
-    'Head Circumference': 'in',
-};
-
-const METRIC_UNITS = {
-    Temperature: '°C',
-    Height: 'cm',
-    Weight: 'kg',
-    'Head Circumference': 'cm',
-};
 
 const STATUS_COLOR_MAP = {
     active: 'text-success',
@@ -42,7 +28,6 @@ const STATUS_COLOR_MAP = {
 };
 
 const DEFAULT_MENU_ITEMS = [
-    { _id: '1', name: 'Vitals', order: 0, hide: true },
     { _id: '2', name: 'Allergy', order: 1, hide: true },
     { _id: '3', name: 'Problems', order: 2, hide: true },
     { _id: '4', name: 'Medications', order: 3, hide: true },
@@ -53,18 +38,7 @@ const DEFAULT_MENU_ITEMS = [
 // UTILITY FUNCTIONS
 // ============================================================================
 
-const convertFromImperial = (value, vitalName) => {
-    if (vitalName === 'Height') return (value * 2.54).toFixed(2);
-    if (vitalName === 'Weight') return (value / 2.20462).toFixed(2);
-    if (vitalName === 'Temperature') return (((value - 32) * 5) / 9).toFixed(2);
-    if (vitalName === 'Head Circumference') return (value * 2.54).toFixed(2);
-    return value;
-};
 
-const formatDate = (dateString) => {
-    const options = { day: 'numeric', month: 'short' };
-    return new Date(dateString).toLocaleDateString('en-GB', options);
-};
 
 // ============================================================================
 // MAIN COMPONENT
@@ -79,8 +53,8 @@ const SummarySection = ({ activeKey, handleToggle }) => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
-    const [unitSystem, setUnitSystem] = useState('imperial');
-    const [vitals, setVitals] = useState(defaultVitals);
+
+
     
     // ========================================================================
     // SELECTORS & DERIVED STATE
@@ -117,20 +91,7 @@ const SummarySection = ({ activeKey, handleToggle }) => {
         familyGeneticHistory: familyGeneticHistory?.slice(0, 2) || []
     }), [tobaccoHistory, familyGeneticHistory]);
     
-    const groupedVitals = useMemo(() => {
-        if (!patienteffectiveVitals) return {};
-        return patienteffectiveVitals.reduce((acc, vitalGroup) => {
-            const date = vitalGroup.effectiveDateTime;
-            if (!acc[date]) acc[date] = [];
-            acc[date].push(...vitalGroup.vitals);
-            return acc;
-        }, {});
-    }, [patienteffectiveVitals]);
-    
-    const sortedDates = useMemo(() => 
-        Object.keys(groupedVitals).sort((a, b) => new Date(b) - new Date(a)),
-        [groupedVitals]
-    );
+
 
     // ========================================================================
     // EFFECTS
@@ -171,62 +132,7 @@ const SummarySection = ({ activeKey, handleToggle }) => {
     // HELPER FUNCTIONS
     // ========================================================================
     
-    const getDisplayUnit = (vital) => {
-        if (vital.unitKey) {
-            return unitSystem === 'imperial' ? IMPERIAL_UNITS[vital.unitKey] : METRIC_UNITS[vital.unitKey];
-        }
-        return vital.unit || '';
-    };
-    
-    const findVitalValue = (vitalName, date) => {
-        if (!groupedVitals[date]) return null;
 
-        const vital = groupedVitals[date].find(v =>
-            v.code?.coding?.[0]?.display === vitalName ||
-            v.code?.text === vitalName
-        );
-
-        if (!vital) return null;
-
-        if (vital.component && vital.component.length > 0) {
-            const systolic = vital.component.find(c =>
-                c.code?.coding?.[0]?.code === "8480-6"
-            )?.valueQuantity?.value;
-
-            const diastolic = vital.component.find(c =>
-                c.code?.coding?.[0]?.code === "8462-4"
-            )?.valueQuantity?.value;
-
-            return { systolic: systolic || '', diastolic: diastolic || '' };
-        }
-
-        let value = vital.valueQuantity?.value || vital.valueString || '';
-
-        if (unitSystem === 'metric') {
-            if (['Height', 'Weight', 'Temperature'].includes(vitalName)) {
-                value = convertFromImperial(value, vitalName);
-            }
-        }
-
-        return value;
-    };
-    
-    const renderVitalCell = (vital, date) => {
-        const value = findVitalValue(vital.name, date);
-
-        if (vital.type === 'bp') {
-            const bpValue = value || { systolic: '', diastolic: '' };
-            return (
-                <div className="d-flex">
-                    <span>{bpValue.systolic || '-'}</span>
-                    <span>/</span>
-                    <span>{bpValue.diastolic || '-'}</span>
-                </div>
-            );
-        }
-
-        return value || '-';
-    };
     
     const getSeverityBadge = (severity) => {
         if (!severity?.code || !severity?.display) return null;
@@ -255,53 +161,6 @@ const SummarySection = ({ activeKey, handleToggle }) => {
 
                     let content;
                     switch (menuItem.name) {
-                        case 'Vitals':
-                            content = (
-                                <Accordion.Body className='p-2 scroll-container' style={{ height: '20vh' }}>
-                                    <Table bordered className={`mb-0 position-relative box-shadow-none vitalsTable ${store?.getVitalsByPatientIdReducer?.loading ? 'opacity-50' : ''}`}>
-                                        <thead>
-                                            <tr className='border'>
-                                                <th className='text-white'>
-                                                    Vital Name
-                                                </th>
-                                                {sortedDates?.slice(0, 3)?.map(date => (
-                                                    <th className='text-white' key={date}>
-                                                        {formatDate(date)}
-                                                    </th>
-                                                ))}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {vitals.map((vital, index) => (
-                                                <tr className='' key={vital.name}>
-                                                    <td className='p-0 vitalsTableBorder'>
-                                                        {vital.name} {getDisplayUnit(vital) && (
-                                                            <small className="text-muted">({getDisplayUnit(vital)})</small>
-                                                        )}
-                                                    </td>
-
-                                                    {sortedDates.slice(0, 3).map(date => (
-                                                        <td className='vitalsTableBorder p-0' key={`${vital.name}-${date}`}>
-                                                            {renderVitalCell(vital, date)}
-                                                        </td>
-                                                    ))}
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                        {store?.getVitalsByPatientIdReducer?.loading &&
-                                            <div className='position-absolute' style={{ top: '35%', left: '50%' }}>
-                                                <Spinner />
-                                            </div>
-                                        }
-                                    </Table>
-                                    <div className="row">
-                                        <div className="col-12 text-end">
-                                            <small className='text-info cursor-pointer'>Add vitals</small>
-                                        </div>
-                                    </div>
-                                </Accordion.Body>
-                            );
-                            break;
                         case 'Allergy':
                             content = (
                                 <Accordion.Body className='p-2 scroll-container' style={{ height: '20vh' }}>
@@ -314,7 +173,7 @@ const SummarySection = ({ activeKey, handleToggle }) => {
                                             ) : (
                                                 <ul className="list-unstyled pb-0 mb-0">
                                                     {allergyData.slice(0, 4).map((allergy, index) => (
-                                                        <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
+                                                        <li key={index} className="mb-2 d-flex justify-content-between align-items-start cursor-pointer" onClick={() => window.populateEncounterField?.('Social History', `Allergy: ${allergy.code?.text || ''} (${allergy.clinicalStatus?.text || 'Status not available'})`)}>
                                                             <div className="fs-6">
                                                                 <strong title={allergy.code?.text}>
                                                                     {allergy.code?.text?.length > 30
@@ -358,7 +217,8 @@ const SummarySection = ({ activeKey, handleToggle }) => {
                                                     {problemData?.slice(0, 4)?.map((problem, index) => (
                                                         <li
                                                             key={index}
-                                                            className="mb-2 d-flex justify-content-between align-items-start">
+                                                            className="mb-2 d-flex justify-content-between align-items-start cursor-pointer"
+                                                            onClick={() => window.populateEncounterField?.('Reason for Visit', problem?.code?.text || '')}>
                                                             <div className="fs-6">
                                                                 <strong title={problem?.code?.text}>
                                                                     {problem?.code?.text?.length > 30
@@ -418,7 +278,10 @@ const SummarySection = ({ activeKey, handleToggle }) => {
                                                             </div>
                                                         </li>
                                                     ) : medicationList?.slice(0, 4)?.map((medication, index) => (
-                                                        <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
+                                                        <li key={index} className="mb-2 d-flex justify-content-between align-items-start cursor-pointer" onClick={() => {
+                                                            const medicationInfo = `${medication?.drugId?.proprietaryName || ''} ${medication?.drugId?.nonProprietaryName ? '(' + medication?.drugId?.nonProprietaryName + ')' : ''} - ${medication?.dosageInstruction?.[0]?.text || ''} [Status: ${medication?.status || 'Unknown'}]`;
+                                                            window.populateEncounterField?.('Prescriptions (Medications)', medicationInfo);
+                                                        }}>
                                                             <div className="fs-6">
                                                                 <strong className="text-capitalize" title={medication?.drugId?.proprietaryName}>{medication?.drugId?.proprietaryName?.length > 30 ? medication?.drugId?.proprietaryName?.slice(0, 29) + '...' : medication?.drugId?.proprietaryName}</strong>
                                                                 <div className="text-muted" title={medication?.drugId?.nonProprietaryName}>
@@ -462,7 +325,7 @@ const SummarySection = ({ activeKey, handleToggle }) => {
                                                 <>
                                                     {socialHistoryData?.tobaccoHistory?.length > 0 && (
                                                         socialHistoryData?.tobaccoHistory?.map((data, index) => (
-                                                            <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
+                                                            <li key={index} className="mb-2 d-flex justify-content-between align-items-start cursor-pointer" onClick={() => window.populateEncounterField?.('Social History', `Tobacco: ${data?.tobaccoUse || ''}`)}>
                                                                 <div className="fs-6">
                                                                     <strong className="text-capitalize" title={data?.tobaccoUse}>{data?.tobaccoUse?.length > 40 ? data?.tobaccoUse?.slice(0, 39) + '...' : data?.tobaccoUse}</strong>
                                                                     <div className="text-muted fs-6" >
@@ -474,7 +337,7 @@ const SummarySection = ({ activeKey, handleToggle }) => {
                                                     )}
                                                     {socialHistoryData?.familyGeneticHistory?.length > 0 && (
                                                         socialHistoryData?.familyGeneticHistory?.map((data, index) => (
-                                                            <li title='Family Genetics' key={index} className="mb-2 d-flex justify-content-between align-items-start">
+                                                            <li title='Family Genetics' key={index} className="mb-2 d-flex justify-content-between align-items-start cursor-pointer" onClick={() => window.populateEncounterField?.('Social History', `Family History: ${data?.name || ''} (${data?.relationship?.coding?.[0]?.display || ''})`)}>
                                                                 <div className="fs-6">
                                                                     <strong className="text-capitalize" title={data?.name}>{data?.name?.length > 40 ? data?.name?.slice(0, 39) + '...' : data?.name}
                                                                         <span className='ms-1'>

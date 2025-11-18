@@ -10,13 +10,6 @@ import { loggedInUser } from 'helpers/loggedInUser';
 import { defaultVitals } from 'utils/DataSets/commonData2';
 import Spinner from 'constants/Spinner';
 
-// const conversionMap = {
-//     Temperature: { imperial: '°F', metric: '°C' },
-//     Height: { imperial: 'in', metric: 'cm' },
-//     Weight: { imperial: 'lbs', metric: 'kg' },
-// };
-// Add these helper functions near the top of your file
-
 const imperialUnits = {
     Temperature: '°F',
     Height: 'in',
@@ -30,7 +23,6 @@ const metricUnits = {
     Weight: 'kg',
     'Head Circumference': 'cm',
 };
-
 
 const formatDate = (dateString) => {
     const options = { day: 'numeric', month: 'short' };

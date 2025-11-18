@@ -181,3 +181,34 @@ export const createResponsiblePartyReducer = (state = CREATE_RESPONSIBLE_PARTY_I
         default: return state
     }
 }
+
+const GET_PATIENT_CONSENT_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
+
+export const getPatientConsentReducer = (state = GET_PATIENT_CONSENT_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case PatientsActionTypes.GET_PATIENT_CONSENT_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case PatientsActionTypes.GET_PATIENT_CONSENT_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case PatientsActionTypes.GET_PATIENT_CONSENT_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        // case PatientsActionTypes.STATE_EMPTY_INTIAL_STATE:
+        //     return {
+        //         data: [],
+        //         loading: false
+        //     }
+        default: return state
+    }
+}

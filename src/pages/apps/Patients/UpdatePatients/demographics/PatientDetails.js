@@ -16,7 +16,7 @@ const PatientDetails = () => {
     const dispatch = useDispatch();
     const {
         register, handleSubmit, watch,
-        formState: { errors }, setValue, clearErrors,getValues
+        formState: { errors }, setValue, clearErrors, getValues
     } = useForm();
 
     const [searchParams] = useSearchParams();
@@ -154,16 +154,15 @@ const PatientDetails = () => {
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
 
-        useEffect(() => {
-            const currentTitle = getValues('title');
-    
-            if (!currentTitle || ['Mr.', 'Mrs.', 'Miss'].includes(currentTitle)) {
-                if (gender === 'male') setValue('title', 'Mr.');
-                else if (gender === 'female') setValue('title', 'Miss');
-                else if (gender === 'other') setValue('title', 'Other');
-                else if (gender === 'unknown') setValue('title', '');
-            }
-        }, [gender, title, setValue, getValues]);
+    useEffect(() => {
+        const currentTitle = getValues('title');
+        if (!currentTitle || ['Mr.', 'Mrs.', 'Miss'].includes(currentTitle)) {
+            if (gender === 'male') setValue('title', 'Mr.');
+            else if (gender === 'female') setValue('title', 'Miss');
+            else if (gender === 'other') setValue('title', 'Other');
+            else if (gender === 'unknown') setValue('title', '');
+        }
+    }, [gender, title, setValue, getValues]);
 
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];
@@ -407,12 +406,27 @@ const PatientDetails = () => {
                     <div className="col-md-3 col-12 mb-2">
                         <Form.Group>
                             <Form.Label htmlFor="email" className="mb-0">
-                                Email ID <span className="text-danger">*</span>
+                                Email <span className="text-danger">*</span>
                             </Form.Label>
                             <Form.Control
                                 type="email"
                                 placeholder="Email ID"
                                 {...register('email', {
+                                    pattern: {
+                                        value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+                                        message: 'Invalid email address',
+                                    },
+                                })}
+                            />
+                        </Form.Group>
+                    </div>
+                    <div className="col-md-3 col-12">
+                        <Form.Group>
+                            <Form.Label className="mb-0">Alternate Email</Form.Label>
+                            <Form.Control
+                                type="email"
+                                placeholder="Alternate Email ID"
+                                {...register('alternateEmail', {
                                     pattern: {
                                         value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
                                         message: 'Invalid email address',
@@ -439,7 +453,7 @@ const PatientDetails = () => {
                     </Col>
                     <Col md={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Approx age (if DOB is unknown)</Form.Label>
+                            <Form.Label className="mb-0">Approx age</Form.Label>
                             <Form.Control type="text" placeholder="Approx. age" {...register('approxAge')} />
                         </Form.Group>
                     </Col>
@@ -452,19 +466,17 @@ const PatientDetails = () => {
                                 id="gender"
                                 {...register(
                                     'gender'
-                                    //  { required: 'Gender is required' }
                                 )}
                                 data-has-value={!!watch('gender')}
                                 defaultValue=""
-                                className="form-select"
+                                className="form-select text-capitalize"
                             >
                                 <option value="" disabled  >
                                     Select
                                 </option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
-                                <option value="unknown">Unknown</option>
+                                {['male', 'female', 'other', 'unknown']?.map((gendder, index) => (
+                                    <option className='text-capitalize' value={gendder} key={index}>{gendder}</option>
+                                ))}
                             </Form.Select>
                             {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
                         </Form.Group>
@@ -474,6 +486,29 @@ const PatientDetails = () => {
 
                 <div className="row">
                     <div className="col-md-3 col-12">
+                        <Form.Group>
+                            <Form.Label htmlFor="patientstatus" className="mb-0">
+                                Patient Status
+                            </Form.Label>
+                            <Form.Select
+                                as="select" // Use 'select' to make it a dropdown
+                                id="patientstatus"
+                                {...register('patientStatus')}
+                                data-has-value={!!watch('patientStatus')}>
+                                <option value="" hidden>
+                                    Select
+                                </option>{' '}
+                                {/* Default option */}
+                                <option value="">Select Status</option> {/* Default option */}
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="Inactive-Deceased">Inactive-Deceased</option>
+                                <option value="Inactive-In Collections">Inactive-In Collections</option>
+                                <option value="Inactive-Terminated">Inactive-Terminated</option>
+                            </Form.Select>
+                        </Form.Group>
+                    </div>
+                    <div className="col-md-3 col-12">
                         <div className="mb-2 d-flex flex-column position-relative">
                             <Form.Label className="mb-0">Patient Photo</Form.Label>
                             <div
@@ -481,7 +516,7 @@ const PatientDetails = () => {
                                 style={{ height: '30px' }}
                                 className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'
                                     }`}>
-                                {logoName ? logoName : profileUploading ? 'Uploading...' : 'Upload Photo'}
+                                {logoName ? logoName : profileUploading ? 'Uploading...' : 'Upload Patient Photo'}
                                 <p className="mb-0">
                                     <FiUploadCloud />
                                 </p>
@@ -500,26 +535,7 @@ const PatientDetails = () => {
                             )}
                         </div>
                     </div>
-                    <div className="col-md-3 col-12">
-                        <Form.Group>
-                            <Form.Label htmlFor="patientstatus" className="mb-0">
-                                Status
-                            </Form.Label>
-                            <Form.Select
-                                as="select" // Use 'select' to make it a dropdown
-                                id="patientstatus"
-                                {...register('patientStatus')}
-                                data-has-value={!!watch('patientStatus')}>
-                                <option value="" hidden>
-                                    Select
-                                </option>{' '}
-                                {/* Default option */}
-                                <option value="Active">Active</option>
-                                <option value="Inactive">Inactive</option>
-                                <option value="Inactive-Deceased">Inactive-Deceased</option>
-                            </Form.Select>
-                        </Form.Group>
-                    </div>
+
                     {/* Show Date Input if "Inactive-Deceased" is selected */}
                     {patientStatus === 'Inactive-Deceased' && (
                         <div className="col-md-3 col-12">
@@ -549,28 +565,10 @@ const PatientDetails = () => {
                                 <option value="" hidden>
                                     Select
                                 </option>
-                                <option value="Mr.">Mr.</option>
-                                <option value="Mrs.">Mrs.</option>
-                                <option value="Miss">Miss</option>
-                                <option value="Dr.">Dr.</option>
-                                <option value="Other">Other</option>
+                                {["Mr.", "Mrs.", "Miss", "Dr.", "Other"]?.sort((a, b) => a.localeCompare(b))?.map((title, index) => (
+                                    <option value={title} key={index}>{title}</option>
+                                ))}
                             </Form.Select>
-                        </Form.Group>
-                    </div>
-
-                    <div className="col-md-3 col-12">
-                        <Form.Group>
-                            <Form.Label className="mb-0">Alternate Email</Form.Label>
-                            <Form.Control
-                                type="email"
-                                placeholder="Alternate Email ID"
-                                {...register('alternateEmail', {
-                                    pattern: {
-                                        value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
-                                        message: 'Invalid email address',
-                                    },
-                                })}
-                            />
                         </Form.Group>
                     </div>
 
@@ -614,7 +612,7 @@ const PatientDetails = () => {
 
                     <div className="col-md-3 col-12">
                         <Form.Group>
-                            <Form.Label className="mb-0">Reminder Language</Form.Label>
+                            <Form.Label className="mb-0">Preferred Language</Form.Label>
                             <Form.Select
                                 {...register('reminderLanguage')}
                                 data-has-value={!!watch('reminderLanguage')}>
@@ -622,8 +620,8 @@ const PatientDetails = () => {
                                     Select
                                 </option>
                                 <option value="English">English</option>
-                                <option value="Spanish">Spanish</option>
                                 <option value="French">French</option>
+                                <option value="Spanish">Spanish</option>
                             </Form.Select>
                         </Form.Group>
                     </div>
@@ -660,20 +658,17 @@ const PatientDetails = () => {
 
                     <div className="col-md-3 col-12">
                         <Form.Group>
-                            <Form.Label className="mb-0">Payment Profile</Form.Label>
+                            <Form.Label className="mb-0">Financial Class</Form.Label>
                             <Form.Select
                                 {...register('paymentProfile')}
-                                aria-label="Payment Profile"
+                                aria-label="Financial Class"
                                 data-has-value={!!watch('paymentProfile')}>
                                 <option value="" hidden>
-                                    Select
+                                    Select Financial Class
                                 </option>
-                                <option value="Cash">Cash</option>
-                                <option value="Insurance">Insurance</option>
-                                <option value="Insurance Out of Network">Insurance Out of Network</option>
-                                <option value="Auto Accident">Auto Accident</option>
-                                <option value="Worker's Comp">Worker's Comp</option>
-                                <option value="Other">Other</option>
+                                {["Cash", "Insurance", "Insurance Out of Network", "Auto Accident", "Worker's Comp", "Other"]?.sort((a, b) => a.localeCompare(b))?.map((paymentProf, index) => (
+                                    <option selected={paymentProf === 'Cash'} value={paymentProf} key={index}>{paymentProf}</option>
+                                ))}
                             </Form.Select>
                             {errors.paymentProfile && (
                                 <span className="text-danger">{errors.paymentProfile.message}</span>

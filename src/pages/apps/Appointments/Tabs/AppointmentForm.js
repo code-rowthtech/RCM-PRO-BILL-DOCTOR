@@ -438,7 +438,6 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
             reset();
             setActiveTab('demographicDetails');
             setPatientId(createPatientResponse?._id);
-            // dispatch(stateEmptydAction());
             const data = {
                 doctorId: doctorId,
                 page: skip,
@@ -453,7 +452,6 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
             setLogo(null);
             setLogoName(null);
             setPatientId(null);
-            // dispatch(stateEmptydAction());
             const data = {
                 doctorId: doctorId,
                 page: skip,
@@ -531,7 +529,7 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
         dispatch(getPatientsAction(data));
     }, [dispatch, skip, search]);
 
-    const selectedDate = watch('scheduled'); // Watch the selected date field
+    const selectedDate = watch('scheduled');
 
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
@@ -603,13 +601,6 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                         : ''
                 );
                 setValue('weekInterval', appointmentDetails?.recurrenceTemplate?.every);
-                // weeklyOccurenceCount
-                // weeklyOccurrenceDate
-                // weekInterval
-                // appointmentDay
-                // setValue("weeklyOccurenceCount",)
-                // setValue("weeklyOccurrenceDate", appointmentDetails?.recurrenceTemplate?.lastOccurrenceDate ? new Date(appointmentDetails?.recurrenceTemplate?.lastOccurrenceDate)?.toISOString().split('T')[0] : '')
-                // setValue("weeksNumberDaily", appointmentDetails?.recurrenceTemplate?.every)
             }
             if (details?.date) {
                 setValue('scheduled', new Date(details?.date).toISOString().split('T')[0]);
@@ -784,7 +775,13 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                                         </option>
                                         {patientsData?.map((patient) => (
                                             <option key={patient?._id} value={patient?._id}>
-                                                {patient?.name?.[0]?.text}
+                                                {(patient?.name?.[0]?.prefix?.[0]
+                                                    ? patient?.name?.[0]?.prefix?.[0] + ' '
+                                                    : '') +
+                                                    (patient?.name?.[0]?.family || '') +
+                                                    (patient?.name?.[0]?.given?.length > 0
+                                                        ? ' ' + patient?.name?.[0]?.given?.join(' ')
+                                                        : '') || 'N/A'}
                                             </option>
                                         ))}
                                     </Form.Select>
@@ -812,20 +809,6 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                                 />
                             </Form.Group>
                         </Col>
-                        {/* <Col md={6} xs={12}>
-                            <Form.Group className="mb-1">
-                                <Form.Label className="mb-0">Office</Form.Label>
-                                <Form.Control as="select" {...register('office')} data-has-value={!!watch('office')}>
-                                    <option value="" hidden>
-                                        Select Office
-                                    </option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                </Form.Control>
-                            </Form.Group>
-                        </Col> */}
                         <Col md={6} xs={12}>
                             <Form.Group className="mb-1" controlId="appointmentType">
                                 <Form.Label className="mb-0">
@@ -946,29 +929,9 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                                     </option>
                                     <option value="Room 1">Room 1</option>
                                     <option value="Room 2">Room 2</option>
-                                    {/* <option value="3">Room 3</option> */}
-                                    {/* <option value="4">Room 4</option> */}
                                 </Form.Select>
-                                {/* {errors.appointmentType && <p className="text-danger err-font">{errors.consultationRoom.message}</p>} */}
                             </Form.Group>
                         </Col>
-                        {/* <Col md={6} xs={12}>
-                            <Form.Group className="mb-1">
-                                <Form.Label className="mb-0">Consent Forms</Form.Label>
-                                <Form.Control
-                                    as="select"
-                                    data-has-value={!!watch('consentForms')}
-                                    {...register('consentForms')}>
-                                    <option value="" hidden>
-                                        Select Consent Forms
-                                    </option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                </Form.Control>
-                            </Form.Group>
-                        </Col> */}
                         <Col md={6} xs={12}>
                             <Form.Group className="mb-3">
                                 <Form.Label className="mb-1">Status <span className="text-danger">*</span></Form.Label>
@@ -1088,7 +1051,6 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                                     'Save'
                                 )}
                             </Button>
-                            {/* <Button className="custom-buttons">Cancel</Button> */}
                         </Col>
                     </Row>
                 </Form>

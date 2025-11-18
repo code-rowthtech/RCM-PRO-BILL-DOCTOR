@@ -1,6 +1,6 @@
 // React and third-party imports
 import React, { useEffect, useState } from 'react';
-import { Button, Col, Form, Row } from 'react-bootstrap';
+import { Button, Col, Form, Row, Accordion } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import Select from 'react-select';
 
@@ -18,10 +18,13 @@ import { encryptMessage } from 'cryptoUtils';
 // Component imports
 import NotesFormFields from './NotesFormFields';
 import ChangeNoteTypeModal from './ChangeNoteTypeModal';
+import VitalsChart from './VitalsChart';
 
 // Data and hooks
 import { encounterClassCodes, encounterTypes } from 'utils/DataSets/encounterData';
 import useNotesTypes from 'hooks/useNotesTypes';
+
+
 
 /**
  * EncounterForm Component
@@ -42,6 +45,7 @@ const EncounterForm = ({ selectedFromList = {} }, expanded) => {
     const [selectedNoteType, setSelectedNoteType] = useState(null); // Currently selected note type
     const [notesTypeModal, setNotesTypeModal] = useState(false); // Note type change confirmation modal
     const [pendingNoteType, setPendingNoteType] = useState(null); // Pending note type change
+
 
     // Redux state selectors
     const notesFields = store?.getSettingsTabsReducer?.data?.data?.displaySettings?.mainPanel?.[0]?.sections;
@@ -186,9 +190,32 @@ const EncounterForm = ({ selectedFromList = {} }, expanded) => {
         }
     }, [createSuccess, updateSuccess]);
 
+
+
+    // Global function to populate encounter fields
+    useEffect(() => {
+        window.populateEncounterField = (fieldName, content) => {
+            const fieldElement = document.querySelector(`[name="${fieldName}"]`);
+            if (fieldElement) {
+                const currentValue = fieldElement.value;
+                const newValue = currentValue ? `${currentValue}\n${content}` : content;
+                fieldElement.value = newValue;
+                setValue(fieldName, newValue);
+                
+                // Trigger change event
+                const event = new Event('input', { bubbles: true });
+                fieldElement.dispatchEvent(event);
+            }
+        };
+
+        return () => {
+            delete window.populateEncounterField;
+        };
+    }, [setValue]);
+
     return (
         <div>
-            <Form onSubmit={handleSubmit(onSubmit)}>
+            <Form id="encounter-form" onSubmit={handleSubmit(onSubmit)}>
                 {/* Header Fields Row */}
                 <Row style={{ height: '16.5vh' }} className="g-2 mt-0 bg-light rounded-top p-1">
 
@@ -350,8 +377,12 @@ const EncounterForm = ({ selectedFromList = {} }, expanded) => {
                     </Col>
                 </Row>
 
+
+
+
+
                 {/* Dynamic Notes Fields Section */}
-                <Row className="mt-1 scroll-container" style={{ minHeight: expanded ? '62vh' : '45vh', height: expanded ? '62vh' : '45vh' }}>
+                <Row className="mt-1 scroll-container" style={{ minHeight: expanded ? '50vh' : '35vh', height: expanded ? '50vh' : '35vh' }}>
                     <Col sm={12}>
                         {selectedNoteType ? (
                             notesFields && Array.isArray(notesFields) && notesFields.length > 0 ? (
@@ -359,6 +390,10 @@ const EncounterForm = ({ selectedFromList = {} }, expanded) => {
                                     data={notesFields}
                                     control={control}
                                     selectedFromList={selectedFromList}
+                                    populatedFields={{}}
+                                    removePopulatedData={() => {}}
+                                    patientDetails={store?.getPatientsByIdReducer?.data?.data}
+                                    getValues={() => ''}
                                 />
                             ) : (
                                 <div className="text-center py-4 text-muted">

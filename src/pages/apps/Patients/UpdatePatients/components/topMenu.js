@@ -7,8 +7,6 @@ const TopMenu = (props) => {
     const [showMoreMenu, setShowMoreMenu] = useState(false);
     const menuRef = useRef(null);
 
-
-
     // Close dropdowns when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -20,7 +18,6 @@ const TopMenu = (props) => {
         document.addEventListener('click', handleClickOutside);
         return () => document.removeEventListener('click', handleClickOutside);
     }, []);
-
 
     const handleSelectTab = (e, item) => {
         e?.stopPropagation();
@@ -46,16 +43,6 @@ const TopMenu = (props) => {
         setActiveSubmenu(null); // Close submenu after selection
     };
 
-    // Auto-open submenu if selected tab is a submenu item
-    // useEffect(() => {
-    //     const parentMenu = patientMenuItems.find(item =>
-    //         item.subItems?.some(subItem => subItem.tab === selectedMainTab)
-    //     );
-    //     if (parentMenu && !activeSubmenu) {
-    //         setActiveSubmenu(parentMenu.label);
-    //         sessionStorage.setItem('activeSubmenu', parentMenu.label);
-    //     }
-    // }, [selectedMainTab, activeSubmenu, setActiveSubmenu]);
     return (
         <Col xs={12}>
             <ul ref={menuRef} className='list-group border border-muted d-flex flex-row patientChartscroll position-relative list-unstyled '>

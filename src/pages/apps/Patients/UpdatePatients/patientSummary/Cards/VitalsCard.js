@@ -9,7 +9,6 @@ import { getVitalsByPatientIdAction } from 'redux/actions';
 import Spinner from 'constants/Spinner';
 import VitalsModal from './VitalsModal';
 
-// Helper function to get vital value
 const getVitalValue = (data) => {
     if (data.valueString) return data.valueString;
     if (data.valueQuantity?.value) {
@@ -24,17 +23,14 @@ const getVitalValue = (data) => {
 // Helper function to get blood pressure reading
 const getBPReading = (component) => {
     if (!component?.length) return null;
-
     const systolic = component.find(c => c.code?.coding?.[0]?.code === '8480-6')?.valueQuantity?.value;
     const diastolic = component.find(c => c.code?.coding?.[0]?.code === '8462-4')?.valueQuantity?.value;
-
     return `${systolic || 'N/A'} / ${diastolic || 'N/A'}`;
 };
 
 // Vitals display component
 const VitalsDisplay = ({ vitalsData }) => {
     const vitals = vitalsData?.vitals;
-
     if (!vitals?.length) {
         return (
             <div className="h-100 d-flex align-items-center justify-content-center bg-white fs-6">
@@ -42,14 +38,12 @@ const VitalsDisplay = ({ vitalsData }) => {
             </div>
         );
     }
-
     return (
         <div className="vitals-grid fs-6">
             {vitals.map((data) => {
                 const codeDisplay = data.code?.coding?.[0]?.display || 'Unknown Vital';
                 const value = getVitalValue(data);
                 const bpReading = !value ? getBPReading(data.component) : null;
-
                 return (
                     <div key={data._id} className="vital-item">
                         <span className="text-muted">{codeDisplay}</span>
@@ -66,9 +60,7 @@ const VitalsCard = ({ activeKey }) => {
     const [searchParams] = useSearchParams();
     const [effectiveDateTime, setEffectiveDateTime] = useState('');
     const [vitalsModal, setVitalsModal] = useState(false);
-
     const patientId = searchParams.get('id');
-
     const {
         getVitalsByPatientIdReducer,
         getPatientByIdReducer,
@@ -123,7 +115,6 @@ const VitalsCard = ({ activeKey }) => {
 
     const closeVitalsModal = useCallback(() => {
         setVitalsModal(false);
-        // Refresh vitals data when modal closes using current effectiveDateTime
         dispatch(getVitalsByPatientIdAction({
             patientId,
             limit: 5,
@@ -133,7 +124,6 @@ const VitalsCard = ({ activeKey }) => {
 
     const handleModalDateChange = useCallback((newDate) => {
         setEffectiveDateTime(newDate);
-        // Refresh vitals data for the new date
         dispatch(getVitalsByPatientIdAction({
             patientId,
             limit: 5,
@@ -156,6 +146,7 @@ const VitalsCard = ({ activeKey }) => {
     const handleAddVitals = useCallback(() => {
         setVitalsModal(true);
     }, []);
+
     return (
         <>
             <Card className="h-100 shadow-sm">
@@ -184,7 +175,7 @@ const VitalsCard = ({ activeKey }) => {
                         />
                     </div>
                 </Card.Header>
-                <Card.Body className="  p-2 scroll-container" style={{ height: activeKey === '0' ? '25vh' : '32vh' }}>
+                <Card.Body className="p-2 scroll-container" style={{ height: activeKey === '0' ? '25vh' : '32vh' }}>
                     {isLoading ? (
                         <div className="d-flex justify-content-center align-items-center w-100 p-5 h-100">
                             <Spinner className="spinner-border-sm" />

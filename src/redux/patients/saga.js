@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { PatientsActionTypes } from './constants';
-import { createPatientsApi, createReferringDoctorApi, createResponsiblePartyApi, getPatientsApi, getPatientsByIdApi, updatePatientsApi } from './api';
+import { createPatientsApi, createReferringDoctorApi, createResponsiblePartyApi, getPatientConsentsApi, getPatientsApi, getPatientsByIdApi, updatePatientsApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -198,6 +198,34 @@ function* createResponsiblePartyFunction(data) {
     }
 }
 
+function* getPatientConsentFunction(data) {
+    try {
+        yield put({
+            type: PatientsActionTypes.GET_PATIENT_CONSENT_LOADING,
+            payload: {},
+        });
+        const response = yield call(getPatientConsentsApi, data);
+        // const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        const decryptedData = response.data.data;
+        if (response.status === 200) {
+            yield put({
+                type: PatientsActionTypes.GET_PATIENT_CONSENT_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: PatientsActionTypes.GET_PATIENT_CONSENT_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: PatientsActionTypes.GET_PATIENT_CONSENT_ERROR,
+            payload: error,
+        });
+    }
+}
+
 
 export function* watchGetPatients() {
     yield takeEvery(PatientsActionTypes.GET_PATIENTS, getPatientsFunction);
@@ -217,6 +245,9 @@ export function* watchCreateReferringDoctor() {
 export function* watchCreateResponsibleParty() {
     yield takeEvery(PatientsActionTypes.CREATE_RESPONSIBLE_PARTY, createResponsiblePartyFunction);
 }
+export function* watchGetPatientConsent() {
+    yield takeEvery(PatientsActionTypes.GET_PATIENT_CONSENT, getPatientConsentFunction);
+}
 
 
 function* patientsSaga() {
@@ -227,6 +258,7 @@ function* patientsSaga() {
         fork(watchUpdatePatients),
         fork(watchCreateReferringDoctor),
         fork(watchCreateResponsibleParty),
+        fork(watchGetPatientConsent)
     ]);
 }
 export default patientsSaga;

@@ -1,12 +1,12 @@
 import ToastHandle from 'helpers/ToastMessage';
-import React, { createRef, useEffect, useRef } from 'react'
-import { Form, Row } from 'react-bootstrap';
+import React, { createRef, useEffect, useRef, useState } from 'react'
+import { Form, Row, Accordion } from 'react-bootstrap';
 import { Controller } from 'react-hook-form';
 import ReactQuill from 'react-quill';
 import { useSelector } from 'react-redux';
 
 const NotesFormFields = ({ data, excludedFields = [], control, expanded = true, isAccordionOpen = true, selectedFromList = {} }) => {
-    // For SOAP sections, keep refs for each ReactQuill
+    const [activeAccordionKey, setActiveAccordionKey] = useState(null);
     const store = useSelector((state) => state);
 
     const patientDetails = store?.getPatientsByIdReducer?.data?.data;
@@ -44,7 +44,7 @@ const NotesFormFields = ({ data, excludedFields = [], control, expanded = true, 
                     const longWord = words.find(word => word.length > MAX_WORD_LENGTH);
 
                     if (longWord || words.length > MAX_WORDS) {
-                        editor.setContents(lastValidDelta); // Restore last valid state
+                        editor.setContents(lastValidDelta);
                         ToastHandle(
                             longWord
                                 ? `Word "${longWord}" exceeds max ${MAX_WORD_LENGTH} characters`
@@ -52,12 +52,28 @@ const NotesFormFields = ({ data, excludedFields = [], control, expanded = true, 
                             'danger'
                         );
                     } else {
-                        lastValidDelta = contents; // Update last valid state
+                        lastValidDelta = contents;
                     }
                 }, 0);
             });
         });
     }, []);
+
+    useEffect(() => {
+        Object.entries(selectedFromList).forEach(([fieldName, content]) => {
+            if (content) {
+                const sections = ['Subjective', 'Objective', 'Assessment', 'Plan', 'CarePlan', 'Notes'];
+                if (sections.includes(fieldName)) {
+                    const editor = quillRefs.current[fieldName]?.current?.getEditor?.();
+                    if (editor) {
+                        const currentContent = editor.getText().trim();
+                        const newContent = currentContent ? `${currentContent}\n${content}` : content;
+                        editor.setText(newContent);
+                    }
+                }
+            }
+        });
+    }, [selectedFromList]);
 
 
 
@@ -68,6 +84,9 @@ const NotesFormFields = ({ data, excludedFields = [], control, expanded = true, 
             .sort((a, b) => a.order - b.order);
     };
 
+    const handleAccordionToggle = (key) => {
+        setActiveAccordionKey(prev => (prev === key ? null : key));
+    };
     const renderField = (field) => {
         const { name, inputType = 'textarea' } = field;
         const countWords = (text) => {
@@ -84,8 +103,7 @@ const NotesFormFields = ({ data, excludedFields = [], control, expanded = true, 
 
         if (name === 'Notes (SOAP)') {
             return (
-                <div className="" key={name}>
-
+                <div key={name}>
                     <h5>{name}</h5>
                     {['Subjective', 'Objective', 'Assessment', 'Plan', 'CarePlan', 'Notes'].map(section => (
                         <Form.Group className="mb-2" key={section} id={section}>
@@ -104,7 +122,7 @@ const NotesFormFields = ({ data, excludedFields = [], control, expanded = true, 
                                         }}
                                     >
                                         <option value="">Add Patient Info</option>
-                                        {['Address', 'Age', 'Date of Birth', 'Email', 'Patient Name', 'Phone'].map((label, index) => {
+                                        {['Address', 'Age', 'Date of Birth', 'Email', 'Patient Name', 'Phone'].map((label, idx) => {
                                             const getValue = () => {
                                                 switch (label) {
                                                     case 'Address':
@@ -125,9 +143,8 @@ const NotesFormFields = ({ data, excludedFields = [], control, expanded = true, 
                                                         return '';
                                                 }
                                             };
-
                                             return (
-                                                <option key={index} value={getValue()}>
+                                                <option key={idx} value={getValue()}>
                                                     {label}
                                                 </option>
                                             );
@@ -144,7 +161,7 @@ const NotesFormFields = ({ data, excludedFields = [], control, expanded = true, 
                                 render={({ field: { onChange, value } }) => (
                                     <ReactQuill ref={quillRefs.current[section]}
                                         theme="snow"
-                                        value={value || '<p><br></p>'}
+                                        value={selectedFromList[section] || value || '<p><br></p>'}
                                         onChange={handleTextChange(onChange, value, MAX_WORDS)}
                                         modules={{
                                             toolbar: [
@@ -163,16 +180,15 @@ const NotesFormFields = ({ data, excludedFields = [], control, expanded = true, 
             );
         }
 
-        // Handle regular fields
         return (
-            <Form.Group key={name}>
-                <Form.Label className="mb-0 d-flex align-items-center justify-content-between">
-                    <p className='mb-0'>
+            <Form.Group key={name} className="mb-3">
+                <Form.Label className="mb-1 d-flex align-items-center justify-content-between">
+                    <span className='fw-medium'>
                         {name}
-                    </p>
-                    <p className='mb-0'>
+                    </span>
+                    <small className='text-muted'>
                         {MAX_WORDS + ' words'}
-                    </p>
+                    </small>
                 </Form.Label>
                 {inputType === 'text-editor' ? (
                     <Controller
@@ -181,15 +197,14 @@ const NotesFormFields = ({ data, excludedFields = [], control, expanded = true, 
                         render={({ field: { onChange, value } }) => (
                             <ReactQuill
                                 theme="snow"
-                                value={value || ''} // Use form state value
-                                onChange={onChange} // Update form state on change
+                                value={selectedFromList[name] || value || ''}
+                                onChange={onChange}
                                 modules={{
                                     toolbar: [
                                         ['bold', 'italic', 'underline'],
                                         [{ list: 'ordered' }, { list: 'bullet' }],
                                         ['link'],
                                         ['clean'],
-                                        ['undo', 'redo'],
                                     ],
                                 }}
                             />
@@ -202,15 +217,13 @@ const NotesFormFields = ({ data, excludedFields = [], control, expanded = true, 
                         render={({ field: { value = '', onChange } }) => (
                             <Form.Control
                                 as={inputType === 'text' ? 'input' : 'textarea'}
-                                rows={inputType === 'text' ? undefined : 10}
-                                value={value}
+                                rows={inputType === 'text' ? undefined : 6}
+                                value={selectedFromList[name] || value}
                                 onChange={(e) => {
                                     const input = e.target.value;
-
-                                    const words = input.match(/\S+/g) || []; // words are non-space sequences
+                                    const words = input.match(/\S+/g) || [];
                                     const wordCount = words.length;
-
-                                    const lastWordMatch = input.match(/(\S+)$/); // match last word
+                                    const lastWordMatch = input.match(/(\S+)$/);
                                     const lastWord = lastWordMatch ? lastWordMatch[0] : '';
 
                                     if (wordCount < MAX_LENGTH) {
@@ -218,23 +231,22 @@ const NotesFormFields = ({ data, excludedFields = [], control, expanded = true, 
                                         return;
                                     }
 
-                                    // Word count == MAX_LENGTH
                                     if (wordCount === MAX_LENGTH) {
-                                        // Allow updating only if user is typing inside the last word and it's <= 45 characters
                                         if (lastWord.length <= 45 && /\S$/.test(input)) {
                                             onChange(input);
                                         }
-                                        // Else block (including if trying to type space after last word)
                                     }
                                 }}
+                                className="border-primary"
                             />
                         )}
                     />
-
                 )}
             </Form.Group>
         );
     };
+
+    const fieldsToRender = getFieldsToRender();
 
     return (
         <Row
@@ -244,7 +256,18 @@ const NotesFormFields = ({ data, excludedFields = [], control, expanded = true, 
                 overflowY: 'auto',
             }}
         >
-            {getFieldsToRender().map(field => renderField(field))}
+            <Accordion activeKey={activeAccordionKey} onSelect={handleAccordionToggle}>
+                {fieldsToRender.map((field, index) => (
+                    <Accordion.Item key={field.name} eventKey={index.toString()} className="border-0 mb-2">
+                        <Accordion.Header className=' bg-light rounded'>
+                            <span className='fw-semibold p-2     fs-6'>{field.name}</span>
+                        </Accordion.Header>
+                        <Accordion.Body className='p-2'>
+                            {renderField(field)}
+                        </Accordion.Body>
+                    </Accordion.Item>
+                ))}
+            </Accordion>
         </Row>
     );
 };
