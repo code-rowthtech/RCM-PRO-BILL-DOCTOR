@@ -31,7 +31,6 @@ const ModalTask = ({ show, handleClose, taskId }) => {
     const roleData = store?.getRolesDataReducer?.data;
     const clinicId = loggedInUser?.clinicId;
     const doctorDetails = store?.getAllDoctorsReducer?.data?.result;
-    console.log(doctorDetails, 'doctor')
     const patientsData = store?.getPatientsReducer?.data?.data;
     const createTaskResponse = store?.createUserTasksReducer?.data?.status;
     const encounters = store?.getEncounterReducer?.data?.encounters;

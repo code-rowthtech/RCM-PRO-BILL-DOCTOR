@@ -21,7 +21,6 @@ import { loggedInUser } from 'helpers/loggedInUser';
 
 const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
     const { control, register, handleSubmit, reset, setValue, watch } = useForm();
-    console.log(loggedInUser, 'login')
     const dispatch = useDispatch();
     const quillRef = useRef(null);
     const store = useSelector((state) => state);

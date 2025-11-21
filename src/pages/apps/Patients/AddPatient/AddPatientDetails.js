@@ -47,7 +47,6 @@ const AddPatientDetails = ({
     const doctorName = JSON.parse(sessionStorage.getItem('hyper_user'))?.name?.text;
     const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
 
-    console.log(store?.createPatientsReducer?.data?.status, 'store?.createPatientsReducer')
     // Function to calculate approximate age from date of birth
     const calculateApproxAge = (dob) => {
         if (!dob) return '';

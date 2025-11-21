@@ -50,7 +50,6 @@ const LabRequestForm = ({ selectedRequest, onSuccess, onCancel }) => {
         try {
             // Mock API call - replace with actual implementation
             await new Promise(resolve => setTimeout(resolve, 1000));
-            console.log('Lab request submitted:', data);
             onSuccess();
         } catch (err) {
             setError(err.message || 'Failed to save lab request');

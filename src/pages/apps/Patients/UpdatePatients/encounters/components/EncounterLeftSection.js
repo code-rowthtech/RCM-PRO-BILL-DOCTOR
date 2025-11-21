@@ -5,7 +5,7 @@ import SummarySection from './SummarySection';
 import TemplatesSection from './TemplatesSection';
 import PastEncountersSection from './PastEncountersSection';
 
-const EncounterLeftSection = ({ selectedFromList, setSelectedFromList, expanded }) => {
+const EncounterLeftSection = ({ selectedFromList, setSelectedFromList, expanded, activeHomeKey }) => {
     const store = useSelector((state) => state);
     const [leftSectionActive, setLeftSectionActive] = useState('Summary');
     const defaultTabs = ['Summary', 'Templates', 'Past Encounters'];
@@ -26,8 +26,8 @@ const EncounterLeftSection = ({ selectedFromList, setSelectedFromList, expanded 
 
 
     return (
-        <div style={{ height: expanded ? '84vh' : 'auto' }}>
-            <ul className='d-flex list-unstyled mt-0 mb-0' style={{ height: 'fit-content' }}>
+        <div className='d-flex flex-column '>
+            <ul className='d-flex  list-unstyled mt-0 mb-0 flex-shrink-0'>
                 {visibleTabs?.map((item) => (
                     <li
                         key={item?._id}
@@ -39,23 +39,23 @@ const EncounterLeftSection = ({ selectedFromList, setSelectedFromList, expanded 
                     </li>
                 ))}
             </ul>
-            <Row className='position-relative'>
-                {leftSectionActive === 'Summary' && (
-                    <SummarySection
-                        activeKey={activeKey}
-                        handleToggle={handleToggle}
-                    // settingsDataMainItems={settingsDataMainItems}
-                    // visibleTabs={visibleTabs}
-                    />
-                )}
-                {leftSectionActive === 'Templates' && (
-                    <TemplatesSection
-                        selectedFromList={selectedFromList}
-                        setSelectedFromList={setSelectedFromList}
-                    />
-                )}
-                {leftSectionActive === 'Past Encounters' && <PastEncountersSection />}
-            </Row>
+            <div className='  scroll-container flex-grow-1 ' style={{ height: expanded ? '77vh' : activeHomeKey ? '60vh' : '73vh' }} >
+                <Row className='position-relative scroll-container '>
+                    {leftSectionActive === 'Summary' && (
+                        <SummarySection
+                            activeKey={activeKey}
+                            handleToggle={handleToggle}
+                        />
+                    )}
+                    {leftSectionActive === 'Templates' && (
+                        <TemplatesSection
+                            selectedFromList={selectedFromList}
+                            setSelectedFromList={setSelectedFromList}
+                        />
+                    )}
+                    {leftSectionActive === 'Past Encounters' && <PastEncountersSection />}
+                </Row>
+            </div>
         </div>
     )
 }

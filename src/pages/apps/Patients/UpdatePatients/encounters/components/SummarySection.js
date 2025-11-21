@@ -34,17 +34,8 @@ const DEFAULT_MENU_ITEMS = [
     { _id: '5', name: 'Social History', order: 4, hide: true }
 ];
 
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
 
-
-
-// ============================================================================
-// MAIN COMPONENT
-// ============================================================================
-
-const SummarySection = ({ activeKey, handleToggle }) => {
+const SummarySection = () => {
     // ========================================================================
     // HOOKS & STATE
     // ========================================================================
@@ -152,8 +143,8 @@ const SummarySection = ({ activeKey, handleToggle }) => {
     // ========================================================================
 
     return (
-        <Col sm={12} className='mt-1'>
-            <Accordion activeKey={activeKey} onSelect={handleToggle}>
+        <Col sm={12} className='mt-1'  >
+            <Accordion alwaysOpen>
                 {sortedSubMenuItems.map((menuItem) => {
                     if (!menuItem?.hide) return null;
 

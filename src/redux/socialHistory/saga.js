@@ -296,9 +296,6 @@ function* createSurgicalHistoryFunction(data) {
         });
         const response = yield call(createSurgicalHistoryApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-
-        console.log(decryptedData, 'decryptedDatadecryptedDatadecryptedData');
-
         if (response.status === 201) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({

@@ -36,7 +36,7 @@ const Encountersindex = (props) => {
         expanded,
         setExpanded,
         createEncounter,
-        setCreateEncounter
+        setCreateEncounter, activeKey
     } = props;
 
     // Hooks initialization
@@ -262,6 +262,7 @@ const Encountersindex = (props) => {
                                     form="encounter-form"
                                     type="submit"
                                     title="Save"
+                                    disabled={store?.createEncounterReducer?.loading || store?.updateEncounterReducer?.loading}
                                 >
                                     <MdSave size={18} />
                                     <span className="small">Save</span>
@@ -303,7 +304,7 @@ const Encountersindex = (props) => {
                     {encounterTabs?.map((tab) => (
                         <div
                             key={tab.id}
-                            className="mt-1"
+                            className="mt-1 "
                             style={{ display: activeTab === tab.id ? 'block' : 'none' }}
                         >
                             {/* Render appropriate component based on tab type */}
@@ -314,6 +315,7 @@ const Encountersindex = (props) => {
                                     activeTabId={activeTab}
                                     tabType={tab?.type}
                                     expanded={expanded}
+                                    activeKey={activeKey}
                                     isCollapsed={isCollapsed}
                                     expandAllAccordions={expandAllAccordions}
                                 />
