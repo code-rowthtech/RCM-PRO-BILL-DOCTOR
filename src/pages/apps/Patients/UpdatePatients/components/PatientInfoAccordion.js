@@ -95,7 +95,6 @@ const PatientInfoAccordion = (props) => {
                 photo: [{ url: photoUrl, title: logoName }],
             } : {}),
         };
-
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
     return (
