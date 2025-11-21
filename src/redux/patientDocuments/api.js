@@ -10,7 +10,6 @@ export function uploadDocumentsApi(params: any): any {
 
 export function updateDocumentsApi(params: any): any {
     const { data } = params;
-    console.log(data, 'in the ayload')
     return api.update(`${URL.patientDocuments}/${data?.id}`, { key: data?.body });
 }
 

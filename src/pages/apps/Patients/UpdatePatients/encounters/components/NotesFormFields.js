@@ -9,6 +9,7 @@ import { FaCloudUploadAlt, FaEye } from 'react-icons/fa';
 import { handlePrintVitals } from 'helpers/printVitals';
 import { handlePrintAutopopulatedFields } from 'helpers/printAutopopulatedFields';
 import VitalsChart from './VitalsChart';
+import AsyncSelect from 'react-select/async';
 
 const NotesFormFields = ({
     data,
@@ -28,7 +29,10 @@ const NotesFormFields = ({
     setAccordionState = () => { },
     getValues = () => '',
     encounterData = null,
-    patientVitals = []
+    patientVitals = [],
+    consentDocuments = [],
+    selectedConsentForms = [],
+    setSelectedConsentForms = () => { }
 }) => {
     const quillRefs = useRef({
         Subjective: createRef(),
@@ -149,6 +153,105 @@ const NotesFormFields = ({
                 <div key={name}>
                     <VitalsChart />
                 </div>
+            );
+        }
+
+        // Render Consent Forms field with card structure
+        if (name === 'Consent Forms') {
+            return (
+                <Form.Group key={name} className='row'>
+                    <div className="col-12">
+                        <Form.Label className="mb-2 d-flex align-items-center">{name}</Form.Label>
+                        <AsyncSelect
+                            loadOptions={(inputValue, callback) => {
+                                try {
+                                    const selectedIds = selectedConsentForms.map(form => form.value);
+                                    const filteredOptions = (consentDocuments || [])
+                                        .filter(form =>
+                                            !selectedIds.includes(form._id) &&
+                                            form?.title?.toLowerCase().includes((inputValue || '').toLowerCase())
+                                        )
+                                        .map(form => ({
+                                            value: form._id,
+                                            label: form.title,
+                                            data: form
+                                        }));
+                                    callback(filteredOptions.slice(0, 20));
+                                } catch (error) {
+                                    console.error('Error loading consent forms:', error);
+                                    callback([]);
+                                }
+                            }}
+                            defaultOptions={(() => {
+                                const selectedIds = selectedConsentForms.map(form => form.value);
+                                return (consentDocuments || [])
+                                    .filter(form => !selectedIds.includes(form._id))
+                                    .slice(0, 10)
+                                    .map(form => ({
+                                        value: form?._id,
+                                        label: form?.title || 'Untitled Form',
+                                        data: form
+                                    })).filter(option => option.value);
+                            })()}
+                            isSearchable
+                            className="basic-single mb-2"
+                            classNamePrefix="select"
+                            placeholder="Search and select consent forms"
+                            value={null}
+                            onChange={(selectedOption) => {
+                                if (selectedOption && !selectedConsentForms.find(form => form.value === selectedOption.value)) {
+                                    setSelectedConsentForms(prev => [...prev, selectedOption]);
+                                }
+                            }}
+                            noOptionsMessage={() => 'No consent forms available'}
+                            styles={{
+                                control: (provided) => ({
+                                    ...provided,
+                                    minHeight: '35px',
+                                    border: '1px solid #dee2e6'
+                                })
+                            }}
+                        />
+                    </div>
+                    {selectedConsentForms?.length > 0 && (
+                        selectedConsentForms?.map((form, index) => (
+                            <div key={index} className="col-4 mt-2 p-1">
+                                <div className='d-flex align-items-center justify-content-between p-2 rounded bg-light border'>
+                                    <div className="flex-grow-1">
+                                        <small className="fw-bold text-truncate d-block" title={form?.label}>
+                                            {form?.label}
+                                        </small>
+                                        <small className="text-muted">Consent Form</small>
+                                    </div>
+                                    <div className="d-flex align-items-center gap-1">
+                                        {form?.data?.consentDocument?.url && (
+                                            <Button
+                                                variant="outline-primary"
+                                                size="sm"
+                                                className="p-0"
+                                                style={{ width: '24px', height: '24px', fontSize: '10px' }}
+                                                onClick={() => window.open(form.data.consentDocument.url.split('?')[0], '_blank')}
+                                                title="View consent form"
+                                            >
+                                                <FaEye size={12} />
+                                            </Button>
+                                        )}
+                                        <Button
+                                            variant="outline-danger"
+                                            size="sm"
+                                            className="p-0"
+                                            style={{ width: '24px', height: '24px', fontSize: '10px' }}
+                                            onClick={() => setSelectedConsentForms(prev => prev.filter((_, i) => i !== index))}
+                                            title="Remove consent form"
+                                        >
+                                            <Trash size={12} />
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </Form.Group>
             );
         }
 
@@ -463,14 +566,19 @@ const NotesFormFields = ({
     return (
         <Row
             className="g-2 px-1 mt-1 scroll-container"
-            style={{
-                height: !expanded ? (isAccordionOpen ? '36vh' : '50vh') : '59.5vh',
-                overflowY: 'auto',
-            }}
+        // style={{
+        //     height: !expanded ? (isAccordionOpen ? '36vh' : '50vh') : '59.5vh',
+        //     overflowY: 'auto',
+        // }}
         >
-            <Accordion activeKey={Object.keys(accordionState).filter(key => accordionState[key]).map(String)} alwaysOpen>
+            <Accordion alwaysOpen>
                 {fieldsToRender.map((field, index) => (
-                    <Accordion.Item className='mb-3' eventKey={index.toString()} key={index}>
+                    <Accordion.Item
+                        className='mb-3'
+                        eventKey={index.toString()}
+                        key={index}
+                        data-field-name={field.name}
+                    >
                         <Accordion.Header
                             className='encounter-accordion-header d-flex justify-content-between w-100'
                             onClick={() => {

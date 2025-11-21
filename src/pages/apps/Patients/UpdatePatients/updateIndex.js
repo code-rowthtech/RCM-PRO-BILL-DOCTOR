@@ -51,6 +51,7 @@ const UpdateIndex = () => {
         setExpanded,
         createEncounter,
         setCreateEncounter,
+        activeKey
     };
     const patientInfoProps = {
         setSelectedMainTab,
@@ -88,6 +89,7 @@ const UpdateIndex = () => {
         }
     }, []);
 
+
     return (
         <div>
             {store?.getPatientsByIdReducer?.loading || !store?.getPatientsByIdReducer?.data?.data ? (
@@ -105,7 +107,7 @@ const UpdateIndex = () => {
 
                     <Row>
                         <Col sm={12}>
-                            <Card className={`mt-1 pt-1 px-2 ${!activeKey ? 'patientChartCardClose' : 'patientChartCard'}`} style={{ height: expanded ? '90vh' : 'auto' }}>
+                            <Card className={`mt-1 pt-1 px-2 ${!activeKey ? 'patientChartCardClose' : 'patientChartCard'}`} style={{ height: expanded ? '90vh' : activeKey ? '74vh' : '85vh' }}>
                                 {selectedMainTab === 'Patient Summary' && <PatientSummary activeKey={activeKey} />}
                                 {selectedMainTab === 'Demographics' && <PatientDemographics activeKey={activeKey} />}
                                 {selectedMainTab === 'Documents' && <Documentsindex />}

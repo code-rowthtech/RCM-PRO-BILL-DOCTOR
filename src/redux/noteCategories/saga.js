@@ -25,7 +25,6 @@ function* createNoteCategoriesFunction(data) {
         });
         const response = yield call(createNoteCategoriesApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        console.log(response, '21345')
         if (response.status === 201) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
@@ -43,7 +42,6 @@ function* createNoteCategoriesFunction(data) {
             });
         }
     } catch (error) {
-        console.log(error, 'errorerrorerror')
         ToastHandle(error, 'danger');
         yield put({
             type: NotesCategoriesActionTypes.CREATE_NOTE_CATEGORIES_ERROR,

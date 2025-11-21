@@ -7,7 +7,7 @@ import Select from 'react-select';
 // Redux imports
 import { useDispatch, useSelector } from 'react-redux';
 import { getSettingsTabAction } from 'redux/noteCategories/action';
-import { createEncounterAction, getEncounterAction, updateEncounterAction } from 'redux/actions';
+import { createEncounterAction, getEncounterAction, updateEncounterAction, getAllConsentActions } from 'redux/actions';
 
 // Router imports
 import { useSearchParams } from 'react-router-dom';
@@ -16,6 +16,7 @@ import { useSearchParams } from 'react-router-dom';
 import { encryptMessage } from 'cryptoUtils';
 import ToastHandle from 'helpers/ToastMessage';
 import { getVitalsByPatientIdAction } from 'redux/actions';
+import AsyncSelect from 'react-select/async';
 
 // Component imports
 import NotesFormFields from './NotesFormFields';
@@ -33,7 +34,7 @@ import useNotesTypes from 'hooks/useNotesTypes';
  * Manages patient encounter creation with dynamic note types and fields
  * Features: FHIR-compliant data structure, dynamic form fields, note type management
  */
-const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions }) => {
+const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, activeHomeKey }) => {
     // Hooks initialization
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
@@ -52,6 +53,7 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions })
     const [attachedRecords, setAttachedRecords] = useState([]);
     const [uploadLoading, setUploadLoading] = useState(false);
     const [accordionState, setAccordionState] = useState({});
+    const [selectedConsentForms, setSelectedConsentForms] = useState([]);
 
 
     // Redux state selectors
@@ -59,6 +61,7 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions })
     const encounterById = store?.getEncounterByIdReducer?.data?.encounter;
     const createSuccess = store?.createEncounterReducer?.data?.status;
     const updateSuccess = store?.updateEncounterReducer?.data?.status;
+    const consentDocuments = store?.getAllConsentReducer?.data?.data;
     // Custom hook for note types with search functionality
     const {
         options: notesTypeOptions,
@@ -83,6 +86,15 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions })
         }
     }, [notesTypeOptions, selectedNoteType, dispatch, encounterById]);
 
+    // Set default values for new encounters
+    useEffect(() => {
+        if (!encounterById && encounterTypes?.length > 0 && encounterClassCodes?.length > 0) {
+            setValue('type', encounterTypes[0]?.code);
+            setValue('class', encounterClassCodes[0]?.code);
+            setValue('status', 'planned');
+        }
+    }, [encounterById, encounterTypes, encounterClassCodes, setValue]);
+
     // Populate form with existing encounter data for updates
     useEffect(() => {
         if (encounterById) {
@@ -96,11 +108,50 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions })
                 dispatch(getSettingsTabAction({ noteId: encounterById.noteType }));
             }
 
-            encounterById?.data?.forEach(item => {
-                setValue(item.type, item.content?.value || '');
-            });
+            // Populate form fields and track populated data
+            if (encounterById?.data && Array.isArray(encounterById?.data)) {
+                const newPopulatedFields = {};
+                const newPopulatedFieldIds = {};
+
+                encounterById?.data?.forEach(field => {
+                    if (field?.type === 'Consent Forms' && consentDocuments?.length > 0) {
+                        // Handle consent forms specially
+                        const consentIds = field.populatedData || [];
+                        const selectedForms = consentIds
+                            .map((consentId) => {
+                                const consentDoc = consentDocuments.find((doc) => doc._id === consentId);
+                                if (consentDoc) {
+                                    return {
+                                        value: consentDoc._id,
+                                        label: consentDoc.title,
+                                        data: consentDoc,
+                                    };
+                                }
+                                return null;
+                            })
+                            .filter(Boolean);
+                        setSelectedConsentForms(selectedForms);
+                    } else if (field?.type && field?.content?.value) {
+                        setValue(field?.type, field?.content?.value);
+                    }
+                    if (field?.populatedData?.length > 0) {
+                        newPopulatedFields[field.type] = field.populatedData;
+                    }
+                    if (field?.populatedIds?.length > 0) {
+                        newPopulatedFieldIds[field.type] = field.populatedIds;
+                    }
+                });
+
+                setPopulatedFields(newPopulatedFields);
+                setPopulatedFieldIds(newPopulatedFieldIds);
+            }
+
+            // Populate attached records if they exist
+            if (encounterById?.attachedRecords) {
+                setAttachedRecords(encounterById.attachedRecords);
+            }
         }
-    }, [encounterById, setValue, dispatch]);
+    }, [encounterById, setValue, dispatch, consentDocuments]);
 
     // Update form fields when template items are selected
     useEffect(() => {
@@ -174,6 +225,17 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions })
                     }
                     fieldsData.push(fieldData);
                 });
+            } else if (name === 'Consent Forms') {
+                // Handle Consent Forms specially
+                const fieldData = {
+                    type: name,
+                    content: {
+                        type: 'text',
+                        value: ''
+                    },
+                    populatedData: selectedConsentForms?.map((form) => form.value) || []
+                };
+                fieldsData.push(fieldData);
             } else if (name !== 'Attached Records') {
                 // Handle regular fields, exclude Attached Records
                 const value = getValues(name) || '';
@@ -224,8 +286,13 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions })
         };
 
         if (encounterById) {
-            encounterPayload.id = encounterById._id;
-            dispatch(updateEncounterAction({ key: encryptMessage(encounterPayload) }));
+            // For update, send only the fields that need to be updated
+            const updatePayload = {
+                id: encounterById._id,
+                data: fieldsData,
+                attachedRecords
+            };
+            dispatch(updateEncounterAction({ key: encryptMessage(updatePayload) }));
         } else {
             dispatch(createEncounterAction({ key: encryptMessage(encounterPayload) }));
         }
@@ -233,16 +300,22 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions })
 
     useEffect(() => {
         if (createSuccess === 201 || updateSuccess === 200) {
-            dispatch(getEncounterAction({ patientId, skip: 1 }))
+            dispatch(getEncounterAction({ patientId, skip: 1 }));
+            // Reset consent forms after successful save
+            setSelectedConsentForms([]);
         }
     }, [createSuccess, updateSuccess, dispatch, patientId]);
 
-    // Load vitals data
+    // Load vitals data and consent forms
     useEffect(() => {
         if (patientId) {
             dispatch(getVitalsByPatientIdAction({ limit: 4, patientId }));
         }
-    }, [dispatch, patientId]);
+        const clinicId = store?.Auth?.user?.clinicId;
+        if (clinicId) {
+            dispatch(getAllConsentActions({ clinicId }));
+        }
+    }, [dispatch, patientId, store?.Auth?.user?.clinicId]);
 
 
 
@@ -269,12 +342,33 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions })
                     [fieldName]: [...(prev[fieldName] || []), itemId]
                 }));
             }
+
+            // Find and open the accordion for the populated field
+            const fieldIndex = notesFields?.findIndex(field => field.name === fieldName);
+            if (fieldIndex !== -1) {
+                setAccordionState(prev => ({ ...prev, [fieldIndex]: true }));
+
+                // Open accordion and scroll after a short delay
+                setTimeout(() => {
+                    const accordionButton = document.querySelector(`[data-field-name="${fieldName}"] .accordion-button`);
+                    if (accordionButton && accordionButton.classList.contains('collapsed')) {
+                        accordionButton.click();
+                    }
+
+                    setTimeout(() => {
+                        const accordionElement = document.querySelector(`[data-field-name="${fieldName}"] .accordion-header`);
+                        if (accordionElement) {
+                            accordionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }, 100);
+                }, 300);
+            }
         };
 
         return () => {
             delete window.populateEncounterField;
         };
-    }, [populatedFields]);
+    }, [populatedFields, notesFields]);
 
     // Function to remove populated data from field
     const removePopulatedData = (fieldName, dataToRemove) => {
@@ -324,11 +418,22 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions })
         setAttachedRecords(prev => [...prev, ...uploadedFiles]);
     };
 
+    // Consent form handlers
+    const handleConsentFormChange = (selectedOptions) => {
+        setSelectedConsentForms(selectedOptions || []);
+    };
+
+    const handleViewConsentForm = (formData) => {
+        if (formData?.consentDocument?.url) {
+            window.open(formData?.consentDocument?.url?.split('?')[0], '_blank');
+        }
+    };
+
     return (
-        <div>
+        <div className='bg-in'>
             <Form id="encounter-form" onSubmit={handleSubmit(onSubmit)}>
                 {/* Header Fields Row */}
-                <Row style={{ height: '16.5vh' }} className="g-2 mt-0 bg-light rounded-top p-1">
+                <Row style={{ height: '16vh' }} className="g-2 mt-0 bg-light rounded-top p-1">
 
                     {/* Encounter Type Field */}
                     <Col sm={4} className='mt-0'>
@@ -488,13 +593,9 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions })
                     </Col>
                 </Row>
 
-
-
-
-
                 {/* Dynamic Notes Fields Section */}
-                <Row className="mt-1 scroll-container" style={{ minHeight: expanded ? '50vh' : '35vh', height: expanded ? '50vh' : '35vh' }}>
-                    <Col sm={12}>
+                <Row style={{ height: expanded ? '64vh' : activeHomeKey ? '48vh' : '60vh' }} className="mt-1 scroll-container" >
+                    <Col className='' sm={12}>
                         {selectedNoteType ? (
                             notesFields && Array.isArray(notesFields) && notesFields.length > 0 ? (
                                 <NotesFormFields
@@ -514,6 +615,9 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions })
                                     expanded={expanded}
                                     encounterData={encounterById}
                                     patientVitals={store?.getVitalsByPatientIdReducer?.data?.data || []}
+                                    consentDocuments={consentDocuments}
+                                    selectedConsentForms={selectedConsentForms}
+                                    setSelectedConsentForms={setSelectedConsentForms}
                                 />
                             ) : (
                                 <div className="text-center py-4 text-muted">
@@ -527,19 +631,6 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions })
                                 <p className="mb-0">Please select a note type to view available fields.</p>
                             </div>
                         )}
-                    </Col>
-                </Row>
-
-                {/* Submit Button */}
-                <Row>
-                    <Col sm={12} className="d-flex justify-content-end mt-2 mb-1">
-                        <Button
-                            type="submit"
-                            className='custom-buttons'
-                            disabled={store?.createEncounterReducer?.loading || store?.updateEncounterReducer?.loading}
-                        >
-                            {store?.createEncounterReducer?.loading ? 'Saving...' : encounterById ? 'Update Encounter' : 'Save Encounter'}
-                        </Button>
                     </Col>
                 </Row>
             </Form>

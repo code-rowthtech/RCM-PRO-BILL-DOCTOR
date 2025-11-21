@@ -136,8 +136,6 @@ const VitalsModal = ({ onClose, initialDate, onDateChange }) => {
             };
 
             // Debug: Log the vital data structure
-            console.log('Existing vitals data:', existingVitalsForDate.vitals);
-
             existingVitalsForDate.vitals.forEach(vital => {
                 const display = vital.code?.coding?.[0]?.display;
                 const loincCode = vital.code?.coding?.[0]?.code;
@@ -238,7 +236,6 @@ const VitalsModal = ({ onClose, initialDate, onDateChange }) => {
 
                     if (key) {
                         newVitals[key] = vital.valueQuantity.value.toString();
-                        console.log(`Mapped ${display} (${loincCode}) to ${key} = ${vital.valueQuantity.value}`);
                     } else {
                         console.log(`No mapping found for: ${display} (${loincCode})`);
                     }

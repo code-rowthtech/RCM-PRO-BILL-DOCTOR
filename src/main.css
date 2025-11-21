@@ -568,3 +568,7 @@ option {
 .box-shadow-none {
     box-shadow: none !important;
 }
+
+.encounter-accordion-header .accordion-button {
+    background-color: rgba(238, 242, 247, 1) !important;
+}
