@@ -38,7 +38,8 @@ export const createPatients = '/api/v1/doctor/Patient/add';
 export const updatePatients = '/api/v1/doctor/Patient/update';
 export const createReferringDoctor = '/api/v1/doctor/add/referringDoc';
 export const createResponsibleParty = '/api/v1/doctor/Patient/responsible-party';
-export const getPatientConsents = '/api/v1/practitioner/consent-documents';
+export const getPatientConsents = '/api/v1/practitioner/patient-consent';
+export const getAllConsents = '/api/v1/practitioner/consent-documents';
 
 // CLINIC NOTES
 export const getClinicEmployees = '/api/v1/doctor/getClinicEmployees';

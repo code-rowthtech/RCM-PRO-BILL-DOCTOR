@@ -9,7 +9,7 @@ import { createRolesReducer, getRolesDataReducer, updateRolesReducer } from './r
 import { createClinicsReducer, getClinicsReducer, getClinicByIdReducer, updateClinicsReducer } from './clinics/reducers';
 import { getAllDoctorsReducer, getCitiesReducer, getDoctorsReducer, getStatesReducer, UpdateDoctorsReducer } from './doctors/reducers';
 import { getAnalyticsReducer } from './dashboard/reducers';
-import { createPatientsReducer, createReferringDoctorReducer, createResponsiblePartyReducer, getPatientConsentReducer, getPatientsByIdReducer, getPatientsReducer, updatePatientsReducer } from './patients/reducers';
+import { createPatientsReducer, createReferringDoctorReducer, createResponsiblePartyReducer, getAllConsentReducer, getPatientConsentReducer, getPatientsByIdReducer, getPatientsReducer, updatePatientsReducer } from './patients/reducers';
 import { getSubscriptionsReducer } from './subscriptions/reducers';
 import { createHolidayScheduleReducer, createScheduleReducer, deleteHolidayScheduleReducer, getHolidayScheduleReducer, getScheduleReducer, updateScheduleReducer } from './schedule/reducers';
 import { createVitalsReducer, getVitalsByPatientIdReducer, getVitalsReducer, updateVitalsReducer } from './vitals/reducers';
@@ -44,7 +44,7 @@ export default (combineReducers({
     getAnalyticsReducer,
     // Doctors Profile 
     getDoctorsReducer, getStatesReducer, getCitiesReducer, UpdateDoctorsReducer, getAllDoctorsReducer,
-    getPatientsReducer, getPatientConsentReducer, createPatientsReducer, getPatientsByIdReducer, updatePatientsReducer, createReferringDoctorReducer, createResponsiblePartyReducer,
+    getPatientsReducer, getPatientConsentReducer, getAllConsentReducer, createPatientsReducer, getPatientsByIdReducer, updatePatientsReducer, createReferringDoctorReducer, createResponsiblePartyReducer,
     getSubscriptionsReducer,
     createHolidayScheduleReducer, getHolidayScheduleReducer, deleteHolidayScheduleReducer, createScheduleReducer, getScheduleReducer, updateScheduleReducer,
     createVitalsReducer, updateVitalsReducer, getVitalsReducer, getVitalsByPatientIdReducer,

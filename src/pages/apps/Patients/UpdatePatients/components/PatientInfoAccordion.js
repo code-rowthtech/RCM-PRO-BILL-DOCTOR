@@ -14,6 +14,7 @@ import { IoClose, IoPrintSharp } from 'react-icons/io5';
 import { LiaReceiptSolid } from 'react-icons/lia';
 import ConsentOffCanvas from '../../../../../components/ConsentOffCanvas';
 import { FaFileSignature } from 'react-icons/fa6';
+import { handlePrintPatientSummary } from './handlePrintPatientSummary';
 
 const PatientInfoAccordion = (props) => {
     const { activeKey, setActiveKey, setSelectedMainTab, setCreateEncounter } = props;
@@ -136,9 +137,6 @@ const PatientInfoAccordion = (props) => {
                                 {patientDetails?.approxAge &&
                                     (() => {
                                         const years = Math.floor(patientDetails.approxAge);
-                                        const months = Math.round(
-                                            (patientDetails.approxAge - years) * 12
-                                        );
                                         return `(${years} year${years !== 1 ? 's old)' : ''} `;
                                     })()}
                             </span>
@@ -438,16 +436,16 @@ const PatientInfoAccordion = (props) => {
                                                         variant="primary"
                                                         size="sm"
                                                         className='custom-buttons'
-                                                        // onClick={() =>
-                                                        //     handlePrintPatientSummary({
-                                                        //         toBePrinted: printOptions,
-                                                        //         patientDetails: patientDetails,
-                                                        //         vitals: store?.getVitalsByPatientIdReducer?.data?.data,
-                                                        //         medicationList: store?.getMedicationReducer?.data?.medicationRequests,
-                                                        //         allergyData: store?.getAllergiesOfAPatientReducer?.data?.allergies,
-                                                        //         problemData: store?.getProblemListReducer?.data?.problems
-                                                        //     })
-                                                        // }
+                                                        onClick={() =>
+                                                            handlePrintPatientSummary({
+                                                                toBePrinted: printOptions,
+                                                                patientDetails: patientDetails,
+                                                                vitals: store?.getVitalsByPatientIdReducer?.data?.data,
+                                                                medicationList: store?.getMedicationReducer?.data?.medicationRequests,
+                                                                allergyData: store?.getAllergiesOfAPatientReducer?.data?.allergies,
+                                                                problemData: store?.getProblemListReducer?.data?.problems
+                                                            })
+                                                        }
                                                         disabled={
                                                             printOptions?.length < 1 ||
                                                             store?.getVitalsByPatientIdReducer?.loading ||

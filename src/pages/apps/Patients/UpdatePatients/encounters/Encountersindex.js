@@ -238,13 +238,8 @@ const Encountersindex = (props) => {
                                     variant="outline-secondary"
                                     className="d-flex align-items-center gap-1 px-2 py-1"
                                     onClick={() => {
-                                        setExpandAllAccordions(!expandAllAccordions)
-                                        if (expandAllAccordions) {
-                                            setExpanded(true);
-                                            setIsCollapsed(true);
-                                        } else {
-                                            setIsCollapsed(false);
-                                        }
+                                        const newState = !expandAllAccordions;
+                                        setExpandAllAccordions(newState);
                                     }}
                                     title={expandAllAccordions ? 'Minimize All' : 'Expand All'}
                                 >
@@ -319,6 +314,8 @@ const Encountersindex = (props) => {
                                     activeTabId={activeTab}
                                     tabType={tab?.type}
                                     expanded={expanded}
+                                    isCollapsed={isCollapsed}
+                                    expandAllAccordions={expandAllAccordions}
                                 />
                             )}
                         </div>

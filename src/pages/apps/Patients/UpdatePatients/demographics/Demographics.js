@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState, memo } from 'react';
 import { Button, Col, Form, Row, InputGroup, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -26,37 +26,103 @@ import { tribalEntitiesOptions } from 'utils/DataSets/tribalEntities';
 import { sexParameterOptions } from 'utils/DataSets/SexParameterforClinicalUse';
 import { maritalStatusOptions } from 'utils/DataSets/maritalStatus';
 
-const Demographics = ({ patientId }) => {
-    const store = useSelector((state) => state);
+// Memoized select styles to prevent recreation on every render
+const selectStyles = {
+    control: (provided) => ({
+        ...provided,
+        color: 'black',
+        fontWeight: 500,
+        fontSize: '12px',
+        backgroundColor: '#e8f0fe',
+        border: 0,
+        minHeight: '30px',
+        height: '30px',
+        boxShadow: 'none',
+    }),
+    valueContainer: (provided) => ({
+        ...provided,
+        padding: '0 6px',
+        height: '30px',
+    }),
+    input: (provided) => ({
+        ...provided,
+        margin: 0,
+        padding: 0,
+        fontSize: '12px',
+        color: 'black',
+        fontWeight: 500,
+    }),
+    placeholder: (provided) => ({
+        ...provided,
+        fontSize: '12px',
+        color: 'black',
+        fontWeight: 500,
+    }),
+    singleValue: (provided) => ({
+        ...provided,
+        fontSize: '12px',
+        color: 'black',
+        fontWeight: 500,
+    }),
+    indicatorsContainer: (provided) => ({
+        ...provided,
+        height: '30px',
+    }),
+    dropdownIndicator: (provided) => ({
+        ...provided,
+        padding: '0 6px',
+    }),
+};
+
+// Debounce utility
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+const Demographics = memo(({ patientId }) => {
+    // Memoized selectors to prevent unnecessary re-renders
+    const statesData = useSelector((state) => state?.getStatesReducer?.data);
+    const cities1 = useSelector((state) => state?.getCitiesReducer?.cities1?.data?.cities);
+    const cities2 = useSelector((state) => state?.getCitiesReducer?.cities2?.data?.cities);
+    const cities3 = useSelector((state) => state?.getCitiesReducer?.cities3?.data?.cities);
+    const patientDetails = useSelector((state) => state?.getPatientsByIdReducer?.data?.data || []);
+    const isLoading = useSelector((state) => state?.updatePatientsReducer?.loading);
+    const citiesLoading = useSelector((state) => state?.getCitiesReducer?.loading);
+
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
+
     const {
         register,
         handleSubmit,
         formState: { errors },
         setValue,
-        clearErrors, watch
+        clearErrors,
+        watch
     } = useForm();
+
     const [employerFocused, setEmployerFocused] = useState(false);
-    const [searchedLocations, setSearchedLocations] = useState(null);
+    const [searchedEmployerLocations, setSearchedEmployerLocations] = useState(null);
     const [primaryCitySearch, setPrimaryCitySearch] = useState(null);
     const [mailingCitySearch, setMailingCitySearch] = useState(null);
     const [employerCitySearch, setEmployerCitySearch] = useState(null);
-    const [searchedEmployerLocations, setSearchedEmployerLocations] = useState(null);
     const [selectedEthnicity, setSelectedEthnicity] = useState(null);
     const [selectedTribe, setSelectedTribe] = useState(null);
     const [selectedRelationship, setSelectedRelationship] = useState(null);
-    const statesData = store?.getStatesReducer?.data;
-    const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
-    const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
-    const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
     const [identifiers, setIdentifiers] = useState([]);
-    const [rela, setRela] = useState(null); // Store selected relationship
+    const [rela, setRela] = useState(null);
     const [demographicAddresses, setDemographicAddresses] = useState([
         { type: 'physical', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
-    const patientDetails = store?.getPatientsByIdReducer?.data?.data || [];
 
     useEffect(() => {
         dispatch(getStatesByCountryAction());
@@ -74,15 +140,15 @@ const Demographics = ({ patientId }) => {
         }
     }, [primaryCitySearch, cities1, mailingCitySearch, cities2, employerCitySearch, cities3]);
 
-    const formatPhoneNumber = (phone) => {
+    const formatPhoneNumber = useCallback((phone) => {
         if (!phone) return '';
         const cleaned = phone.replace(/\D/g, '');
         const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
         if (match) {
             return `(${match[1]})${match[2]}-${match[3]}`;
         }
-        return phone; // fallback if not 10 digits
-    };
+        return phone;
+    }, []);
 
     useEffect(() => {
         if (patientDetails && statesData) {
@@ -107,7 +173,7 @@ const Demographics = ({ patientId }) => {
             setValue('emergencyContactName', patientDetails?.contact?.[0]?.relationship?.[0]?.text || '');
             setValue('emergencyContactPhone', formatPhoneNumber(patientDetails?.contact?.[0]?.telecom?.[0]?.value));
             setSelectedRelationship(patientDetails?.contact?.[0]?.relationship?.[0]?.coding?.[0] || null);
-            setRela(patientDetails?.contact?.[0]?.relationship?.[0]?.coding)
+            setRela(patientDetails?.contact?.[0]?.relationship?.[0]?.coding);
             // ✅ Employer Details Fix
             setValue('employerName', patientDetails?.employerDetails?.employerName || '');
             setValue('employmentStatus', patientDetails?.employerDetails?.employmentStatus || '');
@@ -176,7 +242,7 @@ const Demographics = ({ patientId }) => {
                 });
             }
         }
-    }, [patientDetails, statesData]);
+    }, [patientDetails, statesData, setValue, formatPhoneNumber, setSelectedEthnicity, setSelectedTribe, setSelectedRelationship, setRela, setIdentifiers, setDemographicAddresses, dispatch]);
 
     useEffect(() => {
         if (statesData?.states?.length > 0 && patientDetails) {
@@ -223,7 +289,7 @@ const Demographics = ({ patientId }) => {
                 );
             }
         }
-    }, [statesData, patientDetails]);
+    }, [statesData, patientDetails, setValue, dispatch]);
 
     useEffect(() => {
         if (cities1?.length > 0 && patientDetails?.address?.city) {
@@ -281,7 +347,7 @@ const Demographics = ({ patientId }) => {
             };
         }
         if (data.gender) {
-            payload.gender = data.gender
+            payload.gender = data.gender;
         }
         if (selectedGenderIdentity) {
             payload.genderIdentity = [{
@@ -343,10 +409,10 @@ const Demographics = ({ patientId }) => {
                     ...(selectedMaritalStatus.show && { display: selectedMaritalStatus.show })
                 }],
                 ...(selectedMaritalStatus.show && { text: selectedMaritalStatus.show })
-            }
+            };
         }
         if (data?.preferredLanguage) {
-            payload.preferredCommunication = data?.preferredLanguage
+            payload.preferredCommunication = data?.preferredLanguage;
         }
         if (data?.emergencyContactName || data?.emergencyContactPhone) {
             payload.contact = [{
@@ -396,16 +462,17 @@ const Demographics = ({ patientId }) => {
         if (data?.notes) {
             payload.notes = data.notes;
         }
-        console.log(payload, 'payloadpayloadpayloadpayload')
+        console.log(payload, 'payloadpayloadpayloadpayload');
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     }, [dispatch, id, identifiers, demographicAddresses, rela, selectedEthnicity, selectedTribe, selectedRelationship]);
 
-    const getEmployerGeolocation = (e) => {
-        const addressToSearch = e.target.value;
-        async function fetchGeocodeData(location) {
+    const getEmployerGeolocation = useCallback(
+        debounce(async (addressToSearch) => {
+            if (!addressToSearch || addressToSearch.length < 3) return;
+
             const apiKey = '2a77840d874f4c35848e37042ce7c8ed';
             const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
-                location
+                addressToSearch
             )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
 
             try {
@@ -414,20 +481,14 @@ const Demographics = ({ patientId }) => {
                     throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
                 }
                 const data = await response.json();
-                return data;
+                setSearchedEmployerLocations(data?.results || []);
             } catch (error) {
                 console.error('Failed to fetch geocode data:', error);
-                return null;
+                setSearchedEmployerLocations([]);
             }
-        }
-        fetchGeocodeData(addressToSearch).then((data) => {
-            if (data) {
-                setSearchedEmployerLocations(data?.results);
-            } else {
-                console.log('No data returned.');
-            }
-        });
-    };
+        }, 300),
+        []
+    );
 
 
 
@@ -450,6 +511,20 @@ const Demographics = ({ patientId }) => {
             value: relation,
             label: relation.display,
         })) || [], []
+    );
+
+    const sortedGenderIdentityOptions = useMemo(() =>
+        genderIdentityOptions?.sort((a, b) => a.show.localeCompare(b.show)) || [], []
+    );
+
+    const sortedRaceOptions = useMemo(() =>
+        raceOptions?.sort((a, b) => a.display.localeCompare(b.display)) || [], []
+    );
+
+    const sortedLanguageOptions = useMemo(() =>
+        ["English", "Chinese", "French", "Italian", "Japanese", "Spanish",
+            "Portuguese", "Russian", "Castilian", "Other", "Unknown", "Declined to specify"]
+            .sort((a, b) => a.localeCompare(b)), []
     );
 
     const handleEthnicityChange = useCallback((opt) => setSelectedEthnicity(opt?.value ?? null), []);
@@ -483,10 +558,10 @@ const Demographics = ({ patientId }) => {
                 <IdentifierForm
                     defaultIdentifiers={[
                         {
-                            label: 'National Provider Identifier (NPI)',
-                            value: 'http://hl7.org/fhir/sid/us-npi',
-                            code: 'NPI',
-                        },
+                            label: '',
+                            value: '',
+                            code: '',
+                        }
                     ]}
                     identifiers={identifiers}
                     setIdentifiers={setIdentifiers}
@@ -523,12 +598,9 @@ const Demographics = ({ patientId }) => {
                             <Form.Select
                                 id="genderIdentity"
                                 {...register('genderIdentity')}
-                                isInvalid={!!errors.genderIdentity}
-                            >
-                                <option value="" hidden>
-                                    Select
-                                </option>
-                                {genderIdentityOptions?.sort((a, b) => a.show.localeCompare(b.show))?.map((option) => (
+                                isInvalid={!!errors.genderIdentity}>
+                                <option value="" hidden>Select</option>
+                                {sortedGenderIdentityOptions.map((option) => (
                                     <option key={option?.value} value={option?.value}>
                                         {option?.show}
                                     </option>
@@ -585,7 +657,7 @@ const Demographics = ({ patientId }) => {
                                 isInvalid={!!errors.race}
                             >
                                 <option value="">Select Race</option>
-                                {raceOptions?.sort((a, b) => a.display.localeCompare(b.display))?.map((race) => (
+                                {sortedRaceOptions.map((race) => (
                                     <option key={race.code} value={race.display} className="text-capitalize">
                                         {race.display}
                                     </option>
@@ -607,6 +679,9 @@ const Demographics = ({ patientId }) => {
                                 placeholder="Select Ethnicity"
                                 value={selectedEthnicityOption}
                                 onChange={handleEthnicityChange}
+                                styles={selectStyles}
+                                menuPlacement="auto"
+                                menuPosition="fixed"
                             />
                         </Form.Group>
                     </Col>
@@ -620,12 +695,9 @@ const Demographics = ({ patientId }) => {
                                 isInvalid={!!errors.preferredLanguage}
                             >
                                 <option value="">Select Preferred Language</option>
-                                {["English", "Chinese", "French", "Italian", "Japanese", "Spanish",
-                                    "Portuguese", "Russian", "Castilian", "Other", "Unknown", "Declined to specify"]
-                                    .sort((a, b) => a.localeCompare(b))
-                                    .map(language => (
-                                        <option key={language} value={language}>{language}</option>
-                                    ))}
+                                {sortedLanguageOptions.map(language => (
+                                    <option key={language} value={language}>{language}</option>
+                                ))}
                             </Form.Select>
                         </Form.Group>
                     </Col>
@@ -642,17 +714,9 @@ const Demographics = ({ patientId }) => {
                                 value={selectedTribalOption}
                                 placeholder="Select Tribal Entity"
                                 onChange={handleTribalChange}
-                                styles={{
-                                    control: (provided) => ({
-                                        ...provided,
-                                        minHeight: '38px',
-                                        border: '1px solid #ced4da',
-                                    }),
-                                    placeholder: (provided) => ({
-                                        ...provided,
-                                        fontSize: '14px',
-                                    }),
-                                }}
+                                styles={selectStyles}
+                                menuPlacement="auto"
+                                menuPosition="fixed"
                             />
                         </Form.Group>
                     </Col>
@@ -669,9 +733,9 @@ const Demographics = ({ patientId }) => {
                                 isInvalid={!!errors.maritalStatus}
                             >
                                 <option value="">Select marital status</option>
-                                {maritalStatusOptions.map((option) => (
-                                    <option key={option.value} value={option?.show}>
-                                        {option.show}
+                                {maritalStatusOptions?.map((option) => (
+                                    <option key={option?.value} value={option?.show}>
+                                        {option?.show}
                                     </option>
                                 ))}
                             </Form.Select>
@@ -764,17 +828,7 @@ const Demographics = ({ patientId }) => {
                                 placeholder="Select Relation"
                                 value={selectedRelationOption}
                                 onChange={handleRelationChange}
-                                styles={{
-                                    control: (provided) => ({
-                                        ...provided,
-                                        minHeight: '38px',
-                                        border: '1px solid #ced4da',
-                                    }),
-                                    placeholder: (provided) => ({
-                                        ...provided,
-                                        fontSize: '14px',
-                                    }),
-                                }}
+                                styles={selectStyles}
                                 menuPlacement="auto"
                                 menuPosition="fixed"
                             />
@@ -907,7 +961,7 @@ const Demographics = ({ patientId }) => {
                                                     type="text"
                                                     {...register('employerAddress', {})}
                                                     onChange={(e) => {
-                                                        getEmployerGeolocation(e);
+                                                        getEmployerGeolocation(e.target.value);
                                                         setEmployerFocused(true);
                                                         clearErrors('employerAddress');
                                                     }}
@@ -930,10 +984,7 @@ const Demographics = ({ patientId }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
-                                                        ? 'd-none'
-                                                        : ''
-                                                        }`}>
+                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused ? 'd-none' : ''}`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
@@ -961,7 +1012,7 @@ const Demographics = ({ patientId }) => {
                                                             {data?.formatted}
                                                         </p>
                                                     ))}
-                                                    {searchedLocations?.length === 0 && (
+                                                    {searchedEmployerLocations?.length === 0 && (
                                                         <p className="text-muted px-2 py-1">No results found</p>
                                                     )}
                                                 </div>
@@ -996,10 +1047,10 @@ const Demographics = ({ patientId }) => {
                                         <Form.Group className="">
                                             <Form.Label className="mb-0">City</Form.Label>
                                             <Form.Select
-                                                disabled={store?.getCitiesReducer?.loading}
+                                                disabled={citiesLoading}
                                                 {...register('employerCity')}>
                                                 <option hidden value="">
-                                                    {store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}
+                                                    {citiesLoading ? 'Loading...' : 'City'}
                                                 </option>
                                                 {cities3?.map((data) => (
                                                     <option key={data?.name} value={data?.name}>
@@ -1078,10 +1129,10 @@ const Demographics = ({ patientId }) => {
                 <Col className="d-flex justify-content-end ">
                     <Button
                         className="custom-buttons btn-height"
-                        disabled={store?.updatePatientsReducer?.loading}
+                        disabled={isLoading}
                         style={{ width: '70px' }}
                         type="submit">
-                        {store?.updatePatientsReducer?.loading ? (
+                        {isLoading ? (
                             <Spinner color="white" className="spinner-border-sm" />
                         ) : (
                             '  Update'
@@ -1091,6 +1142,7 @@ const Demographics = ({ patientId }) => {
             </Row>
         </Form>
     );
-};
+}
+);
 
 export default Demographics;

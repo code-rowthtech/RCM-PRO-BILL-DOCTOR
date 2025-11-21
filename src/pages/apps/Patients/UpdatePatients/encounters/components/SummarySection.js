@@ -4,11 +4,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import './Encounters.css';
 
-import { 
-    getAllergiesAction, 
-    getMedicationAction, 
-    getProblemsAction, 
-    getVitalsByPatientIdAction 
+import {
+    getAllergiesAction,
+    getMedicationAction,
+    getProblemsAction,
+    getVitalsByPatientIdAction
 } from 'redux/actions';
 import { getFamilyGeneticAction, getTobaccooAction } from 'redux/socialHistory/action';
 
@@ -48,18 +48,18 @@ const SummarySection = ({ activeKey, handleToggle }) => {
     // ========================================================================
     // HOOKS & STATE
     // ========================================================================
-    
+
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
 
 
-    
+
     // ========================================================================
     // SELECTORS & DERIVED STATE
     // ========================================================================
-    
+
     const settingsDataMainItems = store?.getEncounterSettingsReducer?.data?.data?.items;
     const patienteffectiveVitals = store?.getVitalsByPatientIdReducer?.data?.data || [];
     const allergyData = store?.getAllergiesReducer?.data?.allergies;
@@ -67,47 +67,47 @@ const SummarySection = ({ activeKey, handleToggle }) => {
     const medicationList = store?.getMedicationReducer?.data?.medicationRequests;
     const tobaccoHistory = store?.getTobaccooReducer?.data?.data?.tobaccoHistory;
     const familyGeneticHistory = store?.getFamilyGeneticReducer?.data?.familyMedicalHistory;
-    
+
     // ========================================================================
     // MEMOIZED VALUES
     // ========================================================================
-    
-    const summaryItem = useMemo(() => 
-        settingsDataMainItems?.find(item => item.name === 'Summary'), 
+
+    const summaryItem = useMemo(() =>
+        settingsDataMainItems?.find(item => item.name === 'Summary'),
         [settingsDataMainItems]
     );
-    
+
     const subMenuItems = summaryItem?.subMenu || [];
-    
-    const sortedSubMenuItems = useMemo(() => 
-        subMenuItems.length > 0 
+
+    const sortedSubMenuItems = useMemo(() =>
+        subMenuItems.length > 0
             ? subMenuItems.sort((a, b) => a.order - b.order)
             : DEFAULT_MENU_ITEMS,
         [subMenuItems]
     );
-    
+
     const socialHistoryData = useMemo(() => ({
         tobaccoHistory: tobaccoHistory?.slice(0, 2) || [],
         familyGeneticHistory: familyGeneticHistory?.slice(0, 2) || []
     }), [tobaccoHistory, familyGeneticHistory]);
-    
+
 
 
     // ========================================================================
     // EFFECTS
     // ========================================================================
-    
+
     // Initial data fetch - only when patientId is available and data is not loaded
     useEffect(() => {
         if (!patientId) return;
-        
+
         const shouldFetchVitals = !patienteffectiveVitals?.length;
         const shouldFetchAllergies = !allergyData?.length;
         const shouldFetchProblems = !problemData?.length;
         const shouldFetchMedications = !medicationList?.length;
         const shouldFetchTobacco = !tobaccoHistory?.length;
         const shouldFetchFamily = !familyGeneticHistory?.length;
-        
+
         if (shouldFetchVitals) {
             dispatch(getVitalsByPatientIdAction({ patientId, limit: 5 }));
         }
@@ -131,9 +131,7 @@ const SummarySection = ({ activeKey, handleToggle }) => {
     // ========================================================================
     // HELPER FUNCTIONS
     // ========================================================================
-    
 
-    
     const getSeverityBadge = (severity) => {
         if (!severity?.code || !severity?.display) return null;
 
@@ -148,7 +146,7 @@ const SummarySection = ({ activeKey, handleToggle }) => {
         const variant = variantMap[severity.code.toLowerCase()] || 'secondary';
         return <span className={`ms-2 text-${variant}`}>{severity.display}</span>;
     };
-    
+
     // ========================================================================
     // RENDER
     // ========================================================================
@@ -176,16 +174,16 @@ const SummarySection = ({ activeKey, handleToggle }) => {
                                                         <li key={index} className="mb-2 d-flex justify-content-between align-items-start cursor-pointer" onClick={() => window.populateEncounterField?.('Social History', `Allergy: ${allergy.code?.text || ''} (${allergy.clinicalStatus?.text || 'Status not available'})`)}>
                                                             <div className="fs-6">
                                                                 <strong title={allergy.code?.text}>
-                                                                    {allergy.code?.text?.length > 30
-                                                                        ? allergy.code?.text.slice(0, 29) + '...'
-                                                                        : allergy.code?.text || 'Unknown Allergy'}
+                                                                    {allergy?.code?.text?.length > 30
+                                                                        ? allergy?.code?.text.slice(0, 29) + '...'
+                                                                        : allergy?.code?.text || 'Unknown Allergy'}
                                                                 </strong>
                                                                 <div className="text-muted small">
-                                                                    {allergy.clinicalStatus?.text || 'Status not available'}
+                                                                    {allergy?.clinicalStatus?.text || 'Status not available'}
                                                                 </div>
                                                             </div>
                                                             <span className="fs-6 fw-semibold text-nowrap">
-                                                                {getSeverityBadge(allergy.criticality)}
+                                                                {getSeverityBadge(allergy?.criticality)}
                                                             </span>
                                                         </li>
                                                     ))}

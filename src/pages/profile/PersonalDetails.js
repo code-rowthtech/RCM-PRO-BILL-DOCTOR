@@ -13,7 +13,7 @@ import AddressForm from '../apps/Common Pages/AddressForm';
 import { encryptMessage } from '../../cryptoUtils';
 import DoctorAddress from './DoctorAddress';
 
-const PersonalDetails = () => {
+const PersonalDetails = ({ setActiveTab }) => {
     const {
         register,
         handleSubmit,
@@ -47,25 +47,30 @@ const PersonalDetails = () => {
     const [personalAddresses, setPersonalAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
+    const [shouldNavigateNext, setShouldNavigateNext] = useState(false);
+    const updateSuccess = store?.UpdateDoctorsReducer?.success;
 
     useEffect(() => {
         dispatch(getDoctorsAction());
     }, [dispatch]);
 
     useEffect(() => {
+        if (updateSuccess && shouldNavigateNext && setActiveTab) {
+            setActiveTab('professionalInformation');
+            setShouldNavigateNext(false);
+        }
+    }, [updateSuccess, shouldNavigateNext, setActiveTab]);
+
+    useEffect(() => {
         setValue('firstName', doctorDetails?.name?.[0]?.given);
         setValue('lastName', doctorDetails?.name?.[0]?.family);
         setValue('email', doctorDetails?.userId?.email);
-        setValue(
-            'phone',
-            doctorDetails?.telecom?.[0]?.value
-                ? doctorDetails?.telecom?.[0]?.value
-                    .replace(/\D/g, '')
-                    .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                        p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
-                    )
-                : ''
-        );
+        setValue('phone', doctorDetails?.telecom?.[0]?.value
+            ? doctorDetails?.telecom?.[0]?.value
+                .replace(/\D/g, '')
+                .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                    p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`)
+            : '');
         setValue('gender', doctorDetails?.userId?.gender);
         setValue('department', doctorDetails?.departmentId?._id);
         if (doctorDetails?.address) {
@@ -83,7 +88,7 @@ const PersonalDetails = () => {
         setValue('specialist', doctorDetails?.specialties?.[0]);
     }, [doctorDetails, setValue]);
 
-    const submitData = (data) => {
+    const submitData = (data, shouldNavigate = false) => {
         const payload = {
             doctorId: updateId,
             // clinicId: clinicId,
@@ -124,7 +129,9 @@ const PersonalDetails = () => {
             address: personalAddresses,
             specialties: [data?.specialist],
         };
-
+        if (shouldNavigate) {
+            setShouldNavigateNext(true);
+        }
         dispatch(updateDoctorAction({ key: encryptMessage(payload) }));
     };
 
@@ -255,9 +262,6 @@ const PersonalDetails = () => {
                                                     <span className="text-danger">{errors.phone.message}</span>
                                                 )}
                                             </Form.Group>
-                                            {/* <div className="position-absolute" style={{ top: '52%', left: '1%' }}>
-                                        <img src={us} alt="country code flag" width={20} />
-                                    </div> */}
                                         </Form.Group>
                                     </div>
                                 </div>
@@ -441,14 +445,27 @@ const PersonalDetails = () => {
                             </div>
                             <div className="col-12 mt-3">
                                 <div className="d-flex justify-content-end gap-2">
-                                    {/* <Button className="cancel-button">Cancel</Button> */}
-                                    <Button className="custom-buttons" style={{ width: "70px" }} type="submit" disabled={updateLoading}>
-                                        {
-                                            updateLoading ? (
-                                                <Spinner color="white" className="spinner-border-sm" />
-                                            ) : (
-                                                'Update'
-                                            )}
+                                    <Button
+                                        className="custom-buttons"
+                                        style={{ width: "70px" }}
+                                        onClick={handleSubmit((data) => submitData(data, false))}
+                                        disabled={updateLoading}>
+                                        {updateLoading ? (
+                                            <Spinner color="white" className="spinner-border-sm" />
+                                        ) : (
+                                            'Update'
+                                        )}
+                                    </Button>
+                                    <Button
+                                        className="custom-buttons"
+                                        style={{ width: "120px" }}
+                                        onClick={handleSubmit((data) => submitData(data, true))}
+                                        disabled={updateLoading}>
+                                        {updateLoading ? (
+                                            <Spinner color="white" className="spinner-border-sm" />
+                                        ) : (
+                                            'Update & Next'
+                                        )}
                                     </Button>
                                 </div>
                             </div>

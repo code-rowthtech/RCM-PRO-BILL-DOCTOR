@@ -1,6 +1,6 @@
-import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
+import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { PatientsActionTypes } from './constants';
-import { createPatientsApi, createReferringDoctorApi, createResponsiblePartyApi, getPatientConsentsApi, getPatientsApi, getPatientsByIdApi, updatePatientsApi } from './api';
+import { createPatientsApi, createReferringDoctorApi, createResponsiblePartyApi, getAllConsentApi, getPatientConsentsApi, getPatientsApi, getPatientsByIdApi, updatePatientsApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -205,8 +205,8 @@ function* getPatientConsentFunction(data) {
             payload: {},
         });
         const response = yield call(getPatientConsentsApi, data);
-        // const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        const decryptedData = response.data.data;
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        // const decryptedData = response.data.data;
         if (response.status === 200) {
             yield put({
                 type: PatientsActionTypes.GET_PATIENT_CONSENT_SUCCESS,
@@ -225,6 +225,34 @@ function* getPatientConsentFunction(data) {
         });
     }
 }
+
+function* getAllConsentFunction(data) {
+    try {
+        yield put({
+            type: PatientsActionTypes.GET_ALL_CONSENT_LOADING,
+            payload: {},
+        });
+        const response = yield call(getAllConsentApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            yield put({
+                type: PatientsActionTypes.GET_ALL_CONSENT_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: PatientsActionTypes.GET_ALL_CONSENT_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: PatientsActionTypes.GET_ALL_CONSENT_ERROR,
+            payload: error,
+        });
+    }
+}
+
 
 
 export function* watchGetPatients() {
@@ -248,6 +276,9 @@ export function* watchCreateResponsibleParty() {
 export function* watchGetPatientConsent() {
     yield takeEvery(PatientsActionTypes.GET_PATIENT_CONSENT, getPatientConsentFunction);
 }
+export function* watchGetAllConsents() {
+    yield takeEvery(PatientsActionTypes.GET_ALL_CONSENT, getAllConsentFunction);
+}
 
 
 function* patientsSaga() {
@@ -258,7 +289,8 @@ function* patientsSaga() {
         fork(watchUpdatePatients),
         fork(watchCreateReferringDoctor),
         fork(watchCreateResponsibleParty),
-        fork(watchGetPatientConsent)
+        fork(watchGetPatientConsent),
+        fork(watchGetAllConsents)
     ]);
 }
 export default patientsSaga;

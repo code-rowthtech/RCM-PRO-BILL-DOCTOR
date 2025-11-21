@@ -5,7 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getPatientsByIdAction } from '../../../../redux/actions';
 import PatientInfoAccordion from './components/PatientInfoAccordion';
-import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
+import { decryptMessage } from '../../../../cryptoUtils';
 import PatientDemographics from './demographics';
 import Spinner from '../../../../constants/Spinner';
 import { useSelector } from 'react-redux';
@@ -14,6 +14,7 @@ import Documentsindex from './documents/Documentsindex';
 import Encountersindex from './encounters/Encountersindex';
 import ClinicalReview from './clinicalReview/ClinicalReview';
 import SocialHistory from './socialHistory/socialHistory';
+import LabRequest from './labRequest/LabRequest';
 
 const UpdateIndex = () => {
     // Declarations
@@ -104,7 +105,7 @@ const UpdateIndex = () => {
 
                     <Row>
                         <Col sm={12}>
-                            <Card className={`mt-1 px-2 ${!activeKey ? 'patientChartCardClose' : 'patientChartCard'}`} style={{ height: expanded ? '90vh' : 'auto' }}>
+                            <Card className={`mt-1 pt-1 px-2 ${!activeKey ? 'patientChartCardClose' : 'patientChartCard'}`} style={{ height: expanded ? '90vh' : 'auto' }}>
                                 {selectedMainTab === 'Patient Summary' && <PatientSummary activeKey={activeKey} />}
                                 {selectedMainTab === 'Demographics' && <PatientDemographics activeKey={activeKey} />}
                                 {selectedMainTab === 'Documents' && <Documentsindex />}
@@ -124,6 +125,7 @@ const UpdateIndex = () => {
                                             setSelectedMainTab={setSelectedMainTab}
                                         />
                                     )}
+                                {selectedMainTab === 'Lab Request' && <LabRequest isAccordionOpen={!!activeKey} />}
                             </Card>
                         </Col>
                     </Row>

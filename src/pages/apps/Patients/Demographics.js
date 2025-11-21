@@ -69,12 +69,6 @@ const Demographics = ({ patientId }) => {
         reset,
     } = useForm();
     const [age, setAge] = useState(null);
-    const [longitude, setLongitude] = useState(null);
-    const [latitude, setLatitude] = useState(null);
-    const [mailingLongitude, setMailingLongitude] = useState(null);
-    const [mailingLatitude, setMailingLatitude] = useState(null);
-    const [employerLongitude, setEmployerLongitude] = useState(null);
-    const [employerLatitude, setEmployerLatitude] = useState(null);
     const [focused, setFocused] = useState(false);
     const [employerFocused, setEmployerFocused] = useState(false);
     const [searchedLocations, setSearchedLocations] = useState(null);
@@ -86,9 +80,6 @@ const Demographics = ({ patientId }) => {
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
-    const primaryState = watch('primaryStateName');
-    const mailingState = watch('mailingStateName');
-    const employerState = watch('employerStateName');
     const [identifiers, setIdentifiers] = useState([]);
     const [tri, setTri] = useState(null); // Store selected tribal entity
     const [rela, setRela] = useState(null); // Store selected relationship
@@ -139,8 +130,6 @@ const Demographics = ({ patientId }) => {
             setValue('patientStudentStatus', patientDetails?.patientStudentStatus);
             setValue('nationalIdNumber', patientDetails?.nationalIdNumber);
             setValue('preferredLanguage', patientDetails?.communication?.[0]?.language?.coding?.[0]?.code || '');
-            // setValue('trible', patientDetails?.trible?.[0]?.code || '');
-            // setValue('ethnicity', patientDetails?.ethnicity?.[0]?.value || '');
             setEth(patientDetails?.ethnicity);
             setTri(patientDetails?.tribalAffiliation);
             setValue('notes', patientDetails?.notes);
@@ -151,7 +140,6 @@ const Demographics = ({ patientId }) => {
             // ✅ Emergency Contact Fix
             setValue('emergencyContactName', patientDetails?.contact?.[0]?.relationship?.[0]?.text || '');
             setValue('emergencyContactPhone', formatPhoneNumber(patientDetails?.contact?.[0]?.telecom?.[0]?.value));
-            // setValue('emergencyContactRelation', patientDetails?.contact?.[0]?.relationship?.[0]?.text || '');
             setRela(patientDetails?.contact?.[0]?.relationship?.[0]?.coding);
 
             // ✅ Employer Details Fix
@@ -178,9 +166,6 @@ const Demographics = ({ patientId }) => {
                 },
             }));
             setIdentifiers(defaultIdentifiers || []);
-            // setIdentifiers(patientDetails?.identifier || []);
-
-            // setDemographicAddresses(patientDetails?.address || []);
             const newAddresses = patientDetails?.address?.map((addr) => ({
                 type: addr.type || '', // Make sure type is included
                 use: addr.use || '',
@@ -227,6 +212,7 @@ const Demographics = ({ patientId }) => {
             }
         }
     }, [patientDetails, statesData]);
+
     useEffect(() => {
         if (statesData?.states?.length > 0 && patientDetails) {
             if (patientDetails?.address?.state) {
@@ -273,41 +259,7 @@ const Demographics = ({ patientId }) => {
             }
         }
     }, [statesData, patientDetails]);
-    const handleStateSelection = (code, data) => {
-        if (data === 'primary') {
-            const stateCity1 = statesData?.states?.find((data) => data?.state_code === code)?.id;
-            dispatch(
-                getCitiesAction({
-                    state_code: stateCity1,
-                    name: primaryCitySearch ? primaryCitySearch : '',
-                    limit: 25,
-                    skip: '',
-                })
-            );
-        }
-        if (data === 'mailing') {
-            const stateCity2 = statesData?.states?.find((data) => data?.state_code === code)?.id;
-            dispatch(
-                getCities2Action({
-                    state_code: stateCity2,
-                    name: mailingCitySearch ? mailingCitySearch : '',
-                    limit: 25,
-                    skip: '',
-                })
-            );
-        }
-        if (data === 'employer') {
-            const stateCity3 = statesData?.states?.find((data) => data?.state_code === code)?.id;
-            dispatch(
-                getCities3Action({
-                    state_code: stateCity3,
-                    name: employerCitySearch ? employerCitySearch : '',
-                    limit: 25,
-                    skip: '',
-                })
-            );
-        }
-    };
+
     useEffect(() => {
         if (cities1?.length > 0 && patientDetails?.address?.city) {
             setPrimaryCitySearch(patientDetails?.address?.city);
@@ -480,32 +432,6 @@ const Demographics = ({ patientId }) => {
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
 
-    const getGeolocation = (e) => {
-        const addressToSearch = e.target.value;
-        async function fetchGeocodeData(location) {
-            const apiKey = '2a77840d874f4c35848e37042ce7c8ed';
-            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
-                location
-            )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
-
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
-                }
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error('Failed to fetch geocode data:', error);
-                return null;
-            }
-        }
-        fetchGeocodeData(addressToSearch).then((data) => {
-            if (data) {
-                setSearchedLocations(data?.results);
-            }
-        });
-    };
 
     const getEmployerGeolocation = (e) => {
         const addressToSearch = e.target.value;
@@ -565,6 +491,10 @@ const Demographics = ({ patientId }) => {
     const selectedRelationOption =
         relationshipOption.find((option) => option?.value?.code === rela?.[0]?.code) ||
         relationshipOption.find((option) => option?.value?.display === rela?.[0]?.coding?.[0]?.display);
+
+    const preferredLanguages = ["Castilian", "Chinese", "Declined to specify", "English", "French", "Italian",
+        "Japanese", "Other", "Portugese", "Russian", "Spanish", "Unknown"];
+
     return (
         <>
             <Form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
@@ -696,18 +626,11 @@ const Demographics = ({ patientId }) => {
                             <Form.Label className="mb-0">Preferred Language</Form.Label>
                             <Form.Select {...register('preferredLanguage')}>
                                 <option value="">Select Preferred Language</option>
-                                <option value="English">English</option>
-                                <option value="Chinese">Chinese</option>
-                                <option value="French">French</option>
-                                <option value="Italian">Italian</option>
-                                <option value="Japanese">Japanese</option>
-                                <option value="Spanish">Spanish</option>
-                                <option value="Portugese">Portugese</option>
-                                <option value="Russian">Russian</option>
-                                <option value="Castilian">Castilian</option>
-                                <option value="Other">Other</option>
-                                <option value="Unknown">Unknown</option>
-                                <option value="Declined to specify">Declined to specify</option>
+                                {preferredLanguages.map((lang) => (
+                                    <option key={lang} value={lang}>
+                                        {lang}
+                                    </option>
+                                ))}
                             </Form.Select>
                         </Form.Group>
                     </Col>
@@ -719,7 +642,6 @@ const Demographics = ({ patientId }) => {
                                 isSearchable
                                 className="basic-single"
                                 classNamePrefix="select"
-                                // value={formattedTribleOptions.find((option) => option?.value?.display === tri) || null} // Show selected value
                                 value={selectedTribleOption}
                                 placeholder="&nbsp; Select "
                                 onChange={handleTribalChange}
@@ -764,7 +686,6 @@ const Demographics = ({ patientId }) => {
                 <hr />
                 <AddressForm addresses={demographicAddresses} setAddresses={setDemographicAddresses} />
                 <hr />
-
                 <Row className="mt-1 pb-2">
                     <Col sm={12}>
                         <h5>Emergency Contact Details</h5>
@@ -826,7 +747,6 @@ const Demographics = ({ patientId }) => {
                                         placeholder="(XXX)XXX-XXXX"
                                         maxLength={14}
                                         onKeyPress={(event) => {
-                                            // Only allow numeric characters (0-9)
                                             if (!/[0-9]/.test(event.key)) {
                                                 event.preventDefault();
                                             }
@@ -834,22 +754,17 @@ const Demographics = ({ patientId }) => {
                                     />
                                 </InputGroup>
                             </Form.Group>
-
-                            {/* <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
-                                <img src={us} alt="country code flag" width={20} />
-                            </div> */}
                         </Form.Group>
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Emergency Contact Relation</Form.Label>
                             <Select
-                                options={relationshipOption} // Use the formatted array
+                                options={relationshipOption}
                                 isSearchable
                                 className="basic-single"
                                 classNamePrefix="select"
                                 placeholder="&nbsp; Select "
-                                // value={relationshipOption.find((option) => option?.value?.display === rela) || null} // Show selected value
                                 value={selectedRelationOption}
                                 onChange={handleRelationChange}
                                 styles={{
@@ -950,10 +865,6 @@ const Demographics = ({ patientId }) => {
                                                     )}
                                                 </InputGroup>
                                             </Form.Group>
-                                            {/* 
-                                            <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
-                                                <img src={us} alt="country code flag" width={20} />
-                                            </div> */}
                                         </Form.Group>
                                     </Col>
                                     <Col sm={3}>
@@ -962,10 +873,10 @@ const Demographics = ({ patientId }) => {
                                             <Form.Select {...register('employmentStatus')}>
                                                 <option value="">Select Employment Status</option>
                                                 <option value="employed">Employed</option>
-                                                <option value="self-employed">Self-Employed</option>
-                                                <option value="unemployed">Unemployed</option>
                                                 <option value="retired">Retired</option>
+                                                <option value="self-employed">Self-Employed</option>
                                                 <option value="student">Student</option>
+                                                <option value="unemployed">Unemployed</option>
                                                 <option value="unknown">Unknown</option>
                                             </Form.Select>
                                             {errors.employmentStatus && (
@@ -1045,8 +956,6 @@ const Demographics = ({ patientId }) => {
                                                                     data?.annotations?.timezone?.name
                                                                 );
                                                                 setEmployerCitySearch(data?.components?.county);
-                                                                setEmployerLatitude(data?.bounds?.southwest?.lat);
-                                                                setEmployerLongitude(data?.bounds?.southwest?.lng);
                                                                 setValue('employerAddress', data?.formatted);
                                                                 setEmployerFocused(false);
                                                             }}
@@ -1137,19 +1046,6 @@ const Demographics = ({ patientId }) => {
                                             )}
                                         </Form.Group>
                                     </Col>
-                                    {/* <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className="mb-0">Time Zone</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                {...register('employerTimeZone')}
-                                                placeholder="Time Zone"
-                                            />
-                                            {errors.employerTimeZone && (
-                                                <span className="text-danger">{errors.employerTimeZone.message}</span>
-                                            )}
-                                        </Form.Group>
-                                    </Col> */}
                                 </Row>
                             </Col>
                         </Row>
@@ -1172,11 +1068,7 @@ const Demographics = ({ patientId }) => {
                             disabled={store?.updatePatientsReducer?.loading}
                             style={{ width: '70px' }}
                             type="submit">
-                            {store?.updatePatientsReducer?.loading ? (
-                                <Spinner color="white" className="spinner-border-sm" />
-                            ) : (
-                                '  Update'
-                            )}
+                            Update
                         </Button>
                     </Col>
                 </Row>

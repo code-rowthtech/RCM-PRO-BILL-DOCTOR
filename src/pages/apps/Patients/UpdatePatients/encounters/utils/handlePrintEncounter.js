@@ -1,6 +1,21 @@
 import { loggedInUser } from "../../../../../../helpers/loggedInUser";
 
 export const handlePrintEncounters = (encounterData, patientDetails) => {
+    // Safely extract logo URL
+    let logoUrl = '';
+    try {
+        if (loggedInUser?.logo) {
+            if (typeof loggedInUser.logo === 'string') {
+                logoUrl = loggedInUser.logo.split('?')[0];
+            } else if (typeof loggedInUser.logo === 'object' && loggedInUser.logo.url) {
+                logoUrl = loggedInUser.logo.url.split('?')[0];
+            }
+        }
+    } catch (error) {
+        console.warn('Error processing logo:', error);
+        logoUrl = '';
+    }
+
     const originalContent = document?.body?.innerHTML;
     const printContent = `
          <!DOCTYPE html>
@@ -264,7 +279,7 @@ export const handlePrintEncounters = (encounterData, patientDetails) => {
         </head>
         <body>
             <div class="header">
-            <img src=${loggedInUser?.logo?.split('?')[0]}/>
+            ${logoUrl ? `<img src="${logoUrl}" style="max-height: 60px; margin-bottom: 10px;" alt="Logo" />` : ''}
                 <h1>Medical Encounter Report</h1>
                 <div class="header-info">
                     <div>
@@ -289,15 +304,15 @@ export const handlePrintEncounters = (encounterData, patientDetails) => {
             ` : ''}
 
              <div class="patient-info">
-                <h2>Doctor Information</h2>
+                <h2>Provider Information</h2>
                 <div class="patient-details">
                     <div class="detail-item">
                         <span class="detail-label">Name</span>
-                        <span class="detail-value">${loggedInUser?.name || 'Not available'}</span>
+                        <span class="detail-value">${loggedInUser?.name || encounterData?.providerId?.name?.find((data) => data?.use === 'official')?.text || 'Not available'}</span>
                     </div>
                      <div class="detail-item">
                         <span class="detail-label">Email</span>
-                        <span class="detail-value">${patientDetails?.email || 'Not available'}</span>
+                        <span class="detail-value">${loggedInUser?.email || 'Not available'}</span>
                     </div>  
                 </div>
             </div>
@@ -356,8 +371,24 @@ export const handlePrintEncounters = (encounterData, patientDetails) => {
         </html>
     `;
 
-    document.body.innerHTML = printContent;
-    window.print();
-    document.body.innerHTML = originalContent;
-    window.location.reload();
+    // document.body.innerHTML = printContent;
+    // window.print();
+    // document.body.innerHTML = originalContent;
+    // window.location.reload();
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+        alert('Popup blocked. Please allow popups for this site.');
+        return;
+    }
+
+    printWindow.document.open();
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+
+    // Wait for window to finish loading styles and layout
+    printWindow.onload = () => {
+        printWindow.focus();
+        printWindow.print();
+        // printWindow.close(); // optional
+    };
 };

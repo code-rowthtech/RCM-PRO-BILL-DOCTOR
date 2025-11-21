@@ -5,10 +5,10 @@ import AddressForm from '../../../Common Pages/AddressForm';
 import TelecomFrom from '../../../Common Pages/TelecomForm';
 import { useDispatch, useSelector } from 'react-redux';
 import { encryptMessage } from '../../../../../cryptoUtils';
-import { createResponsiblePartyAction, updatePatientsAction } from '../../../../../redux/actions';
+import { createResponsiblePartyAction } from '../../../../../redux/actions';
 import { dataList } from '../../../../../utils/DataSets/relations.data';
 import Select from 'react-select';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 const ResponsibleParty = () => {
 
@@ -20,7 +20,6 @@ const ResponsibleParty = () => {
         handleSubmit,
         setValue,
         formState: { errors },
-        reset,
     } = useForm();
     const [submissionType, setSubmissionType] = useState(null);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
@@ -30,7 +29,6 @@ const ResponsibleParty = () => {
     ]);
 
     const [responsibleTelecom, setResponsibleTelecom] = useState([{ system: '', value: '', use: '' }]);
-    const createResponse = store?.createResponsiblePartyReducer?.data?.status;
     const patientDetails = store?.getPatientsByIdReducer?.data?.data || [];
 
     useEffect(() => {
@@ -71,6 +69,7 @@ const ResponsibleParty = () => {
             setResponsibleTelecom(updateTelecom);
         }
     }, [patientDetails, id]);
+
     const onSubmit = (data) => {
         const payload = {
             patientId: id,
@@ -120,10 +119,10 @@ const ResponsibleParty = () => {
                         </Form.Label>
                         <Form.Select {...register('title', { required: 'This field is required' })}>
                             <option value="">Select Title</option>
+                            <option value="Dr.">Dr.</option>
+                            <option value="Miss">Miss</option>
                             <option value="Mr.">Mr.</option>
                             <option value="Mrs.">Mrs.</option>
-                            <option value="Miss">Miss</option>
-                            <option value="Dr.">Dr.</option>
                             <option value="Other">Other</option>
                         </Form.Select>
                         {errors.title && <span className="text-danger">{errors.title.message}</span>}
@@ -149,8 +148,8 @@ const ResponsibleParty = () => {
                                 {...register('gender', { required: 'Gender is required' })}
                                 aria-label="Select Gender">
                                 <option value="">Select Gender</option>
-                                <option value="Male">Male</option>
                                 <option value="Female">Female</option>
+                                <option value="Male">Male</option>
                                 <option value="Other">Other</option>
                             </Form.Select>
                         </div>

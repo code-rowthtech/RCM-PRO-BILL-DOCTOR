@@ -9,24 +9,24 @@ import { createVitalsAction, getVitalsByPatientIdAction } from '../../../redux/v
 import { useSearchParams } from 'react-router-dom';
 
 const VitalStatus = ({ patientId }) => {
-    const [yesterdayVitals, setYesterdayVitals] = useState({});
     const [todayVitals, setTodayVitals] = useState({ weight: '', height: '', bmi: '', smoking_status: '' });
     const [todayDate, setTodayDate] = useState(new Date());
-    const [yesterdayDate, setYesterdayDate] = useState(new Date());
     const [previousVitals, setPreviousVitals] = useState();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const patientVitals = store?.getVitalsByPatientIdReducer?.data?.vitals;
+
     useEffect(() => {
         dispatch(getVitalsByPatientIdAction({ key: encryptMessage({ patientId: id }) }))
     }, [patientId, dispatch]);
 
     const smokingOptions = [
-        'Former smoker', 'Smoker, current status unknown', 'Never smoker', 'Unknown if ever smoked',
-        'Current every day smoker', 'Light tobacco smoker', 'Heavy tobacco smoker', 'Current some day smoker'
+        'Current every day smoker', 'Current some day smoker', 'Former smoker', 'Heavy tobacco smoker',
+        'Light tobacco smoker', 'Never smoker', 'Smoker, current status unknown', 'Unknown if ever smoked'
     ];
+
 
     const vitalsList = [
         { key: 'temperature', label: 'Temperature', unit: '°F' },
@@ -87,17 +87,14 @@ const VitalStatus = ({ patientId }) => {
             inhaled_oxygen_flow_rate: { value: todayVitals.inhaled_oxygen_flow_rate, unit: 'l/min' },
         };
         dispatch(createVitalsAction({ key: encryptMessage(payload) }))
-
     };
 
     useEffect(() => {
         if (patientVitals && patientVitals.length > 0) {
             // Sort vitals by date (newest first)
             const sortedVitals = [...patientVitals].sort((a, b) => new Date(b.date) - new Date(a.date));
-
             // The latest entry will be the first after sorting
             const latestVitals = sortedVitals[0];
-
             setTodayVitals({
                 temperature: latestVitals.temperature?.value || '',
                 height: latestVitals.height?.value || '',
@@ -116,10 +113,8 @@ const VitalStatus = ({ patientId }) => {
                 inhaled_oxygen_flow_rate: latestVitals.inhaled_oxygen_flow_rate?.value || '',
                 smoking_status: latestVitals.smoking_status || '',
             });
-
             // Store all previous vitals (excluding the latest one)
             setPreviousVitals(sortedVitals.slice(1));
-
             setTodayDate(new Date(latestVitals.date));
         }
     }, [patientVitals]);
@@ -149,9 +144,7 @@ const VitalStatus = ({ patientId }) => {
                             </Row>
 
                             <Row className='' >
-                                <Col className='px-0'>
-
-                                </Col>
+                                <Col className='px-0'></Col>
                                 {previousVitals && previousVitals?.map((data) => (
                                     <Col key={data?._id} style={{ background: '#E6EBFF' }}>
                                         <p className='m-0 fw-bold'>
@@ -159,9 +152,7 @@ const VitalStatus = ({ patientId }) => {
                                         </p>
                                     </Col>
                                 ))}
-                                <Col className='text-center px-0'
-                                    style={{ background: '#E6EBFF' }}
-                                >
+                                <Col className='text-center px-0' style={{ background: '#E6EBFF' }}>
                                     <p className='m-0 fw-bold'>{todayDate.toISOString().split('T')[0]}</p>
                                 </Col>
                             </Row>
@@ -173,7 +164,6 @@ const VitalStatus = ({ patientId }) => {
                                         <Col className='px-0'>
                                             <p className='mb-0 ps-2'>{vital.label} <span className='text-secondary'>{vital.unit}</span></p>
                                         </Col>
-
                                         {/* Display previous vitals under respective sections */}
                                         {previousVitals?.map((prev, idx) => (
                                             <Col key={idx} className="px-0 text-center" style={{ background: idx % 2 === 0 ? '#F9F9F9' : '#E6EBFF' }}>

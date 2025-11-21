@@ -44,8 +44,6 @@ import Drug from './DrugIntraction/Drug';
 import CQIs from './CQIs/CQIs';
 import AppointmentList from './AppointmentsListShow/Appointment';
 import LabRequest from './LabRequest/LabRequest';
-import ResponsibleParty from './ResponsibleParty';
-import RefferingDoctor from './RefferingDoctor';
 import { FaRegCopy } from 'react-icons/fa';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
@@ -82,7 +80,6 @@ const NewPatient = () => {
     const [encounterModal, setEncounterModal] = useState(false);
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
-    const workingTabs = ['Patient Info', 'Demographics', 'ResponsibleParty', 'RefferingDoctor'];
     const activePatientChartItems = ['Patient Info', 'Appointments'];
 
     useEffect(() => {
@@ -118,13 +115,7 @@ const NewPatient = () => {
     const handleEncounterTabs = () => {
         setEncounterModal(true);
     };
-    const handleSidebarToggle = () => {
-        setSidebarCollapsed(!isSidebarCollapsed);
-    };
 
-    const handleTabClick = (tab) => {
-        setSelectedSubTab(tab);
-    };
     const tabMappings = {
         'Patient Info': { mainTab: 'Patient Info', section: 'patient' },
         Appointments: { mainTab: 'Appointments', section: 'appointments' },
@@ -146,7 +137,6 @@ const NewPatient = () => {
         setIsClinicalReviewExpanded(!isClinicalReviewExpanded);
         setVisibleSection('task');
     };
-    const [isClinicalReviewExpandedData, setIsClinicalReviewExpandedData] = useState(false);
 
     const patientMenuItems = [
         { label: 'Patient Info', icon: <MdMedicalInformation /> },
@@ -794,29 +784,21 @@ const NewPatient = () => {
 
                             {/* Drug Sections */}
                             {visibleSection === 'drug' && (
-                                <>
-                                    <Drug />
-                                </>
+                                <Drug />
                             )}
 
                             {/* CQIs section */}
                             {visibleSection === 'CQIs' && (
-                                <>
-                                    <CQIs />
-                                </>
+                                <CQIs />
                             )}
                             {/* Appointment section */}
                             {visibleSection === 'appointments' && (
-                                <>
-                                    <AppointmentList Id={id} isOpen={isOpen} setIsOpen={setIsOpen} />
-                                </>
+                                <AppointmentList Id={id} isOpen={isOpen} setIsOpen={setIsOpen} />
                             )}
 
                             {/* Lab Request section */}
                             {visibleSection === 'Lab Request' && (
-                                <>
-                                    <LabRequest />
-                                </>
+                                <LabRequest />
                             )}
                         </div>
 
@@ -946,10 +928,10 @@ const NewPatient = () => {
                                                                                             }}
                                                                                             title={
                                                                                                 isSidebarCollapsed
-                                                                                                    ? subItem.label
+                                                                                                    ? subItem?.label
                                                                                                     : ''
                                                                                             }>
-                                                                                            {subItem.icon}
+                                                                                            {subItem?.icon}
                                                                                         </p>
                                                                                     )}
                                                                                 </div>
@@ -1043,7 +1025,7 @@ const NewPatient = () => {
                     </style>
                     <div>
                         <ul className="nav nav-underline">
-                            {modalTabs.map((modalTab) => (
+                            {modalTabs?.map((modalTab) => (
                                 <li className="nav-item" key={modalTab}>
                                     <a
                                         className={`nav-link text-black me-2 ${activeModalTab === modalTab ? 'active fw-bold' : ''
@@ -1055,7 +1037,7 @@ const NewPatient = () => {
                                 </li>
                             ))}
                         </ul>
-                        <div className=" ">
+                        <div>
                             {activeModalTab === 'Appointments' && <AppointmentForm Id={id} />}
                             {activeModalTab === 'Billing' && <p>Billing Content ⏳ In Progress</p>}
                             {activeModalTab === 'Eligibility' && <p>Eligibility Content ⏳ In Progress</p>}

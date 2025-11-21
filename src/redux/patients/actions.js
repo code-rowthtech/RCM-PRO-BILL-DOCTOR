@@ -38,3 +38,8 @@ export const getPatientConsentAction = (data): AuthAction => ({
     type: PatientsActionTypes.GET_PATIENT_CONSENT,
     data
 })
+
+export const getAllConsentActions = (data): AuthAction => ({
+    type: PatientsActionTypes.GET_ALL_CONSENT,
+    data
+})

@@ -142,8 +142,6 @@ const VitalsModal = ({ onClose, initialDate, onDateChange }) => {
                 const display = vital.code?.coding?.[0]?.display;
                 const loincCode = vital.code?.coding?.[0]?.code;
 
-                console.log('Processing vital:', { display, loincCode, vital });
-
                 if (vital.component?.length > 0) {
                     // Handle blood pressure components
                     const systolic = vital.component.find(c => c.code?.coding?.[0]?.code === '8480-6')?.valueQuantity?.value;
@@ -713,7 +711,8 @@ const VitalsModal = ({ onClose, initialDate, onDateChange }) => {
                         </small>
                         <div className="d-flex gap-2">
                             <Button
-                                variant="secondary"
+                                // variant="secondary"
+                                className='custom-buttons'
                                 onClick={() => {
                                     // Reset form state when canceling
                                     setVitals({

@@ -671,25 +671,12 @@ const PatientDetails = () => {
                                     <option value="" hidden>
                                         Select
                                     </option>
-                                    <option value="Mr.">Mr.</option>
-                                    <option value="Mrs.">Mrs.</option>
-                                    <option value="Miss">Miss</option>
-                                    <option value="Dr.">Dr.</option>
-                                    <option value="Other">Other</option>
+                                    {["Mr.", "Mrs.", "Miss", "Dr.", "Other"]?.map((title, index) => (
+                                        <option value={title} key={index}>{title}</option>
+                                    ))}
                                 </Form.Select>
                             </Form.Group>
                         </div>
-
-                        {/* <div className="col-md-3 col-12 mb-2">
-                            <Form.Group>
-                                <Form.Label className="mb-0">Suffix </Form.Label>
-                                <Form.Control type="text" placeholder="Suffix" {...register('suffix')} />
-                                {errors.suffix && (
-                                    <span className="text-danger">{errors.suffix.message}</span>
-                                )}
-                            </Form.Group>
-                        </div> */}
-
                         <div className="col-md-3 col-12">
                             <Form.Group>
                                 <Form.Label className="mb-0">Alternate Email</Form.Label>

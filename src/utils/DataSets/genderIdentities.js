@@ -1,9 +1,9 @@
-export const genderIdentityOptions = [
+export const genderIdentityOptionsList = [
     {
-        show: "Unknown",
-        value: "UNK",
-        label: "Unknown",
-        system: "http://terminology.hl7.org/CodeSystem/v3-NullFlavor"
+        show: "Asked But Declined",
+        value: "asked-declined",
+        label: "Asked But Declined",
+        system: "http://terminology.hl7.org/CodeSystem/data-absent-reason"
     },
     {
         show: "Female",
@@ -24,10 +24,13 @@ export const genderIdentityOptions = [
         system: "http://snomed.info/sct"
     },
     {
-        show: "Asked But Declined",
-        value: "asked-declined",
-        label: "Asked But Declined",
-        system: "http://terminology.hl7.org/CodeSystem/data-absent-reason"
+        show: "Unknown",
+        value: "UNK",
+        label: "Unknown",
+        system: "http://terminology.hl7.org/CodeSystem/v3-NullFlavor"
     },
-
 ];
+
+export const genderIdentityOptions = genderIdentityOptionsList?.sort((a, b) =>
+    a.show.localeCompare(b.show)
+);

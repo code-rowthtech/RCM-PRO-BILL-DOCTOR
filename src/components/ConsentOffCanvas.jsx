@@ -13,6 +13,7 @@ const ConsentOffCanvas = ({ show, handleClose }) => {
     const { data, loading } = useSelector((state) => state?.getPatientConsentReducer || {});
     const patientConsents = data?.data || [];
     const patientId = searchParams.get('id');
+    const store = useSelector((state) => state);
 
     useEffect(() => {
         if (show && patientId) {

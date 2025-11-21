@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap';
+import { Button, Col, Form, InputGroup } from 'react-bootstrap';
 import { useSearchParams } from 'react-router-dom';
 import { updatePatientsAction } from '../../../../../redux/actions';
 import { encryptMessage } from '../../../../../cryptoUtils';
@@ -595,14 +595,14 @@ const PatientDetails = () => {
                                 <option value="" hidden>
                                     Select
                                 </option>
-                                <option value="Home Phone">Home Phone</option>
-                                <option value="Work Phone">Work Phone</option>
                                 <option value="Cell Phone">Cell Phone</option>
-                                <option value="Email">Email</option>
-                                <option value="Text Message">Text Message</option>
                                 <option value="Declined">Declined</option>
-                                <option value="Snail Mail">Snail Mail</option>
+                                <option value="Email">Email</option>
+                                <option value="Home Phone">Home Phone</option>
                                 <option value="Other">Other</option>
+                                <option value="Snail Mail">Snail Mail</option>
+                                <option value="Text Message">Text Message</option>
+                                <option value="Work Phone">Work Phone</option>
                             </Form.Select>
                             {errors.preferredCommunication && (
                                 <span className="text-danger">{errors.preferredCommunication.message}</span>
