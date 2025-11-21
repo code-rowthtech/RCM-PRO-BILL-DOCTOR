@@ -57,11 +57,6 @@ const predefinedMenuItems = [
     }
 ];
 
-/**
- * EncounterSettingsForm Component
- * Manages encounter menu configuration with drag-and-drop reordering
- * Features: Menu item management, submenu configuration, order management
- */
 const EncounterSettingsForm = ({ showSettings, closeSettings, initialData }) => {
     // Hooks initialization
     const dispatch = useDispatch();
@@ -207,18 +202,15 @@ const EncounterSettingsForm = ({ showSettings, closeSettings, initialData }) => 
      */
     const onSubMenuDragEnd = (itemIndex, result) => {
         if (!result.destination) return;
-
         const newItems = [...getValues('items')];
         const subMenu = [...newItems[itemIndex].subMenu];
         const [reorderedSubItem] = subMenu.splice(result.source.index, 1);
         subMenu.splice(result.destination.index, 0, reorderedSubItem);
-
         // Update submenu orders based on new positions
         newItems[itemIndex].subMenu = subMenu.map((sub, index) => ({
             ...sub,
             order: index + 1
         }));
-
         setValue('items', newItems);
     };
 
@@ -228,11 +220,9 @@ const EncounterSettingsForm = ({ showSettings, closeSettings, initialData }) => 
             <Offcanvas.Header closeButton className='border-bottom'>
                 <Offcanvas.Title className='fw-bold'>Encounter Menu Settings</Offcanvas.Title>
             </Offcanvas.Header>
-
             {/* Body Section */}
             <Offcanvas.Body>
                 <Form onSubmit={handleSubmit(onSubmit)} className="h-100 d-flex flex-column">
-
                     {/* Main Content Area */}
                     <div className="flex-grow-1 overflow-auto">
                         {items?.length > 0 && (
@@ -244,13 +234,12 @@ const EncounterSettingsForm = ({ showSettings, closeSettings, initialData }) => 
                                         Drag and drop items to reorder them. The order number will update automatically.
                                         Toggle the switch to include/exclude items from the menu.
                                     </p>
-
                                     {/* Drag and Drop Menu Items */}
                                     <DragDropContext onDragEnd={onDragEnd}>
                                         <Droppable droppableId="menuItems">
                                             {(provided) => (
                                                 <div {...provided.droppableProps} ref={provided.innerRef}>
-                                                    {items.map((item, itemIndex) => (
+                                                    {items?.map((item, itemIndex) => (
                                                         <Draggable
                                                             key={itemIndex}
                                                             draggableId={`item-${itemIndex}`}
@@ -320,7 +309,7 @@ const EncounterSettingsForm = ({ showSettings, closeSettings, initialData }) => 
                                                                                                                         >
                                                                                                                             <GripVertical size={12} />
                                                                                                                         </div>
-                                                                                                                        <small>{subItem.name}</small>
+                                                                                                                        <small>{subItem?.name || ''}</small>
                                                                                                                     </div>
                                                                                                                     <div className="d-flex align-items-center">
                                                                                                                         <Form.Check

@@ -15,7 +15,7 @@ import DoctorIdentifierForm from './DoctorIdentifiers';
 import AsyncSelect from 'react-select/async';
 import { taxonomyOptions as taxonomy } from '../../utils/DataSets/commonDataSet';
 
-const ProfessionalInformation = () => {
+const ProfessionalInformation = ({ setActiveTab }) => {
     const {
         register,
         handleSubmit,
@@ -30,11 +30,18 @@ const ProfessionalInformation = () => {
     const [degreeUploading, setDegreeUploading] = useState(false);
     const defaultIdentifiers = [
         {
-            label: 'National Provider Identifier (NPI)',
-            value: 'http://hl7.org/fhir/sid/us-npi',
-            code: 'NPI',
+            label: '',
+            value: '',
+            code: '',
         },
     ];
+    // const defaultIdentifiers = [
+    //     {
+    //         label: 'National Provider Identifier (NPI)',
+    //         value: 'http://hl7.org/fhir/sid/us-npi',
+    //         code: 'NPI',
+    //     },
+    // ];
     const [constantIdentifiers, setConstantIdentifiers] = useState([]);
     const [identifiers, setIdentifiers] = useState([]);
     const [licensure, setLicensure] = useState([]);
@@ -47,7 +54,7 @@ const ProfessionalInformation = () => {
     const statesData = store?.getStatesReducer?.data?.states;
 
     const [taxonomyCodesList, setTaxonomyCodesList] = useState([
-        { type: 'primary', code: '', state: '', licenseNumber: '', status: '' },
+        { type: '', code: '', status: '' },
     ]);
     const defaultLicensure = [
         {
@@ -56,9 +63,19 @@ const ProfessionalInformation = () => {
             code: '',
         },
     ];
+    const [shouldNavigateNext, setShouldNavigateNext] = useState(false);
+    const updateSuccess = store?.UpdateDoctorsReducer?.success;
+
     useEffect(() => {
         dispatch(getDoctorsAction());
     }, [dispatch]);
+
+    useEffect(() => {
+        if (updateSuccess && shouldNavigateNext && setActiveTab) {
+            setActiveTab('qualifications');
+            setShouldNavigateNext(false);
+        }
+    }, [updateSuccess, shouldNavigateNext, setActiveTab]);
     const handleTaxonomyChange = (selectedOption, index) => {
         const updatedList = [...taxonomyCodesList];
         updatedList[index] = {
@@ -123,7 +140,7 @@ const ProfessionalInformation = () => {
         );
     }, []);
 
-    const submitData = (data) => {
+    const submitData = (data, shouldNavigate = false) => {
         const qualificationData = qualifications?.map((item) => ({
             code: item?.degreeName,
             documents: item?.degreeFile,
@@ -182,30 +199,35 @@ const ProfessionalInformation = () => {
                 finalLicensureData.push(licensureData);
             });
         }
-        const taxonomyCodes = taxonomyCodesList?.map((item) => ({
-            type: item?.type,
-            code: item?.code?.code, // Taxonomy code
-            Grouping: item?.code?.grouping, // Taxonomy grouping
-            Classification: item?.code?.classification, // Taxonomy classification
-            Specialization: item?.code?.specialization, // Taxonomy specialization
-            Definition: item?.code?.definition, // Taxonomy definition
-            Notes: item?.code?.notes, // Taxonomy notes
-            displayName: item?.code?.displayName, // Taxonomy display name
-            section: item?.code?.section, // Taxonomy section
-            state: item?.state, // Taxonomy state
-            licenseNumber: item?.licenseNumber, // Taxonomy license number
-            status: item?.status === 'active' ? true : false, // Taxonomy sta
-        }));
+        const taxonomyCodes = taxonomyCodesList
+            ?.filter(item => item?.code && item?.type && item?.status)
+            ?.map((item) => ({
+                type: item?.type,
+                code: item?.code?.code,
+                Grouping: item?.code?.grouping,
+                Classification: item?.code?.classification,
+                Specialization: item?.code?.specialization,
+                Definition: item?.code?.definition,
+                Notes: item?.code?.notes,
+                displayName: item?.code?.displayName,
+                section: item?.code?.section,
+                state: item?.state,
+                licenseNumber: item?.licenseNumber,
+                status: item?.status === 'active' ? true : false,
+            })) || [];
         const payload = {
-            doctorId: updateId,
-            identifier: [...finalIdentifiersData, ...finalLicensureData],
-            taxonomy: taxonomyCodes,
+            ...(updateId ? { doctorId: updateId } : {}),
+            ...(finalIdentifiersData.length > 0 || finalLicensureData.length > 0 ? { identifier: [...finalIdentifiersData, ...finalLicensureData] } : {}),
+            ...(taxonomyCodes.length > 0 ? { taxonomy: taxonomyCodes } : {}),
         };
+        if (shouldNavigate) {
+            setShouldNavigateNext(true);
+        }
         dispatch(updateDoctorAction({ key: encryptMessage(payload) }));
     };
     useEffect(() => {
-        if (doctorDetails) {
-            const updatedTaxonomyCodes = doctorDetails?.taxonomy?.map((item, index) => ({
+        if (doctorDetails?.taxonomy && doctorDetails.taxonomy.length > 0) {
+            const updatedTaxonomyCodes = doctorDetails.taxonomy.map((item, index) => ({
                 type: item?.type || '',
                 displayName: item?.displayName || '',
                 code: { code: item?.code, grouping: item?.Grouping, classification: item?.Classification } || {},
@@ -260,7 +282,10 @@ const ProfessionalInformation = () => {
         callback(filteredOptions.slice(0, 20)); // Return up to 20 results on search
     };
     const removeTaxonomyItem = (index) => {
-        setTaxonomyCodesList((prev) => prev.filter((_, i) => i !== index));
+        setTaxonomyCodesList((prev) => {
+            const filtered = prev.filter((_, i) => i !== index);
+            return filtered.length > 0 ? filtered : [{ type: '', code: '', status: '' }];
+        });
     };
     return (
         <div className="container-fluid px-0">
@@ -301,6 +326,7 @@ const ProfessionalInformation = () => {
                                             loadOptions={loadTaxonomyOptions}
                                             defaultOptions={formattedTaxonomyOptions.slice(0, 10)}
                                             isSearchable
+                                            isClearable
                                             className="basic-single"
                                             classNamePrefix="select"
                                             placeholder="&nbsp; Select"
@@ -389,11 +415,10 @@ const ProfessionalInformation = () => {
                                             <option value="inactive">Inactive</option>
                                         </Form.Select>
 
-                                        {/* Minus icon, aligned to the right */}
-                                        {index > 0 && (
+                                        {taxonomyCodesList.length > 1 && (
                                             <span
                                                 className="text-danger cursor-pointer fs-5 fw-bold position-absolute"
-                                                style={{ right: '-5px', top: '50%', }}
+                                                style={{ right: '-5px', top: '50%' }}
                                                 onClick={() => removeTaxonomyItem(index)}>
                                                 <CiCircleMinus />
                                             </span>
@@ -408,14 +433,19 @@ const ProfessionalInformation = () => {
                         </Row>
 
                         <div className="d-flex justify-content-end gap-2 my-1">
-                            {/* <Button className="cancel-button">Cancel</Button> */}
-
                             <Button
                                 className="custom-buttons"
                                 style={{ width: '70px' }}
-                                type="submit"
+                                onClick={handleSubmit((data) => submitData(data, false))}
                                 disabled={updateLoading}>
                                 {updateLoading ? <Spinner color="white" className="spinner-border-sm" /> : 'Update'}
+                            </Button>
+                            <Button
+                                className="custom-buttons"
+                                style={{ width: '120px' }}
+                                onClick={handleSubmit((data) => submitData(data, true))}
+                                disabled={updateLoading}>
+                                {updateLoading ? <Spinner color="white" className="spinner-border-sm" /> : 'Update & Next'}
                             </Button>
                         </div>
                     </>

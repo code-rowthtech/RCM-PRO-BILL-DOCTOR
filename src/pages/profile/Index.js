@@ -42,12 +42,10 @@ const Index = () => {
                             </ul>
                         </div>
                         <div>
-                            {activeTab === 'personalDetails' && <PersonalDetails />}
-                            {activeTab === 'professionalInformation' && <ProfessionalInformation />}
+                            {activeTab === 'personalDetails' && <PersonalDetails setActiveTab={setActiveTab} />}
+                            {activeTab === 'professionalInformation' && <ProfessionalInformation setActiveTab={setActiveTab} />}
                             {activeTab === 'qualifications' && (
-                                <DoctorQualifications
-                                //  docId={docId} setActiveTab={setActiveTab}
-                                />
+                                <DoctorQualifications setActiveTab={setActiveTab} />
                             )}
 
                             {activeTab === 'documents' && <Documents />}

@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Col, Form, Row, InputGroup ,Spinner } from 'react-bootstrap';
+import { Button, Col, Form, Row, InputGroup, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     getStatesByCountryAction,
     getCitiesAction,
-    updatePatientsAction,
-    stateEmptydAction,
     createReferringDoctorAction,
 } from '../../../redux/actions';
 import us from '../../../assets/images/flags/us.jpg';
@@ -34,16 +32,6 @@ const ReferringDoctor = ({ activeTab, setActiveTab }) => {
     ]);
     const [submissionType, setSubmissionType] = useState(null);
     const patientDetails = store?.getPatientsByIdReducer?.data?.data || [];
-    const createResponseReferring = store?.createReferringDoctorReducer?.data?.status;
-    // useEffect(() => {
-    //     if (createResponseReferring === 201) {
-    //         if (submissionType === 'Update') {
-    //             setActiveTab('insurance');
-    //         } else if (submissionType === 'saveAndReset') {
-    //             setActiveTab('personalDetails');
-    //         }
-    //     }
-    // }, [createResponseReferring]);
     const primaryState = watch('primaryStateName');
     const primaryCitySearch = watch('primaryCity');
 
@@ -72,10 +60,10 @@ const ReferringDoctor = ({ activeTab, setActiveTab }) => {
                 'phone',
                 patientDetails?.referringDocId?.telecom?.[0]?.value
                     ? patientDetails?.referringDocId?.telecom?.[0]?.value
-                          .replace(/\D/g, '')
-                          .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                              p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
-                          )
+                        .replace(/\D/g, '')
+                        .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                            p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
+                        )
                     : ''
             );
             // setValue('phone', patientDetails?.referringDocId?.telecom?.[0]?.value);
@@ -127,26 +115,7 @@ const ReferringDoctor = ({ activeTab, setActiveTab }) => {
                 ...(data.email ? [{ system: 'email', value: data.email }] : []),
                 ...(data.fax ? [{ system: 'fax', value: data.fax }] : []),
             ],
-            address: referringDoctorAddress,
-            // practitionerRole: [
-            //     {
-            //         role: {
-            //             coding: [
-            //                 {
-            //                     system: 'http://terminology.hl7.org/CodeSystem/practitioner-role',
-            //                     code: data.speciality,
-            //                     display: data.speciality,
-            //                 },
-            //             ],
-            //         },
-            //         organization: data.source
-            //             ? {
-            //                   reference: `Organization/${data.source.replace(/\s/g, '-').toLowerCase()}`,
-            //                   display: data.source,
-            //               }
-            //             : undefined,
-            //     },
-            // ],
+            address
         };
         dispatch(createReferringDoctorAction({ key: encryptMessage(payload) }));
     };
@@ -239,11 +208,6 @@ const ReferringDoctor = ({ activeTab, setActiveTab }) => {
                                 placeholder="(XXX)XXX-XXXX"
                             />
                         </InputGroup>
-                        {/* <div
-                            className="position-absolute"
-                            style={{ top: '54%', left: '1%', transform: 'translateY(-16%)' }}>
-                            <img src={us} alt="country code flag" width={20} />
-                        </div> */}
                         {errors.phone && <span className="text-danger">{errors.phone.message}</span>}
                     </Form.Group>
                 </Col>
@@ -258,7 +222,7 @@ const ReferringDoctor = ({ activeTab, setActiveTab }) => {
                         }}
                         disabled={store?.createReferringDoctorReducer?.loading}
                         className="custom-buttons"
-                        style= {{width:'70px'}}
+                        style={{ width: '70px' }}
                         type="submit">
                         {store?.createReferringDoctorReducer?.loading ? (
                             <Spinner color="white" className="spinner-border-sm" />

@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Form } from 'react-bootstrap';
-import { useForm, useFieldArray, Controller } from 'react-hook-form';
-import { FiDownloadCloud } from 'react-icons/fi';
+import { useForm } from 'react-hook-form';
 import { CiCircleMinus } from 'react-icons/ci';
 import { useDispatch, useSelector } from 'react-redux';
 // import PatientDetails from '../Patients/UpdatePatient/PatientDetails';
-import PateintDetails from '../Patients/PatientDetails'
 import { getCities2Action, getCities3Action, getCitiesAction, getStatesByCountryAction } from 'redux/actions';
 import ToastHandle from 'helpers/ToastMessage';
 
@@ -13,7 +11,6 @@ const AddressForm = ({ addresses, setAddresses }) => {
     const [activeAddressIndex, setActiveAddressIndex] = useState(null);
     const [addressFocused, setAddressFocused] = useState(false);
     const [searchedLocations, setSearchedLocations] = useState([]);
-    const [selectedState, setSelectedState] = useState(null);
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const statesData = store?.getStatesReducer?.data;
@@ -28,11 +25,9 @@ const AddressForm = ({ addresses, setAddresses }) => {
     }, [statesData, dispatch]);
     const [selectedLocation, setSelectedLocation] = useState(null);
     const {
-        control,
         register,
         setValue,
         getValues,
-        handleSubmit,
         formState: { errors },
         watch,
     } = useForm();
@@ -52,16 +47,14 @@ const AddressForm = ({ addresses, setAddresses }) => {
             { type: availableType, use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
         ]);
     };
-
     const removeAddress = (index) => {
         if (addresses.length > 1) {
             setAddresses(addresses.filter((_, i) => i !== index));
         }
     };
 
-    const addressUses = ['home', 'work', 'temp', 'old', 'billing', 'mailing', 'primary'];
-    const addressTypes = ['physical', 'postal', 'both'];
-
+    const addressUses = ['billing', 'home', 'mailing', 'old', 'primary', 'temp', 'work'];
+    const addressTypes = ['both', 'physical', 'postal'];
     const getGeolocation = (e) => {
         const addressToSearch = e.target.value;
         async function fetchGeocodeData(location) {
@@ -69,7 +62,6 @@ const AddressForm = ({ addresses, setAddresses }) => {
             const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
                 location
             )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
-
             try {
                 const response = await fetch(url);
 
@@ -150,7 +142,6 @@ const AddressForm = ({ addresses, setAddresses }) => {
             patientDetails?.address?.forEach((address) => {
                 const stateObj = statesData?.states?.find((data) => data?.name === address?.state);
                 const stateCode = stateObj?.id;
-
                 if (!stateCode) return;
 
                 const cityPayload = {
@@ -174,6 +165,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
             });
         }
     }, [patientDetails, statesData]);
+
     const addAddressLine = (index) => {
         if (addresses[index]?.line?.length === 3) {
             ToastHandle('Maximum 3 address lines are allowed.', 'danger');
@@ -182,10 +174,8 @@ const AddressForm = ({ addresses, setAddresses }) => {
         setAddresses((prev) => {
             const updated = [...prev];
             const currentAddress = { ...updated[index] };
-
             // Copy the line array and add a new empty line
             currentAddress.line = [...(currentAddress.line || []), ''];
-
             updated[index] = currentAddress;
             return updated;
         });
@@ -204,7 +194,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
             <Row>
                 <Col sm={12}>
                     <h5>
-                        Address Details
+                        {`Address Details`}
                         <span
                             className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
                             onClick={addAddress}></span>
@@ -307,7 +297,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                                 data.components?.city ||
                                                 data.components?.town ||
                                                 data.components?.village ||
-                                                data.components?.normalize_city||
+                                                data.components?.normalize_city ||
                                                 '';
 
                                             // Dispatch city load based on address type
@@ -370,7 +360,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             </div>
                         )}
                     </Col>
-                    {item.line.slice(1).map((line, lineIndex) => (
+                    {item?.line?.slice(1)?.map((line, lineIndex) => (
                         <Col key={lineIndex} sm={3} className="mb-1" style={{ height: 'fit-content' }}>
                             <Form.Label className="mb-0">
                                 Line {lineIndex + 2}
@@ -415,8 +405,8 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                 item?.type === 'physical'
                                     ? store?.getCitiesReducer?.cities1?.loading
                                     : item?.type === 'postal'
-                                      ? store?.getCitiesReducer?.cities2?.loading
-                                      : store?.getCitiesReducer?.cities3?.loading
+                                        ? store?.getCitiesReducer?.cities2?.loading
+                                        : store?.getCitiesReducer?.cities3?.loading
                             }>
                             <option value="">
                                 {item?.type === 'physical'
@@ -424,12 +414,12 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                         ? 'Loading...'
                                         : 'Select City'
                                     : item?.type === 'postal'
-                                      ? store?.getCitiesReducer?.cities2?.loading
-                                          ? 'Loading...'
-                                          : 'Select City'
-                                      : store?.getCitiesReducer?.cities3?.loading
-                                        ? 'Loading...'
-                                        : 'Select City'}
+                                        ? store?.getCitiesReducer?.cities2?.loading
+                                            ? 'Loading...'
+                                            : 'Select City'
+                                        : store?.getCitiesReducer?.cities3?.loading
+                                            ? 'Loading...'
+                                            : 'Select City'}
                             </option>
                             {(() => {
                                 const cities =
@@ -442,12 +432,12 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                                 ? 'Loading...'
                                                 : data?.name
                                             : item?.type === 'postal'
-                                              ? store?.getCitiesReducer?.cities2?.loading
-                                                  ? 'Loading...'
-                                                  : data?.name
-                                              : store?.getCitiesReducer?.cities3?.loading
-                                                ? 'Loading...'
-                                                : data?.name}
+                                                ? store?.getCitiesReducer?.cities2?.loading
+                                                    ? 'Loading...'
+                                                    : data?.name
+                                                : store?.getCitiesReducer?.cities3?.loading
+                                                    ? 'Loading...'
+                                                    : data?.name}
                                     </option>
                                 ));
                             })()}

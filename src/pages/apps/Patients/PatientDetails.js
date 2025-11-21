@@ -577,7 +577,7 @@ const PatientDetails = () => {
                                     defaultValue=""
                                     className="form-select"
                                 >
-                                    <option value="" disabled  >
+                                    <option value="" disabled>
                                         Select
                                     </option>
                                     <option value="male">Male</option>
@@ -592,6 +592,29 @@ const PatientDetails = () => {
                     <hr className="mt-2" />
 
                     <div className="row">
+                        <div className="col-md-3 col-12">
+                            <Form.Group>
+                                <Form.Label htmlFor="patientstatus" className="mb-0">
+                                    Patient Status
+                                </Form.Label>
+                                <Form.Select
+                                    as="select" // Use 'select' to make it a dropdown
+                                    id="patientstatus"
+                                    {...register('patientStatus')}
+                                    data-has-value={!!watch('patientStatus')}>
+                                    <option value="" hidden>
+                                        Select
+                                    </option>{' '}
+                                    {/* Default option */}
+                                    <option value="">Select Status</option> {/* Default option */}
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                    <option value="Inactive-Deceased">Inactive-Deceased</option>
+                                    <option value="Inactive-In Collections">Inactive-In Collections</option>
+                                    <option value="Inactive-Terminated">Inactive-Terminated</option>
+                                </Form.Select>
+                            </Form.Group>
+                        </div>
                         <div className="col-md-3 col-12">
                             <div className="mb-2 d-flex flex-column position-relative">
                                 <Form.Label className="mb-0">Patient Photo</Form.Label>
@@ -618,26 +641,6 @@ const PatientDetails = () => {
                                     <span className="text-danger">{errors.profileImage.message}</span>
                                 )}
                             </div>
-                        </div>
-                        <div className="col-md-3 col-12">
-                            <Form.Group>
-                                <Form.Label htmlFor="patientstatus" className="mb-0">
-                                    Status
-                                </Form.Label>
-                                <Form.Select
-                                    as="select" // Use 'select' to make it a dropdown
-                                    id="patientstatus"
-                                    {...register('patientStatus')}
-                                    data-has-value={!!watch('patientStatus')}>
-                                    <option value="" hidden>
-                                        Select
-                                    </option>{' '}
-                                    {/* Default option */}
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
-                                    <option value="Inactive-Deceased">Inactive-Deceased</option>
-                                </Form.Select>
-                            </Form.Group>
                         </div>
                         {/* Show Date Input if "Inactive-Deceased" is selected */}
                         {patientStatus === 'Inactive-Deceased' && (
@@ -668,25 +671,12 @@ const PatientDetails = () => {
                                     <option value="" hidden>
                                         Select
                                     </option>
-                                    <option value="Mr.">Mr.</option>
-                                    <option value="Mrs.">Mrs.</option>
-                                    <option value="Miss">Miss</option>
-                                    <option value="Dr.">Dr.</option>
-                                    <option value="Other">Other</option>
+                                    {["Mr.", "Mrs.", "Miss", "Dr.", "Other"]?.map((title, index) => (
+                                        <option value={title} key={index}>{title}</option>
+                                    ))}
                                 </Form.Select>
                             </Form.Group>
                         </div>
-
-                        {/* <div className="col-md-3 col-12 mb-2">
-                            <Form.Group>
-                                <Form.Label className="mb-0">Suffix </Form.Label>
-                                <Form.Control type="text" placeholder="Suffix" {...register('suffix')} />
-                                {errors.suffix && (
-                                    <span className="text-danger">{errors.suffix.message}</span>
-                                )}
-                            </Form.Group>
-                        </div> */}
-
                         <div className="col-md-3 col-12">
                             <Form.Group>
                                 <Form.Label className="mb-0">Alternate Email</Form.Label>

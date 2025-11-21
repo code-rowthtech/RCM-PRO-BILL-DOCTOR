@@ -5,16 +5,17 @@ import { updateDoctorAction } from '../../redux/actions';
 import { encryptMessage } from '../../cryptoUtils';
 import { useForm } from 'react-hook-form';
 
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { FiUploadCloud } from 'react-icons/fi';
 import { CiCircleMinus } from 'react-icons/ci';
 import { handleUpload } from '../../helpers/HandleUpload';
 import Select from 'react-select';
 import { qualificationsData } from '../../utils/DataSets/qualificationsData';
 
-const DoctorQualifications = () => {
+const DoctorQualifications = ({ setActiveTab }) => {
     // const defaultIdentifiers = ['NPI'];
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const store = useSelector((state) => state);
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const updateLoading = store?.UpdateDoctorsReducer?.loading;
@@ -33,6 +34,15 @@ const DoctorQualifications = () => {
         { name: '', number: '', issuingAuthority: '', document: null, note: '' },
     ]);
     const [documentUploading, setDocumentUploading] = useState(false);
+    const [shouldExit, setShouldExit] = useState(false);
+    const updateSuccess = store?.UpdateDoctorsReducer?.success;
+
+    useEffect(() => {
+        if (updateSuccess && shouldExit) {
+            navigate(-1);
+            setShouldExit(false);
+        }
+    }, [updateSuccess, shouldExit, navigate]);
     const addQualification = () => {
         const newQualification = {
             id: qualifications.length + 1,
@@ -86,7 +96,7 @@ const DoctorQualifications = () => {
         data: qualification, // Store full object for later use
     }));
 
-    const onsubmit = (data) => {
+    const onsubmit = (data, shouldExitAfterUpdate = false) => {
         const qualificationData = qualifications?.map((item) => ({
             code: item?.degreeName,
             documents: item?.degreeFile,
@@ -97,6 +107,9 @@ const DoctorQualifications = () => {
             qualification: qualificationData,
             otherDocuments: documents,
         };
+        if (shouldExitAfterUpdate) {
+            setShouldExit(true);
+        }
         dispatch(updateDoctorAction({ key: encryptMessage(payload) }));
     };
     useEffect(() => {
@@ -400,13 +413,19 @@ const DoctorQualifications = () => {
                         </Row>
 
                         <div className="d-flex justify-content-end gap-2 mt-1">
-                            {/* <Button className="cancel-button">Cancel</Button> */}
                             <Button
                                 className="custom-buttons"
                                 style={{ width: '70px' }}
-                                type="submit"
+                                onClick={handleSubmit((data) => onsubmit(data, false))}
                                 disabled={updateLoading}>
                                 {updateLoading ? <Spinner color="white" className="spinner-border-sm" /> : 'Update'}
+                            </Button>
+                            <Button
+                                className="custom-buttons"
+                                style={{ width: '120px' }}
+                                onClick={handleSubmit((data) => onsubmit(data, true))}
+                                disabled={updateLoading}>
+                                {updateLoading ? <Spinner color="white" className="spinner-border-sm" /> : 'Update & Exit'}
                             </Button>
                         </div>
                     </>

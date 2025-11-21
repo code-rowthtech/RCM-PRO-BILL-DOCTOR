@@ -144,7 +144,11 @@ const Patients = () => {
                                                         <div>
                                                             {(data?.name?.[0]?.prefix?.[0]
                                                                 ? data?.name?.[0]?.prefix?.[0] + ' '
-                                                                : '') + (data?.name?.[0]?.text || 'N/A')}
+                                                                : '') +
+                                                                (data?.name?.[0]?.family || '') +
+                                                                (data?.name?.[0]?.given?.length > 0
+                                                                    ? ' ' + data?.name?.[0]?.given?.join(' ')
+                                                                    : '') || 'N/A'}
                                                             <div className="text-info fw-bold fs-6">
                                                                 <span className="text-dark">MRN: </span>
                                                                 {data?.chartNumber}

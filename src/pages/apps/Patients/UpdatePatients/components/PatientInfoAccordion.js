@@ -12,6 +12,9 @@ import { updatePatientsAction } from '../../../../../redux/actions';
 import { TbCapture } from 'react-icons/tb';
 import { IoClose, IoPrintSharp } from 'react-icons/io5';
 import { LiaReceiptSolid } from 'react-icons/lia';
+import ConsentOffCanvas from '../../../../../components/ConsentOffCanvas';
+import { FaFileSignature } from 'react-icons/fa6';
+import { handlePrintPatientSummary } from './handlePrintPatientSummary';
 
 const PatientInfoAccordion = (props) => {
     const { activeKey, setActiveKey, setSelectedMainTab, setCreateEncounter } = props;
@@ -29,7 +32,7 @@ const PatientInfoAccordion = (props) => {
     const [uploading, setUploading] = useState(false);
     const [printOptions, setPrintOptions] = useState([]);
     const [profilePhoto, setProfilePhoto] = useState('');
-
+    const [showConsent, setShowConsent] = useState(false);
     const id = searchParams.get('id');
     const patientDetails = store?.getPatientsByIdReducer?.data?.data;
 
@@ -110,9 +113,13 @@ const PatientInfoAccordion = (props) => {
                                     color: 'rgb(249, 139, 55)',
                                     borderRight: '1px solid gray',
                                 }}>
-                                {patientDetails?.name?.[0]?.prefix + ' ' || ''}
-                                {patientDetails?.name?.[0]?.given?.join(' ') + ' ' || 'N/A'}
-                                {patientDetails?.name?.[0]?.family || ''}
+                                {(patientDetails?.name?.[0]?.prefix?.[0]
+                                    ? patientDetails?.name?.[0]?.prefix?.[0] + ' '
+                                    : '') +
+                                    (patientDetails?.name?.[0]?.family || '') +
+                                    (patientDetails?.name?.[0]?.given?.length > 0
+                                        ? ' ' + patientDetails?.name?.[0]?.given?.join(' ')
+                                        : '') || 'N/A'}
                             </span>{' '}
                             <span
                                 style={{ borderRight: '1px solid gray' }}
@@ -130,9 +137,6 @@ const PatientInfoAccordion = (props) => {
                                 {patientDetails?.approxAge &&
                                     (() => {
                                         const years = Math.floor(patientDetails.approxAge);
-                                        const months = Math.round(
-                                            (patientDetails.approxAge - years) * 12
-                                        );
                                         return `(${years} year${years !== 1 ? 's old)' : ''} `;
                                     })()}
                             </span>
@@ -386,6 +390,7 @@ const PatientInfoAccordion = (props) => {
                                         New Encounter
                                     </Button>
                                     <div className="mt-1 d-flex justify-content-center align-items-center gap-2 ps-2">
+                                        <FaFileSignature className="fs-4 cursor-pointer text-primary" onClick={() => setShowConsent(true)} />
                                         <Dropdown>
                                             <Dropdown.Toggle
                                                 variant="light"
@@ -431,16 +436,16 @@ const PatientInfoAccordion = (props) => {
                                                         variant="primary"
                                                         size="sm"
                                                         className='custom-buttons'
-                                                        // onClick={() =>
-                                                        //     handlePrintPatientSummary({
-                                                        //         toBePrinted: printOptions,
-                                                        //         patientDetails: patientDetails,
-                                                        //         vitals: store?.getVitalsByPatientIdReducer?.data?.data,
-                                                        //         medicationList: store?.getMedicationReducer?.data?.medicationRequests,
-                                                        //         allergyData: store?.getAllergiesOfAPatientReducer?.data?.allergies,
-                                                        //         problemData: store?.getProblemListReducer?.data?.problems
-                                                        //     })
-                                                        // }
+                                                        onClick={() =>
+                                                            handlePrintPatientSummary({
+                                                                toBePrinted: printOptions,
+                                                                patientDetails: patientDetails,
+                                                                vitals: store?.getVitalsByPatientIdReducer?.data?.data,
+                                                                medicationList: store?.getMedicationReducer?.data?.medicationRequests,
+                                                                allergyData: store?.getAllergiesOfAPatientReducer?.data?.allergies,
+                                                                problemData: store?.getProblemListReducer?.data?.problems
+                                                            })
+                                                        }
                                                         disabled={
                                                             printOptions?.length < 1 ||
                                                             store?.getVitalsByPatientIdReducer?.loading ||
@@ -465,8 +470,8 @@ const PatientInfoAccordion = (props) => {
                                                 </div>
                                             </Dropdown.Menu>
                                         </Dropdown>
-
-                                        <LiaReceiptSolid className="fs-4  text-primary" />
+                                        <ConsentOffCanvas show={showConsent} handleClose={() => setShowConsent(false)} />
+                                        <LiaReceiptSolid className="fs-4 cursor-pointer text-primary" />
                                     </div>
                                 </div>
                             </Col>

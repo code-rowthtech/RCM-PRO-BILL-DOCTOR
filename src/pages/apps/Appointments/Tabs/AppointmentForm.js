@@ -9,6 +9,7 @@ import { debounce } from 'lodash';
 import {
     createAppointmentsAction,
     getAllAppointmentsAction,
+    getAllConsentActions,
     getAppointmentDetailsAction,
     getPatientsAction,
     getPatientsByIdAction,
@@ -359,7 +360,7 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
     const createAppointmentResponse = store?.createAppointmentsReducer?.data?.status;
     const appointmentDetails = store?.getAppointmentDetailsReducer?.data?.appointment;
     const availabilityResponse = store?.getPractitionerAvailabilityReducer?.data;
-
+    const consentDocuments = store?.getAllConsentReducer?.data?.data;
     const [search, setSearch] = useState('');
     const [skip, setSkip] = useState(1);
     const [logoName, setLogoName] = useState('');
@@ -376,6 +377,9 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
     const [appointmentDates, setAppointmentDates] = useState();
     const [repeatType, setRepeatType] = useState('day');
     const [showToast, setShowToast] = useState(false);
+    const [appointmentReason, setAppointmentReason] = useState(null);
+    const [selectedConsentForm, setSelectedConsentForm] = useState([]);
+    const [consentFormsInitialized, setConsentFormsInitialized] = useState(false);
     const isLoading =
         store?.getPatientsReducer?.loading ||
         store?.createPatientsReducer?.loading ||
@@ -389,6 +393,7 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
     useEffect(() => {
         if (createAppointmentResponse === 200 && createAppointmentType === 'back') {
             reset();
+            setSelectedConsentForm([]);
             navigate('/apps/appointments/list');
         } else if (createAppointmentResponse === 200 && createAppointmentType === 'save') {
         }
@@ -410,6 +415,7 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
         };
         if (appointmentId || id) {
             dispatch(getAppointmentDetailsAction(data));
+            setConsentFormsInitialized(false);
         }
     }, [dispatch, appointmentId, id]);
 
@@ -436,9 +442,9 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
         if (createResponse === 201 && submissionType === 'saveAndNext') {
             handleCloseModal();
             reset();
+            setSelectedConsentForm([]);
             setActiveTab('demographicDetails');
             setPatientId(createPatientResponse?._id);
-            // dispatch(stateEmptydAction());
             const data = {
                 doctorId: doctorId,
                 page: skip,
@@ -449,11 +455,11 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
             dispatch(getPatientsAction(data));
         } else if (createResponse === 201 && submissionType === 'saveAndReset') {
             reset();
+            setSelectedConsentForm([]);
             setSelectedDoctor(null);
             setLogo(null);
             setLogoName(null);
             setPatientId(null);
-            // dispatch(stateEmptydAction());
             const data = {
                 doctorId: doctorId,
                 page: skip,
@@ -531,7 +537,11 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
         dispatch(getPatientsAction(data));
     }, [dispatch, skip, search]);
 
-    const selectedDate = watch('scheduled'); // Watch the selected date field
+    useEffect(() => {
+        dispatch(getAllConsentActions({ clinicId }))
+    }, [dispatch])
+
+    const selectedDate = watch('scheduled');
 
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
@@ -603,19 +613,32 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                         : ''
                 );
                 setValue('weekInterval', appointmentDetails?.recurrenceTemplate?.every);
-                // weeklyOccurenceCount
-                // weeklyOccurrenceDate
-                // weekInterval
-                // appointmentDay
-                // setValue("weeklyOccurenceCount",)
-                // setValue("weeklyOccurrenceDate", appointmentDetails?.recurrenceTemplate?.lastOccurrenceDate ? new Date(appointmentDetails?.recurrenceTemplate?.lastOccurrenceDate)?.toISOString().split('T')[0] : '')
-                // setValue("weeksNumberDaily", appointmentDetails?.recurrenceTemplate?.every)
             }
             if (details?.date) {
                 setValue('scheduled', new Date(details?.date).toISOString().split('T')[0]);
             }
         }
     }, [appointmentDetails, patientsData]);
+
+    useEffect(() => {
+        if (appointmentDetails?.consentForms && consentDocuments?.length > 0 && !consentFormsInitialized) {
+            const selectedForms = appointmentDetails.consentForms
+                .map((consentId) => {
+                    const consentDoc = consentDocuments.find((doc) => doc._id === consentId);
+                    if (consentDoc) {
+                        return {
+                            value: consentDoc._id,
+                            label: consentDoc.title,
+                            data: consentDoc,
+                        };
+                    }
+                    return null;
+                })
+                .filter(Boolean);
+            setSelectedConsentForm(selectedForms);
+            setConsentFormsInitialized(true);
+        }
+    }, [appointmentDetails, consentDocuments, consentFormsInitialized]);
 
     useEffect(() => {
         if (id) {
@@ -669,6 +692,7 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
             examRoom: data?.consultationRoom,
             status: data?.status,
             slot: data?.startTime,
+            consentForms: selectedConsentForm?.map((option) => option.value) || [],
             ...(repeat &&
                 repeatType !== '' && {
                 recurrenceTemplate: {
@@ -729,10 +753,20 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
         []
     );
 
-    const [appointmentReason, setAppointmentReason] = useState(null);
+
 
     const handleReasonChange = useCallback((selectedOption) => {
         setAppointmentReason(selectedOption ? selectedOption.value : '');
+    }, []);
+
+    const handleConsentFormChange = useCallback((selectedOptions) => {
+        setSelectedConsentForm(selectedOptions || []);
+    }, []);
+
+    const handleViewConsentForm = useCallback((formData) => {
+        if (formData?.consentDocument?.url) {
+            window.open(formData?.consentDocument?.url?.split('?')[0], '_blank');
+        }
     }, []);
 
     const selectedReasonOption =
@@ -753,6 +787,30 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
             callback(filteredOptions.slice(0, 20));
         },
         [formattedReasonOptions]
+    );
+
+    const formattedConsentFormOptions = useMemo(
+        () =>
+            consentDocuments?.map((form) => ({
+                value: form?._id,
+                label: form?.title,
+                data: form,
+            })) || [],
+        [consentDocuments]
+    );
+
+    const loadConsentFormOptions = useCallback(
+        (inputValue, callback) => {
+            if (!inputValue) {
+                callback(formattedConsentFormOptions.slice(0, 10));
+                return;
+            }
+            const filteredOptions = formattedConsentFormOptions.filter((option) =>
+                option.label.toLowerCase().includes(inputValue.toLowerCase())
+            );
+            callback(filteredOptions.slice(0, 20));
+        },
+        [formattedConsentFormOptions]
     );
 
     return (
@@ -784,7 +842,13 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                                         </option>
                                         {patientsData?.map((patient) => (
                                             <option key={patient?._id} value={patient?._id}>
-                                                {patient?.name?.[0]?.text}
+                                                {(patient?.name?.[0]?.prefix?.[0]
+                                                    ? patient?.name?.[0]?.prefix?.[0] + ' '
+                                                    : '') +
+                                                    (patient?.name?.[0]?.family || '') +
+                                                    (patient?.name?.[0]?.given?.length > 0
+                                                        ? ' ' + patient?.name?.[0]?.given?.join(' ')
+                                                        : '') || 'N/A'}
                                             </option>
                                         ))}
                                     </Form.Select>
@@ -812,20 +876,6 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                                 />
                             </Form.Group>
                         </Col>
-                        {/* <Col md={6} xs={12}>
-                            <Form.Group className="mb-1">
-                                <Form.Label className="mb-0">Office</Form.Label>
-                                <Form.Control as="select" {...register('office')} data-has-value={!!watch('office')}>
-                                    <option value="" hidden>
-                                        Select Office
-                                    </option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                </Form.Control>
-                            </Form.Group>
-                        </Col> */}
                         <Col md={6} xs={12}>
                             <Form.Group className="mb-1" controlId="appointmentType">
                                 <Form.Label className="mb-0">
@@ -916,21 +966,56 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                                     classNamePrefix="select"
                                     placeholder="&nbsp; Select"
                                     value={selectedReasonOption}
+                                    onInputChange={(data) => dispatch(getAllConsentActions({ clinicId, search: data }))}
                                     onChange={handleReasonChange}
                                     styles={{
                                         control: (provided) => ({
                                             ...provided,
-                                            height: '30px',
+                                            color: 'black',
+                                            fontWeight: 500,
+                                            fontSize: '12px',
+                                            backgroundColor: '#e8f0fe',
+                                            border: 0,
                                             minHeight: '30px',
-                                            border: '0px',
+                                            height: '30px',
+                                            paddingRight: '40px',
+                                            boxShadow: 'none',
+                                        }),
+                                        valueContainer: (provided) => ({
+                                            ...provided,
+                                            padding: '0 6px',
+                                            height: '30px',
+                                        }),
+                                        input: (provided) => ({
+                                            ...provided,
+                                            margin: 0,
+                                            padding: 0,
+                                            fontSize: '12px',
+                                            color: 'black',
+                                            fontWeight: 500,
                                         }),
                                         placeholder: (provided) => ({
                                             ...provided,
-                                            fontWeight: 'bold',
                                             fontSize: '12px',
-                                            paddingBottom: '5px',
+                                            color: 'black',
+                                            fontWeight: 500,
+                                        }),
+                                        singleValue: (provided) => ({
+                                            ...provided,
+                                            fontSize: '12px',
+                                            color: 'black',
+                                            fontWeight: 500,
+                                        }),
+                                        indicatorsContainer: (provided) => ({
+                                            ...provided,
+                                            height: '30px',
+                                        }),
+                                        dropdownIndicator: (provided) => ({
+                                            ...provided,
+                                            padding: '0 6px',
                                         }),
                                     }}
+
                                 />
                             </Form.Group>
                         </Col>
@@ -946,29 +1031,9 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                                     </option>
                                     <option value="Room 1">Room 1</option>
                                     <option value="Room 2">Room 2</option>
-                                    {/* <option value="3">Room 3</option> */}
-                                    {/* <option value="4">Room 4</option> */}
                                 </Form.Select>
-                                {/* {errors.appointmentType && <p className="text-danger err-font">{errors.consultationRoom.message}</p>} */}
                             </Form.Group>
                         </Col>
-                        {/* <Col md={6} xs={12}>
-                            <Form.Group className="mb-1">
-                                <Form.Label className="mb-0">Consent Forms</Form.Label>
-                                <Form.Control
-                                    as="select"
-                                    data-has-value={!!watch('consentForms')}
-                                    {...register('consentForms')}>
-                                    <option value="" hidden>
-                                        Select Consent Forms
-                                    </option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                </Form.Control>
-                            </Form.Group>
-                        </Col> */}
                         <Col md={6} xs={12}>
                             <Form.Group className="mb-3">
                                 <Form.Label className="mb-1">Status <span className="text-danger">*</span></Form.Label>
@@ -991,6 +1056,135 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                                     ))}
                                 </Form.Control>
                                 {errors.status && <p className="text-danger mt-1 text-sm">{errors.status.message}</p>}
+                            </Form.Group>
+                        </Col>
+                        <Col sm={6}>
+                            <Form.Group className="mb-3">
+                                <Form.Label className="mb-1">Consent Form</Form.Label>
+                                <div className="position-relative">
+                                    <AsyncSelect
+                                        loadOptions={loadConsentFormOptions}
+                                        defaultOptions={formattedConsentFormOptions.slice(0, 10)}
+                                        isSearchable
+                                        isMulti
+                                        className="basic-single"
+                                        classNamePrefix="select"
+                                        placeholder="Select Consent Forms"
+                                        value={selectedConsentForm}
+                                        onChange={handleConsentFormChange}
+                                        onInputChange={(data) => dispatch(getAllConsentActions({ clinicId, search: data }))}
+                                        noOptionsMessage={() => 'No consent forms available'}
+                                        styles={{
+                                            control: (provided) => ({
+                                                ...provided,
+                                                color: 'black',
+                                                fontWeight: 500,
+                                                fontSize: '12px',
+                                                backgroundColor: '#e8f0fe',
+                                                border: 0,
+                                                minHeight: '30px',
+                                                height: '30px',
+                                                boxShadow: 'none',
+                                            }),
+                                            valueContainer: (provided) => ({
+                                                ...provided,
+                                                padding: '0 6px',
+                                                height: '30px',
+                                                overflowY: 'auto',
+                                            }),
+                                            input: (provided) => ({
+                                                ...provided,
+                                                margin: 0,
+                                                padding: 0,
+                                                fontSize: '12px',
+                                                color: 'black',
+                                                fontWeight: 500,
+                                            }),
+                                            placeholder: (provided) => ({
+                                                ...provided,
+                                                fontSize: '12px',
+                                                color: 'black',
+                                                fontWeight: 500,
+                                            }),
+                                            singleValue: (provided) => ({
+                                                ...provided,
+                                                fontSize: '12px',
+                                                color: 'black',
+                                                fontWeight: 500,
+                                            }),
+                                            multiValue: (provided) => ({
+                                                ...provided,
+                                                backgroundColor: '#65656933',
+                                                margin: '2px 2px',
+                                                height: '20px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                            }),
+                                            multiValueLabel: (provided) => ({
+                                                ...provided,
+                                                fontSize: '12px',
+                                                color: 'black',
+                                                fontWeight: 500,
+                                                lineHeight: '18px',
+                                            }),
+                                            multiValueRemove: (provided) => ({
+                                                ...provided,
+                                                padding: '0 2px',
+                                                height: '18px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                            }),
+                                        }}
+
+                                        formatOptionLabel={(option, { context }) => (
+                                            <div className="d-flex justify-content-between align-items-center">
+                                                <span>{option.label}</span>
+                                                {context === 'menu' && option.data?.document?.url && (
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-sm btn-outline-primary ms-2"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleViewConsentForm(option.data);
+                                                        }}
+                                                        style={{ fontSize: '10px', padding: '2px 6px' }}
+                                                    >
+                                                        View
+                                                    </button>
+                                                )}
+                                            </div>
+                                        )}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        {...register('consentForm')}
+                                        value={JSON.stringify(selectedConsentForm?.map((option) => option.value) || [])}
+                                    />
+                                </div>
+                                {selectedConsentForm?.length > 0 && (
+                                    <div className="mt-2">
+                                        <small className="text-muted">Selected forms:</small>
+                                        <div className="d-flex flex-wrap gap-1 mt-1">
+                                            {selectedConsentForm?.map((form, index) => (
+                                                <span
+                                                    key={index}
+                                                    className="badge bg-light text-dark border d-flex align-items-center">
+                                                    {form?.label}
+                                                    {form?.data?.consentDocument?.url && (
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-sm p-0 ms-1"
+                                                            onClick={() => handleViewConsentForm(form.data)}
+                                                            style={{ fontSize: '10px', color: '#007bff' }}
+                                                            title="View consent form">
+                                                            <i className="bi bi-eye"></i>
+                                                        </button>
+                                                    )}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </Form.Group>
                         </Col>
                     </Row>
@@ -1066,6 +1260,7 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                                     }
                                     onClick={() => {
                                         reset();
+                                        setSelectedConsentForm([]);
                                         navigate(-1);
                                     }}>
                                     Cancel
@@ -1088,7 +1283,6 @@ const AppointmentForm = ({ Id, appointmentId, calendarView, selectedSlot }) => {
                                     'Save'
                                 )}
                             </Button>
-                            {/* <Button className="custom-buttons">Cancel</Button> */}
                         </Col>
                     </Row>
                 </Form>

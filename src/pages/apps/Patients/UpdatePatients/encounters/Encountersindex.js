@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 
 // Redux imports
-import { useDispatch, useSelector } from "react-redux";
-import { getNoteSettingAction } from "redux/noteCategories/action";
+import { getNoteSettingAimport } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getNotesCategoriesAction } from "redux/noteCategories/action";
 import { getEncounterSettingsAction } from "redux/actions";
 
 // Icon imports
@@ -12,6 +13,9 @@ import { CiSettings } from "react-icons/ci";
 import { HiMiniBars3BottomLeft } from 'react-icons/hi2';
 import { BiCollapse, BiExpand } from 'react-icons/bi';
 import { IoClose } from 'react-icons/io5';
+import { MdPrint, MdSave } from 'react-icons/md';
+import { FaFileInvoiceDollar } from 'react-icons/fa';
+import { Button } from 'react-bootstrap';
 
 // Component imports
 import EncounterList from "./components/EncounterList";
@@ -44,6 +48,7 @@ const Encountersindex = (props) => {
     const [isCollapsed, setIsCollapsed] = useState(false); // Tab bar collapse state
     const [newEncounterModal, setNewEncounterModal] = useState(false); // Duplicate encounter modal
     const [showSettings, setShowSettings] = useState(false); // Settings panel visibility
+    const [expandAllAccordions, setExpandAllAccordions] = useState(false); // Accordion expand state
 
     // Effect hooks
 
@@ -130,6 +135,30 @@ const Encountersindex = (props) => {
         setNewEncounterModal(false);
     };
 
+    // Print handler
+    const handlePrint = () => {
+        const activeTabData = encounterTabs.find(tab => tab.id === activeTab);
+        if (activeTabData?.type !== 'default') {
+            const encounterData = {
+                providerId: { name: [{ use: 'official', text: store?.Auth?.user?.name || 'Provider' }] },
+                period: { start: new Date().toISOString() },
+                status: 'in-progress',
+                type: [{ coding: [{ display: 'Standard Visit' }] }],
+                data: []
+            };
+            const patientDetails = store?.getPatientsByIdReducer?.data?.data;
+            // Import and use print function
+            import('./utils/handlePrintEncounter').then(({ handlePrintEncounters }) => {
+                handlePrintEncounters(encounterData, patientDetails);
+            });
+        }
+    };
+
+    // Ready for billing handler
+    const handleReadyForBilling = () => {
+        console.log('Ready for billing clicked');
+    };
+
     // Props for child components
     const encounterListProps = {
         expanded,
@@ -197,20 +226,75 @@ const Encountersindex = (props) => {
                     ))}
                 </div>
 
-                {/* Expand/Collapse Toggle */}
-                {expanded ? (
-                    <BiCollapse
-                        className='text-primary fw-bold fs-4 cursor-pointer me-2'
-                        onClick={() => setExpanded(!expanded)}
-                        title="Collapse panel"
-                    />
-                ) : (
-                    <BiExpand
-                        className='text-primary fw-bold fs-4 cursor-pointer me-2'
-                        onClick={() => setExpanded(!expanded)}
-                        title="Expand panel"
-                    />
-                )}
+                {/* Action Buttons */}
+                <div className="d-flex align-items-center gap-2">
+                    {(() => {
+                        const activeTabData = encounterTabs.find(tab => tab.id === activeTab);
+                        const isFormTab = activeTabData?.type !== 'default';
+                        return isFormTab && (
+                            <>
+                                <Button
+                                    size="sm"
+                                    variant="outline-secondary"
+                                    className="d-flex align-items-center gap-1 px-2 py-1"
+                                    onClick={() => {
+                                        const newState = !expandAllAccordions;
+                                        setExpandAllAccordions(newState);
+                                    }}
+                                    title={expandAllAccordions ? 'Minimize All' : 'Expand All'}
+                                >
+                                    <span className="small">{expandAllAccordions ? 'Minimize All' : 'Expand All'}</span>
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant="outline-primary"
+                                    className="d-flex align-items-center gap-1 px-2 py-1"
+                                    onClick={handlePrint}
+                                    title="Print"
+                                >
+                                    <MdPrint size={18} />
+                                    <span className="small">Print</span>
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant="outline-success"
+                                    className="d-flex align-items-center gap-1 px-2 py-1"
+                                    form="encounter-form"
+                                    type="submit"
+                                    title="Save"
+                                >
+                                    <MdSave size={18} />
+                                    <span className="small">Save</span>
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant="outline-info"
+                                    className="d-flex align-items-center gap-1 px-2 py-1"
+                                    onClick={handleReadyForBilling}
+                                    title="Ready for Billing"
+                                >
+                                    <FaFileInvoiceDollar size={16} />
+                                    <span className="small">Billing</span>
+                                </Button>
+                            </>
+                        );
+                    })()}
+
+                    {/* Expand/Collapse Toggle */}
+                    {expanded ? (
+                        <BiCollapse
+                            className='text-primary fw-bold fs-4 cursor-pointer'
+                            onClick={() => setExpanded(!expanded)}
+                            title="Collapse panel"
+                        />
+                    ) : (
+                        <BiExpand
+                            className='text-primary fw-bold fs-4 cursor-pointer'
+                            onClick={() => setExpanded(!expanded)}
+                            title="Expand panel"
+                        />
+                    )}
+                </div>
             </div>
 
             {/* Tab Content Section */}
@@ -230,6 +314,8 @@ const Encountersindex = (props) => {
                                     activeTabId={activeTab}
                                     tabType={tab?.type}
                                     expanded={expanded}
+                                    isCollapsed={isCollapsed}
+                                    expandAllAccordions={expandAllAccordions}
                                 />
                             )}
                         </div>

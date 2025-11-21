@@ -15,11 +15,11 @@ const PatientDemographics = () => {
     return (
         <Row>
             <Col sm={12}>
-                <ul className="nav nav-underline d-flex gap-2">
+                <ul className="nav nav-underline border-bottom border-black d-flex gap-3">
                     {PatientDemographicTabs?.map((data, index) => (
                         <li key={index}>
                             <span
-                                className={`nav-link text-secondary fs-6 pb-1 ${activeTab === data ? 'active fw-bold' : ''
+                                className={`nav-link text-secondary fs-6 pb-1 ${activeTab === data ? 'active fw-bold' : 'text-black fw-medium'
                                     }`}
                                 onClick={() => {
                                     handleTabClick(data)

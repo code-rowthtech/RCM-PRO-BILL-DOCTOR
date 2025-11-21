@@ -33,3 +33,13 @@ export function createResponsiblePartyApi(params: any): any {
     const { data } = params;
     return api.create(URL.createResponsibleParty, data);
 }
+
+export function getPatientConsentsApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.getPatientConsents}?subject=${data.patientId}`);
+}
+
+export function getAllConsentApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.getAllConsents}?clinicId=${data.clinicId}&search=${data?.search || ''}`);
+}

@@ -76,7 +76,6 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
     };
 
     const removeIdentifier = (index) => {
-        if (index < defaultIdentifiers.length) return; // Prevent removing default identifiers
         setIdentifiers(identifiers.filter((_, i) => i !== index));
     };
 
@@ -109,20 +108,6 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
     useEffect(() => {
         if (doctorDetails) {
             if (doctorDetails) {
-                // Set qualifications data
-                // const updatedIdentifiers = doctorDetails?.identifier?.map((item, index) => ({
-                //     expiry: item?.expirationDate ? new Date(item?.expirationDate).toISOString().split('T')[0] : '',
-                //     file: item?.documents?.[0],
-                //     issuingAuthority: item?.issuingAuthority,
-                //     number: item?.value,
-                //     system: '',
-                //     type: {
-                //         code: item?.sliceName,
-                //         label: item?.identifierType,
-                //         value: item?.system,
-                //     }
-                // }));
-                // setIdentifiers(updatedIdentifiers);
                 setValue('specialist', doctorDetails?.specialties?.[0])
             }
         }
@@ -171,8 +156,9 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                                 const selectedSystem = item?.system
                                 handleChange(index, 'type', selectedType, 'system', selectedSystem);
                             }}
-                            disabled={defaultIdentifiers.some((d) => d.value === item.type?.value)}>
-                            <option value="" disabled>
+                        // disabled={defaultIdentifiers.some((d) => d.value === item.type?.value)}
+                        >
+                            <option value="">
                                 Select Identifier Type
                             </option>
                             {identifierOptions.map((option) => (
@@ -237,7 +223,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                             value={item?.expiry || ''}
                             onChange={(e) => handleChange(index, 'expiry', e.target.value)}
                         />
-                        {index >= defaultIdentifiers?.length && (
+                        {identifiers.length > 1 && (
                             <span
                                 className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
                                 style={{ marginTop: '-27px', right: '7px' }}

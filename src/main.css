@@ -564,3 +564,7 @@ option {
     grid-template-columns: 1fr 1fr;
     gap: 15px;
 }
+
+.box-shadow-none {
+    box-shadow: none !important;
+}

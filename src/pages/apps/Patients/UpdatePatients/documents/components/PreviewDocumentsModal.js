@@ -9,30 +9,30 @@ const PreviewDocumentsModal = ({ show, onHide, previewLink }) => {
 
     const renderPreview = () => {
         if (!previewLink) return null
-        
+
         const fileType = getFileType(previewLink)
-        
+
         if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileType)) {
             return (
-                <img 
-                    src={previewLink} 
-                    alt="Document preview" 
+                <img
+                    src={previewLink}
+                    alt="Document preview"
                     style={{ maxWidth: '100%', maxHeight: '70vh', objectFit: 'contain' }}
                 />
             )
         }
-        
+
         if (fileType === 'pdf') {
             return (
-                <iframe 
-                    src={previewLink} 
-                    width="100%" 
-                    height="600px" 
+                <iframe
+                    src={previewLink}
+                    width="100%"
+                    height="600px"
                     title="PDF Preview"
                 />
             )
         }
-        
+
         return (
             <div className="text-center py-5">
                 <i className="bi bi-file-earmark fs-1 text-muted mb-3" />
@@ -47,7 +47,7 @@ const PreviewDocumentsModal = ({ show, onHide, previewLink }) => {
     return (
         <Modal show={show} onHide={onHide} size="lg" centered>
             <Modal.Header closeButton>
-                <Modal.Title>Document Preview</Modal.Title>
+                <Modal.Title className='my-0'>Document Preview</Modal.Title>
             </Modal.Header>
             <Modal.Body className="text-center">
                 {renderPreview()}

@@ -109,7 +109,13 @@ const AppointmentCalendar = () => {
                         end: end,
                         slotStart: data?.start,
                         slotEnd: data?.end,
-                        patientName: data?.subject?.name?.find((nameData) => nameData?.use === 'official')?.text,
+                        patientName: ((data?.subject?.name?.[0]?.prefix?.[0]
+                            ? data?.subject?.name?.[0]?.prefix?.[0] + ' '
+                            : '') +
+                            (data?.subject?.name?.[0]?.family || '') +
+                            (data?.subject?.name?.[0]?.given?.length > 0
+                                ? ' ' + data?.subject?.name?.[0]?.given?.join(' ')
+                                : '')) || 'N/A'
                     }
                 })
                 .filter(Boolean)
@@ -119,7 +125,6 @@ const AppointmentCalendar = () => {
             setEvents([])
         }
     }, [appointmentsList])
-
     // Event handlers
     const handleEventClick = useCallback((event) => {
         setShow(true)

@@ -1,4 +1,5 @@
 // @flow
+import { data } from 'jquery';
 import { PatientsActionTypes } from './constants';
 
 type AuthAction = { type: string, payload: {} | string };
@@ -32,3 +33,13 @@ export const createResponsiblePartyAction = (data): AuthAction => ({
     type: PatientsActionTypes.CREATE_RESPONSIBLE_PARTY,
     data
 });
+
+export const getPatientConsentAction = (data): AuthAction => ({
+    type: PatientsActionTypes.GET_PATIENT_CONSENT,
+    data
+})
+
+export const getAllConsentActions = (data): AuthAction => ({
+    type: PatientsActionTypes.GET_ALL_CONSENT,
+    data
+})

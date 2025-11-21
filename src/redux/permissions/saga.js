@@ -1,4 +1,4 @@
-import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
+import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { PermissionsActionTypes } from './constants';
 import { createPermissionsApi, getPermissionsApi, deletePermissionsApi, updatePermissionsApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
@@ -6,9 +6,6 @@ import { decryptMessage } from '../../cryptoUtils';
  * Login the user
  * @param {*} payload - username and password
  */
-
-
-
 
 function* addPermissionsFunction(data) {
     try {

@@ -5,18 +5,14 @@ import { CiCircleMinus } from 'react-icons/ci';
 import us from '../../../assets/images/flags/us.jpg';
 
 
-const TelecomFrom = ({constantContact,setConstantContact}) => {
-    const contactDetails = ['phone', 'email'];
-    const contactOptions = ['phone', 'fax', 'email', 'pager', 'url', 'sms', 'other'];
-        const {
-            control,
-            register,
-            setValue,
-            getValues,
-            handleSubmit,
-            formState: { errors },
-            watch,
-        } = useForm();
+const TelecomFrom = ({ constantContact, setConstantContact }) => {
+    const contactDetails = ['email', 'phone'];
+    const contactOptions = ['email', 'fax', 'other', 'pager', 'phone', 'sms', 'url'];
+    const {
+        register,
+        formState: { errors },
+        watch,
+    } = useForm();
     useEffect(() => {
         setConstantContact(
             contactDetails.map((system) => ({
@@ -63,20 +59,6 @@ const TelecomFrom = ({constantContact,setConstantContact}) => {
             if (p2) return `(${p1})${p2}`;
             return `(${p1}`;
         });
-    };
-    // Function to handle Telecom (Contact) field changes inside POCs
-    const handleTelecomChange = (pocIndex, telecomIndex, field, value) => {
-        let rawValue = value.replace(/\D/g, ''); // Remove non-numeric characters
-
-        // Limit to 10 digits
-        if (rawValue.length > 10) rawValue = rawValue.slice(0, 10);
-
-        // Format as (XXX)XXXXXXX
-        const formattedValue = rawValue.replace(/(\d{1,3})(\d{0,7})/, (match, p1, p2) => {
-            if (p2) return `(${p1})${p2}`;
-            return `(${p1}`;
-        });
-
     };
 
     return (
@@ -147,16 +129,6 @@ const TelecomFrom = ({constantContact,setConstantContact}) => {
                                             }}
                                             style={{ paddingLeft: '40px' }}
                                         />
-                                        {/* Flag Icon */}
-                                        {/* <div
-                                            className="position-absolute"
-                                            style={{
-                                                left: '10px',
-                                                top: '50%',
-                                                transform: 'translateY(-50%)',
-                                            }}>
-                                            <img src={us} alt="flag" width={20} />
-                                        </div> */}
                                     </InputGroup>
                                 ) : (
                                     <Form.Control
@@ -175,11 +147,11 @@ const TelecomFrom = ({constantContact,setConstantContact}) => {
                                     {...register(`constantContact[${index}].use`)}
                                     onChange={(e) => handleContactChange(index, 'use', e.target.value)}>
                                     <option value="">Select Option</option> {/* Placeholder option */}
-                                    <option value="temp">Temp</option>
                                     <option value="home">Home</option>
-                                    <option value="work">Work</option>
-                                    <option value="old">Old</option>
                                     <option value="mobile">Mobile</option>
+                                    <option value="old">Old</option>
+                                    <option value="temp">Temp</option>
+                                    <option value="work">Work</option>
                                     {/* Add more options as needed */}
                                 </Form.Select>
                                 {index >= contactDetails.length && (

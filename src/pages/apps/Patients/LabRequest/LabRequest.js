@@ -130,8 +130,6 @@ const LabRequest = () => {
                     </Form.Label>
                     <Form.Select
                       id="comments"
-                    // {...register('comments', { required: 'comments is required' })}
-                    // data-has-value={!!watch('comments')}
                     >
                       <option value="" hidden>
                         Select comments
