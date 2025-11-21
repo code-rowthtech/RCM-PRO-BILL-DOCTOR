@@ -25,7 +25,6 @@ function* login({ payload }) {
             key: encryptMessage(payload)
         }
         const response = yield call(loginApi, encryptedPayload);
-
         if (!response?.data?.data) {
             throw new Error('Invalid response data');
         }
@@ -57,7 +56,7 @@ function* login({ payload }) {
 
         yield put(authApiResponseSuccess(AuthActionTypes.LOGIN_USER, userData));
     } catch (error) {
-        const errorMessage = error?.message || 'Login failed';
+        const errorMessage = error?.message || error || 'Login failed';
         yield put(authApiResponseError(AuthActionTypes.LOGIN_USER, errorMessage));
         api.setLoggedInUser(null);
         setAuthorization(null);
