@@ -9,6 +9,7 @@ import { getEncounterAction, getEncounterByIdAction } from 'redux/actions'
 import Spinner from 'constants/Spinner'
 import { formatDate } from 'helpers/dateFormat'
 import { IoPrintSharp } from 'react-icons/io5'
+import { handlePrintEncounters } from '../utils/handlePrintEncounter'
 const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreateEncounter, setExpanded }) => {
     const dispatch = useDispatch()
     const [searchParams] = useSearchParams();
@@ -16,11 +17,11 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
     const id = searchParams.get('id')
     const store = useSelector((state) => state)
     const encounterData = store?.getEncounterReducer?.data?.encounters;
+    const patientDetails = store?.getPatientByIdReducer?.data?.data;
 
     useEffect(() => {
         dispatch(getEncounterAction({ patientId: id, skip }));
     }, [dispatch, id, skip]);
-
 
     const statusColorMap = {
         planned: 'text-secondary',
@@ -34,10 +35,7 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
 
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
-        // dispatch(getEncounterAction({ patientId: id, skip: pageNumber }))
     };
-
-    // const encounterData = store?.getEncounterByIdReducer?.data?.encounter;
 
     return (
         <Row className='my-1'>
@@ -89,7 +87,7 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
                                         <td>{encounter?.period?.start ? formatDate(encounter?.period?.start) : '-'}</td>
                                         <td>{encounter?.period?.end ? formatDate(encounter?.period?.end) : '-'}</td>
                                         <td>
-                                            <IoPrintSharp className="fs-4 mb-1 me-1" />
+                                            <IoPrintSharp className="fs-4 mb-1 me-1 cursor-pointer" onClick={() => handlePrintEncounters(encounter, patientDetails)} />
                                             <i
                                                 className=" mdi mdi-square-edit-outline fs-4 cursor-pointer"
                                                 onClick={() => {

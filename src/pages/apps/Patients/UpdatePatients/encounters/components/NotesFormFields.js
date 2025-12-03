@@ -1,5 +1,5 @@
 import ToastHandle from 'helpers/ToastMessage';
-import React, { createRef, useEffect, useRef } from 'react'
+import React, { createRef, useEffect, useRef, useState, memo, useMemo } from 'react'
 import { Form, Row, Accordion, Table, Button, Col } from 'react-bootstrap';
 import { Controller } from 'react-hook-form';
 import ReactQuill from 'react-quill';
@@ -10,30 +10,119 @@ import { handlePrintVitals } from 'helpers/printVitals';
 import { handlePrintAutopopulatedFields } from 'helpers/printAutopopulatedFields';
 import VitalsChart from './VitalsChart';
 import AsyncSelect from 'react-select/async';
+import { useSelector, useDispatch } from 'react-redux';
+import { getPatientConsentAction } from 'redux/actions';
+import { scrollToEncounterField } from '../utils/scrollUtils';
 
-const NotesFormFields = ({
-    data,
+const MAX_WORDS = 700;
+const MAX_WORD_LENGTH = 45;
+const SOAP_SECTIONS = ['Subjective', 'Objective', 'Assessment', 'Plan', 'CarePlan', 'Notes'];
+
+export const NotesFormFields = memo(({
+    data = [],
     excludedFields = [],
     control,
-    expanded = true,
-    isAccordionOpen = true,
-    selectedFromList = {},
-    populatedFields = {},
-    removePopulatedData = () => { },
+    populatedFields,
+    removePopulatedData,
     patientDetails,
-    attachedRecords = [],
-    setAttachedRecords = () => { },
-    handleFileUpload = () => { },
-    uploadLoading = false,
-    accordionState = {},
-    setAccordionState = () => { },
-    getValues = () => '',
-    encounterData = null,
-    patientVitals = [],
-    consentDocuments = [],
-    selectedConsentForms = [],
-    setSelectedConsentForms = () => { }
+    attachedRecords,
+    setAttachedRecords,
+    handleFileUpload,
+    uploadLoading,
+    accordionState,
+    setAccordionState,
+    expanded,
+    isAccordionOpen,
+    getValues,
+    encounterData,
+    patientVitals,
+    externalConsentForms = [],
+    appointmentData,
+    scrollToAccordion,
+    setScrollToAccordion
 }) => {
+    const dispatch = useDispatch();
+    const store = useSelector((state) => state);
+    const [selectedConsentForms, setSelectedConsentForms] = useState([]);
+    const [selectedFromList, setSelectedFromList] = useState({});
+    const consentDocuments = store?.getPatientConsentReducer?.data?.documents;
+
+    // Load consent forms
+    useEffect(() => {
+        const clinicId = store?.Auth?.user?.clinicId;
+        if (clinicId && !consentDocuments?.length) {
+            dispatch(getPatientConsentAction({ clinicId }));
+        }
+    }, [dispatch, store?.Auth?.user?.clinicId, consentDocuments?.length]);
+
+    useEffect(() => {
+        window.getSelectedConsentForms = () => {
+            return selectedConsentForms?.map((form) => form.value) || [];
+        };
+        return () => {
+            delete window.getSelectedConsentForms;
+        };
+    }, [selectedConsentForms]);
+
+    useEffect(() => {
+        if (encounterData?.data && consentDocuments?.length > 0) {
+            const consentField = encounterData.data.find(field => field.type === 'Consent Forms');
+            if (consentField?.populatedData?.length > 0) {
+                const selectedForms = consentField.populatedData
+                    .map((consentId) => {
+                        const consentDoc = consentDocuments.find((doc) => doc?._id === consentId);
+                        if (consentDoc) {
+                            return {
+                                value: consentDoc?._id,
+                                label: consentDoc?.title,
+                                data: consentDoc,
+                            };
+                        }
+                        return null;
+                    })
+                    .filter(Boolean);
+                setSelectedConsentForms(selectedForms);
+            }
+        }
+    }, [encounterData, consentDocuments]);
+
+    // Handle external consent forms from appointment
+    useEffect(() => {
+        if (externalConsentForms?.length > 0 && !encounterData?.data) {
+            setSelectedConsentForms(externalConsentForms);
+        }
+    }, [externalConsentForms, encounterData]);
+
+    // Handle scrolling to accordion when field is populated
+    useEffect(() => {
+        if (scrollToAccordion) {
+            const fieldIndex = data?.findIndex(field => field.name === scrollToAccordion);
+            if (fieldIndex !== -1) {
+                // Expand accordion first
+                setAccordionState(prev => ({ ...prev, [fieldIndex]: true }));
+
+                // Enhanced scroll with proper timing and error handling
+                setTimeout(() => {
+                    const element = document.querySelector(`[data-field-name="${scrollToAccordion}"]`);
+                    const scrollContainer = document.querySelector('.scroll-container');
+
+                    if (element && scrollContainer) {
+                        const elementRect = element.getBoundingClientRect();
+                        const containerRect = scrollContainer.getBoundingClientRect();
+                        const offset = elementRect.top - containerRect.top + scrollContainer.scrollTop - 50;
+
+                        scrollContainer.scrollTo({
+                            top: Math.max(0, offset),
+                            behavior: 'smooth'
+                        });
+                    }
+
+                    setScrollToAccordion?.(null);
+                }, 400); // Allow time for accordion expansion
+            }
+        }
+    }, [scrollToAccordion, data, setAccordionState, setScrollToAccordion]);
+
     const quillRefs = useRef({
         Subjective: createRef(),
         Objective: createRef(),
@@ -42,26 +131,18 @@ const NotesFormFields = ({
         CarePlan: createRef(),
         Notes: createRef(),
     });
-    const MAX_WORDS = 700;
-    const MAX_WORD_LENGTH = 45;
 
     useEffect(() => {
-        const sections = ['Subjective', 'Objective', 'Assessment', 'Plan', 'CarePlan', 'Notes'];
-
-        sections.forEach(section => {
+        SOAP_SECTIONS.forEach(section => {
             const editor = quillRefs.current[section]?.current?.getEditor?.();
             if (!editor) return;
-
             let lastValidDelta = editor.getContents();
-
             editor.on('text-change', (delta, oldDelta, source) => {
                 if (source !== 'user') return;
-
                 setTimeout(() => {
                     const contents = editor.getContents();
                     const text = editor.getText().trim();
                     const words = text.split(/\s+/).filter(Boolean);
-
                     const longWord = words.find(word => word.length > MAX_WORD_LENGTH);
 
                     if (longWord || words.length > MAX_WORDS) {
@@ -109,7 +190,6 @@ const NotesFormFields = ({
         } else {
             const fieldSpecificData = populatedFields[fieldName?.name] || [];
             const fieldContent = getValues(fieldName?.name) || '';
-
             handlePrintAutopopulatedFields({
                 populatedFields: { [fieldName?.name]: fieldSpecificData },
                 patientDetails,
@@ -125,18 +205,15 @@ const NotesFormFields = ({
         const countWords = (text) => {
             return text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
         };
-
         const getWordCount = (text) => {
             return countWords(text?.replace(/<[^>]*>/g, ' ') || '');
         };
-
         const getWordCountColor = (count, max) => {
             const percentage = (count / max) * 100;
             if (percentage >= 90) return 'text-danger';
             if (percentage >= 75) return 'text-warning';
             return 'text-muted';
         };
-
         // Handler for text change with word limit
         const handleTextChange = (onChange, value, maxWords) => (content) => {
             const wordCount = countWords(content.replace(/<[^>]*>/g, ' ')); // Strip HTML tags for counting
@@ -146,7 +223,6 @@ const NotesFormFields = ({
                 ToastHandle(`Maximum word limit of ${maxWords} exceeded`, 'warning');
             }
         };
-
         // Render Vitals field with chart/table
         if (name === 'Monitoring Chart (Vitals)' || name?.toLowerCase().includes('vital')) {
             return (
@@ -155,7 +231,58 @@ const NotesFormFields = ({
                 </div>
             );
         }
-
+        // Render Related Appointment field
+        if (name === 'Related Appointment') {
+            return (
+                <Form.Group key={name} className='row'>
+                    <div className="col-12">
+                        <Form.Label className="mb-2 d-flex align-items-center">{name}</Form.Label>
+                        {appointmentData ? (
+                            <div className="p-3 rounded bg-light border">
+                                <div className="row">
+                                    <div className="col-md-6">
+                                        <small className="text-muted d-block">Appointment Date</small>
+                                        <span className="fw-bold">
+                                            {appointmentData?.start ? new Date(appointmentData?.start).toLocaleDateString() : 'N/A'}
+                                        </span>
+                                    </div>
+                                    <div className="col-md-6">
+                                        <small className="text-muted d-block">Time</small>
+                                        <span className="fw-bold">
+                                            {appointmentData?.start ? new Date(appointmentData?.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A'}
+                                        </span>
+                                    </div>
+                                    <div className="col-md-6 mt-2">
+                                        <small className="text-muted d-block">Status</small>
+                                        <span className="fw-bold text-capitalize">
+                                            {appointmentData?.status || 'N/A'}
+                                        </span>
+                                    </div>
+                                    <div className="col-md-6 mt-2">
+                                        <small className="text-muted d-block">Type</small>
+                                        <span className="fw-bold">
+                                            {appointmentData?.appointmentType?.text || appointmentData?.appointmentType?.coding?.[0]?.display || 'N/A'}
+                                        </span>
+                                    </div>
+                                    {appointmentData.reason?.[0]?.coding?.[0]?.display && (
+                                        <div className="col-12 mt-2">
+                                            <small className="text-muted d-block">Reason</small>
+                                            <span className="fw-bold">
+                                                {appointmentData?.reason[0]?.coding[0]?.display}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="p-3 rounded bg-light border text-center text-muted">
+                                <small>No related appointment found</small>
+                            </div>
+                        )}
+                    </div>
+                </Form.Group>
+            );
+        }
         // Render Consent Forms field with card structure
         if (name === 'Consent Forms') {
             return (
@@ -498,12 +625,10 @@ const NotesFormFields = ({
                                             const wordCount = words.length;
                                             const lastWordMatch = input.match(/(\S+)$/);
                                             const lastWord = lastWordMatch ? lastWordMatch[0] : '';
-
                                             if (wordCount < MAX_WORDS) {
                                                 onChange(input);
                                                 return;
                                             }
-
                                             if (wordCount === MAX_WORDS) {
                                                 if (lastWord.length <= MAX_WORD_LENGTH && /\S$/.test(input)) {
                                                     onChange(input);
@@ -565,19 +690,15 @@ const NotesFormFields = ({
 
     return (
         <Row
-            className="g-2 px-1 mt-1 scroll-container"
-        // style={{
-        //     height: !expanded ? (isAccordionOpen ? '36vh' : '50vh') : '59.5vh',
-        //     overflowY: 'auto',
-        // }}
-        >
-            <Accordion alwaysOpen>
+            className="g-2 px-1 mt-1 scroll-container">
+            <Accordion alwaysOpen activeKey={Object.keys(accordionState).filter(key => accordionState[key]).map(String)}>
                 {fieldsToRender.map((field, index) => (
                     <Accordion.Item
                         className='mb-3'
                         eventKey={index.toString()}
                         key={index}
                         data-field-name={field.name}
+                        data-accordion-index={index}
                     >
                         <Accordion.Header
                             className='encounter-accordion-header d-flex justify-content-between w-100'
@@ -605,6 +726,6 @@ const NotesFormFields = ({
             </Accordion>
         </Row>
     );
-};
+});
 
 export default NotesFormFields;

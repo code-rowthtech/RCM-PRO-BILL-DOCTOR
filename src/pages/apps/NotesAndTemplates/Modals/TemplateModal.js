@@ -69,28 +69,22 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
 
     const handleAddTag = (e) => {
         const inputValue = e.target.value.trim();
-
         if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-
             // Check for empty input
             if (!inputValue) return;
-
             // Check for duplicates
             if (tags.includes(inputValue)) {
                 ToastHandle('Tag already added.', 'danger');
                 return;
             }
-
             // Check for max tag limit
             if (tags.length >= 5) {
                 ToastHandle('You can only add up to 5 tags.', 'danger');
                 return;
             }
-
             // Add new tag
             setTags(prevTags => [...prevTags, inputValue]);
-
             // Clear input
             e.target.value = '';
         }
@@ -124,7 +118,6 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
         setValue,
         fieldName: 'note',
     });
-
     return (
         <Modal className='templateModal' show={show} onHide={() => {
             onHide();
@@ -137,7 +130,7 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body className="pt-0 scroll-container">
-                <ul style={{ height: '6.1%' }} className=" nav nav-underline mb-2">
+                <ul style={{ height: '6.1%' }} className="nav nav-underline mb-2">
                     <li className="nav-item">
                         <span
                             className={classNames(
@@ -301,10 +294,8 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
                                         <Badge key={index}
                                             bg="primary"
                                             text="white"
-                                            // title={tag}
                                             style={{ height: '1.6rem', marginTop: '1.1rem' }}
                                             className="d-flex px-2 align-items-center mb-0">
-                                            {/* {tag?.length > 35 ? tag?.slice(0, 34) + '...' : tag} */}
                                             {tag}
                                             <TiDelete className='text-white fs-4 ms-1 cursor-pointer' onClick={() => handleRemoveTag(index)} />
                                         </Badge>
@@ -315,10 +306,7 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
                                 <div className="col-md-12 pe-0  flex-grow-1 d-flex flex-column" style={{ minHeight: 0 }}>
                                     <Form.Group controlId="description" className="flex-grow-1 d-flex flex-column mb-0">
                                         <Form.Label className="fw-medium mb-1 d-flex justify-content-between align-items-center">
-                                            <div>
-                                                Description{' '}
-
-                                            </div>
+                                            <div>Description{' '}</div>
                                             <small className="text-muted">
                                                 {(() => {
                                                     const content = watch('description') || '';
@@ -326,9 +314,7 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
                                                     const words = plainText?.split(/\s+/)?.filter(Boolean);
                                                     const wordCount = words?.length > MAX_WORDS ? MAX_WORDS : words?.length;
                                                     return (
-                                                        <div>
-                                                            <div>{`${wordCount} / ${MAX_WORDS} words`}</div>
-                                                        </div>
+                                                        <div>{`${wordCount} / ${MAX_WORDS} words`}</div>
                                                     );
                                                 })()}
                                             </small>
@@ -364,7 +350,6 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
                                     </Form.Group>
                                 </div>
                             </div>
-
                         </div>
                         <div className="row">
                             <div className="col-12 d-flex justify-content-end pb-2 gap-1">

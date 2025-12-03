@@ -100,16 +100,16 @@ const NewPatient = () => {
             setIsCameraOpen(false);
             setSelectedMainTab('Demographics');
         }
-    }, [updateSuccess, id, dispatch]); // Ensure dependencies are correctly set
+    }, [updateSuccess, id, dispatch]);
 
     const handleMainTabChange = (tab) => {
         setSelectedMainTab(tab);
-        setVisibleSection('patient'); // Show Patient Section, Hide Task Section
+        setVisibleSection('patient');
     };
 
     const handleSubTabChange = (subTab) => {
         setSelectedSubTab(subTab);
-        setVisibleSection('task'); // Show Task Section, Hide Patient Section
+        setVisibleSection('task');
     };
 
     const handleEncounterTabs = () => {
@@ -168,10 +168,10 @@ const NewPatient = () => {
         if (!isRunning) {
             // Start or Resume Timer
             if (timeLeft === 0) {
-                setTimeLeft(30 * 60); // Set to 30 minutes if starting fresh
+                setTimeLeft(30 * 60);
             }
         }
-        setIsRunning((prevIsRunning) => !prevIsRunning); // Toggle running state
+        setIsRunning((prevIsRunning) => !prevIsRunning);
     };
 
     useEffect(() => {
@@ -186,7 +186,6 @@ const NewPatient = () => {
         return () => clearInterval(timer);
     }, [isRunning, timeLeft]);
 
-    // Function to format seconds into MM:SS
     const formatTime = (seconds) => {
         const minutes = Math.floor(seconds / 60);
         const secs = seconds % 60;
@@ -233,7 +232,6 @@ const NewPatient = () => {
             canvas.height = video.videoHeight;
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Convert canvas image to Blob
             canvas.toBlob(async (blob) => {
                 if (blob) {
                     const file = new File([blob], `profile-photo-${Date.now()}.png`, { type: 'image/png' });
@@ -279,7 +277,6 @@ const NewPatient = () => {
             <div className="background_Color  pb-2">
                 <div className="container-fluid px-0 mt-2 pt-0">
                     <div className="row">
-                        {/* Main Content */}
                         <div className={isSidebarCollapsed ? 'col-11 px-0' : 'col-10 px-0'}>
                             <div class="accordion border-none custom-shadow rounded-1" id="accordionExample">
                                 <div class="accordion-item collapsed border-0">

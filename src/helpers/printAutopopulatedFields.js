@@ -1,4 +1,4 @@
-import { loggedInUser } from './loggedInUser';
+import { loggedInUser } from "./loggedInUser";
 
 export const handlePrintAutopopulatedFields = ({
     populatedFields,
@@ -283,8 +283,8 @@ export const handlePrintAutopopulatedFields = ({
         
         <div class="report-info">
             <h4>REPORT DETAILS</h4>
-            <div class="info-row"><strong>Provider:</strong> ${loggedInUser?.name || 'N/A'}</div>
-            <div class="info-row"><strong>Email:</strong> ${loggedInUser?.email || 'N/A'}</div>
+            <div class="info-row"><strong>Provider:</strong> ${loggedInUser()?.name || 'N/A'}</div>
+            <div class="info-row"><strong>Email:</strong> ${loggedInUser()?.email || 'N/A'}</div>
             <div class="info-row"><strong>Date Printed:</strong> ${formatDate(new Date())}</div>
             ${encounterData?.period?.start ? `<div class="info-row"><strong>Encounter Date:</strong> ${formatDate(encounterData.period.start)}</div>` : ''}
         </div>

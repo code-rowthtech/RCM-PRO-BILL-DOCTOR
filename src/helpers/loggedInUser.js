@@ -1,36 +1,14 @@
-// import { decryptMessage } from "../cryptoUtils";
+import { decryptMessage } from '../cryptoUtils';
 
-// let loggedInUser = null;
-
-// try {
-//     const encryptedUser = sessionStorage.getItem('loggedInUser');
-//     if (encryptedUser) {
-//         const decryptedUser = decryptMessage(encryptedUser);
-//         loggedInUser = JSON.parse(decryptedUser);
-//     }
-// } catch (error) {
-//     console.error("Failed to retrieve or parse loggedInUser:", error);
-//     loggedInUser = null;
-// }
-
-// export { loggedInUser };
-
-import { decryptMessage } from "../cryptoUtils";
-
-let loggedInUser = null;
-
-try {
-    const encryptedUser = sessionStorage.getItem('loggedInUser');
-
-    if (encryptedUser && encryptedUser !== 'undefined') {
-        const decryptedUser = decryptMessage(encryptedUser);
-        loggedInUser = JSON.parse(decryptedUser);
-    } else {
-        console.warn("No valid encrypted user found in sessionStorage.");
+export const loggedInUser = () => {
+    try {
+        const encryptedData = localStorage.getItem('encryptedUserData');
+        if (encryptedData) {
+            return JSON.parse(decryptMessage(encryptedData));
+        }
+        return null;
+    } catch (err) {
+        console.error("Failed to decrypt user data:", err);
+        return null;
     }
-} catch (error) {
-    console.error("Failed to retrieve or parse loggedInUser:", error);
-    loggedInUser = null;
-}
-
-export { loggedInUser };
+};

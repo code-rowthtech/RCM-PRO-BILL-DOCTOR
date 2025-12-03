@@ -8,19 +8,11 @@ import { useSelector } from 'react-redux';
 
 const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, identifiers }) => {
     const {
-        register,
-        handleSubmit,
         formState: { errors },
-        reset,
-        watch,
         setValue,
-        getValues,
-        setError,
-        clearErrors,
     } = useForm();
     const store = useSelector((state) => state);
     const [identifierDocument, setIdentifierDocument] = useState(false); // Fixed typo
-    const [constantIdentifiers, setConstantIdentifiers] = useState([]);
     const doctorDetails = store?.getDoctorsReducer?.data?.result
 
     const identifierOptions = [
@@ -89,7 +81,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         if (!selectedFile) return;
 
         try {
-            const url = await handleUpload(selectedFile, setIdentifierDocument); // Upload file
+            const url = await handleUpload(selectedFile, setIdentifierDocument);
             setIdentifiers((prevDetails) => {
                 const updatedDetails = [...prevDetails];
                 updatedDetails[index] = {
@@ -127,23 +119,12 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
 
             {/* Table Header */}
             <Row className="fw-bold">
-                <Col>
-                    <Form.Label>Identifier Type</Form.Label>
-                </Col>
-                <Col>
-                    <Form.Label>Identifier Number</Form.Label>
-                </Col>
-                <Col>
-                    <Form.Label>Identifier Document</Form.Label>
-                </Col>
-                <Col>
-                    <Form.Label>Issuing Authority</Form.Label>
-                </Col>
-                <Col>
-                    <Form.Label>Identifier Expiry (If Applicable)</Form.Label>
-                </Col>
+                {["Identifier Type", "Identifier Number", "Identifier Document", "Issuing Authority", "Identifier Expiry  (If Applicable)"]?.map((header, idx) => (
+                    <Col key={idx}>
+                        <Form.Label>{header}</Form.Label>
+                    </Col>
+                ))}
             </Row>
-
             {/* Dynamic Identifier Fields */}
             {identifiers.map((item, index) => (
                 <Row key={index} className={`position-relative ${identifiers?.length > 1 ? 'pe-2' : ''}`}>
@@ -155,20 +136,18 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                                 const selectedType = identifierOptions.find((opt) => opt.value === e.target.value);
                                 const selectedSystem = item?.system
                                 handleChange(index, 'type', selectedType, 'system', selectedSystem);
-                            }}
-                        // disabled={defaultIdentifiers.some((d) => d.value === item.type?.value)}
-                        >
-                            <option value="">
-                                Select Identifier Type
-                            </option>
-                            {identifierOptions.map((option) => (
-                                <option key={option.value} value={option.value}>
-                                    {option.label}
-                                </option>
-                            ))}
+                            }} >
+                            <option value="">Select Identifier Type</option>
+                            {identifierOptions
+                                .slice() // optional: avoids mutating original array
+                                .sort((a, b) => a.label.localeCompare(b.label))
+                                .map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
                         </Form.Select>
                     </Col>
-
                     <Col>
                         <Form.Control
                             type="text"
@@ -201,7 +180,6 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                         />
                         {errors?.[index]?.file && <span className="text-danger">Please upload a document</span>}
                     </Col>
-
                     <Col>
                         <Form.Select
                             value={item.issuingAuthority}
@@ -216,7 +194,6 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                             ))}
                         </Form.Select>
                     </Col>
-
                     <Col>
                         <Form.Control
                             type="date"

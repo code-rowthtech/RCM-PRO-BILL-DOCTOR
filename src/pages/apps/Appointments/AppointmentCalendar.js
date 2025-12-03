@@ -82,7 +82,6 @@ const AppointmentCalendar = () => {
         }
     }, [createAppointmentResponse, dispatch, getAppointmentParams])
 
-    // Handle successful appointment update
     useEffect(() => {
         if (updateSuccess === 200) {
             dispatch(getAppointmentsAction(getAppointmentParams()))
@@ -90,17 +89,13 @@ const AppointmentCalendar = () => {
         }
     }, [updateSuccess, dispatch, getAppointmentParams])
 
-    // Transform appointments data to calendar events
     useEffect(() => {
         if (appointmentsList?.length > 0) {
             const transformedEvents = appointmentsList
                 .map((data) => {
                     const start = new Date(data.start)
                     const end = new Date(data.end)
-
-                    // Skip invalid dates
                     if (isNaN(start) || isNaN(end)) return null
-
                     return {
                         event_id: data?._id,
                         title: data?.reason?.[0]?.coding?.[0]?.display,
@@ -119,13 +114,12 @@ const AppointmentCalendar = () => {
                     }
                 })
                 .filter(Boolean)
-
             setEvents(transformedEvents)
         } else {
             setEvents([])
         }
-    }, [appointmentsList])
-    // Event handlers
+    }, [appointmentsList]);
+
     const handleEventClick = useCallback((event) => {
         setShow(true)
         setSelectedEvent(event)
@@ -157,7 +151,6 @@ const AppointmentCalendar = () => {
         setCalendarView(view)
     }, [])
 
-    // Custom toolbar component
     const CustomToolbar = useCallback((toolbar) => {
         const goToBack = () => {
             const prevMonth = new Date(toolbar?.date)
@@ -165,27 +158,22 @@ const AppointmentCalendar = () => {
             formatMonthYear(prevMonth)
             toolbar.onNavigate('PREV')
         }
-
         const goToNext = () => {
             const nextMonth = new Date(toolbar?.date)
             nextMonth.setMonth(nextMonth.getMonth() + 1)
             formatMonthYear(nextMonth)
             toolbar.onNavigate('NEXT')
         }
-
         const goToToday = () => {
             const today = new Date()
             formatMonthYear(today)
             toolbar.onNavigate('TODAY')
         }
-
         const changeView = (view) => {
             toolbar.onView(view)
         }
-
         return (
             <div className="rbc-toolbar">
-                {/* Navigation buttons */}
                 <span className="rbc-btn-group">
                     <button type="button" className="fs-6" onClick={goToBack}>
                         Back
@@ -197,11 +185,7 @@ const AppointmentCalendar = () => {
                         Next
                     </button>
                 </span>
-
-                {/* Current date label */}
                 <span className="rbc-toolbar-label">{toolbar.label}</span>
-
-                {/* View selection buttons */}
                 <span className="rbc-btn-group">
                     <button
                         type="button"
@@ -226,15 +210,12 @@ const AppointmentCalendar = () => {
         )
     }, [formatMonthYear])
 
-
-
     return (
         <div className="background_Color scroll-container" style={{ height: '80vh' }}>
             <div className="container-fluid px-2 mx-0">
                 <div className="row">
                     <div className="col px-0 mx-0">
                         <div className="mt-2">
-                            {/* Main Calendar Component */}
                             <Calendar
                                 localizer={localizer}
                                 events={events}
@@ -252,8 +233,6 @@ const AppointmentCalendar = () => {
                                 onView={handleViewChange}
                                 view={calendarView}
                             />
-
-                            {/* Loading overlay */}
                             {isLoading && (
                                 <div className="loading-overlay">
                                     <Spinner />
@@ -263,7 +242,6 @@ const AppointmentCalendar = () => {
                     </div>
                 </div>
             </div>
-
             {/* Appointment Modal */}
             <Modal centered show={show} size="xl" onHide={closeModal}>
                 <Modal.Body>

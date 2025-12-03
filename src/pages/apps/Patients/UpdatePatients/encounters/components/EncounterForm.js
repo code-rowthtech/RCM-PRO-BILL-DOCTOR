@@ -1,13 +1,13 @@
 // React and third-party imports
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Button, Col, Form, Row, Accordion } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import Select from 'react-select';
 
 // Redux imports
 import { useDispatch, useSelector } from 'react-redux';
-import { getSettingsTabAction } from 'redux/noteCategories/action';
-import { createEncounterAction, getEncounterAction, updateEncounterAction, getAllConsentActions } from 'redux/actions';
+import { getNoteCategoriesAction, getSettingsTabAction } from 'redux/noteCategories/action';
+import { createEncounterAction, getEncounterAction, updateEncounterAction, getAllConsentActions, getAppointmentByPatientIdAction } from 'redux/actions';
 
 // Router imports
 import { useSearchParams } from 'react-router-dom';
@@ -23,18 +23,30 @@ import NotesFormFields from './NotesFormFields';
 import ChangeNoteTypeModal from './ChangeNoteTypeModal';
 import VitalsChart from './VitalsChart';
 
+// Utility imports
+import { scrollToEncounterField } from '../utils/scrollUtils';
+
 // Data and hooks
 import { encounterClassCodes, encounterTypes } from 'utils/DataSets/encounterData';
 import useNotesTypes from 'hooks/useNotesTypes';
-
-
+import { useAppointmentIntegration } from '../hooks/useAppointmentIntegration';
+import { useFieldPopulation } from '../hooks/useFieldPopulation';
 
 /**
  * EncounterForm Component
  * Manages patient encounter creation with dynamic note types and fields
- * Features: FHIR-compliant data structure, dynamic form fields, note type management
+ * Features: FHIR-compliant data structure, dynamic form fields, note type management, appointment integration
  */
-const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, activeHomeKey }) => {
+const EncounterForm = ({
+    selectedFromList = {},
+    expanded,
+    expandAllAccordions,
+    activeHomeKey,
+    appointmentData,
+    onPrintRef,
+    onPopulatedFieldsChange,
+    scrollToAccordion
+}) => {
     // Hooks initialization
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
@@ -44,17 +56,40 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
     // Form management
     const { handleSubmit, register, control, formState: { errors }, setValue, getValues } = useForm();
 
-    // Component state
-    const [selectedNoteType, setSelectedNoteType] = useState(null); // Currently selected note type
-    const [notesTypeModal, setNotesTypeModal] = useState(false); // Note type change confirmation modal
-    const [pendingNoteType, setPendingNoteType] = useState(null); // Pending note type change
-    const [populatedFields, setPopulatedFields] = useState({});
-    const [populatedFieldIds, setPopulatedFieldIds] = useState({});
-    const [attachedRecords, setAttachedRecords] = useState([]);
-    const [uploadLoading, setUploadLoading] = useState(false);
-    const [accordionState, setAccordionState] = useState({});
-    const [selectedConsentForms, setSelectedConsentForms] = useState([]);
+    // Custom hook for note types
+    const {
+        options: notesTypeOptions,
+        isLoading: notesLoading,
+        error: notesError
+    } = useNotesTypes();
 
+    // Load note types on component mount
+    useEffect(() => {
+        const clinicId = store?.Auth?.user?.clinicId;
+        if (clinicId && !notesTypeOptions.length && !notesLoading) {
+            dispatch(getNoteCategoriesAction({
+                search: '',
+                skip: 1,
+                limit: 10,
+                clinicId,
+                active: true,
+                noteType: ''
+            }));
+        }
+    }, [dispatch, notesTypeOptions.length, notesLoading, store?.Auth?.user?.clinicId]);
+
+    // Appointment integration
+    const { getAppointmentBasedDefaults, getAppointmentFieldPopulation } = useAppointmentIntegration();
+
+    // Field population hook
+    const {
+        populatedFields,
+        populatedFieldIds,
+        setPopulatedFields,
+        setPopulatedFieldIds,
+        removePopulatedData,
+        markPopulatedDataComplete
+    } = useFieldPopulation();
 
     // Redux state selectors
     const notesFields = store?.getSettingsTabsReducer?.data?.data?.displaySettings?.mainPanel?.[0]?.sections;
@@ -62,20 +97,57 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
     const createSuccess = store?.createEncounterReducer?.data?.status;
     const updateSuccess = store?.updateEncounterReducer?.data?.status;
     const consentDocuments = store?.getAllConsentReducer?.data?.data;
-    // Custom hook for note types with search functionality
-    const {
-        options: notesTypeOptions,
-        isLoading: notesLoading,
-        error: notesError,
-        handleSearch: handleNotesSearch,
-        refresh: refreshNotesTypes
-    } = useNotesTypes('', {
-        debounceMs: 300,
-        limit: 25,
-        enableCache: true
-    });
+    const appointmentsData = store?.getAppointmentByPatientIdReducer?.data?.appointments || [];
 
-    // Effect hooks
+    // Component state
+    const [selectedNoteType, setSelectedNoteType] = useState(null);
+    const [notesTypeModal, setNotesTypeModal] = useState(false);
+    const [pendingNoteType, setPendingNoteType] = useState(null);
+    const [attachedRecords, setAttachedRecords] = useState([]);
+    const [uploadLoading, setUploadLoading] = useState(false);
+    const [accordionState, setAccordionState] = useState({});
+    const [selectedConsentForms, setSelectedConsentForms] = useState([]);
+    const [selectedAppointment, setSelectedAppointment] = useState(appointmentData || null);
+    const [internalScrollToAccordion, setInternalScrollToAccordion] = useState(null);
+
+    // Global function for summary section
+    useEffect(() => {
+        window.populateEncounterField = (fieldName, content) => {
+            if (fieldName && content) {
+                setPopulatedFields(prev => ({
+                    ...prev,
+                    [fieldName]: [...(prev[fieldName] || []), content]
+                }));
+
+                // Find and open the accordion for this field
+                const fieldIndex = notesFields?.findIndex(field => field.name === fieldName);
+                if (fieldIndex !== -1) {
+                    // Expand accordion first
+                    setAccordionState(prev => ({ ...prev, [fieldIndex]: true }));
+
+                    // Enhanced scroll with proper timing - matches clinic panel
+                    setTimeout(() => {
+                        const accordionElement = document.querySelector(`[data-accordion-index="${fieldIndex}"]`);
+                        if (accordionElement) {
+                            accordionElement.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    }, 300); // Allow time for accordion to expand
+                }
+            }
+        };
+
+        return () => {
+            delete window.populateEncounterField;
+        };
+    }, [setPopulatedFields, setAccordionState, notesFields]);
+
+    // Notify parent of populated fields changes
+    useEffect(() => {
+        onPopulatedFieldsChange?.(populatedFields);
+    }, [populatedFields, onPopulatedFieldsChange]);
 
     // Set default note type when options are loaded
     useEffect(() => {
@@ -86,16 +158,20 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
         }
     }, [notesTypeOptions, selectedNoteType, dispatch, encounterById]);
 
-    // Set default values for new encounters
     useEffect(() => {
         if (!encounterById && encounterTypes?.length > 0 && encounterClassCodes?.length > 0) {
-            setValue('type', encounterTypes[0]?.code);
-            setValue('class', encounterClassCodes[0]?.code);
-            setValue('status', 'planned');
-        }
-    }, [encounterById, encounterTypes, encounterClassCodes, setValue]);
+            const appointmentDefaults = getAppointmentBasedDefaults();
 
-    // Populate form with existing encounter data for updates
+            setValue('type', appointmentDefaults.encounterType || encounterTypes[0]?.code);
+            setValue('class', encounterClassCodes[0]?.code);
+            setValue('status', appointmentDefaults.status || 'planned');
+
+            if (appointmentDefaults.startDate) {
+                setValue('startDate', appointmentDefaults.startDate);
+            }
+        }
+    }, [encounterById, encounterTypes, encounterClassCodes, setValue, getAppointmentBasedDefaults]);
+
     useEffect(() => {
         if (encounterById) {
             setValue('type', encounterById?.type?.[0]?.coding?.[0]?.code || '');
@@ -107,15 +183,11 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
                 setSelectedNoteType(encounterById.noteType);
                 dispatch(getSettingsTabAction({ noteId: encounterById.noteType }));
             }
-
-            // Populate form fields and track populated data
             if (encounterById?.data && Array.isArray(encounterById?.data)) {
                 const newPopulatedFields = {};
                 const newPopulatedFieldIds = {};
-
                 encounterById?.data?.forEach(field => {
                     if (field?.type === 'Consent Forms' && consentDocuments?.length > 0) {
-                        // Handle consent forms specially
                         const consentIds = field.populatedData || [];
                         const selectedForms = consentIds
                             .map((consentId) => {
@@ -141,28 +213,87 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
                         newPopulatedFieldIds[field.type] = field.populatedIds;
                     }
                 });
-
                 setPopulatedFields(newPopulatedFields);
                 setPopulatedFieldIds(newPopulatedFieldIds);
             }
-
-            // Populate attached records if they exist
             if (encounterById?.attachedRecords) {
                 setAttachedRecords(encounterById.attachedRecords);
             }
         }
     }, [encounterById, setValue, dispatch, consentDocuments]);
 
-    // Update form fields when template items are selected
     useEffect(() => {
         Object.entries(selectedFromList).forEach(([fieldName, content]) => {
             if (content) {
-                setValue(fieldName, content);
+                const contentItems = content.split('\n').filter(item => item.trim());
+                const existingContent = populatedFields[fieldName] || [];
+                const newItems = contentItems.filter(item => !existingContent.includes(item));
+                if (newItems.length > 0) {
+                    setPopulatedFields(prev => ({
+                        ...prev,
+                        [fieldName]: [...existingContent, ...newItems]
+                    }));
+                    const fieldIndex = notesFields?.findIndex(field => field.name === fieldName);
+                    if (fieldIndex !== -1) {
+                        setAccordionState(prev => ({ ...prev, [fieldIndex]: true }));
+
+                        // Enhanced scroll with proper timing and error handling
+                        setTimeout(() => {
+                            const accordionElement = document.querySelector(`[data-accordion-index="${fieldIndex}"]`);
+                            const scrollContainer = document.querySelector('.scroll-container');
+
+                            if (accordionElement && scrollContainer) {
+                                const elementRect = accordionElement.getBoundingClientRect();
+                                const containerRect = scrollContainer.getBoundingClientRect();
+                                const offset = elementRect.top - containerRect.top + scrollContainer.scrollTop - 20;
+
+                                scrollContainer.scrollTo({
+                                    top: Math.max(0, offset),
+                                    behavior: 'smooth'
+                                });
+                            }
+                        }, 300);
+                    }
+                    setInternalScrollToAccordion(fieldName);
+                }
             }
         });
-    }, [selectedFromList, setValue]);
+    }, [selectedFromList, populatedFields, notesFields, setAccordionState, setPopulatedFields]);
 
-    // Event handlers
+    // Scroll to accordion functionality - matches clinic panel pattern
+    useEffect(() => {
+        if (scrollToAccordion && notesFields) {
+            const soapSections = ['Subjective', 'Objective', 'Assessment', 'Plan'];
+            const targetField = soapSections.includes(scrollToAccordion) ? 'Notes (SOAP)' : scrollToAccordion;
+
+            const accordionIndex = notesFields.findIndex(field =>
+                field.name.toLowerCase().includes(targetField.toLowerCase())
+            );
+            if (accordionIndex !== -1) {
+                // Open the accordion
+                setAccordionState(prev => ({ ...prev, [accordionIndex]: true }));
+
+                // Scroll to the accordion after a short delay
+                setTimeout(() => {
+                    const accordionElement = document.querySelector(`[data-accordion-index="${accordionIndex}"]`);
+                    const scrollContainer = document.querySelector('.scroll-container');
+
+                    if (accordionElement && scrollContainer) {
+                        const elementRect = accordionElement.getBoundingClientRect();
+                        const containerRect = scrollContainer.getBoundingClientRect();
+                        const offset = elementRect.top - containerRect.top + scrollContainer.scrollTop - 20;
+
+                        scrollContainer.scrollTo({
+                            top: Math.max(0, offset),
+                            behavior: 'smooth'
+                        });
+                    }
+                }, 300);
+                // Clear the scroll trigger
+                setInternalScrollToAccordion(null);
+            }
+        }
+    }, [scrollToAccordion, notesFields, setAccordionState]);
 
     // Handle note type selection with confirmation modal
     const handleNoteTypeChange = (selected) => {
@@ -172,7 +303,6 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
         }
     };
 
-    // Confirm note type change and load new fields
     const confirmNoteTypeChange = () => {
         if (pendingNoteType) {
             setSelectedNoteType(pendingNoteType.value);
@@ -192,12 +322,9 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
      * Creates FHIR-compliant encounter payload and dispatches create action
      */
     const onSubmit = (data) => {
-        // Get selected encounter type and class details from datasets
         const selectedEncounterType = encounterTypes?.find(type => type.code === data.type);
         const selectedEncounterClass = encounterClassCodes?.find(cls => cls.code === data.class);
         const currentUser = store?.Auth?.user || {};
-
-        // Process form fields data
         const fieldsData = [];
         const fieldsToRender = (notesFields || [])
             .filter(field => field.isShown)
@@ -208,7 +335,7 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
 
             if (name === 'Notes (SOAP)') {
                 // Handle SOAP notes specially
-                ['Subjective', 'Objective', 'Assessment', 'Plan'].forEach(section => {
+                ['Subjective', 'Objective', 'Assessment', 'Plan', 'Care Plan', 'Notes'].forEach(section => {
                     const value = getValues(section) || '';
                     const fieldData = {
                         type: section,
@@ -256,7 +383,6 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
             }
         });
 
-        // Structure data according to FHIR encounter schema
         const encounterPayload = {
             status: data.status,
             class: {
@@ -284,9 +410,7 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
             data: fieldsData,
             attachedRecords
         };
-
         if (encounterById) {
-            // For update, send only the fields that need to be updated
             const updatePayload = {
                 id: encounterById._id,
                 data: fieldsData,
@@ -301,15 +425,14 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
     useEffect(() => {
         if (createSuccess === 201 || updateSuccess === 200) {
             dispatch(getEncounterAction({ patientId, skip: 1 }));
-            // Reset consent forms after successful save
             setSelectedConsentForms([]);
         }
     }, [createSuccess, updateSuccess, dispatch, patientId]);
 
-    // Load vitals data and consent forms
     useEffect(() => {
         if (patientId) {
             dispatch(getVitalsByPatientIdAction({ limit: 4, patientId }));
+            dispatch(getAppointmentByPatientIdAction({ patientId, status: '', limit: 50, skip: 1 }));
         }
         const clinicId = store?.Auth?.user?.clinicId;
         if (clinicId) {
@@ -317,78 +440,56 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
         }
     }, [dispatch, patientId, store?.Auth?.user?.clinicId]);
 
-
-
-    // Global function to populate encounter fields from EncounterSummary
     useEffect(() => {
-        window.populateEncounterField = (fieldName, data, itemId) => {
-            // Check for duplicates
-            const existingData = populatedFields[fieldName] || [];
-            if (existingData.includes(data)) {
-                ToastHandle('This data has already been added to the related field.', 'danger');
-                return;
-            }
+        if (onPrintRef) {
+            onPrintRef.current = () => {
+                const allFieldsData = {};
+                const allFieldContent = {};
+                const allFieldLabels = {};
+                const fieldsToRender = (notesFields || [])
+                    .filter(field => field.isShown)
+                    .sort((a, b) => a.order - b.order);
 
-            // Track populated data for removal functionality
-            setPopulatedFields(prev => ({
-                ...prev,
-                [fieldName]: [...(prev[fieldName] || []), data]
-            }));
-
-            // Track IDs if provided
-            if (itemId) {
-                setPopulatedFieldIds(prev => ({
-                    ...prev,
-                    [fieldName]: [...(prev[fieldName] || []), itemId]
-                }));
-            }
-
-            // Find and open the accordion for the populated field
-            const fieldIndex = notesFields?.findIndex(field => field.name === fieldName);
-            if (fieldIndex !== -1) {
-                setAccordionState(prev => ({ ...prev, [fieldIndex]: true }));
-
-                // Open accordion and scroll after a short delay
-                setTimeout(() => {
-                    const accordionButton = document.querySelector(`[data-field-name="${fieldName}"] .accordion-button`);
-                    if (accordionButton && accordionButton.classList.contains('collapsed')) {
-                        accordionButton.click();
+                fieldsToRender.forEach(field => {
+                    const { name } = field;
+                    if (name === 'Notes (SOAP)') {
+                        ['Subjective', 'Objective', 'Assessment', 'Plan', 'Care Plan', 'Notes'].forEach(section => {
+                            allFieldsData[section] = populatedFields[section] || [];
+                            allFieldContent[section] = getValues(section) || '';
+                            allFieldLabels[section] = section;
+                        });
+                    } else if (name !== 'Attached Records' && name !== 'Vitals' && !name.toLowerCase().includes('vital')) {
+                        allFieldsData[name] = populatedFields[name] || [];
+                        allFieldContent[name] = getValues(name) || '';
+                        allFieldLabels[name] = name;
                     }
+                });
 
-                    setTimeout(() => {
-                        const accordionElement = document.querySelector(`[data-field-name="${fieldName}"] .accordion-header`);
-                        if (accordionElement) {
-                            accordionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }
-                    }, 100);
-                }, 300);
-            }
-        };
+                const formData = getValues();
+                const encounterData = {
+                    providerId: { name: [{ use: 'official', text: store?.Auth?.user?.name || 'Provider' }] },
+                    period: { start: formData.startDate ? new Date(formData.startDate).toISOString() : new Date().toISOString() },
+                    status: formData.status || 'in-progress',
+                    type: [{ coding: [{ display: encounterTypes?.find(t => t.code === formData.type)?.display || 'Standard Visit' }] }]
+                };
 
-        return () => {
-            delete window.populateEncounterField;
-        };
-    }, [populatedFields, notesFields]);
+                const patientDetails = store?.getPatientsByIdReducer?.data?.data;
+                const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data || [];
 
-    // Function to remove populated data from field
-    const removePopulatedData = (fieldName, dataToRemove) => {
-        const indexToRemove = (populatedFields[fieldName] || []).indexOf(dataToRemove);
-
-        setPopulatedFields(prev => ({
-            ...prev,
-            [fieldName]: (prev[fieldName] || []).filter(item => item !== dataToRemove)
-        }));
-
-        // Remove corresponding ID
-        if (indexToRemove !== -1) {
-            setPopulatedFieldIds(prev => ({
-                ...prev,
-                [fieldName]: (prev[fieldName] || []).filter((_, index) => index !== indexToRemove)
-            }));
+                import('../helpers/printAutopopulatedFields').then(({ handlePrintAutopopulatedFields }) => {
+                    handlePrintAutopopulatedFields({
+                        populatedFields: allFieldsData,
+                        patientDetails,
+                        encounterData,
+                        fieldLabels: allFieldLabels,
+                        fieldContent: allFieldContent,
+                        vitals: patientVitals
+                    });
+                });
+            };
         }
-    };
+    }, [onPrintRef, notesFields, populatedFields, getValues, store?.Auth?.user?.name, store?.getPatientsByIdReducer?.data?.data, store?.getVitalsByPatientIdReducer?.data?.data, encounterTypes]);
 
-    // Initialize accordion state when fields load
     useEffect(() => {
         if (notesFields) {
             const initialState = {};
@@ -399,12 +500,10 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
         }
     }, [notesFields, expandAllAccordions]);
 
-    // File upload handler
     const handleFileUpload = async (files) => {
         const { handleUpload } = await import('helpers/HandleUpload');
         const fileArray = Array.from(files);
         const uploadedFiles = [];
-
         for (const file of fileArray) {
             const uploadResult = await handleUpload(file, setUploadLoading);
             if (uploadResult) {
@@ -414,11 +513,9 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
                 });
             }
         }
-
         setAttachedRecords(prev => [...prev, ...uploadedFiles]);
     };
 
-    // Consent form handlers
     const handleConsentFormChange = (selectedOptions) => {
         setSelectedConsentForms(selectedOptions || []);
     };
@@ -432,11 +529,8 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
     return (
         <div className='bg-in'>
             <Form id="encounter-form" onSubmit={handleSubmit(onSubmit)}>
-                {/* Header Fields Row */}
                 <Row style={{ height: '16vh' }} className="g-2 mt-0 bg-light rounded-top p-1">
-
-                    {/* Encounter Type Field */}
-                    <Col sm={4} className='mt-0'>
+                    <Col sm={3} className='mt-0'>
                         <Form.Group className='encounterHeaderGroup'>
                             <Form.Label className='mb-0 fw-bold small'>
                                 Encounter Type <span className='text-danger'>*</span>
@@ -456,9 +550,7 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
                             )}
                         </Form.Group>
                     </Col>
-
-                    {/* Encounter Class Field */}
-                    <Col sm={4} className='mt-0'>
+                    <Col sm={3} className='mt-0'>
                         <Form.Group className='encounterHeaderGroup'>
                             <Form.Label className='mb-0 fw-bold small'>
                                 Encounter Class <span className='text-danger'>*</span>
@@ -478,9 +570,7 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
                             )}
                         </Form.Group>
                     </Col>
-
-                    {/* Note Type Field */}
-                    <Col sm={4} className='mt-0'>
+                    <Col sm={3} className='mt-0'>
                         <Form.Group className='encounterHeaderGroup'>
                             <Form.Label className='mb-0 fw-bold small'>
                                 Note Type <span className='text-danger'>*</span>
@@ -500,25 +590,37 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
                                 }}
                                 onInputChange={(value, { action }) => {
                                     if (action === 'input-change') {
-                                        handleNotesSearch(value);
+                                        const clinicId = store?.Auth?.user?.clinicId;
+                                        if (clinicId) {
+                                            dispatch(getNoteCategoriesAction({
+                                                search: value,
+                                                skip: 1,
+                                                limit: 25,
+                                                clinicId,
+                                                active: true,
+                                                noteType: ''
+                                            }));
+                                        }
                                     }
                                 }}
                                 filterOption={null}
                                 styles={{
-                                    control: (provided, state) => ({
+                                    control: (provided) => ({
                                         ...provided,
                                         height: '30px',
                                         minHeight: '30px',
-                                        border: `1px solid ${state.isFocused ? '#0d6efd' : 'rgba(186, 185, 185, 0.762)'}`,
+                                        border: '1px solid rgba(186, 185, 185, 0.762)',
                                         background: "white !important",
-                                        boxShadow: state.isFocused ? '0 0 0 0.2rem rgba(13, 110, 253, 0.25)' : 'none',
                                     }),
                                     placeholder: (provided) => ({
                                         ...provided,
                                         fontWeight: 'bold',
                                         fontSize: '12px',
                                         paddingBottom: '5px',
-                                        color: '#6c757d',
+                                    }),
+                                    menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
                                     }),
                                 }}
                                 menuPlacement="auto"
@@ -530,7 +632,19 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
                                     <button
                                         type="button"
                                         className="btn btn-link p-0 ms-1 small text-decoration-underline"
-                                        onClick={refreshNotesTypes}
+                                        onClick={() => {
+                                            const clinicId = store?.Auth?.user?.clinicId;
+                                            if (clinicId) {
+                                                dispatch(getNoteCategoriesAction({
+                                                    search: '',
+                                                    skip: 1,
+                                                    limit: 10,
+                                                    clinicId,
+                                                    active: true,
+                                                    noteType: ''
+                                                }));
+                                            }
+                                        }}
                                     >
                                         Retry
                                     </button>
@@ -543,9 +657,8 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
                             onConfirm={confirmNoteTypeChange}
                         />
                     </Col>
-
                     {/* Start Date Field */}
-                    <Col sm={4} className='mt-0'>
+                    <Col sm={3} className='mt-0'>
                         <Form.Group className='encounterHeaderGroup'>
                             <Form.Label className='mb-0 fw-bold small'>
                                 Start Date <span className='text-danger'>*</span>
@@ -561,9 +674,8 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
                             )}
                         </Form.Group>
                     </Col>
-
                     {/* Status Field */}
-                    <Col sm={4} className='mt-0'>
+                    <Col sm={3} className='mt-0'>
                         <Form.Group className='encounterHeaderGroup'>
                             <Form.Label className='mb-0 fw-bold small'>
                                 Status <span className='text-danger'>*</span>
@@ -583,25 +695,85 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
                             )}
                         </Form.Group>
                     </Col>
-
-                    {/* Provider Field */}
-                    <Col sm={4} className='mt-0'>
+                    <Col sm={3} className='mt-0'>
                         <Form.Group className='encounterHeaderGroup'>
                             <Form.Label className='mb-0 fw-bold small'>Provider</Form.Label>
-                            <Form.Control type='text' value={'Current Provider'} disabled />
+                            <Form.Control
+                                type='text'
+                                value={`${store?.Auth?.user?.name?.family || ''} ${store?.Auth?.user?.name?.given?.[0] || ''}` || 'Current Provider'}
+                                readOnly
+                                style={{ cursor: 'not-allowed' }}
+                            />
+                        </Form.Group>
+                    </Col>
+                    {/* Related Appointment Field */}
+                    <Col sm={3} className='mt-0'>
+                        <Form.Group className='encounterHeaderGroup'>
+                            <Form.Label className='mb-0 fw-bold small'>Related Appointment</Form.Label>
+                            <Select
+                                options={appointmentsData.map(apt => ({
+                                    value: apt._id,
+                                    label: `${apt.appointmentType?.text || apt.appointmentType?.coding?.[0]?.display || 'Appointment'} - ${new Date(apt.start).toLocaleDateString()}`,
+                                    appointment: apt
+                                }))}
+                                value={selectedAppointment ? {
+                                    value: selectedAppointment._id,
+                                    label: `${selectedAppointment.appointmentType?.text || selectedAppointment.appointmentType?.coding?.[0]?.display || 'Appointment'} - ${new Date(selectedAppointment.start).toLocaleDateString()}`,
+                                    appointment: selectedAppointment
+                                } : null}
+                                onChange={(selected) => {
+                                    const appointment = selected?.appointment || null;
+                                    setSelectedAppointment(appointment);
+                                    if (appointment) {
+                                        const relatedAppointmentIndex = notesFields?.findIndex(field => field.name === 'Related Appointment');
+                                        if (relatedAppointmentIndex !== -1) {
+                                            setAccordionState(prev => ({ ...prev, [relatedAppointmentIndex]: true }));
+                                            scrollToEncounterField('Related Appointment');
+                                        }
+                                    }
+                                }}
+                                isSearchable
+                                isClearable
+                                className="basic-single"
+                                classNamePrefix="select"
+                                placeholder="Select appointment..."
+                                styles={{
+                                    control: (provided) => ({
+                                        ...provided,
+                                        height: '30px',
+                                        minHeight: '30px',
+                                        border: '1px solid rgba(186, 185, 185, 0.762)',
+                                        background: "white !important",
+                                    }),
+                                    placeholder: (provided) => ({
+                                        ...provided,
+                                        fontWeight: 'bold',
+                                        fontSize: '12px',
+                                        paddingBottom: '5px',
+                                    }),
+                                    menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                    }),
+                                }}
+                            />
                         </Form.Group>
                     </Col>
                 </Row>
-
-                {/* Dynamic Notes Fields Section */}
                 <Row style={{ height: expanded ? '64vh' : activeHomeKey ? '48vh' : '60vh' }} className="mt-1 scroll-container" >
                     <Col className='' sm={12}>
                         {selectedNoteType ? (
-                            notesFields && Array.isArray(notesFields) && notesFields.length > 0 ? (
+                            store?.getSettingsTabsReducer?.loading ? (
+                                <div className="text-center py-4">
+                                    <div className="spinner-border text-primary" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p className="mt-2 text-muted mb-0">Loading fields...</p>
+                                </div>
+                            ) : notesFields && Array.isArray(notesFields) && notesFields.length > 0 ? (
                                 <NotesFormFields
                                     data={notesFields}
                                     control={control}
-                                    selectedFromList={selectedFromList}
                                     populatedFields={populatedFields}
                                     removePopulatedData={removePopulatedData}
                                     patientDetails={store?.getPatientsByIdReducer?.data?.data}
@@ -615,14 +787,17 @@ const EncounterForm = ({ selectedFromList = {}, expanded, expandAllAccordions, a
                                     expanded={expanded}
                                     encounterData={encounterById}
                                     patientVitals={store?.getVitalsByPatientIdReducer?.data?.data || []}
-                                    consentDocuments={consentDocuments}
-                                    selectedConsentForms={selectedConsentForms}
-                                    setSelectedConsentForms={setSelectedConsentForms}
+                                    externalConsentForms={selectedConsentForms}
+                                    appointmentData={selectedAppointment || appointmentData}
+                                    scrollToAccordion={internalScrollToAccordion}
+                                    setScrollToAccordion={setInternalScrollToAccordion}
                                 />
                             ) : (
                                 <div className="text-center py-4 text-muted">
-                                    <i className="bi bi-file-text fs-2 mb-2 d-block"></i>
-                                    <p className="mb-0">No fields configured for the selected note type.</p>
+                                    <div className="spinner-border text-secondary" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p className="mt-2 mb-0">Loading note fields...</p>
                                 </div>
                             )
                         ) : (

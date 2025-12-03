@@ -9,7 +9,6 @@ import { useSelector } from 'react-redux';
 import { getDoctorsAction, updateDoctorAction } from '../../redux/doctors/actions';
 import { useForm } from 'react-hook-form';
 import us from '../../assets/images/flags/us.jpg';
-import AddressForm from '../apps/Common Pages/AddressForm';
 import { encryptMessage } from '../../cryptoUtils';
 import DoctorAddress from './DoctorAddress';
 
@@ -90,7 +89,6 @@ const PersonalDetails = ({ setActiveTab }) => {
     const submitData = (data, shouldNavigate = false) => {
         const payload = {
             doctorId: updateId,
-            // clinicId: clinicId,
             email: data?.email,
             ...(!updateId ? { password: data?.password } : {}),
             dob: data?.dateOfBirth,
@@ -100,17 +98,15 @@ const PersonalDetails = ({ setActiveTab }) => {
                 text: `${data?.firstName || ''} ${data?.lastName || ''}`.trim(),
                 family: data?.lastName,
                 given: data?.firstName,
-                // prefix: [''],
-                // suffix: [],
             },
             photo: [
                 {
                     contentType: logo?.type || 'image/jpeg',
                     url: logo?.url?.split('?')[0] || logo,
-                    data: logo?.data || null, // Assuming `data` contains base64 or buffer
-                    hash: logo?.hash || null, // You may need to generate or pass the hash
-                    title: logoName || null, // Use `logoName` as the title
-                    creation: new Date(), // Automatically sets the creation date
+                    data: logo?.data || null,
+                    hash: logo?.hash || null,
+                    title: logoName || null,
+                    creation: new Date(),
                 },
             ],
             telecom: [
@@ -234,8 +230,8 @@ const PersonalDetails = ({ setActiveTab }) => {
                                                             },
                                                         })}
                                                         onChange={(e) => {
-                                                            let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
-                                                            if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
+                                                            let rawValue = e.target.value.replace(/\D/g, '');
+                                                            if (rawValue.length > 10) rawValue = rawValue.slice(0, 10);
                                                             const formattedValue = rawValue.replace(
                                                                 /(\d{1,3})(\d{0,3})(\d{0,4})/,
                                                                 (match, p1, p2, p3) => {
@@ -243,14 +239,13 @@ const PersonalDetails = ({ setActiveTab }) => {
                                                                     if (p2) return `(${p1})${p2}`;
                                                                     return `(${p1}`;
                                                                 }
-                                                            ); // Format dynamically as (XXX)XXX-XXXX
-                                                            e.target.value = formattedValue; // Update input value
-                                                            clearErrors('phone'); // Clear validation errors
+                                                            );
+                                                            e.target.value = formattedValue;
+                                                            clearErrors('phone');
                                                         }}
                                                         placeholder="1234-234-234"
                                                         maxLength={14}
                                                         onKeyPress={(event) => {
-                                                            // Only allow numeric characters (0-9)
                                                             if (!/[0-9]/.test(event.key)) {
                                                                 event.preventDefault();
                                                             }
@@ -264,7 +259,6 @@ const PersonalDetails = ({ setActiveTab }) => {
                                         </Form.Group>
                                     </div>
                                 </div>
-
                                 <div className="col-md-6 col-lg-3 col-sm-6 col-12">
                                     <Form.Group className="mb-1">
                                         <Form.Label className="mb-0">Date of Birth</Form.Label>
@@ -288,7 +282,6 @@ const PersonalDetails = ({ setActiveTab }) => {
                                                 setFormData({ ...formData, dateOfBirth: e.target.value });
                                             }}
                                         />
-
                                         {errors.dateOfBirth && (
                                             <span className="text-danger">{errors.dateOfBirth.message}</span>
                                         )}
@@ -330,9 +323,9 @@ const PersonalDetails = ({ setActiveTab }) => {
                                             <option value="" hidden>
                                                 Select Gender
                                             </option>
-                                            <option value="Male">Male</option>
-                                            <option value="Female">Female</option>
-                                            <option value="Other">Other</option>
+                                            {['Male', 'Female', 'Other']?.map((gender, i) => (
+                                                <option value={gender} key={i}>{gender}</option>
+                                            ))}
                                         </Form.Select>
                                         {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
                                     </Form.Group>
@@ -343,8 +336,6 @@ const PersonalDetails = ({ setActiveTab }) => {
                                         <div className="position-relative">
                                             <Form.Control
                                                 type={showPassword ? 'text' : 'password'}
-                                                // onKeyDown={(event) => handleFirstSpace(event, 0)}
-
                                                 onKeyDown={(e) => {
                                                     if (e.key === ' ') {
                                                         e.preventDefault();
@@ -376,7 +367,6 @@ const PersonalDetails = ({ setActiveTab }) => {
                                             <Form.Control
                                                 type={showConfirmPassword ? 'text' : 'password'}
                                                 placeholder="Confirm Password"
-                                                // readOnly={id}
                                                 onCopy={(e) => e.preventDefault()}
                                                 onCut={(e) => e.preventDefault()}
                                                 onChange={(e) => {
@@ -436,7 +426,6 @@ const PersonalDetails = ({ setActiveTab }) => {
                                     </Form.Group>
                                 </div>
                                 <hr className="my-1" />
-                                {/* <AddressForm addresses={demographicAddresses} setAddresses={setDemographicAddresses} /> */}
                                 <DoctorAddress
                                     addresses={personalAddresses}
                                     setAddresses={setPersonalAddresses}

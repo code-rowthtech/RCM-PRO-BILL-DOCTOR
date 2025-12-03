@@ -1,21 +1,7 @@
-import { loggedInUser } from "../../../../../../helpers/loggedInUser";
+import { loggedInUser } from "helpers/loggedInUser";
 
 export const handlePrintEncounters = (encounterData, patientDetails) => {
-    // Safely extract logo URL
-    let logoUrl = '';
-    try {
-        if (loggedInUser?.logo) {
-            if (typeof loggedInUser.logo === 'string') {
-                logoUrl = loggedInUser.logo.split('?')[0];
-            } else if (typeof loggedInUser.logo === 'object' && loggedInUser.logo.url) {
-                logoUrl = loggedInUser.logo.url.split('?')[0];
-            }
-        }
-    } catch (error) {
-        console.warn('Error processing logo:', error);
-        logoUrl = '';
-    }
-
+    const user = loggedInUser();
     const originalContent = document?.body?.innerHTML;
     const printContent = `
          <!DOCTYPE html>
@@ -279,7 +265,7 @@ export const handlePrintEncounters = (encounterData, patientDetails) => {
         </head>
         <body>
             <div class="header">
-            ${logoUrl ? `<img src="${logoUrl}" style="max-height: 60px; margin-bottom: 10px;" alt="Logo" />` : ''}
+            <img src=${user?.logo?.split('?')[0]}/>
                 <h1>Medical Encounter Report</h1>
                 <div class="header-info">
                     <div>
@@ -304,15 +290,15 @@ export const handlePrintEncounters = (encounterData, patientDetails) => {
             ` : ''}
 
              <div class="patient-info">
-                <h2>Provider Information</h2>
+                <h2>Clinic Information</h2>
                 <div class="patient-details">
                     <div class="detail-item">
                         <span class="detail-label">Name</span>
-                        <span class="detail-value">${loggedInUser?.name || encounterData?.providerId?.name?.find((data) => data?.use === 'official')?.text || 'Not available'}</span>
+                        <span class="detail-value">${user?.name || 'Not available'}</span>
                     </div>
                      <div class="detail-item">
                         <span class="detail-label">Email</span>
-                        <span class="detail-value">${loggedInUser?.email || 'Not available'}</span>
+                        <span class="detail-value">${user?.email || 'Not available'}</span>
                     </div>  
                 </div>
             </div>
@@ -351,14 +337,41 @@ export const handlePrintEncounters = (encounterData, patientDetails) => {
             ${encounterData?.data?.length === 0 ?
             '<div class="encounter-section"><div class="section-content">No encounter data available</div></div>'
             :
-            encounterData?.data?.map((section, index) => `
-                <div class="encounter-section">
-                    <h3 class="section-header">${section?.type || 'Section'}</h3>
-                    <div class="section-content">
-                        ${section?.content?.value || 'No content available'}
+            encounterData?.data?.map((section, index) => {
+                const hasPopulatedData = section?.populatedData?.length > 0;
+                const cleanContent = section?.content?.value ? section.content.value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() : '';
+                const hasContent = !!cleanContent;
+                
+                let sectionContent = '';
+                
+                // Add populated data as table
+                if (hasPopulatedData) {
+                    sectionContent += '<table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; background: white; border: 1px solid #e5e7eb;"><thead><tr><th style="border: 1px solid #e5e7eb; padding: 8px; background: #6168d0; color: white; font-weight: 600;">Sr.</th><th style="border: 1px solid #e5e7eb; padding: 8px; background: #6168d0; color: white; font-weight: 600;">Data</th></tr></thead><tbody>';
+                    section.populatedData.forEach((item, idx) => {
+                        sectionContent += `<tr><td style="border: 1px solid #e5e7eb; padding: 8px;">${idx + 1}</td><td style="border: 1px solid #e5e7eb; padding: 8px;">${item}</td></tr>`;
+                    });
+                    sectionContent += '</tbody></table>';
+                }
+                
+                // Add field content
+                if (hasContent) {
+                    sectionContent += `<div style="white-space: pre-line; line-height: 1.5; padding: 8px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px; margin-top: 8px; font-size: 12px; color: #374151;">${section?.content?.value}</div>`;
+                }
+                
+                // Show "No data recorded" if both are empty
+                if (!hasPopulatedData && !hasContent) {
+                    sectionContent = '<div style="text-align: center; color: #6b7280; font-style: italic; padding: 15px;">No data recorded</div>';
+                }
+                
+                return `
+                    <div class="encounter-section">
+                        <h3 class="section-header">${section?.type || 'Section'}</h3>
+                        <div class="section-content">
+                            ${sectionContent}
+                        </div>
                     </div>
-                </div>
-            `).join('')
+                `;
+            }).join('')
         }
 
             <div class="provider-signature">
@@ -375,6 +388,7 @@ export const handlePrintEncounters = (encounterData, patientDetails) => {
     // window.print();
     // document.body.innerHTML = originalContent;
     // window.location.reload();
+
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
         alert('Popup blocked. Please allow popups for this site.');

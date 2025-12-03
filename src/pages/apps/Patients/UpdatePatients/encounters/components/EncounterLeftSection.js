@@ -5,7 +5,7 @@ import SummarySection from './SummarySection';
 import TemplatesSection from './TemplatesSection';
 import PastEncountersSection from './PastEncountersSection';
 
-const EncounterLeftSection = ({ selectedFromList, setSelectedFromList, expanded, activeHomeKey }) => {
+const EncounterLeftSection = ({ selectedFromList, setSelectedFromList, expanded, activeHomeKey, populatedFields = {} }) => {
     const store = useSelector((state) => state);
     const [leftSectionActive, setLeftSectionActive] = useState('Summary');
     const defaultTabs = ['Summary', 'Templates', 'Past Encounters'];
@@ -45,6 +45,7 @@ const EncounterLeftSection = ({ selectedFromList, setSelectedFromList, expanded,
                         <SummarySection
                             activeKey={activeKey}
                             handleToggle={handleToggle}
+                            populatedFields={populatedFields}
                         />
                     )}
                     {leftSectionActive === 'Templates' && (

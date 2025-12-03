@@ -11,8 +11,6 @@ import { useSearchParams } from 'react-router-dom';
 const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], onChange, setIdentifiers, identifiers, licensure, setLicensure }) => {
     const {
         formState: { errors },
-        setValue,
-        watch,
     } = useForm();
     const store = useSelector((state) => state);
     // const [searchParams] = useSearchParams();
@@ -22,14 +20,9 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
     const id = JSON.parse(localStorage.getItem('hyper_user'))?.userId;
     const updateId = id?.replace(/^check/, '');
     const defaultIssuingAuthority = [
-        'NPPES',
-        'CLIA',
-        'State Licensing Authority',
-        'IRS',
-        'CMS',
-        'The Joint Commission',
-        'Other',
+        'CLIA', 'CMS', 'IRS', 'NPPES', 'State Licensing Authority', 'The Joint Commission', 'Other',
     ];
+
     useEffect(() => {
         if (identifiers.length === 0) {
             setIdentifiers(
@@ -39,6 +32,7 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
             );
         }
     }, [defaultIdentifiers, setIdentifiers, identifiers.length]);
+
     useEffect(() => {
         if (licensure.length === 0) {
             setLicensure(
@@ -49,21 +43,12 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
         }
     }, [defaultLicensure, setLicensure, licensure.length]);
 
-    // useEffect(() => {
-    //     onChange?.(identifiers);
-    // }, [identifiers, onChange]);
-
     const addIdentifier = () => {
         setIdentifiers([
             ...identifiers,
             { type: null, number: '', file: null, expiry: '', issuingAuthority: '', system: '', status: '', ennumerationDate: '' },
         ]);
     };
-
-    // const removeIdentifier = (index) => {
-    //     if (index < defaultIdentifiers.length) return; // Prevent removing default identifiers
-    //     setIdentifiers(identifiers.filter((_, i) => i !== index));
-    // };
 
     const removeIdentifier = useCallback((index) => {
         setIdentifiers(prev => prev.filter((_, i) => i !== index));
@@ -97,8 +82,6 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
         }
     };
 
-
-
     // Licensure
     const addLicensure = () => {
         setLicensure([
@@ -106,11 +89,6 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
             { type: null, number: '', file: null, expiry: '', issuingAuthority: '', system: '', ennumerationDate: '', licenseState: '', status: '' },
         ]);
     };
-
-    // const removeLicensure = (index) => {
-    //     if (index < defaultLicensure.length) return; // Prevent removing default identifiers
-    //     setLicensure(licensure.filter((_, i) => i !== index));
-    // };
 
     const removeLicensure = useCallback((index) => {
         setLicensure(prev => prev.filter((_, i) => i !== index));
@@ -144,12 +122,11 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
             console.error('Error during file upload:', error);
         }
     };
+
     useEffect(() => {
         if (doctorDetails) {
             const identifiersWithState = doctorDetails?.identifier?.filter(item => item?.hasOwnProperty('licenseState')) || [];
             const identifiersWithoutState = doctorDetails?.identifier?.filter(item => !item?.hasOwnProperty('licenseState')) || [];
-
-            // Set qualifications data
             const updatedIdentifiers = identifiersWithoutState?.map((item, index) => ({
                 expiry: item?.expiry ? new Date(item?.expiry).toISOString().split('T')[0] : '',
                 file: item?.documents?.[0],
@@ -197,7 +174,6 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                     </h5>
                 </Col>
             </Row>
-            {/* Dynamic Identifier Fields */}
             {identifiers?.map((item, index) => (
                 <Row key={index} className="mb-0">
                     <Col sm={3}>
@@ -208,7 +184,6 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                                 const selectedType = identifierOptions.find((opt) => opt.value === e.target.value);
                                 handleChange(index, 'type', selectedType);
                             }}
-                        // disabled={defaultIdentifiers.some((d) => d.value === item.type?.value)}
                         >
                             <option value="">Select Identifier Type</option>
                             {identifierOptions.map((option) => (
@@ -259,14 +234,6 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                             min={new Date().toISOString().split('T')[0]}
                             onChange={(e) => handleChange(index, 'expiry', e.target.value)}
                         />
-                        {/* {index >= defaultIdentifiers?.length && (
-                            <span
-                                className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
-                                style={{ marginTop: '-29px', right: '9px' }}
-                                onClick={() => removeIdentifier(index)}>
-                                <CiCircleMinus />
-                            </span>
-                        )} */}
                         {identifiers.length > 1 && (
                             <span
                                 className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
@@ -354,7 +321,6 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                                 const selectedType = licensureOptions.find((opt) => opt.value === e.target.value);
                                 handleLicensureChange(index, 'type', selectedType);
                             }}
-                        // disabled={defaultLicensure.some((d) => d.value === item.type?.value)}
                         >
                             <option value="">Select License Type</option>
                             {licensureOptions.map((option) => (
@@ -401,7 +367,7 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                                 <option key={option} value={option}>
                                     {option}
                                 </option>
-                            ))}
+                            ))}scrollToAccordion
                         </Form.Select>
                     </Col>
                     <Col sm={3}>
@@ -411,7 +377,6 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                             value={item?.ennumerationDate || ''}
                             onChange={(e) => handleLicensureChange(index, 'ennumerationDate', e.target.value)}
                             maxLength={10}
-                        // onChange={(e) => handleChange(index, 'number', e.target.value)}
                         />
                     </Col>
                     <Col sm={3}>

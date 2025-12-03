@@ -17,7 +17,6 @@ import {
  */
 
 function* createNoteCategoriesFunction(data) {
-    alert('sdasdasd')
     try {
         yield put({
             type: NotesCategoriesActionTypes.CREATE_NOTE_CATEGORIES_LOADING,
@@ -50,51 +49,6 @@ function* createNoteCategoriesFunction(data) {
     }
 }
 
-// function* getNoteCategoriesFunction(data) {
-//     try {
-//         yield put({
-//             type: NotesCategoriesActionTypes.GET_NOTE_CATEGORIES_LOADING,
-//             payload: {},
-//         });
-//         const response = yield call(getNoteCategoriesApi, data);
-//         console.log(response, '432rf23f')
-//         if (response?.data?.data) {
-//             const decryptedData = JSON.parse(decryptMessage(response.data.data));
-
-//             if (response.status === 200 || response.status === 201) {
-//                 yield put({
-//                     type: NotesCategoriesActionTypes.GET_NOTE_CATEGORIES_SUCCESS,
-//                     payload: { ...decryptedData },
-//                 });
-//             } else {
-//                 console.warn('Unexpected response status:', response.status);
-//                 yield put({
-//                     type: NotesCategoriesActionTypes.GET_NOTE_CATEGORIES_ERROR,
-//                     payload: { message: decryptedData?.message || 'Failed to fetch note categories' },
-//                 });
-//             }
-//         } else {
-//             yield put({
-//                 type: NotesCategoriesActionTypes.GET_NOTE_CATEGORIES_ERROR,
-//                 payload: { message: 'Invalid response format' },
-//             });
-//         }
-//     } catch (error) {
-//         console.error('Error fetching note categories:', error);
-//         const errorMessage = error?.response?.data?.message || error?.message || 'Failed to fetch note categories';
-
-//         yield put({
-//             type: NotesCategoriesActionTypes.GET_NOTE_CATEGORIES_ERROR,
-//             payload: { message: errorMessage },
-//         });
-
-//         // Only show toast for non-search related errors or critical errors
-//         if (!data?.data?.search || error?.response?.status >= 500) {
-//             ToastHandle(errorMessage, 'danger');
-//         }
-//     }
-// }
-
 function* getNoteCategoriesFunction(data) {
     try {
         yield put({
@@ -115,13 +69,13 @@ function* getNoteCategoriesFunction(data) {
             });
         }
     } catch (error) {
-        // ToastHandle(error, 'danger');
         yield put({
             type: NotesCategoriesActionTypes.GET_NOTE_CATEGORIES_ERROR,
             payload: error,
         });
     }
 }
+
 function* updateNoteCategoriesFunction(data) {
     try {
         yield put({
@@ -209,7 +163,6 @@ function* getSettingsTabsFunction(data) {
             });
         }
     } catch (error) {
-        // ToastHandle(error, 'danger');
         yield put({
             type: NotesCategoriesActionTypes.GET_SETTINGS_TABS_ERROR,
             payload: error,
@@ -249,13 +202,6 @@ function* updateSettingsTabsFunction(data) {
         });
     }
 }
-
-// export function* callResetUpdate() {
-//     put({
-//         type: NotesCategoriesActionTypes.RESET_UPDATE_STATUS,
-//         payload: {},
-//     });
-// }
 
 export function* watchCreateNoteCategories() {
     yield takeEvery(NotesCategoriesActionTypes.CREATE_NOTE_CATEGORIES, createNoteCategoriesFunction);

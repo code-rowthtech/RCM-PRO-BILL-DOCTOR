@@ -7,8 +7,6 @@ import { loggedInUser } from 'helpers/loggedInUser';
 import { encryptMessage } from 'cryptoUtils';
 import Spinner from 'constants/Spinner';
 import ToastHandle from 'helpers/ToastMessage';
-
-
 const defaultVitals = [
     { name: 'Temperature', type: 'number', value: '', unit: '°F', code: '8310-5', system: 'http://loinc.org' },
     { name: 'Pulse', type: 'number', value: '', unit: 'bpm', code: '8867-4', system: 'http://loinc.org' },
@@ -119,13 +117,11 @@ export default function VitalsChart({ isAccordionOpen }) {
             if (!vital.value || (vital.type === 'bp' && (!vital.value.systolic || !vital.value.diastolic))) {
                 return;
             }
-
             const error = validateVital(vital);
             if (error) {
                 errors[vital.name] = error;
                 return;
             }
-
             const effectiveDateTime = `${visitDateTime.date}T${visitDateTime.time}:00`;
             const observation = {
                 code: {
@@ -135,7 +131,6 @@ export default function VitalsChart({ isAccordionOpen }) {
                 subject: patientId,
                 createdBy: loggedInUser?._id,
             };
-
             if (vital.type === 'bp') {
                 observation.component = [
                     {
@@ -154,9 +149,7 @@ export default function VitalsChart({ isAccordionOpen }) {
             }
             observations.push(observation);
         });
-
         setValidationErrors(errors);
-
         if (Object.keys(errors).length > 0) {
             ToastHandle('Please fix validation errors', 'danger');
             return;
@@ -166,11 +159,9 @@ export default function VitalsChart({ isAccordionOpen }) {
             ToastHandle('Please enter at least one vital', 'warning');
             return;
         }
-
         observations.forEach((obs) => {
             dispatch(createVitalsAction({ key: encryptMessage(obs) }));
         });
-
         setVitals(defaultVitals);
     };
 
@@ -186,7 +177,6 @@ export default function VitalsChart({ isAccordionOpen }) {
     }, {});
 
     const sortedDates = Object.keys(groupedVitals).sort((a, b) => new Date(b) - new Date(a));
-
     return (
         <div
             className="scroll-container"

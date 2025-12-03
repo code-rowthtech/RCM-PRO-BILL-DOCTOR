@@ -57,7 +57,8 @@ const TemplatesSection = ({ selectedFromList = {}, setSelectedFromList = () => {
         setSelectedFromList(prev => {
             const currentValue = prev[fieldName] || '';
             const newValue = currentValue
-                ? `${currentValue}\n${itemList?.text}`
+                ? `${currentValue}
+${itemList?.text}`
                 : itemList?.text;
             return {
                 ...prev,
@@ -142,11 +143,15 @@ const TemplatesSection = ({ selectedFromList = {}, setSelectedFromList = () => {
                                     <li
                                         key={listIndex}
                                         style={{
-                                            backgroundColor: alreadySelected ? 'rgb(232 240 254 / 61%)' : ''
+                                            backgroundColor: alreadySelected ? 'rgb(232 240 254 / 61%)' : '',
+                                            opacity: alreadySelected ? 0.7 : 1
                                         }}
-                                        onClick={() => handleTemplateItemClick(item, itemList)}
-                                        className={`border-bottom py-1 cursor-pointer list-hover ${alreadySelected ? 'text-muted' : ''
-                                            }`}
+                                        onClick={() => {
+                                            if (!alreadySelected) {
+                                                handleTemplateItemClick(item, itemList);
+                                            }
+                                        }}
+                                        className={`border-bottom py-1 ${alreadySelected ? 'text-muted' : 'cursor-pointer list-hover'}`}
                                     >
                                         {itemList?.text}
                                         {alreadySelected && (

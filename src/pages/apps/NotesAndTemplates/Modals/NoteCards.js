@@ -80,17 +80,15 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
                                         </strong>{' '}
                                     </div>
                                 </div>
-                                {
-                                    <div>
-                                        <i
-                                            className=" mdi mdi-square-edit-outline text-primary fs-4 cursor-pointer"
-                                            title="Edit"
-                                            onClick={() => {
-                                                handleOpenEditModal(note);
-                                            }}
-                                        />
-                                    </div>
-                                }
+                                {<div>
+                                    <i
+                                        className=" mdi mdi-square-edit-outline text-primary fs-4 cursor-pointer"
+                                        title="Edit"
+                                        onClick={() => {
+                                            handleOpenEditModal(note);
+                                        }}
+                                    />
+                                </div>}
                             </div>
                             <hr className="my-0" />
                             <div className="d-flex align-items-center justify-content-between px-2 py-2 border-bottom small">
@@ -120,10 +118,7 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
                                 />
                             </div>
 
-                            <div
-                                className="d-flex align-items-center justify-content-between rounded-bottom  small px-2 py-2"
-                            // style={{ backgroundColor: '#5582E51A' }}
-                            >
+                            <div className="d-flex align-items-center justify-content-between rounded-bottom  small px-2 py-2">
                                 <div className="d-flex align-items-center">
                                     <Form.Check
                                         type="radio"

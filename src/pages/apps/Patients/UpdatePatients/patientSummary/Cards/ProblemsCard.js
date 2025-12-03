@@ -24,10 +24,12 @@ const ProblemsCard = ({ activeKey }) => {
     useEffect(() => {
         dispatch(getProblemsAction({ patientId: patientId }));
     }, [patientId]);
+
     const handleCloseModal = () => {
         setProblemModal(false);
         setSelectedProblem(null);
     };
+
     return (
         <>
             <Card className="h-100 shadow-sm">
@@ -90,12 +92,6 @@ const ProblemsCard = ({ activeKey }) => {
                         </ul>
                     )}
                 </Card.Body>
-                {/* <div
-                    className="fs-6 text-end text-info d-flex align-items-end justify-content-end px-2 pb-1 cursor-pointer text-decoration-underline"
-                onClick={() => setSelectedMainTab('Problem List')}
-                >
-                    Go To Problem List
-                </div> */}
             </Card>
             <ProblemsModal show={problemModal} closeModal={handleCloseModal} problemId={selectedProblem} />
         </>

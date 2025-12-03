@@ -89,7 +89,6 @@ const UpdateIndex = () => {
         }
     }, []);
 
-
     return (
         <div>
             {store?.getPatientsByIdReducer?.loading || !store?.getPatientsByIdReducer?.data?.data ? (

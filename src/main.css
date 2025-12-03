@@ -239,11 +239,28 @@ body {
 }
 
 .scroll-container {
-    overflow-y: auto;
+    overflow-y: auto !important;
+    scroll-behavior: smooth !important;
+    position: relative;
+    contain: layout style paint;
+    will-change: scroll-position;
+    max-height: 100%;
 }
 
 :root {
     overflow: hidden;
+}
+
+/* Prevent viewport shifting during scroll operations */
+html, body {
+    scroll-behavior: auto !important;
+    overflow-x: hidden;
+}
+
+/* Ensure scroll containers handle their own scrolling */
+.scroll-container {
+    contain: layout style paint;
+    will-change: scroll-position;
 }
 
 select.form-control:not([size]):not([multiple]) {
@@ -571,4 +588,15 @@ option {
 
 .encounter-accordion-header .accordion-button {
     background-color: rgba(238, 242, 247, 1) !important;
+}
+
+.encounter-header-buttons {
+    border: none !important;
+    border-radius: 10px;
+    line-height: 10px;
+    font-size: 13px;
+    height: 30px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
