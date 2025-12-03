@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Accordion, Col, Spinner } from 'react-bootstrap';
+import { Accordion, Col, Spinner, Modal } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import './Encounters.css';
@@ -11,6 +11,9 @@ import {
     getVitalsByPatientIdAction
 } from 'redux/actions';
 import { getFamilyGeneticAction, getTobaccooAction } from 'redux/socialHistory/action';
+import AllergyModal from '../../clinicalReview/allergy/AllergyModal';
+import ProblemsModal from '../../clinicalReview/problems/ProblemsModal';
+import MedicationsModal from '../../clinicalReview/medications/MedicationsModal';
 
 // ============================================================================
 // CONSTANTS
@@ -44,6 +47,11 @@ const SummarySection = ({ populatedFields = {} }) => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
+
+    // Modal states
+    const [showAllergyModal, setShowAllergyModal] = useState(false);
+    const [showProblemModal, setShowProblemModal] = useState(false);
+    const [showMedicationModal, setShowMedicationModal] = useState(false);
 
 
 
@@ -143,6 +151,11 @@ const SummarySection = ({ populatedFields = {} }) => {
         return fieldItems.some(item => item.includes(itemText) || itemText.includes(item));
     };
 
+    // Modal handlers
+    const handleAllergyModalClose = () => setShowAllergyModal(false);
+    const handleProblemModalClose = () => setShowProblemModal(false);
+    const handleMedicationModalClose = () => setShowMedicationModal(false);
+
     // ========================================================================
     // RENDER
     // ========================================================================
@@ -196,7 +209,7 @@ const SummarySection = ({ populatedFields = {} }) => {
                                     )}
                                     <div className="row">
                                         <div className="col-12 text-end">
-                                            <small className='text-info cursor-pointer'>Add new allergy</small>
+                                            <small className='text-info cursor-pointer' onClick={() => setShowAllergyModal(true)}>Add new allergy</small>
                                         </div>
                                     </div>
                                 </Accordion.Body>
@@ -258,7 +271,7 @@ const SummarySection = ({ populatedFields = {} }) => {
                                     )}
                                     <div className="row">
                                         <div className="col-12 text-end">
-                                            <small className='text-info cursor-pointer'>Add new problem</small>
+                                            <small className='text-info cursor-pointer' onClick={() => setShowProblemModal(true)}>Add new problem</small>
                                         </div>
                                     </div>
                                 </Accordion.Body>
@@ -312,7 +325,7 @@ const SummarySection = ({ populatedFields = {} }) => {
                                     )}
                                     <div className="row">
                                         <div className="col-12 text-end">
-                                            <small className='text-info cursor-pointer'>Add new medication</small>
+                                            <small className='text-info cursor-pointer' onClick={() => setShowMedicationModal(true)}>Add new medication</small>
                                         </div>
                                     </div>
                                 </Accordion.Body>
@@ -397,6 +410,25 @@ const SummarySection = ({ populatedFields = {} }) => {
                     );
                 })}
             </Accordion>
+
+            {/* Modals */}
+            <AllergyModal 
+                show={showAllergyModal} 
+                closeModal={handleAllergyModalClose} 
+                allergyId={null} 
+            />
+            
+            <ProblemsModal 
+                show={showProblemModal} 
+                closeModal={handleProblemModalClose} 
+                problemId={null} 
+            />
+            
+            <MedicationsModal
+                show={showMedicationModal}
+                closeModal={handleMedicationModalClose}
+                selectedMedication={null}
+            />
         </Col>
     );
 };

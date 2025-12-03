@@ -29,11 +29,7 @@ const AddAllergy = ({ onCancel }) => {
         register,
         handleSubmit,
         formState: { errors },
-        setValue,
-        reset,
-        clearErrors,
         watch,
-        getValues,
     } = useForm();
 
     const onSubmit = (data) => {
@@ -45,7 +41,6 @@ const AddAllergy = ({ onCancel }) => {
         const selectedCategory = category.find((item) => item?.code === data?.category);
         const selectedCriticalityOption = criticality.find((option) => option?.code === data?.criticality);
         const selectedSeverityOption = severityData.find((option) => option?.code === data?.severity);
-
         const payload = {
             patientId: patientId,
             clinicId: clinicId,
@@ -165,9 +160,9 @@ const AddAllergy = ({ onCancel }) => {
                 },
             ],
         };
-
         dispatch(createAllergyAction({ key: encryptMessage(payload) }));
     };
+
     const formattedCodeOption = useMemo(
         () =>
             allergyCode?.map((reason) => ({
@@ -176,6 +171,7 @@ const AddAllergy = ({ onCancel }) => {
             })),
         []
     );
+
     const handleCodeChange = useCallback((selectedOption) => {
         setCode(selectedOption ? selectedOption.value : '');
     }, []);
@@ -199,12 +195,12 @@ const AddAllergy = ({ onCancel }) => {
         },
         [formattedCodeOption]
     );
-    // Manifestation Options
+
     const formattedManifestationOption = useMemo(
         () =>
             manifestationData?.map((reason) => ({
-                value: reason, // The whole object or unique identifier
-                label: reason.display, // What will be displayed in the dropdown
+                value: reason,
+                label: reason.display,
             })),
         [manifestationData]
     );
@@ -233,6 +229,7 @@ const AddAllergy = ({ onCancel }) => {
         },
         [formattedManifestationOption]
     );
+
     const formattedExposurRouteOption = useMemo(
         () =>
             exposureRouteData?.map((reason) => ({
@@ -298,7 +295,6 @@ const AddAllergy = ({ onCancel }) => {
                             )}
                         </Form.Group>
                     </Col>
-
                     <Col sm={4}>
                         <Form.Group className="mb-1">
                             <Form.Label htmlFor="category" className="mb-0">
